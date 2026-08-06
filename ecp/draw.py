@@ -325,6 +325,40 @@ def new_diagram(figsize=(4.2, 4.2)):
     return fig, ax
 
 
+def _reserve_label_room(ax):
+    """Widen the view limits to leave room for the labels *before* they are placed.
+
+    ``ax.margins`` pads around the *data*, and a label is not data: a wide one
+    anchored near the right-hand edge is simply sliced off. The collision gate is
+    blind to this, since a clipped label overlaps nothing.
+
+    Expanding the limits *after* placement would be worse than useless — it
+    rescales the transform the placement was solved against, so labels the gate
+    just certified can drift back together. The room is therefore reserved first,
+    by rendering each pending label once to measure it, and placement then runs
+    against limits that are already final.
+    """
+    reqs = _REQUESTS.get(id(ax), [])
+    if not reqs:
+        return
+    fig = ax.figure
+    fig.canvas.draw()
+    rend = fig.canvas.get_renderer()
+    w = h = 0.0
+    for req in reqs:                       # measure, then discard the probe
+        probe = ax.annotate(req["text"], (0.0, 0.0), fontsize=req["fontsize"])
+        bb = probe.get_window_extent(renderer=rend)
+        w, h = max(w, bb.width), max(h, bb.height)
+        probe.remove()
+    x0, x1 = ax.get_xlim()
+    y0, y1 = ax.get_ylim()
+    sx = (x1 - x0) / max(ax.bbox.width, 1.0)     # data units per display unit
+    sy = (y1 - y0) / max(ax.bbox.height, 1.0)
+    dx, dy = w * sx, h * sy
+    ax.set_xlim(x0 - dx, x1 + dx)
+    ax.set_ylim(y0 - dy, y1 + dy)
+
+
 def finish(ax, pad=0.15, check=True):
     """Equalise aspect, strip the frame, resolve all deferred labels, then run
     the collision gate.
@@ -335,6 +369,10 @@ def finish(ax, pad=0.15, check=True):
     failed `validate.check`: the cell errors and the build fails, so a label on
     an arrow can never ship. Pass ``check=False`` only for a figure with a
     deliberate on-geometry label that cannot be exempted with ``nocheck``.
+
+    The view is then widened to contain the placed labels themselves. Clipping is
+    the one label defect the collision gate is blind to, since a label sliced off
+    at the axes edge overlaps nothing at all.
 
     Parameters
     ----------
@@ -358,6 +396,7 @@ def finish(ax, pad=0.15, check=True):
     ax.set_aspect("equal")
     ax.axis("off")
     ax.margins(pad)
+    _reserve_label_room(ax)
     _resolve_labels(ax)
     if check:
         assert_no_collisions(ax)

@@ -47,7 +47,7 @@ __all__ = [
     # graphs and attention
     "graph_plot", "attention_heatmap",
     # named test matrices
-    "hilbert", "wilkinson", "grcar", "poisson_1d", "poisson_2d",
+    "hilbert", "wilkinson", "gaussian_blur", "grcar", "poisson_1d", "poisson_2d",
     "random_with_condition", "random_spd", "low_rank_plus_noise",
     # cost model
     "flops", "cost_table",
@@ -1010,6 +1010,38 @@ def wilkinson(n):
     A[np.tril_indices(n, -1)] = -1.0
     A[:, -1] = 1.0
     return A
+
+
+def gaussian_blur(n, width=0.03):
+    """The 1-D Gaussian convolution operator on ``n`` equispaced points of [0, 1].
+
+    The course's standard *ill-posed* problem, as opposed to the merely
+    ill-conditioned ones above. Row ``i`` samples the kernel
+    ``exp(-(t_i - t_j)^2 / 2w^2) / (w sqrt(2 pi))`` at the midpoint grid
+    ``t_i = (i + 1/2)/n`` and multiplies by the quadrature weight ``h = 1/n``, so
+    ``A @ x`` is the trapezoid-free midpoint rule for the convolution and every
+    row sums to 1 to graphical accuracy. The matrix is symmetric, Toeplitz, and
+    its singular values decay *exponentially* rather than algebraically, which is
+    what separates an ill-posed problem from a hard one: no amount of precision
+    recovers the components below the noise, because the forward map genuinely
+    destroyed them.
+
+    Parameters
+    ----------
+    n : int
+        Number of grid points; the matrix is ``(n, n)``.
+    width : float, default 0.03
+        Standard deviation of the kernel, in units of the domain [0, 1]. Wider
+        kernels blur more and decay faster, so ``kappa`` grows with ``width``.
+
+    Returns
+    -------
+    numpy.ndarray, shape (n, n)
+        The blur matrix in float64.
+    """
+    t = (np.arange(n) + 0.5) / n
+    d = t[:, None] - t[None, :]
+    return np.exp(-0.5 * (d / width) ** 2) / (width * np.sqrt(2.0 * np.pi)) / n
 
 
 def grcar(n, k=3):
