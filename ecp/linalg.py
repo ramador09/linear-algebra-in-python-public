@@ -119,11 +119,26 @@ def matrix_heatmap(ax, A, *, title=None, annotate=None, cmap="PuOr_r",
                 colour = "white" if abs(v) > 0.62 * m else INK
                 ax.text(j, i, fmt.format(v), ha="center", va="center",
                         fontsize=fontsize, color=colour)
-    ax.set_xticks(range(A.shape[1]))
-    ax.set_yticks(range(A.shape[0]))
+    # Label every index only while the labels still fit; past ~16 they collide
+    # into an unreadable smear, so thin them to a round stride and keep the last
+    # index, which is the one a reader checks the matrix's size against.
+    def _ticks(n):
+        if n <= 16:
+            return list(range(n))
+        stride = next(s for s in (2, 5, 10, 20, 50, 100) if n / s <= 16)
+        t = list(range(0, n, stride))
+        if n - 1 - t[-1] >= stride / 2:      # else the final pair would collide
+            t.append(n - 1)
+        return t
+
+    ax.set_xticks(_ticks(A.shape[1]))
+    ax.set_yticks(_ticks(A.shape[0]))
     ax.set_xticks(np.arange(-0.5, A.shape[1], 1), minor=True)
     ax.set_yticks(np.arange(-0.5, A.shape[0], 1), minor=True)
-    ax.grid(which="minor", color=PANEL, linewidth=0.8)
+    if max(A.shape) <= 40:                # cell borders swamp a large matrix
+        ax.grid(which="minor", color=PANEL, linewidth=0.8)
+    else:
+        ax.grid(which="minor", visible=False)
     ax.grid(which="major", visible=False)
     ax.tick_params(which="minor", length=0)
     if title:
