@@ -7,7 +7,7 @@ title: "Linear Algebra in Python: A Notebook Course in Matrices, Algorithms, and
 authors:
   - family-names: Amador
     given-names: Raymond
-version: 1.0.0
+version: 1.1.0
 date-released: "2026-08-07"
 url: "https://ramador.me/linear-algebra-in-python-public/"
 repository-code: "https://github.com/ramador09/linear-algebra-in-python"

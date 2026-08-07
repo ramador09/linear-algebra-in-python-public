@@ -1,12 +1,27 @@
 {
   "title": "Linear Algebra in Python: A Notebook Course in Matrices, Algorithms, and Learning",
   "upload_type": "lesson",
-  "description": "<p>A complete linear-algebra course in 47 executable notebooks: a Prologue, nine volumes (the machine, matrices, orthogonality, eigenvalues, the SVD, numerical linear algebra, structured matrices, tensors, and the linear algebra of machine learning — through attention, LoRA, and where linear algebra stops), and an Epilogue that closes the Prologue's question. Every notebook executes in CI with validation gates; roughly 1,100 checks distinguish what the mathematics determines from what the machine chooses.</p><p>Read the course at <a href=\"https://ramador.me/linear-algebra-in-python-public/\">ramador.me/linear-algebra-in-python-public</a>. This archive captures the runnable, solution-stripped public mirror. Text is licensed CC BY 4.0; code cells are MIT.</p>",
-  "creators": [{"name": "Amador, Raymond"}],
-  "license": "cc-by-4.0",
-  "keywords": ["linear algebra", "numerical linear algebra", "python", "numpy", "machine learning", "scientific computing"],
-  "related_identifiers": [
-    {"relation": "isSupplementTo", "identifier": "https://ramador.me/linear-algebra-in-python-public/", "scheme": "url"}
+  "description": "<p>A complete linear-algebra course in 50 executable notebooks: a Prologue, nine volumes (the machine, matrices, orthogonality, eigenvalues, the SVD, numerical linear algebra, structured matrices, tensors, and the linear algebra of machine learning — through attention, LoRA, and where linear algebra stops), and an Epilogue that closes the Prologue's question. Every notebook executes in CI with validation gates; roughly 1,100 checks distinguish what the mathematics determines from what the machine chooses.</p><p>Read the course at <a href=\"https://ramador.me/linear-algebra-in-python-public/\">ramador.me/linear-algebra-in-python-public</a>. This archive captures the runnable, solution-stripped public mirror. Text is licensed CC BY 4.0; code cells are MIT.</p>",
+  "creators": [
+    {
+      "name": "Amador, Raymond"
+    }
   ],
-  "version": "1.0.0"
+  "license": "cc-by-4.0",
+  "keywords": [
+    "linear algebra",
+    "numerical linear algebra",
+    "python",
+    "numpy",
+    "machine learning",
+    "scientific computing"
+  ],
+  "related_identifiers": [
+    {
+      "relation": "isSupplementTo",
+      "identifier": "https://ramador.me/linear-algebra-in-python-public/",
+      "scheme": "url"
+    }
+  ],
+  "version": "1.1.0"
 }
