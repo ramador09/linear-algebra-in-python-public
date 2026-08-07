@@ -32,7 +32,7 @@ SERIES_SUBTITLE = "A Notebook Course in Matrices, Algorithms, and Learning"
 AUTHOR = "Raymond Amador"
 
 # Bumped by tools/bump_version.py / edited by hand; shown in every header.
-SERIES_VERSION = "1.1.0"
+SERIES_VERSION = "1.2.0"
 
 # Refined editorial / scientific-manuscript palette.
 # Deep ink + warm amber accent on a faint parchment panel. Deliberately not

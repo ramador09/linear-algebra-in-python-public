@@ -5,7 +5,7 @@ Before the first matrix, three notebooks about the thing that will hold it.
 A vector in a lecture is an element of a vector space. A vector in a Python
 session is a contiguous block of bytes with a shape attached, a rule for reading
 strides out of that block, and a floating-point format that cannot represent
-one tenth. Every result in the remaining eight chapters is produced by that
+one tenth. Every result in the remaining nine chapters is produced by that
 object, so it is worth knowing what it can and cannot do before asking it to
 diagonalise anything.
 
