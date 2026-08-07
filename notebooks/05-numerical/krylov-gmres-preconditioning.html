@@ -1,0 +1,1429 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/05-numerical/krylov-gmres-preconditioning.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: §5.4 ended with a diagnosis: CG’s speed is set by how well a polynomial can cover the spectrum, and clustering the spectrum is the game. T..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: §5.4 ended with a diagnosis: CG’s speed is set by how well a polynomial can cover the spectrum, and clustering the spectrum is the game. T..." />
+
+    <title>5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/05-numerical/krylov-gmres-preconditioning';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/05-numerical/krylov-gmres-preconditioning.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="5.6 Multigrid: The O(n) Solver" href="multigrid.html" />
+    <link rel="prev" title="5.4 Stationary Iterations and Conjugate Gradients" href="stationary-and-cg.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter V — Numerical Linear Algebra</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/05-numerical/krylov-gmres-preconditioning.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/05-numerical/krylov-gmres-preconditioning.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/05-numerical/krylov-gmres-preconditioning.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/05-numerical/krylov-gmres-preconditioning.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-subspace-and-why-its-raw-basis-is-unusable">The subspace, and why its raw basis is unusable</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arnoldi-lanczos-ritz">Arnoldi, Lanczos, Ritz</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gmres">GMRES</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#preconditioning">Preconditioning</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-the-raw-krylov-basis-destroys-itself">Exercise 1: The raw Krylov basis destroys itself</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-arnoldi-the-basis-done-right">Exercise 2: Arnoldi: the basis done right</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-lanczos-the-shortcut-and-its-famous-bill">Exercise 3: Lanczos: the shortcut and its famous bill</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-ritz-values-fan-onto-the-spectrum">Exercise 4: Ritz values fan onto the spectrum</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-gmres-least-squares-in-the-subspace">Exercise 5: GMRES: least squares in the subspace</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-preconditioning-clustering-a-spectrum-on-purpose">Exercise 6: Preconditioning: clustering a spectrum on purpose</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="krylov-subspaces-arnoldi-lanczos-gmres-and-preconditioning">
+<h1>5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning<a class="headerlink" href="#krylov-subspaces-arnoldi-lanczos-gmres-and-preconditioning" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter V — Numerical Linear Algebra
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;5.5
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">The subspace CG built implicitly becomes the explicit object: Arnoldi orthogonalizes it, Lanczos shortens the recurrence and pays in lost orthogonality, GMRES solves nonsymmetric systems in it — and preconditioning, the craft of clustering a spectrum on purpose, decides whether any of it is fast.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;advanced&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;120–150 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="stationary-and-cg.html"><span class="std std-doc">§5.4</span></a> ended with a diagnosis: CG’s speed is set
+by how well a polynomial can cover the spectrum, and clustering the
+spectrum is the game. This closing notebook of Chapter V makes the machinery
+explicit. The Krylov subspace’s <em>raw</em> basis
+<span class="math notranslate nohighlight">\(\{b, Ab, A^2b, \dots\}\)</span> is measured first and found catastrophically
+ill-conditioned (<span class="math notranslate nohighlight">\(\kappa &gt; 10^{12}\)</span> by dimension 20 — power iteration
+aligning every column with the dominant eigenvector). <strong>Arnoldi</strong> fixes it
+by orthogonalizing as it goes, producing the relation
+<span class="math notranslate nohighlight">\(AQ_k = Q_{k+1}\tilde H_k\)</span> that everything downstream lives on:
+<strong>Lanczos</strong> (Arnoldi on a symmetric matrix, where <span class="math notranslate nohighlight">\(H\)</span> turns tridiagonal and
+a famous instability appears), <strong>Ritz values</strong> (eigenvalue estimates that
+fan onto the true spectrum from the extremes inward), and <strong>GMRES</strong> — the
+nonsymmetric workhorse that turns the Hessenberg system into a small least
+squares and inherits a monotone residual by construction.</p>
+<p>The finale is the craft the whole chapter has been building toward:
+<strong>preconditioning</strong> the convection–diffusion matrix. Jacobi does exactly
+nothing here (constant diagonal — a pure rescaling, measured as such), an
+incomplete LU at drop tolerance <span class="math notranslate nohighlight">\(10^{-1}\)</span> pulls the complex fan of
+eigenvalues into a loose cloud around 1, and at <span class="math notranslate nohighlight">\(10^{-3}\)</span> into a tight
+cluster — with iteration counts falling 56 → 31 → 4. The restart penalty
+is measured at both of its sizes: a factor 2.2 on this right-half-plane
+spectrum, and a factor 75 on the indefinite one — with a library trap
+caught on the way (<code class="docutils literal notranslate"><span class="pre">scipy</span></code>’s <code class="docutils literal notranslate"><span class="pre">restart=None</span></code> silently means GMRES(20), so a
+naive “full” run compares the restarted method with itself). And <code class="docutils literal notranslate"><span class="pre">minres</span></code>
+sits out the nonsymmetric comparison for a stated
+reason: it requires symmetry, so it meets the symmetric-indefinite system
+CG cannot touch instead. Right method, right structure — the chapter’s
+closing sentence.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> Saad <span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id18" title="Yousef Saad. Iterative Methods for Sparse Linear Systems. SIAM, Philadelphia, 2 edition, 2003. doi:10.1137/1.9780898718003.">Saa03</a>]</span> Chapters 6–10 is the reference;
+GMRES is Saad and Schultz <span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id25" title="Youcef Saad and Martin H. Schultz. GMRES: a generalized minimal residual algorithm for solving nonsymmetric linear systems. SIAM Journal on Scientific and Statistical Computing, 7(3):856–869, 1986. doi:10.1137/0907058.">SS86</a>]</span>; Trefethen and Bau
+<span class="bibtex-citation" id="id3">[<a class="reference internal" href="#id13" title="Lloyd N. Trefethen and David Bau, III. Numerical Linear Algebra. SIAM, Philadelphia, 1997. doi:10.1137/1.9780898719574.">TB97</a>]</span> Lectures 33–35 for Arnoldi and Lanczos; Golub and
+Van Loan <span class="bibtex-citation" id="id4">[<a class="reference internal" href="#id14" title="Gene H. Golub and Charles F. Van Loan. Matrix Computations. Johns Hopkins University Press, Baltimore, 4 edition, 2013.">GVL13</a>]</span> Chapters 10–11. The nonsymmetric model problem
+is a convection–diffusion matrix — <a class="reference internal" href="sparse-matrices.html"><span class="std std-doc">§5.3</span></a>’s
+Poisson operator plus a first-derivative term strong enough
+(<span class="math notranslate nohighlight">\(c = 1.4\)</span>) to push the spectrum off the real axis.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="the-subspace-and-why-its-raw-basis-is-unusable">
+<h3>The subspace, and why its raw basis is unusable<a class="headerlink" href="#the-subspace-and-why-its-raw-basis-is-unusable" title="Link to this heading">#</a></h3>
+<p>Everything a matvec-only method can know after <span class="math notranslate nohighlight">\(k\)</span> steps lives in the
+Krylov subspace
+<span class="math notranslate nohighlight">\(\mathcal{K}_k = \operatorname{span}\{b, Ab, \dots, A^{k-1}b\}\)</span>. But the
+columns of the raw Krylov matrix align exponentially fast with the dominant
+eigenvector — each multiplication <em>is</em> a power-iteration step
+(<a class="reference internal" href="eigenvalue-algorithms.html"><span class="std std-doc">§5.2</span></a>) — so its condition number explodes
+and the basis is numerically useless long before <span class="math notranslate nohighlight">\(k\)</span> reaches interesting
+sizes. The subspace is fine; the basis is not.</p>
+</section>
+<section id="arnoldi-lanczos-ritz">
+<h3>Arnoldi, Lanczos, Ritz<a class="headerlink" href="#arnoldi-lanczos-ritz" title="Link to this heading">#</a></h3>
+<p><strong>Arnoldi</strong> builds an orthonormal basis <span class="math notranslate nohighlight">\(Q_k\)</span> of <span class="math notranslate nohighlight">\(\mathcal{K}_k\)</span> by
+Gram–Schmidt against all previous vectors, recording coefficients in an
+upper-Hessenberg <span class="math notranslate nohighlight">\(\tilde H_k \in \mathbb{R}^{(k+1)\times k}\)</span>:</p>
+<div class="math notranslate nohighlight" id="equation-eq-kry-arnoldi">
+<span class="eqno">(239)<a class="headerlink" href="#equation-eq-kry-arnoldi" title="Link to this equation">#</a></span>\[AQ_k = Q_{k+1}\tilde H_k, \qquad Q_k^{\top}Q_k = I .\]</div>
+<p>For symmetric <span class="math notranslate nohighlight">\(A\)</span> the Hessenberg matrix is forced tridiagonal and the full
+recurrence collapses to three terms — <strong>Lanczos</strong> — but the shortcut has a
+price, found by Paige: once the leading Ritz value converges, orthogonality
+against the early basis vectors is lost, and it fails <em>fast</em>. The
+eigenvalues <span class="math notranslate nohighlight">\(\theta_i\)</span> of <span class="math notranslate nohighlight">\(H_k\)</span> (<strong>Ritz values</strong>) are Rayleigh quotients,
+so they live inside <span class="math notranslate nohighlight">\([\lambda_{\min}, \lambda_{\max}]\)</span> and converge to the
+extreme eigenvalues first — the fan this notebook draws.</p>
+</section>
+<section id="gmres">
+<h3>GMRES<a class="headerlink" href="#gmres" title="Link to this heading">#</a></h3>
+<p>Minimize the residual over the subspace: with <span class="math notranslate nohighlight">\(x_k = Q_ky\)</span>,</p>
+<div class="math notranslate nohighlight" id="equation-eq-kry-gmres">
+<span class="eqno">(240)<a class="headerlink" href="#equation-eq-kry-gmres" title="Link to this equation">#</a></span>\[\min_{y}\,\bigl\lVert b - AQ_ky \bigr\rVert
+= \min_{y}\,\bigl\lVert \beta e_1 - \tilde H_k y \bigr\rVert,
+\qquad \beta = \lVert b\rVert,\]</div>
+<p>a <span class="math notranslate nohighlight">\((k{+}1)\times k\)</span> least squares (<a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html"><span class="std std-doc">§2.3</span></a>’s
+machinery, miniaturized). Because <span class="math notranslate nohighlight">\(\mathcal{K}_k \subset \mathcal{K}_{k+1}\)</span>
+the minimum can only fall: GMRES residuals are <strong>non-increasing by
+construction</strong>. Full GMRES stores all of <span class="math notranslate nohighlight">\(Q_k\)</span>; GMRES(<span class="math notranslate nohighlight">\(m\)</span>) restarts every
+<span class="math notranslate nohighlight">\(m\)</span> steps to cap memory, discarding subspace — a penalty that ranges from
+nothing to fatal depending on the spectrum.</p>
+</section>
+<section id="preconditioning">
+<h3>Preconditioning<a class="headerlink" href="#preconditioning" title="Link to this heading">#</a></h3>
+<p>Solve <span class="math notranslate nohighlight">\(M^{-1}Ax = M^{-1}b\)</span> with <span class="math notranslate nohighlight">\(M \approx A\)</span> but cheap to apply. The
+iteration then sees the spectrum of <span class="math notranslate nohighlight">\(M^{-1}A\)</span>, and the craft is choosing
+<span class="math notranslate nohighlight">\(M\)</span> to cluster it near 1:</p>
+<div class="math notranslate nohighlight" id="equation-eq-kry-precond">
+<span class="eqno">(241)<a class="headerlink" href="#equation-eq-kry-precond" title="Link to this equation">#</a></span>\[M = \operatorname{diag}(A) \;\text{(Jacobi)}, \qquad
+M = \tilde L\tilde U \;\text{(incomplete LU: factor, drop small entries)},\]</div>
+<p>with the drop tolerance trading setup cost against clustering quality.
+A constant diagonal makes Jacobi a pure rescaling — spectra and iteration
+counts provably untouched — which <a class="reference internal" href="stationary-and-cg.html"><span class="std std-doc">§5.4</span></a>’s
+assistant exercise already anticipated.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data only: the convection-diffusion and Poisson operators and the seeded
+rng. Arnoldi, GMRES and the preconditioners are all built in the
+exercises, where they are the lesson.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse.linalg</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">spla</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random array below comes from this seed</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+
+<span class="c1"># The nonsymmetric model problem: convection-diffusion on a 20x20 grid.</span>
+<span class="c1"># Diffusion is 5.3&#39;s Poisson stencil; convection strength c = 1.4 makes the</span>
+<span class="c1"># 1-D blocks&#39; off-diagonal product negative, pushing eigenvalues off the</span>
+<span class="c1"># real axis (a genuinely complex spectrum, drawn in Exercise 6).</span>
+<span class="n">N_GRID</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">N_UNK</span> <span class="o">=</span> <span class="n">N_GRID</span> <span class="o">*</span> <span class="n">N_GRID</span>
+<span class="n">CONV</span> <span class="o">=</span> <span class="mf">1.4</span>
+<span class="n">T1</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">([</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">N_GRID</span><span class="p">,</span> <span class="n">N_GRID</span><span class="p">))</span>
+<span class="n">C1</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">([</span><span class="o">-</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">CONV</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">CONV</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+              <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">N_GRID</span><span class="p">,</span> <span class="n">N_GRID</span><span class="p">))</span>
+<span class="n">I1</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">N_GRID</span><span class="p">)</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">C1</span><span class="p">,</span> <span class="n">I1</span><span class="p">)</span> <span class="o">+</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">I1</span><span class="p">,</span> <span class="n">T1</span><span class="p">))</span>   <span class="c1"># nonsymmetric</span>
+<span class="n">P</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">T1</span><span class="p">,</span> <span class="n">I1</span><span class="p">)</span> <span class="o">+</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">I1</span><span class="p">,</span> <span class="n">T1</span><span class="p">))</span>   <span class="c1"># symmetric (Poisson)</span>
+
+<span class="n">b</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">(</span><span class="n">N_UNK</span><span class="p">)</span>
+<span class="n">NORM_B</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+<span class="n">NORM_A2</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">toarray</span><span class="p">(),</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">NORM_P2</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">toarray</span><span class="p">(),</span> <span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-the-raw-krylov-basis-destroys-itself">
+<h2>Exercise 1: The raw Krylov basis destroys itself<a class="headerlink" href="#exercise-1-the-raw-krylov-basis-destroys-itself" title="Link to this heading">#</a></h2>
+<p>Before building the good basis, measure why the obvious one fails.</p>
+<p><strong>Part a)</strong> Form the Krylov matrix <span class="math notranslate nohighlight">\(K_k = [\,\hat b, \widehat{Ab},
+\widehat{A^2b}, \dots\,]\)</span> with each column normalized to unit length
+(normalization is free and does not help — the failure is <em>direction</em>, not
+scale). Use a loop of <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">&#64;</span> <span class="pre">v</span></code> products from <code class="docutils literal notranslate"><span class="pre">b</span></code>, up to <span class="math notranslate nohighlight">\(k = 25\)</span> columns.</p>
+<p><strong>Part b)</strong> Compute <span class="math notranslate nohighlight">\(\kappa(K_k)\)</span> with <code class="docutils literal notranslate"><span class="pre">np.linalg.cond</span></code> for
+<span class="math notranslate nohighlight">\(k = 5, 10, 15, 20, 25\)</span>. The growth is exponential — each matvec is a
+power-iteration step (<a class="reference internal" href="eigenvalue-algorithms.html"><span class="std std-doc">§5.2</span></a>) pulling every
+column toward the dominant eigenvector — and by <span class="math notranslate nohighlight">\(k = 25\)</span> the basis is
+numerically rank-deficient (<span class="math notranslate nohighlight">\(\kappa\)</span> at the <span class="math notranslate nohighlight">\(1/\varepsilon\)</span> scale).</p>
+<p><strong>Part c)</strong> Gate what mathematics determines: <span class="math notranslate nohighlight">\(\kappa(K_{20}) &gt; 10^{8}\)</span>
+(measured near <span class="math notranslate nohighlight">\(10^{12}\)</span> — the precise value is the machine’s, the
+explosion is the geometry’s), and growth by a factor <span class="math notranslate nohighlight">\(&gt; 10\)</span> over each
+5-column block up to <span class="math notranslate nohighlight">\(k = 20\)</span>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>kappa(K_ 5) = 9.08e+01
+kappa(K_10) = 2.99e+04
+kappa(K_15) = 1.09e+07
+kappa(K_20) = 4.46e+09
+kappa(K_25) = 2.71e+12
+block-to-block growth factors up to k = 20: 329x, 366x, 407x
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the raw Krylov basis is catastrophically ill-conditioned by k = 20   [kappa = 4.5e+09: every matvec is a power-iteration step and the columns align exponentially — the subspace is fine, the basis is not]
+✓  and the conditioning grows by more than 10x per five columns   [factors 329, 366, 407 — exponential in k, which is the geometry&#39;s doing; only its precise size is the machine&#39;s]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-arnoldi-the-basis-done-right">
+<h2>Exercise 2: Arnoldi: the basis done right<a class="headerlink" href="#exercise-2-arnoldi-the-basis-done-right" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-kry-arnoldi">Eq. 239</a> is the identity every Krylov method is built on.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">arnoldi(A,</span> <span class="pre">b,</span> <span class="pre">m,</span> <span class="pre">reorth=False)</span></code>: start from
+<span class="math notranslate nohighlight">\(q_1 = b/\lVert b\rVert\)</span>; at step <span class="math notranslate nohighlight">\(k\)</span> compute <span class="math notranslate nohighlight">\(w = Aq_k\)</span>, subtract
+<span class="math notranslate nohighlight">\(h_{jk} = q_j^{\top}w\)</span> times <span class="math notranslate nohighlight">\(q_j\)</span> for <span class="math notranslate nohighlight">\(j \le k\)</span> (modified Gram–Schmidt),
+set <span class="math notranslate nohighlight">\(h_{k+1,k} = \lVert w\rVert\)</span> and <span class="math notranslate nohighlight">\(q_{k+1} = w/h_{k+1,k}\)</span>. With
+<code class="docutils literal notranslate"><span class="pre">reorth=True</span></code> run the Gram–Schmidt sweep a second time, adding the
+corrections into <span class="math notranslate nohighlight">\(H\)</span> — “twice is enough” (<a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html"><span class="std std-doc">§2.2</span></a>’s
+lesson, now in production).</p>
+<p><strong>Write this one yourself</strong> — every method below is a client of it.</p>
+<p><strong>Part b)</strong> Run 60 reorthogonalized steps on the convection–diffusion
+matrix and gate <a class="reference internal" href="#equation-eq-kry-arnoldi">Eq. 239</a>:
+<span class="math notranslate nohighlight">\(\lVert AQ_{60} - Q_{61}\tilde H_{60}\rVert / \lVert A\rVert_2 &lt; 10^{-11}\)</span>
+and <span class="math notranslate nohighlight">\(\max|Q_{61}^{\top}Q_{61} - I| &lt; 10^{-12}\)</span> (measured: both at
+<span class="math notranslate nohighlight">\(10^{-15}\)</span>).</p>
+<p><strong>Part c)</strong> Confirm the Hessenberg structure exactly: entries of <span class="math notranslate nohighlight">\(H\)</span> below
+the first subdiagonal are <em>structural</em> zeros — never written — so exact
+equality is legitimate, as in <a class="reference internal" href="sparse-matrices.html"><span class="std std-doc">§5.3</span></a>’s format
+checks.</p>
+<p><strong>Part d)</strong> Measure what reorthogonalization buys: the same 60 steps with
+<code class="docutils literal notranslate"><span class="pre">reorth=False</span></code> and the worst entry of <span class="math notranslate nohighlight">\(|Q^{\top}Q - I|\)</span> for both. Single-pass
+MGS drifts (reported); the second pass holds machine level. GMRES will
+shrug this off; eigenvalue work will not — which is why the flag exists.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Arnoldi (reorth) m = 60: relation residual 1.4e-15 (relative to ||A||_2), orthogonality 6.7e-16
+entries below the first subdiagonal are exactly zero: True (structural, never written)
+single-pass MGS at the same m: orthogonality 6.0e-05 — the drift the second sweep removes
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the Arnoldi relation AQ_k = Q_(k+1) H holds to machine level (Eq. 1)   [residual scaled by the 2-norm of A, per the course&#39;s tolerance rules [1.37535e-15 &lt; 1e-11]]
+✓  with Q orthonormal to machine level under reorthogonalization   [twice-is-enough Gram-Schmidt (2.2), now doing production work [6.66134e-16 &lt; 1e-12]]
+✓  and H upper-Hessenberg exactly — structural zeros, the legitimate exact comparison   [entries below the first subdiagonal are never written, like 5.3&#39;s format arrays]
+✓  single-pass MGS measurably drifts by m = 60 (reported, not sized)   [6.0e-05 against 6.7e-16 — GMRES tolerates this; eigenvalue work cannot, which is what the reorth flag is for]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-lanczos-the-shortcut-and-its-famous-bill">
+<h2>Exercise 3: Lanczos: the shortcut and its famous bill<a class="headerlink" href="#exercise-3-lanczos-the-shortcut-and-its-famous-bill" title="Link to this heading">#</a></h2>
+<p>On the <em>symmetric</em> Poisson matrix, Arnoldi’s <span class="math notranslate nohighlight">\(H\)</span> is forced tridiagonal —
+the full Gram–Schmidt secretly reduces to three terms. Run Arnoldi
+unmodified and watch both the tridiagonal structure appear and the
+stability bill arrive.</p>
+<p><strong>Part a)</strong> Run plain (no reorthogonalization) Arnoldi on <code class="docutils literal notranslate"><span class="pre">P</span></code> for
+<span class="math notranslate nohighlight">\(m = 40\)</span> steps. Gate tridiagonality while orthogonality still holds:
+<span class="math notranslate nohighlight">\(\max_{j &gt; i+1} |h_{ij}| / \lVert P\rVert_2 &lt; 10^{-10}\)</span> (measured
+<span class="math notranslate nohighlight">\(10^{-12}\)</span> — the manifest’s absolute <span class="math notranslate nohighlight">\(10^{-13}\)</span>, scaled by the matrix per
+Rule 1, then widened to keep a 100x margin against a different BLAS’s
+rounding path per Rule 8).</p>
+<p><strong>Part b)</strong> Now the bill. Extend to <span class="math notranslate nohighlight">\(m = 120\)</span> and record
+<span class="math notranslate nohighlight">\(\max|Q_k^{\top}Q_k - I|\)</span> at <span class="math notranslate nohighlight">\(k = 10, 20, \dots, 120\)</span>: machine level
+through <span class="math notranslate nohighlight">\(k \approx 40\)</span>, then a cliff — <span class="math notranslate nohighlight">\(10^{-9}\)</span> by 60, order <strong>one</strong> by
+90. This is Paige’s analysis: orthogonality fails <em>when and because</em> the
+leading Ritz pair converges, not gradually. Draw the cliff on a log axis.</p>
+<p><strong>Part c)</strong> Confirm the structural consequence: at <span class="math notranslate nohighlight">\(m = 120\)</span> the computed
+<span class="math notranslate nohighlight">\(H\)</span> is no longer even close to tridiagonal (off-tridiagonal entries at
+<span class="math notranslate nohighlight">\(10^{-1}\lVert P\rVert\)</span> scale — report the value). The three-term recurrence’s
+claim to represent <span class="math notranslate nohighlight">\(A\)</span> in the basis has silently expired; everything from
+<a class="reference internal" href="eigenvalue-algorithms.html"><span class="std std-doc">§5.2</span></a>’s “the algorithm keeps working as the
+premise dies” carries over.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Lanczos m = 40: off-tridiagonal / ||P||_2 = 5.6e-13, orthogonality 1.9e-12
+orthogonality loss: k=10: 3e-15, k=20: 1e-14, k=30: 9e-14, k=40: 1e-12, k=50: 4e-11, k=60: 4e-09, k=70: 7e-07, k=80: 2e-04, k=90: 2e-01, k=100: 3e-01, k=110: 3e-01, k=120: 3e-01
+off-tridiagonal / ||P||_2 at m = 120: 1.3e-01 — the three-term premise has expired
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-kry-paige">
+<img alt="../../_images/452d28aad5da8bfd217091feb8dc87f7c59167ef9034b17860c490343cf7e9e1.png" src="../../_images/452d28aad5da8bfd217091feb8dc87f7c59167ef9034b17860c490343cf7e9e1.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 104 </span><span class="caption-text">Paige’s cliff: the worst entry of <span class="math notranslate nohighlight">\(|Q_k^{\top}Q_k - I|\)</span> for plain Lanczos on the Poisson matrix, against the step count. Orthogonality sits at machine level through <span class="math notranslate nohighlight">\(k \approx 40\)</span>, crosses <span class="math notranslate nohighlight">\(10^{-9}\)</span> near 60, and reaches order one by 90 – not gradual decay but a cliff, triggered when the leading Ritz pair converges. Past the cliff the computed <span class="math notranslate nohighlight">\(H\)</span> is not even approximately tridiagonal (off-tridiagonal entries at the <span class="math notranslate nohighlight">\(10^{-1}\|P\|\)</span> scale), yet the Ritz extremes it produces remain accurate – the recurring Chapter V phenomenon of algorithms outliving their premises.</span><a class="headerlink" href="#fig-kry-paige" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  symmetric input forces H tridiagonal — while orthogonality lasts   [off-tridiagonal at 5.6e-13 of the matrix norm at m = 40, with orthogonality still at machine level: the manifest&#39;s bare 1e-13, scaled by the matrix it forgot (rule 1) [5.609e-13 &lt; 1e-10]]
+✓  and orthogonality holds at m = 40 but is fully lost by m = 120   [1.9e-12 against 3e-01: Paige&#39;s cliff — the loss arrives with Ritz convergence, and its exact onset is the machine&#39;s business (reported, drawn, not sized)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-ritz-values-fan-onto-the-spectrum">
+<h2>Exercise 4: Ritz values fan onto the spectrum<a class="headerlink" href="#exercise-4-ritz-values-fan-onto-the-spectrum" title="Link to this heading">#</a></h2>
+<p>The eigenvalues of <span class="math notranslate nohighlight">\(H_k\)</span> are the subspace’s best guesses at the spectrum,
+and they converge from the outside in.</p>
+<p><strong>Part a)</strong> Run <em>reorthogonalized</em> Arnoldi on <code class="docutils literal notranslate"><span class="pre">P</span></code> (Exercise 3 showed why
+plain Lanczos cannot be trusted past <span class="math notranslate nohighlight">\(k \approx 40\)</span>) and compute Ritz
+values <code class="docutils literal notranslate"><span class="pre">np.linalg.eigvalsh(H[:k,</span> <span class="pre">:k])</span></code> for <span class="math notranslate nohighlight">\(k = 5, 10, \dots, 60\)</span>.</p>
+<p><strong>Part b)</strong> Gate the bracket: every Ritz value lies in
+<span class="math notranslate nohighlight">\([\lambda_{\min} - \tau, \lambda_{\max} + \tau]\)</span> with
+<span class="math notranslate nohighlight">\(\tau = 10^{-10}\lVert P\rVert_2\)</span>, at every <span class="math notranslate nohighlight">\(k\)</span> — Ritz values are Rayleigh
+quotients (<a class="reference internal" href="../03-eigenvalues/spectral-theorem.html"><span class="std std-doc">§3.2</span></a>), so the bracket
+is a theorem.</p>
+<p><strong>Part c)</strong> Gate the convergence at the extremes: at <span class="math notranslate nohighlight">\(k = 60\)</span>,
+<span class="math notranslate nohighlight">\(|\theta_{\max} - \lambda_{\max}| &lt; 10^{-8}\)</span> and
+<span class="math notranslate nohighlight">\(|\theta_{\min} - \lambda_{\min}| &lt; 10^{-8}\)</span> against
+<code class="docutils literal notranslate"><span class="pre">np.linalg.eigvalsh</span></code> of the dense matrix (measured: <span class="math notranslate nohighlight">\(10^{-12}\)</span> — the
+manifest’s tolerance holds with four orders to spare <em>because</em> of the
+reorthogonalization).</p>
+<p><strong>Part d)</strong> Draw the fan: Ritz values against <span class="math notranslate nohighlight">\(k\)</span>, with the true spectrum
+as horizontal rules. The extremes lock on by <span class="math notranslate nohighlight">\(k \approx 30\)</span>; the interior
+fills in last — the same outside-in order that made CG’s polynomial
+argument work in <a class="reference internal" href="stationary-and-cg.html"><span class="std std-doc">§5.4</span></a>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>bracket holds at every k: True
+extreme Ritz errors at k = 60: max 5.8e-13, min 9.7e-13
+  k = 10: theta_max err 1.2e-01, theta_min err 1.2e-01
+  k = 30: theta_max err 4.8e-04, theta_min err 3.9e-04
+  k = 60: theta_max err 5.8e-13, theta_min err 9.7e-13
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-kry-ritz">
+<img alt="../../_images/4ba5c54a730b2d5d13f1f0ad52289a55a441950f96043382b3d1a5172695d754.png" src="../../_images/4ba5c54a730b2d5d13f1f0ad52289a55a441950f96043382b3d1a5172695d754.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 105 </span><span class="caption-text">The Ritz fan: eigenvalue estimates from the <span class="math notranslate nohighlight">\(k\)</span>-step Krylov subspace of the Poisson matrix (dots) against the true spectrum (grey rules), for <span class="math notranslate nohighlight">\(k = 5\)</span> to <span class="math notranslate nohighlight">\(60\)</span>. The extreme eigenvalues lock on first – by <span class="math notranslate nohighlight">\(k \approx 30\)</span> the outermost Ritz values agree with the true extremes to better than <span class="math notranslate nohighlight">\(10^{-3}\)</span>, and to <span class="math notranslate nohighlight">\(10^{-12}\)</span> by <span class="math notranslate nohighlight">\(k = 60\)</span> – while the interior of the spectrum fills in last. This outside-in convergence is the same fact that let 5.4’s CG polynomial kill extreme eigenvalues cheaply, seen from the eigenvalue side.</span><a class="headerlink" href="#fig-kry-ritz" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  every Ritz value lies inside the spectral interval at every k   [Rayleigh quotients cannot leave [lambda_min, lambda_max] (3.2) — the bracket is a theorem, gated with 1e-10*||P|| slack for arithmetic]
+✓  and the extreme Ritz values converge to the true extremes at k = 60   [errors 5.8e-13 and 9.7e-13 against the manifest&#39;s 1e-8 — four orders to spare, bought by reorthogonalization (Exercise 3 shows what happens without it)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-gmres-least-squares-in-the-subspace">
+<h2>Exercise 5: GMRES: least squares in the subspace<a class="headerlink" href="#exercise-5-gmres-least-squares-in-the-subspace" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-kry-gmres">Eq. 240</a> turns Arnoldi’s output into a solver.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">gmres_own(A,</span> <span class="pre">b,</span> <span class="pre">tol)</span></code>: extend the Arnoldi basis one step
+at a time; after step <span class="math notranslate nohighlight">\(k\)</span> solve the small least squares
+<span class="math notranslate nohighlight">\(\min_y \lVert \beta e_1 - \tilde H_k y\rVert\)</span> with <code class="docutils literal notranslate"><span class="pre">np.linalg.lstsq</span></code>,
+record the residual, stop at relative residual <span class="math notranslate nohighlight">\(10^{-11}\)</span> and return
+<span class="math notranslate nohighlight">\(x = Q_ky\)</span>.</p>
+<p><strong>Write this one yourself</strong> — Arnoldi plus six lines.</p>
+<p><strong>Part b)</strong> Gate what the construction promises on the
+convection–diffusion system: the residual sequence is non-increasing (slack
+<span class="math notranslate nohighlight">\(10^{-12}\)</span> for arithmetic), convergence arrives in <strong>59</strong> iterations
+<span class="math notranslate nohighlight">\(\le n = 400\)</span>, and the returned solution matches
+<code class="docutils literal notranslate"><span class="pre">scipy.sparse.linalg.gmres</span></code> (<code class="docutils literal notranslate"><span class="pre">rtol=1e-12</span></code>, <code class="docutils literal notranslate"><span class="pre">restart=n</span></code> — full GMRES; the default <code class="docutils literal notranslate"><span class="pre">restart=None</span></code> silently means GMRES(20), the trap Part c disarms) to <span class="math notranslate nohighlight">\(10^{-9}\)</span>.</p>
+<p><strong>Part c)</strong> The restart experiment, with a library trap. GMRES(<span class="math notranslate nohighlight">\(m\)</span>)
+restarts every <span class="math notranslate nohighlight">\(m\)</span> steps to cap the stored basis — and in
+<code class="docutils literal notranslate"><span class="pre">scipy.sparse.linalg.gmres</span></code>, <code class="docutils literal notranslate"><span class="pre">restart=None</span></code> does <strong>not</strong> mean full GMRES:
+it silently defaults to GMRES(20), so the naive experiment compares the
+restarted method with itself and reports no penalty. Force full GMRES with
+<code class="docutils literal notranslate"><span class="pre">restart=n</span></code>, and the penalty appears: <strong>56</strong> inner iterations full against
+<strong>125</strong> restarted — a factor 2.2 on this benign right-half-plane spectrum.
+Gate the ordering; Exercise 6 shows the same penalty at factor 75 on the
+indefinite system, where discarding the subspace is nearly fatal.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>gmres_own: 59 iterations to 1e-11 (n = 400); residuals non-increasing: True
+gmres_own vs scipy gmres: 1.6e-11 (info = 0)
+scipy inner iterations: full (restart=n) 56, GMRES(20) 125 — a 2.2x restart penalty. Trap: scipy&#39;s restart=None means GMRES(20), not full — the naive experiment compares the restarted method with itself and finds nothing
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  GMRES residuals are non-increasing, by construction (Eq. 2)   [nested subspaces can only lower a minimum; the 1e-12 slack is for arithmetic, not for the theorem]
+✓  with convergence well inside the n-step guarantee   [59 iterations against n = 400 — full GMRES is a direct method wearing an iterative costume]
+✓  and gmres_own matches scipy&#39;s gmres   [two implementations of the same least-squares-in-the-subspace, compared at tight tolerance [1.62951e-11 &lt; 1e-09]]
+✓  and GMRES(20) pays a real restart penalty against true full GMRES   [125 vs 56 inner iterations (2.2x): discarding the subspace costs — and scipy&#39;s restart=None quietly means GMRES(20), a trap that makes the penalty vanish by comparing the restarted method with itself]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-6-preconditioning-clustering-a-spectrum-on-purpose">
+<h2>Exercise 6: Preconditioning: clustering a spectrum on purpose<a class="headerlink" href="#exercise-6-preconditioning-clustering-a-spectrum-on-purpose" title="Link to this heading">#</a></h2>
+<p>The chapter’s closing craft, measured three ways on the
+convection–diffusion system.</p>
+<p><strong>Part a)</strong> Jacobi first — <a class="reference internal" href="#equation-eq-kry-precond">Eq. 241</a> with
+<span class="math notranslate nohighlight">\(M = \operatorname{diag}(A) = 4I\)</span>. A constant diagonal makes <span class="math notranslate nohighlight">\(M^{-1}A\)</span> a
+pure rescaling of <span class="math notranslate nohighlight">\(A\)</span>: gate <span class="math notranslate nohighlight">\(\kappa\)</span> unchanged (to <span class="math notranslate nohighlight">\(10^{-8}\)</span> relative) and
+the GMRES iteration count unchanged (within 2), exactly as
+<a class="reference internal" href="stationary-and-cg.html"><span class="std std-doc">§5.4</span></a>’s assistant exercise predicted.</p>
+<p><strong>Part b)</strong> Incomplete LU, the workhorse: <code class="docutils literal notranslate"><span class="pre">scipy.sparse.linalg.spilu</span></code> at
+<code class="docutils literal notranslate"><span class="pre">drop_tol=1e-1,</span> <span class="pre">fill_factor=2</span></code> (cheap) and <code class="docutils literal notranslate"><span class="pre">drop_tol=1e-3,</span> <span class="pre">fill_factor=10</span></code>
+(standard), wrapped as <code class="docutils literal notranslate"><span class="pre">LinearOperator</span></code>s. Gate the manifest’s claims on
+the standard ILU: <span class="math notranslate nohighlight">\(\kappa(M^{-1}A)\)</span> at least <span class="math notranslate nohighlight">\(10\times\)</span> below <span class="math notranslate nohighlight">\(\kappa(A)\)</span>
+(measured <span class="math notranslate nohighlight">\(35 \to 1.01\)</span>), and GMRES iterations at least <span class="math notranslate nohighlight">\(3\times\)</span> fewer
+(measured <span class="math notranslate nohighlight">\(56 \to 4\)</span>). Report the cheap ILU’s intermediate numbers
+(<span class="math notranslate nohighlight">\(\kappa \approx 27\)</span>, 31 iterations).</p>
+<p><strong>Part c)</strong> Draw the mechanism: the spectra of <span class="math notranslate nohighlight">\(A\)</span>, of the cheap
+<span class="math notranslate nohighlight">\(M^{-1}A\)</span>, and of the standard <span class="math notranslate nohighlight">\(M^{-1}A\)</span> on the complex plane — the
+convection fan collapsing into a cloud, then a point, at 1. Add the GMRES
+residual histories for all four preconditioners on one log axis.</p>
+<p><strong>Part d)</strong> Method-to-structure, the chapter’s closing table, measured:
+<code class="docutils literal notranslate"><span class="pre">bicgstab</span></code> (short recurrences, no stored basis) on the same nonsymmetric
+system; and <code class="docutils literal notranslate"><span class="pre">minres</span></code> on the <strong>symmetric indefinite</strong> shifted Poisson
+<span class="math notranslate nohighlight">\(S = P - I\)</span> — the system CG’s SPD theory does not cover and <code class="docutils literal notranslate"><span class="pre">minres</span></code> is
+<em>for</em> (<code class="docutils literal notranslate"><span class="pre">minres</span></code> requires symmetry, which is why the manifest’s plan to
+race it on the nonsymmetric matrix had to be amended). Report CG’s
+non-converging residual on <span class="math notranslate nohighlight">\(S\)</span> (never gate a failure size), gate <code class="docutils literal notranslate"><span class="pre">minres</span></code>
+reaching <span class="math notranslate nohighlight">\(10^{-6}\)</span>, and show full GMRES vs GMRES(20) on <span class="math notranslate nohighlight">\(S\)</span> — the restart
+penalty at its other size: a factor 75.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Jacobi: kappa 35.48 -&gt; 35.48 (constant diagonal = pure rescaling); iterations 56 -&gt; 56
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>ILU(1e-1): kappa 27.1, 31 iterations
+ILU(1e-3): kappa 1.01, 4 iterations -&gt; kappa cut 35x, iteration cut 14x
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_2823/2936506189.py:31: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
+  fig.tight_layout()
+</pre></div>
+</div>
+<figure class="align-default" id="fig-kry-precond">
+<img alt="../../_images/49ad8aa3745a481111fb4ef0cd4649318a785a6ea8c8fb03465ba84e1d40a16e.png" src="../../_images/49ad8aa3745a481111fb4ef0cd4649318a785a6ea8c8fb03465ba84e1d40a16e.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 106 </span><span class="caption-text">Preconditioning, watched working. Top: the spectra of <span class="math notranslate nohighlight">\(A\)</span> (left – the convection fan, complex eigenvalues with real part near 2 to 6), of the cheap ILU’s <span class="math notranslate nohighlight">\(M^{-1}A\)</span> (centre – a loose cloud around 1), and of the standard ILU’s (right – a point at 1; note the collapsing axis scales). Bottom: full-GMRES residual histories on one axis – plain and Jacobi indistinguishable at 56 iterations (a constant diagonal preconditions nothing), the cheap ILU at 31, the standard ILU at 4. The spectrum panels and the iteration counts are the same fact displayed twice: Krylov methods pay for spectral spread, and preconditioning is the purchase of clustering.</span><a class="headerlink" href="#fig-kry-precond" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>bicgstab on the nonsymmetric system: 35 steps (two matvecs each), final residual 7.7e-11, info 0 — no stored basis, at the price of a non-monotone history
+
+shifted Poisson S = P - I: spectrum [-0.955, 6.955] — symmetric indefinite, outside CG&#39;s SPD theory
+CG after 400 steps on S: relative residual 3.4e-14 (reported — indefinite denominators break the descent argument)
+minres on S: 141 steps, relative residual 1.2e-07, info 0 — built for exactly this structure
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>GMRES on S: full 147 iterations, GMRES(20) 10982 — Exercise 5&#39;s factor-2 penalty, grown to 75x where the spectrum surrounds the origin
+</pre></div>
+</div>
+</div>
+</div>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p>The drop tolerance swept here by hand is a design dial. Ask your assistant
+for <code class="docutils literal notranslate"><span class="pre">ilu_tradeoff(A,</span> <span class="pre">b,</span> <span class="pre">drop_tols)</span></code> returning, per tolerance, the factor’s
+nnz, the GMRES iteration count, and total matvec-equivalent work — then
+check it against the mathematics rather than a demo: (i) at
+<code class="docutils literal notranslate"><span class="pre">drop_tol=0</span></code> the factorization is exact, the iteration count is 1–2, and
+the factor nnz matches <code class="docutils literal notranslate"><span class="pre">splu</span></code>’s from <a class="reference internal" href="sparse-matrices.html"><span class="std std-doc">§5.3</span></a> within
+20%; (ii) iteration counts are non-increasing as the tolerance tightens on
+this matrix; (iii) the work-optimal tolerance is interior — neither
+endpoint wins once setup cost is counted. The check is yours.</p>
+</div>
+<section id="validation-6">
+<h3>Validation 6<a class="headerlink" href="#validation-6" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  Jacobi preconditioning does exactly nothing on a constant diagonal   [kappa 35.48 -&gt; 35.48, iterations 56 -&gt; 56: a pure rescaling, as 5.4&#39;s assistant exercise predicted — a preconditioner must vary where the matrix does]
+✓  while the standard ILU cuts kappa by 10x and iterations by 3x, as the manifest asked   [measured 35x on kappa (35 -&gt; 1.01) and 14x on iterations (56 -&gt; 4) — both far past the gate]
+✓  with the cheap ILU strictly between: more clustering, fewer iterations   [kappa 35 &gt; 27 &gt; 1.01 and iterations 56 &gt; 31 &gt; 4: the drop tolerance is a dial, and both orderings move together]
+✓  and each structure gets its method: minres converges on the indefinite system, bicgstab on the nonsymmetric one   [minres residual 1.2e-07 on S (CG&#39;s, reported above, is 3e-14 after 400 steps); bicgstab 7.7e-11 — right method, right structure, the chapter&#39;s closing rule]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p><strong>The raw basis fails; Arnoldi is the repair.</strong> The normalized Krylov
+matrix hit <span class="math notranslate nohighlight">\(\kappa &gt; 10^{12}\)</span> by 20 columns (each matvec is a
+power-iteration step), while reorthogonalized Arnoldi delivered
+<span class="math notranslate nohighlight">\(AQ_k = Q_{k+1}\tilde H_k\)</span> to <span class="math notranslate nohighlight">\(10^{-15}\)</span> of <span class="math notranslate nohighlight">\(\lVert A\rVert\)</span> with exact
+structural Hessenberg zeros and machine-level orthogonality — single-pass
+MGS drifted measurably by <span class="math notranslate nohighlight">\(m = 60\)</span>, and the second sweep removed it.</p>
+<p><strong>Lanczos is Arnoldi with a bill.</strong> Symmetric input forced <span class="math notranslate nohighlight">\(H\)</span> tridiagonal
+to <span class="math notranslate nohighlight">\(10^{-12}\)</span> of the matrix norm at <span class="math notranslate nohighlight">\(m = 40\)</span> — then Paige’s cliff:
+orthogonality at machine level through <span class="math notranslate nohighlight">\(k \approx 40\)</span>, <span class="math notranslate nohighlight">\(10^{-9}\)</span> by 60,
+order one by 90, arriving with Ritz convergence rather than gradually. The
+reorthogonalized run kept the Ritz bracket (a Rayleigh-quotient theorem,
+gated at every <span class="math notranslate nohighlight">\(k\)</span>) and locked the extreme eigenvalues to <span class="math notranslate nohighlight">\(10^{-12}\)</span> by
+<span class="math notranslate nohighlight">\(k = 60\)</span> — four orders inside the manifest’s tolerance, <em>because</em> of the
+second Gram–Schmidt pass.</p>
+<p><strong>GMRES is least squares in the subspace, and its guarantees are
+structural.</strong> Residuals non-increasing (nested subspaces), convergence in
+59 of an entitled 400 steps, agreement with <code class="docutils literal notranslate"><span class="pre">scipy</span></code> to <span class="math notranslate nohighlight">\(10^{-11}\)</span>. The
+restart penalty was measured at both of its sizes — a factor 2.2 on this
+right-half-plane spectrum (56 full vs 125 restarted), a factor 75 on the
+indefinite shifted Poisson — after disarming a library trap: <code class="docutils literal notranslate"><span class="pre">scipy</span></code>’s
+<code class="docutils literal notranslate"><span class="pre">restart=None</span></code> silently means GMRES(20), so the naive experiment compares
+the restarted method with itself and reports no penalty at all.</p>
+<p><strong>Preconditioning is spectrum design.</strong> Jacobi on a constant diagonal
+changed nothing, measured to <span class="math notranslate nohighlight">\(10^{-8}\)</span> on <span class="math notranslate nohighlight">\(\kappa\)</span> and to <span class="math notranslate nohighlight">\(\pm2\)</span>
+iterations — a pure rescaling. Incomplete LU pulled the convection fan
+into a loose cloud (<span class="math notranslate nohighlight">\(\kappa\ 35 \to 27\)</span>, iterations <span class="math notranslate nohighlight">\(56 \to 31\)</span>) and then
+a point at 1 (<span class="math notranslate nohighlight">\(\kappa \to 1.01\)</span>, iterations <span class="math notranslate nohighlight">\(\to 4\)</span>), beating the
+manifest’s <span class="math notranslate nohighlight">\(10\times\)</span>/<span class="math notranslate nohighlight">\(3\times\)</span> gates by wide margins — the spectra
+panels and the residual histories are the same fact drawn twice. And the
+method-structure table closed the chapter: <code class="docutils literal notranslate"><span class="pre">bicgstab</span></code> for nonsymmetric
+without storage, <code class="docutils literal notranslate"><span class="pre">minres</span></code> for symmetric indefinite (where CG’s own
+residual, reported not gated, went nowhere in 400 steps), full GMRES when
+memory allows.</p>
+<p><strong>Methods introduced.</strong> The Krylov matrix and its conditioning,
+<code class="docutils literal notranslate"><span class="pre">arnoldi</span></code> with optional reorthogonalization, Lanczos tridiagonality and
+Paige’s loss, Ritz fans, <code class="docutils literal notranslate"><span class="pre">gmres_own</span></code> via Hessenberg least squares,
+restarted GMRES, <code class="docutils literal notranslate"><span class="pre">LinearOperator</span></code> preconditioner wrappers, <code class="docutils literal notranslate"><span class="pre">spilu</span></code>
+incomplete factorizations, spectrum-clustering diagnostics, <code class="docutils literal notranslate"><span class="pre">bicgstab</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">minres</span></code>.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Chapter V, closed.</strong> Conditioning (<a class="reference internal" href="norms-conditioning-stability.html"><span class="std std-doc">§5.1</span></a>),
+eigenvalue algorithms (<a class="reference internal" href="eigenvalue-algorithms.html"><span class="std std-doc">§5.2</span></a>), sparsity
+(<a class="reference internal" href="sparse-matrices.html"><span class="std std-doc">§5.3</span></a>), CG (<a class="reference internal" href="stationary-and-cg.html"><span class="std std-doc">§5.4</span></a>),
+and Krylov methods here: the numerical spine of everything the applied
+chapters now build on.</p></li>
+<li><p><strong>Structure is the next multiplier.</strong>
+<a class="reference internal" href="../06-structure/graphs-laplacian.html"><span class="std std-doc">§6.1</span></a> opens Chapter VI with the
+graph Laplacian — the Poisson matrix’s generalization to arbitrary
+networks, where the eigenvectors this chapter computed become cuts,
+clusters, and diffusion maps.</p></li>
+<li><p><strong>Lanczos at scale.</strong> Production eigensolvers (ARPACK under
+<code class="docutils literal notranslate"><span class="pre">scipy.sparse.linalg.eigsh</span></code>) are restarted Lanczos with implicit
+filtering — Paige’s cliff managed, not avoided. The Ritz-fan picture is
+their mental model.</p></li>
+<li><p><strong>Preconditioners as approximate physics.</strong> Multigrid, domain
+decomposition, and learned preconditioners are all bets that a cheap
+model of the operator clusters its spectrum — the drop-tolerance dial of
+Exercise 6, generalized into a research field.</p></li>
+</ul>
+<div class="docutils container" id="id5">
+<div role="list" class="citation-list">
+<div class="citation" id="id14" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">GVL13</a><span class="fn-bracket">]</span></span>
+<p>Gene H. Golub and Charles F. Van Loan. <em>Matrix Computations</em>. Johns Hopkins University Press, Baltimore, 4 edition, 2013.</p>
+</div>
+<div class="citation" id="id25" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">SS86</a><span class="fn-bracket">]</span></span>
+<p>Youcef Saad and Martin H. Schultz. GMRES: a generalized minimal residual algorithm for solving nonsymmetric linear systems. <em>SIAM Journal on Scientific and Statistical Computing</em>, 7(3):856–869, 1986. <a class="reference external" href="https://doi.org/10.1137/0907058">doi:10.1137/0907058</a>.</p>
+</div>
+<div class="citation" id="id18" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">Saa03</a><span class="fn-bracket">]</span></span>
+<p>Yousef Saad. <em>Iterative Methods for Sparse Linear Systems</em>. SIAM, Philadelphia, 2 edition, 2003. <a class="reference external" href="https://doi.org/10.1137/1.9780898718003">doi:10.1137/1.9780898718003</a>.</p>
+</div>
+<div class="citation" id="id13" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">TB97</a><span class="fn-bracket">]</span></span>
+<p>Lloyd N. Trefethen and David Bau, III. <em>Numerical Linear Algebra</em>. SIAM, Philadelphia, 1997. <a class="reference external" href="https://doi.org/10.1137/1.9780898719574">doi:10.1137/1.9780898719574</a>.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/05-numerical"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="stationary-and-cg.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">5.4 Stationary Iterations and Conjugate Gradients</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="multigrid.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">5.6 Multigrid: The O(n) Solver</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-subspace-and-why-its-raw-basis-is-unusable">The subspace, and why its raw basis is unusable</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arnoldi-lanczos-ritz">Arnoldi, Lanczos, Ritz</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gmres">GMRES</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#preconditioning">Preconditioning</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-the-raw-krylov-basis-destroys-itself">Exercise 1: The raw Krylov basis destroys itself</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-arnoldi-the-basis-done-right">Exercise 2: Arnoldi: the basis done right</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-lanczos-the-shortcut-and-its-famous-bill">Exercise 3: Lanczos: the shortcut and its famous bill</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-ritz-values-fan-onto-the-spectrum">Exercise 4: Ritz values fan onto the spectrum</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-gmres-least-squares-in-the-subspace">Exercise 5: GMRES: least squares in the subspace</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-preconditioning-clustering-a-spectrum-on-purpose">Exercise 6: Preconditioning: clustering a spectrum on purpose</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

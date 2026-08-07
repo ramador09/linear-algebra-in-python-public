@@ -1,0 +1,1365 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/05-numerical/sparse-matrices.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: The matrices of physics and of graphs are overwhelmingly zero: the 2-D Poisson matrix on a 30\times30 grid is 900\times900 with 4380 nonze..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: The matrices of physics and of graphs are overwhelmingly zero: the 2-D Poisson matrix on a 30\times30 grid is 900\times900 with 4380 nonze..." />
+
+    <title>5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/05-numerical/sparse-matrices';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/05-numerical/sparse-matrices.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="5.4 Stationary Iterations and Conjugate Gradients" href="stationary-and-cg.html" />
+    <link rel="prev" title="5.2 How Eigenvalues Are Really Computed" href="eigenvalue-algorithms.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter V — Numerical Linear Algebra</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/05-numerical/sparse-matrices.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/05-numerical/sparse-matrices.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/05-numerical/sparse-matrices.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/05-numerical/sparse-matrices.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#three-formats-one-matrix">Three formats, one matrix</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-model-problems">The model problems</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fill-in-and-why-ordering-matters">Fill-in, and why ordering matters</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-tridiagonal-endgame">The tridiagonal endgame</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-csr-by-hand-and-the-storage-arithmetic">Exercise 1: CSR by hand, and the storage arithmetic</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-o-mathrm-nnz-matvec-and-a-spectrum-in-closed-form">Exercise 2: The <span class="math notranslate nohighlight">\(O(\mathrm{nnz})\)</span> matvec, and a spectrum in closed form</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-fill-in-and-the-ordering-war">Exercise 3: Fill-in, and the ordering war</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-sparse-direct-solve-and-a-drum-mode-to-prove-it">Exercise 4: Sparse direct solve, and a drum mode to prove it</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-the-thomas-algorithm-eight-flops-per-unknown">Exercise 5: The Thomas algorithm: eight flops per unknown</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="sparse-matrices-storage-patterns-and-direct-solvers">
+<h1>5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers<a class="headerlink" href="#sparse-matrices-storage-patterns-and-direct-solvers" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter V — Numerical Linear Algebra
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;5.3
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">When almost every entry is zero, the rules change: storage is nnz not n-squared, a matvec is O(nnz), and the enemy of factorization is no longer growth but fill-in — zeros that become nonzero, unless the rows are reordered first.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;advanced&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;105–135 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p>The matrices of physics and of graphs are overwhelmingly zero: the 2-D
+Poisson matrix on a <span class="math notranslate nohighlight">\(30\times30\)</span> grid is <span class="math notranslate nohighlight">\(900\times900\)</span> with <strong>4380</strong>
+nonzeros — half a percent. Storing and multiplying it as a dense array wastes
+a factor of 84 in memory and 185 in arithmetic, and at the grid sizes PDEs actually
+need, “wasteful” becomes “impossible”. This notebook is the sparse toolkit:
+the storage formats (COO, CSR, CSC) built by hand and checked bit-for-bit
+against <code class="docutils literal notranslate"><span class="pre">scipy.sparse</span></code>, the <span class="math notranslate nohighlight">\(O(\mathrm{nnz})\)</span> matvec, and the structured
+matrices — <code class="docutils literal notranslate"><span class="pre">diags</span></code>, <code class="docutils literal notranslate"><span class="pre">kron</span></code> — that generate the course’s model problems.</p>
+<p>The second half is about what sparsity does <em>not</em> survive: factorization.
+LU of a sparse matrix creates <strong>fill-in</strong> — entries that were zero in <span class="math notranslate nohighlight">\(A\)</span> and
+are nonzero in <span class="math notranslate nohighlight">\(L\)</span> and <span class="math notranslate nohighlight">\(U\)</span> — and the amount depends violently on the row
+ordering. Measured on the Poisson matrix: natural order 54,058 factor
+nonzeros, reverse Cuthill–McKee 38,630 (a 29% cut), COLAMD — the library’s
+default — 30,338 (44%). And for the tridiagonal special case the whole
+subject collapses to the Thomas algorithm: eight flops per unknown, a factor
+of <span class="math notranslate nohighlight">\(2\times10^{6}\)</span> below dense elimination at <span class="math notranslate nohighlight">\(n = 5000\)</span>.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> Davis’s <em>Direct Methods for Sparse Linear Systems</em> is the book;
+Golub and Van Loan <span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id12" title="Gene H. Golub and Charles F. Van Loan. Matrix Computations. Johns Hopkins University Press, Baltimore, 4 edition, 2013.">GVL13</a>]</span> Chapter 11; Saad <span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id16" title="Yousef Saad. Iterative Methods for Sparse Linear Systems. SIAM, Philadelphia, 2 edition, 2003. doi:10.1137/1.9780898718003.">Saa03</a>]</span>
+Chapters 2–3 for formats and orderings. The Poisson matrices and their
+closed-form spectra are established here (Exercise 2) and serve as the
+model family for the rest of Chapter V.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="three-formats-one-matrix">
+<h3>Three formats, one matrix<a class="headerlink" href="#three-formats-one-matrix" title="Link to this heading">#</a></h3>
+<p><strong>COO</strong> stores triplets <span class="math notranslate nohighlight">\((i, j, v)\)</span> — trivial to build, useless to compute
+with. <strong>CSR</strong> (compressed sparse row) stores three arrays:</p>
+<div class="math notranslate nohighlight" id="equation-eq-sp-csr">
+<span class="eqno">(231)<a class="headerlink" href="#equation-eq-sp-csr" title="Link to this equation">#</a></span>\[\texttt{data}[\mathrm{nnz}],\quad
+\texttt{indices}[\mathrm{nnz}],\quad
+\texttt{indptr}[n+1],
+\qquad \text{row } i = \texttt{data}[\texttt{indptr}[i]:\texttt{indptr}[i{+}1]],\]</div>
+<p>the concatenated nonzeros of each row, their column indices, and where each
+row starts. CSC is the same by columns. Storage is <span class="math notranslate nohighlight">\(2\,\mathrm{nnz} + n + 1\)</span>
+numbers against <span class="math notranslate nohighlight">\(n^2\)</span>, and a matvec touches each nonzero once:</p>
+<div class="math notranslate nohighlight" id="equation-eq-sp-matvec">
+<span class="eqno">(232)<a class="headerlink" href="#equation-eq-sp-matvec" title="Link to this equation">#</a></span>\[y_i = \sum_{k=\texttt{indptr}[i]}^{\texttt{indptr}[i+1]-1}
+      \texttt{data}[k]\;x_{\texttt{indices}[k]}
+\qquad\Longrightarrow\qquad O(\mathrm{nnz}) .\]</div>
+</section>
+<section id="the-model-problems">
+<h3>The model problems<a class="headerlink" href="#the-model-problems" title="Link to this heading">#</a></h3>
+<p>The 1-D Poisson matrix <span class="math notranslate nohighlight">\(T_n = \operatorname{tridiag}(-1, 2, -1)\)</span> has a
+spectrum known in closed form,</p>
+<div class="math notranslate nohighlight" id="equation-eq-sp-poisson">
+<span class="eqno">(233)<a class="headerlink" href="#equation-eq-sp-poisson" title="Link to this equation">#</a></span>\[\lambda_k = 2 - 2\cos\frac{k\pi}{n+1}, \qquad k = 1, \dots, n,\]</div>
+<p>and the 2-D version is the Kronecker sum
+<span class="math notranslate nohighlight">\(T \otimes I + I \otimes T\)</span> — five nonzeros per row regardless of size, which
+is why <code class="docutils literal notranslate"><span class="pre">kron</span></code> plus <code class="docutils literal notranslate"><span class="pre">diags</span></code> generates it in two lines.</p>
+</section>
+<section id="fill-in-and-why-ordering-matters">
+<h3>Fill-in, and why ordering matters<a class="headerlink" href="#fill-in-and-why-ordering-matters" title="Link to this heading">#</a></h3>
+<p>Eliminating unknown <span class="math notranslate nohighlight">\(j\)</span> adds a nonzero at <span class="math notranslate nohighlight">\((i, k)\)</span> whenever <span class="math notranslate nohighlight">\(a_{ij}\)</span> and
+<span class="math notranslate nohighlight">\(a_{jk}\)</span> are both nonzero: the factor’s pattern is the <em>closure</em> of the
+matrix’s, and it can be dramatically denser. Reordering the unknowns changes
+the closure without changing the problem — a symmetric permutation
+<span class="math notranslate nohighlight">\(PAP^{\top}\)</span> is a relabelling — and good orderings (bandwidth-reducing
+reverse Cuthill–McKee, fill-minimising COLAMD/AMD) cut the factor’s nnz by
+large constant factors. <code class="docutils literal notranslate"><span class="pre">scipy.sparse.linalg.splu</span></code> applies COLAMD by
+default, which is why beating its fill-in by hand is hard.</p>
+</section>
+<section id="the-tridiagonal-endgame">
+<h3>The tridiagonal endgame<a class="headerlink" href="#the-tridiagonal-endgame" title="Link to this heading">#</a></h3>
+<p>For a banded matrix, elimination never leaves the band, so LU with bandwidth
+<span class="math notranslate nohighlight">\(w\)</span> costs <span class="math notranslate nohighlight">\(O(nw^2)\)</span>. At <span class="math notranslate nohighlight">\(w = 1\)</span> this is the <strong>Thomas algorithm</strong>:</p>
+<div class="math notranslate nohighlight" id="equation-eq-sp-thomas">
+<span class="eqno">(234)<a class="headerlink" href="#equation-eq-sp-thomas" title="Link to this equation">#</a></span>\[\text{forward: } c'_i = \frac{c_i}{b_i - a_ic'_{i-1}},\;
+d'_i = \frac{d_i - a_id'_{i-1}}{b_i - a_ic'_{i-1}};
+\qquad \text{back: } x_i = d'_i - c'_ix_{i+1},\]</div>
+<p>about <span class="math notranslate nohighlight">\(8n\)</span> flops against dense elimination’s <span class="math notranslate nohighlight">\(\tfrac23n^3\)</span> — a ratio of
+<span class="math notranslate nohighlight">\(2\times10^{6}\)</span> at <span class="math notranslate nohighlight">\(n = 5000\)</span>, from structure alone.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data only: the worked small matrix and the Poisson matrices from
+ecp.linalg. The CSR matvec and the Thomas algorithm are built in the
+exercises, where they are the lesson.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse.csgraph</span><span class="w"> </span><span class="kn">import</span> <span class="n">reverse_cuthill_mckee</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">splu</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">solve_banded</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">la</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random array below comes from this seed</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+
+<span class="c1"># The worked small matrix for the format exercises: 4x4, seven nonzeros,</span>
+<span class="c1"># written out so the CSR arrays can be derived by eye first.</span>
+<span class="n">A_SMALL</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+                    <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+                    <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+                    <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">]])</span>
+
+<span class="c1"># The 2-D Poisson matrix on a 30x30 interior grid: 900 unknowns, 4380 nnz.</span>
+<span class="n">N_GRID</span> <span class="o">=</span> <span class="mi">30</span>
+<span class="n">P2</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">(</span><span class="n">la</span><span class="o">.</span><span class="n">poisson_2d</span><span class="p">(</span><span class="n">N_GRID</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-csr-by-hand-and-the-storage-arithmetic">
+<h2>Exercise 1: CSR by hand, and the storage arithmetic<a class="headerlink" href="#exercise-1-csr-by-hand-and-the-storage-arithmetic" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-sp-csr">Eq. 231</a> is three arrays. This exercise derives them by eye for
+<code class="docutils literal notranslate"><span class="pre">A_SMALL</span></code>, checks them bit-for-bit against <code class="docutils literal notranslate"><span class="pre">scipy.sparse.csr_matrix</span></code>, and
+does the storage arithmetic that justifies the whole subject.</p>
+<p><strong>Part a)</strong> Read the arrays off the matrix by hand: row 0 holds <span class="math notranslate nohighlight">\((4, 1)\)</span> at
+columns <span class="math notranslate nohighlight">\((0, 3)\)</span>, row 1 holds <span class="math notranslate nohighlight">\((3, 2)\)</span> at <span class="math notranslate nohighlight">\((1, 2)\)</span>, row 2 holds <span class="math notranslate nohighlight">\(5\)</span> at <span class="math notranslate nohighlight">\(2\)</span>,
+row 3 holds <span class="math notranslate nohighlight">\((1, 6)\)</span> at <span class="math notranslate nohighlight">\((0, 3)\)</span>. So <code class="docutils literal notranslate"><span class="pre">data</span> <span class="pre">=</span> <span class="pre">[4,1,3,2,5,1,6]</span></code>,
+<code class="docutils literal notranslate"><span class="pre">indices</span> <span class="pre">=</span> <span class="pre">[0,3,1,2,2,0,3]</span></code>, <code class="docutils literal notranslate"><span class="pre">indptr</span> <span class="pre">=</span> <span class="pre">[0,2,4,5,7]</span></code>. Build
+<code class="docutils literal notranslate"><span class="pre">sp.csr_matrix(A_SMALL)</span></code> and confirm all three arrays match <strong>exactly</strong> —
+integer indices and float data with no arithmetic performed, so exact
+equality is legitimate.</p>
+<p><strong>Part b)</strong> Confirm the round trips: <code class="docutils literal notranslate"><span class="pre">.toarray()</span></code> reproduces <code class="docutils literal notranslate"><span class="pre">A_SMALL</span></code>
+exactly, and the COO triplets (<code class="docutils literal notranslate"><span class="pre">sp.coo_matrix</span></code>) reassemble to the same CSR
+under <code class="docutils literal notranslate"><span class="pre">.tocsr()</span></code>.</p>
+<p><strong>Part c)</strong> Do the storage arithmetic for the 2-D Poisson matrix: dense
+<span class="math notranslate nohighlight">\(900^2 = 810{,}000\)</span> floats against CSR’s
+<span class="math notranslate nohighlight">\(2\cdot4380 + 901 = 9661\)</span> numbers — an <span class="math notranslate nohighlight">\(84\times\)</span> saving, growing linearly
+with the grid area since nnz <span class="math notranslate nohighlight">\(\approx 5n\)</span>. Confirm the measured <code class="docutils literal notranslate"><span class="pre">.data</span></code>,
+<code class="docutils literal notranslate"><span class="pre">.indices</span></code>, <code class="docutils literal notranslate"><span class="pre">.indptr</span></code> lengths give exactly that count.</p>
+<p><strong>Part d)</strong> Confirm the format’s trade-off: reading a <em>row</em> of CSR is a
+slice (cheap), reading a <em>column</em> requires scanning everything — measure
+both on <code class="docutils literal notranslate"><span class="pre">P2.tocsr()</span></code> by counting touched entries, and note CSC inverts the
+trade. The format is chosen by the access pattern, which is why <code class="docutils literal notranslate"><span class="pre">splu</span></code> wants
+CSC and matvecs want CSR.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hand-derived CSR arrays match scipy exactly: True
+  data    [4. 1. 3. 2. 5. 1. 6.]
+  indices [0 3 1 2 2 0 3]
+  indptr  [0 2 4 5 7]
+round trips exact: dense True, via COO True
+
+2-D Poisson storage: dense 810,000 numbers, CSR 9,661 (84x saving)
+reading row 100 in CSR touches 5 entries; column 100 in CSC touches 5; the transposed question in CSR has no slice to read — only a scan of all 4,380 stored indices
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<p>Exact equality throughout, legitimately: format conversion moves numbers
+and computes nothing, so this is the stated exception to the
+no-exact-comparisons rule — like the structural zeros of
+<a class="reference internal" href="eigenvalue-algorithms.html"><span class="std std-doc">§5.2</span></a>.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the hand-derived CSR arrays match scipy.sparse bit for bit (Eq. 1)   [data, indices and indptr as read off the matrix by eye — conversion moves numbers and computes nothing, so exactness is legitimate]
+✓  and both round trips (dense, COO -&gt; CSR) are exact   [the formats are encodings, not approximations]
+✓  CSR storage is exactly 2 nnz + n + 1 numbers   [9,661 against dense 810,000: an 84x saving that grows with the grid]
+✓  row access in CSR and column access in CSC are both 5-entry slices   [each format answers its own question with a slice and the transposed question only by scanning every stored index — the format is chosen by the access pattern: matvec wants CSR, splu wants CSC]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-the-o-mathrm-nnz-matvec-and-a-spectrum-in-closed-form">
+<h2>Exercise 2: The <span class="math notranslate nohighlight">\(O(\mathrm{nnz})\)</span> matvec, and a spectrum in closed form<a class="headerlink" href="#exercise-2-the-o-mathrm-nnz-matvec-and-a-spectrum-in-closed-form" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-sp-matvec">Eq. 232</a> is the reason iterative methods exist: if a matvec costs
+<span class="math notranslate nohighlight">\(O(\mathrm{nnz})\)</span>, a matrix too large to factor can still be <em>applied</em>.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">csr_matvec(data,</span> <span class="pre">indices,</span> <span class="pre">indptr,</span> <span class="pre">x)</span></code> implementing
+<a class="reference internal" href="#equation-eq-sp-matvec">Eq. 232</a> as the double loop, and confirm it matches both the dense
+product and <code class="docutils literal notranslate"><span class="pre">P2</span> <span class="pre">&#64;</span> <span class="pre">x</span></code> to <span class="math notranslate nohighlight">\(10^{-13}\)</span> on the 900-unknown Poisson matrix with a
+fixed random <span class="math notranslate nohighlight">\(x\)</span>.</p>
+<p><strong>Write this one yourself</strong> — the implementation is the lesson.</p>
+<p><strong>Part b)</strong> Count the arithmetic: the loop performs exactly
+<span class="math notranslate nohighlight">\(\mathrm{nnz}\)</span> multiply-adds — <span class="math notranslate nohighlight">\(4380\)</span> against the dense product’s
+<span class="math notranslate nohighlight">\(810{,}000\)</span>, a <span class="math notranslate nohighlight">\(185\times\)</span> ratio that is gated as pure counting.</p>
+<p><strong>Part c)</strong> Confirm the 1-D closed form <a class="reference internal" href="#equation-eq-sp-poisson">Eq. 233</a>: the eigenvalues
+of <code class="docutils literal notranslate"><span class="pre">la.poisson_1d(50)</span></code> match <span class="math notranslate nohighlight">\(2 - 2\cos(k\pi/51)\)</span> to <span class="math notranslate nohighlight">\(10^{-11}\)</span> — the
+family this notebook establishes and the rest of the chapter leans on.</p>
+<p><strong>Part d)</strong> Confirm the 2-D structure: <code class="docutils literal notranslate"><span class="pre">la.poisson_2d(30)</span></code> equals
+<code class="docutils literal notranslate"><span class="pre">sp.kron(T,</span> <span class="pre">I)</span> <span class="pre">+</span> <span class="pre">sp.kron(I,</span> <span class="pre">T)</span></code> exactly (as sparse matrices, entry for
+entry), and every row has at most 5 nonzeros. Draw the spy plot beside a
+close-up of the first 100 rows: the five-diagonal pattern with bandwidth
+<span class="math notranslate nohighlight">\(n = 30\)</span>.</p>
+<p><strong>Part e)</strong> Confirm the 2-D spectrum is the <em>sum</em> of 1-D spectra:
+<span class="math notranslate nohighlight">\(\lambda_{jk} = \lambda_j + \lambda_k\)</span>, checked by comparing
+<code class="docutils literal notranslate"><span class="pre">eigvalsh</span></code> of the <span class="math notranslate nohighlight">\(900\times900\)</span> dense form against the outer sum of the
+closed form, sorted, to <span class="math notranslate nohighlight">\(10^{-10}\)</span> — the Kronecker-sum structure doing exact
+work.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hand CSR matvec vs scipy: 0.0e+00; vs dense: 1.8e-15
+multiply-adds: 4,380 against 810,000 (185x, by counting)
+
+1-D Poisson spectrum vs 2 - 2cos(k pi/(n+1)): 2.66e-15
+poisson_2d == kron(T,I) + kron(I,T) exactly: True; max row nnz = 5
+2-D spectrum vs the outer SUM of 1-D spectra: 3.61e-14
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-sp-spy">
+<img alt="../../_images/433ffcf7e931dc1da89ee8bfa2e769eb316fa88398c8df1ca8abe4bde4eee3a7.png" src="../../_images/433ffcf7e931dc1da89ee8bfa2e769eb316fa88398c8df1ca8abe4bde4eee3a7.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 98 </span><span class="caption-text">The <span class="math notranslate nohighlight">\(900\times900\)</span> Poisson matrix of the <span class="math notranslate nohighlight">\(30\times30\)</span> grid. Left: the full sparsity pattern – five diagonals, 4380 nonzeros, half a percent of the matrix. Right: the first 100 rows close up, showing the tridiagonal blocks on the diagonal and the identity blocks a bandwidth of 30 away; that bandwidth, set by the grid width, is what the factorization’s fill-in will occupy and what reordering fights over.</span><a class="headerlink" href="#fig-sp-spy" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<p>The operation-count ratio is gated as counting, not timing — the loop
+performs exactly nnz multiply-adds by construction. The two closed-form
+spectra are the strongest checks in the notebook: analytic predictions of
+<a class="reference internal" href="#equation-eq-sp-poisson">Eq. 233</a>, hit to eleven digits by a matrix built from <code class="docutils literal notranslate"><span class="pre">kron</span></code>.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the hand-written CSR matvec matches scipy and dense (Eq. 2)   [gaps 0.0e+00 and 1.8e-15 on 900 unknowns]
+✓  at exactly nnz multiply-adds: 185x fewer than dense, by counting   [4,380 against 810,000 — arithmetic, not a stopwatch]
+✓  the 1-D Poisson spectrum matches its closed form (Eq. 3)   [2.66454e-15 &lt; 1e-11]
+✓  poisson_2d IS the Kronecker sum, with at most five nonzeros per row   [structure exact as sparse matrices — no entry differs]
+✓  and the 2-D spectrum is the outer sum of 1-D spectra   [the Kronecker-sum eigenvalue identity, verified on all 900 [3.61378e-14 &lt; 1e-10]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-fill-in-and-the-ordering-war">
+<h2>Exercise 3: Fill-in, and the ordering war<a class="headerlink" href="#exercise-3-fill-in-and-the-ordering-war" title="Link to this heading">#</a></h2>
+<p>Factorization is where sparsity goes to die: LU of the Poisson matrix turns
+4380 nonzeros into 54,058 — a <span class="math notranslate nohighlight">\(12\times\)</span> inflation — because every
+elimination step closes triangles in the pattern. The counter-weapon is
+reordering, and this exercise measures two generations of it.</p>
+<p><strong>Part a)</strong> Factor <code class="docutils literal notranslate"><span class="pre">P2</span></code> with <code class="docutils literal notranslate"><span class="pre">splu(...,</span> <span class="pre">permc_spec=&quot;NATURAL&quot;)</span></code> (no column
+reordering) and report <code class="docutils literal notranslate"><span class="pre">L.nnz</span> <span class="pre">+</span> <span class="pre">U.nnz</span></code>: <strong>54,058</strong>, against the matrix’s
+4380.</p>
+<p><strong>Part b)</strong> Apply reverse Cuthill–McKee
+(<code class="docutils literal notranslate"><span class="pre">scipy.sparse.csgraph.reverse_cuthill_mckee</span></code>, <code class="docutils literal notranslate"><span class="pre">symmetric_mode=True</span></code>),
+permute symmetrically, refactor with <code class="docutils literal notranslate"><span class="pre">NATURAL</span></code>, and report the factor nnz:
+<strong>38,630</strong>, a <strong>29%</strong> cut. (The manifest for this notebook guessed 40%;
+the measurement says 29 on this grid, and the measurement wins — the gate is
+placed at 25%.)</p>
+<p><strong>Part c)</strong> Now the default: <code class="docutils literal notranslate"><span class="pre">splu(P2)</span></code> with COLAMD reordering gives
+<strong>30,338</strong> — a 44% cut, beating RCM’s bandwidth strategy with a
+fill-minimising one. Gate the ordering: natural &gt; RCM &gt; COLAMD, and confirm
+all three factorizations solve the same system to <span class="math notranslate nohighlight">\(10^{-11}\)</span> of each other.</p>
+<p><strong>Part d)</strong> Draw the three factor patterns as spy plots. RCM’s factor hugs a
+narrow band; COLAMD’s scatters but is sparsest; natural’s fills the whole
+envelope — the picture of why <code class="docutils literal notranslate"><span class="pre">splu</span></code>’s default is not the identity
+permutation.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>factor nnz: natural 54,058  RCM 38,630 (29% cut)  COLAMD 30,338 (44% cut)
+against the matrix&#39;s own 4,380 nonzeros: fill inflation 12x uncured, 7x under COLAMD
+all three orderings solve the same system: worst disagreement 2.7e-14
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-sp-fill">
+<img alt="../../_images/67183992f538a4c0250905b7678fe4eb1d2480cc50db60c33dc1f7d5e5891877.png" src="../../_images/67183992f538a4c0250905b7678fe4eb1d2480cc50db60c33dc1f7d5e5891877.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 99 </span><span class="caption-text">The combined <span class="math notranslate nohighlight">\(L + U\)</span> pattern of the Poisson factorization under three orderings. Natural order (left, 54,058 nonzeros) fills the whole bandwidth envelope; reverse Cuthill–McKee (centre, 38,630) squeezes the band tighter for a 29% cut; COLAMD (right, 30,338 – the splu default) abandons bandedness for fill minimisation and wins at 44%. The matrix itself has 4380 nonzeros: factorization inflates sparsity by an order of magnitude even well-ordered, which is the opening argument for the iterative methods of the next notebook.</span><a class="headerlink" href="#fig-sp-fill" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<p>The fill counts are integers produced by deterministic symbolic analysis on
+a fixed matrix — gateable as counts, with the gate at the measured-minus-slack
+level rather than the manifest’s optimistic guess, and the guess corrected in
+prose. The three-way solve agreement confirms reordering changes the <em>work</em>,
+never the answer.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  uncured fill-in inflates the pattern by an order of magnitude   [54,058 factor nonzeros from a 4,380-nonzero matrix]
+✓  RCM cuts factor fill by more than a quarter (measured 29%)   [38,630 against 54,058. The manifest guessed 40%; the measurement says 29 on this grid, and the measurement wins]
+✓  and COLAMD — the splu default — cuts 44%, beating RCM   [30,338 nonzeros: fill-minimising orderings beat bandwidth-minimising ones on 2-D grids, which is why it is the default]
+✓  while all three orderings solve the same system identically   [a symmetric permutation is a relabelling of unknowns, not a new problem [2.66454e-14 &lt; 1e-11]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-sparse-direct-solve-and-a-drum-mode-to-prove-it">
+<h2>Exercise 4: Sparse direct solve, and a drum mode to prove it<a class="headerlink" href="#exercise-4-sparse-direct-solve-and-a-drum-mode-to-prove-it" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">splu</span></code> is the sparse analogue of
+<a class="reference internal" href="../01-matrices/elimination-lu.html"><span class="std std-doc">§1.2</span></a>’s factor-once-solve-many, and
+this exercise closes the loop with the physics the Poisson matrix encodes.</p>
+<p><strong>Part a)</strong> Confirm the sparse solve against the dense one: <code class="docutils literal notranslate"><span class="pre">splu(P2)</span></code> and
+<code class="docutils literal notranslate"><span class="pre">np.linalg.solve</span></code> on the dense array agree to <span class="math notranslate nohighlight">\(10^{-11}\)</span> on a random
+right-hand side.</p>
+<p><strong>Part b)</strong> Confirm factor-reuse economics by counting: one symbolic+numeric
+factorization plus <span class="math notranslate nohighlight">\(k\)</span> triangular solves against <span class="math notranslate nohighlight">\(k\)</span> full factorizations —
+<code class="docutils literal notranslate"><span class="pre">splu</span></code> once and <code class="docutils literal notranslate"><span class="pre">.solve</span></code> fifty times touches the factor’s 30,338 nonzeros
+<span class="math notranslate nohighlight">\(2\times50\)</span> times, against <span class="math notranslate nohighlight">\(50\times\)</span> the full elimination. Gate the count
+ratio; report nothing about the clock.</p>
+<p><strong>Part c)</strong> Compute the smallest eigenpair of <code class="docutils literal notranslate"><span class="pre">P2</span></code> by shift-invert power
+iteration (<a class="reference internal" href="eigenvalue-algorithms.html"><span class="std std-doc">§5.2</span></a>’s Exercise 1, at <span class="math notranslate nohighlight">\(\mu = 0\)</span>):
+60 iterations of <code class="docutils literal notranslate"><span class="pre">lu.solve</span></code> from the COLAMD factorization. Confirm the
+eigenvalue matches the closed form
+<span class="math notranslate nohighlight">\(2\lambda^{(1)}_{\text{1D}} = 2(2 - 2\cos(\pi/31))\)</span> to <span class="math notranslate nohighlight">\(10^{-10}\)</span> — the
+sparse factorization powering the eigensolver.</p>
+<p><strong>Part d)</strong> Reshape the eigenvector to the <span class="math notranslate nohighlight">\(30\times30\)</span> grid and draw it: the
+fundamental drum mode, one smooth bump, the lowest resonance of the membrane
+the matrix discretises. The eigenvector’s sign is the iteration’s choice, so
+the figure fixes it by making the peak positive.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>splu vs dense solve: 1.24e-14
+work for 50 right-hand sides (in factor-nnz touches): factor-once 3,064,138 vs refactor-each 4,550,700 (1.49x)
+
+smallest eigenvalue by shift-invert at mu = 0: 0.020522706432
+closed form 2(2 - 2cos(pi/31))              : 0.020522706432
+gap: 2.78e-17
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-sp-drum">
+<img alt="../../_images/9b1b7e5ae62c841efc65c91ad8a4214ae68772e9a75edbc6cccf930b7596d219.png" src="../../_images/9b1b7e5ae62c841efc65c91ad8a4214ae68772e9a75edbc6cccf930b7596d219.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 100 </span><span class="caption-text">The eigenvector of the smallest Poisson eigenvalue, reshaped to its <span class="math notranslate nohighlight">\(30\times30\)</span> grid: the fundamental mode of the discrete drum – one smooth bump, positive everywhere once the iteration’s arbitrary sign is fixed, vanishing at the clamped boundary the matrix encodes. It was computed by sixty applications of the COLAMD-ordered sparse factorization from Exercise 3, and its eigenvalue matches the closed form <span class="math notranslate nohighlight">\(2(2 - 2\cos(\pi/31))\)</span> to <span class="math notranslate nohighlight">\(10^{-13}\)</span>: storage formats, orderings and closed-form spectra all meeting in one picture.</span><a class="headerlink" href="#fig-sp-drum" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<p>The eigenvalue check closes a loop across three notebooks: the matrix from
+this one, the algorithm from <a class="reference internal" href="eigenvalue-algorithms.html"><span class="std std-doc">§5.2</span></a>, the closed
+form from <a class="reference internal" href="../01-matrices/elimination-lu.html"><span class="std std-doc">§1.2</span></a> — three independent
+artefacts required to agree to ten digits.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the sparse direct solve matches the dense one   [1.24345e-14 &lt; 1e-11]
+✓  factor-once-solve-many wins by counting factor touches, not clocks   [1.49x at 50 right-hand sides; the ratio approaches 1.5 as k grows, and far more when the symbolic analysis dominates]
+✓  shift-invert on the sparse factor recovers the smallest eigenvalue (Eq. 3)   [matrix from 5.3, algorithm from 5.2, closed form from 1.2 — three artefacts, ten digits [2.77556e-17 &lt; 1e-10]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-the-thomas-algorithm-eight-flops-per-unknown">
+<h2>Exercise 5: The Thomas algorithm: eight flops per unknown<a class="headerlink" href="#exercise-5-the-thomas-algorithm-eight-flops-per-unknown" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-sp-thomas">Eq. 234</a> is what elimination becomes when the bandwidth is 1: no
+pivot search (the Poisson matrix is diagonally dominant, so stability is
+free), no fill-in (the band cannot widen), and <span class="math notranslate nohighlight">\(\sim8n\)</span> flops. The manifest
+asked this exercise to gate a <span class="math notranslate nohighlight">\(50\times\)</span> wall-clock speedup at <span class="math notranslate nohighlight">\(n = 5000\)</span>;
+per the course’s gating rules the <em>FLOP ratio</em> — <span class="math notranslate nohighlight">\(2\times10^{6}\)</span> — is what
+gets gated, and the stopwatch testifies without being cross-examined.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">thomas(a,</span> <span class="pre">b,</span> <span class="pre">c,</span> <span class="pre">d)</span></code> implementing <a class="reference internal" href="#equation-eq-sp-thomas">Eq. 234</a> for
+the tridiagonal system with sub-, main and superdiagonals <code class="docutils literal notranslate"><span class="pre">a,</span> <span class="pre">b,</span> <span class="pre">c</span></code>. Run it
+on the <span class="math notranslate nohighlight">\(n = 5000\)</span> Poisson system with a fixed random right-hand side.</p>
+<p><strong>Write this one yourself</strong> — the implementation is the lesson.</p>
+<p><strong>Part b)</strong> Confirm against <code class="docutils literal notranslate"><span class="pre">scipy.linalg.solve_banded((1,</span> <span class="pre">1),</span> <span class="pre">ab,</span> <span class="pre">d)</span></code> and
+against the dense <code class="docutils literal notranslate"><span class="pre">np.linalg.solve</span></code>, to <span class="math notranslate nohighlight">\(10^{-8}\)</span> — the tolerance scaled to
+this system’s <span class="math notranslate nohighlight">\(\kappa \approx 4(n/\pi)^2 \approx 10^{7}\)</span>, per
+<a class="reference internal" href="norms-conditioning-stability.html"><span class="std std-doc">§5.1</span></a>: three backward stable solvers
+may legitimately differ by <span class="math notranslate nohighlight">\(\kappa\varepsilon \approx 2\times10^{-9}\)</span>.</p>
+<p><strong>Part c)</strong> Gate the arithmetic: dense elimination costs
+<span class="math notranslate nohighlight">\(\tfrac23n^3 = 8.3\times10^{10}\)</span> flops at <span class="math notranslate nohighlight">\(n = 5000\)</span>, Thomas <span class="math notranslate nohighlight">\(8n = 4\times
+10^{4}\)</span> — a ratio of <span class="math notranslate nohighlight">\(2.1\times10^{6}\)</span>, computed not measured. Report the
+three wall times (here: dense <span class="math notranslate nohighlight">\(\sim0.8\)</span> s, banded <span class="math notranslate nohighlight">\(\sim1\)</span> ms, Thomas in
+Python <span class="math notranslate nohighlight">\(\sim6\)</span> ms — the pure-Python loop loses to LAPACK’s banded solver
+despite identical flop counts, which is its own small lesson about constant
+factors).</p>
+<p><strong>Part d)</strong> Confirm the count directly: replay the loop with a counter
+beside every arithmetic operation (a counted twin of <code class="docutils literal notranslate"><span class="pre">thomas</span></code>) and confirm
+it performs exactly <span class="math notranslate nohighlight">\(8n - 7\)</span> operations — <span class="math notranslate nohighlight">\(6n - 5\)</span> in the forward sweep,
+<span class="math notranslate nohighlight">\(2n - 2\)</span> in the back sweep — returning bit-identical <span class="math notranslate nohighlight">\(x\)</span>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>thomas vs dense: 1.7e-10; banded vs dense: 9.5e-11 (kappa eps = 2.2e-09)
+
+flops: dense 8.33e+10, Thomas 4e+04 -&gt; ratio 2.08e+06 (gated, pure arithmetic)
+wall times (reported only): dense 2059 ms, banded 0.45 ms, Thomas-in-Python 7.2 ms
+the Python loop loses to LAPACK&#39;s banded solver at IDENTICAL flops: constant factors are real, which is why the flop ratio is the gate
+
+instrumented count: 39,993 operations = 8n - 7 = 39,993 exactly; counted replay bit-identical to thomas: True
+</pre></div>
+</div>
+</div>
+</div>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p>The Thomas algorithm assumes the tridiagonal system needs no pivoting, which
+diagonal dominance guarantees — but many tridiagonal systems are not
+dominant. Ask your assistant for <code class="docutils literal notranslate"><span class="pre">thomas_pivoting(a,</span> <span class="pre">b,</span> <span class="pre">c,</span> <span class="pre">d)</span></code> with partial
+pivoting (the band grows to two superdiagonals, and no further). Then check
+it against the mathematics rather than a demo: (i) on the Poisson system it
+agrees with plain Thomas to <span class="math notranslate nohighlight">\(10^{-12}\)</span>; (ii) on
+<span class="math notranslate nohighlight">\(\operatorname{tridiag}(1, 10^{-12}, 1)\)</span> — near-zero pivots — plain Thomas
+loses at least six digits against <code class="docutils literal notranslate"><span class="pre">solve</span></code> while the pivoting version stays
+at rounding level; (iii) the operation count is still <span class="math notranslate nohighlight">\(O(n)\)</span>, near <span class="math notranslate nohighlight">\(12n\)</span>.
+The check is yours.</p>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<p>The FLOP ratio is the gate; the stopwatch is testimony, and this exercise’s
+own timing makes the case for that rule — the Python Thomas loop loses to
+LAPACK’s banded solver at <em>identical</em> flop counts, so a wall-clock gate here
+would grade the interpreter, not the algorithm.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  Thomas and solve_banded agree with the dense solve at kappa-scaled tolerance   [gaps 1.7e-10, 9.5e-11 against kappa eps = 2.2e-09: three backward stable solvers on a kappa = 1e7 system (5.1&#39;s master inequality pricing the agreement)]
+✓  the flop ratio at n = 5000 exceeds two million — gated as arithmetic   [8.3e+10 against 4e+04; the measured wall times are reported above and gated nowhere (rule 2), and the Python loop losing to LAPACK at equal flops is the reason why]
+✓  and the instrumented loop performs exactly 8n - 7 operations   [39,993 counted for n = 5,000 (6n - 5 forward, 2n - 2 back), the counted replay bit-identical to thomas: structure, not cleverness]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p><strong>Formats are encodings, checked exactly.</strong> The hand-derived CSR arrays of
+the <span class="math notranslate nohighlight">\(4\times4\)</span> example matched <code class="docutils literal notranslate"><span class="pre">scipy.sparse</span></code> bit for bit; both round trips
+were exact; the Poisson matrix’s CSR storage came to exactly
+<span class="math notranslate nohighlight">\(2\,\mathrm{nnz} + n + 1 = 9661\)</span> numbers against 810,000 dense — <span class="math notranslate nohighlight">\(84\times\)</span>,
+growing with the grid.</p>
+<p><strong>The matvec is counting, and the spectra are closed forms.</strong> The
+hand-written CSR product matched scipy and dense to <span class="math notranslate nohighlight">\(10^{-13}\)</span> at exactly
+nnz multiply-adds (185× fewer than dense, gated as arithmetic); the 1-D
+spectrum hit <span class="math notranslate nohighlight">\(2 - 2\cos(k\pi/51)\)</span> to <span class="math notranslate nohighlight">\(3\times10^{-15}\)</span>; <code class="docutils literal notranslate"><span class="pre">poisson_2d</span></code> equalled its
+Kronecker sum <em>exactly</em> with the 2-D spectrum the outer sum of 1-D ones to
+<span class="math notranslate nohighlight">\(10^{-13}\)</span>.</p>
+<p><strong>Fill-in is the enemy and ordering the weapon — with the manifest
+corrected by measurement.</strong> Natural-order LU inflated 4380 nonzeros to
+54,058; RCM cut 29% (the manifest guessed 40%; the measurement wins and the
+gate sits at 25%); COLAMD, the <code class="docutils literal notranslate"><span class="pre">splu</span></code> default, cut 44% and beat RCM — fill
+minimisation beats bandwidth minimisation on 2-D grids. All three orderings
+solved the same system to <span class="math notranslate nohighlight">\(10^{-12}\)</span>: permutation changes work, never
+answers.</p>
+<p><strong>Three notebooks met in one eigenvalue.</strong> Shift-invert iteration
+(<a class="reference internal" href="eigenvalue-algorithms.html"><span class="std std-doc">§5.2</span></a>) on the COLAMD factorization recovered
+the drum’s fundamental <span class="math notranslate nohighlight">\(2(2 - 2\cos(\pi/31))\)</span>
+(<a class="reference internal" href="../01-matrices/elimination-lu.html"><span class="std std-doc">§1.2</span></a>’s closed form) to <span class="math notranslate nohighlight">\(10^{-13}\)</span>,
+and the mode’s picture is one smooth bump on the membrane the matrix
+discretises.</p>
+<p><strong>The tridiagonal endgame is structural.</strong> Thomas at <span class="math notranslate nohighlight">\(8n\)</span> flops against
+dense’s <span class="math notranslate nohighlight">\(\tfrac23n^3\)</span>: a ratio of <span class="math notranslate nohighlight">\(2.1\times10^{6}\)</span> at <span class="math notranslate nohighlight">\(n = 5000\)</span>, gated as
+arithmetic — while the wall clock testified that the pure-Python loop loses
+to LAPACK’s banded solver at <em>identical</em> flop counts, which is precisely why
+this course gates flops and reports clocks. Agreement between the three
+solvers was priced by <a class="reference internal" href="norms-conditioning-stability.html"><span class="std std-doc">§5.1</span></a>’s master
+inequality at the system’s <span class="math notranslate nohighlight">\(\kappa \approx 10^{7}\)</span>.</p>
+<p><strong>Methods introduced.</strong> COO/CSR/CSC and their arrays, the hand-written
+<span class="math notranslate nohighlight">\(O(\mathrm{nnz})\)</span> matvec, <code class="docutils literal notranslate"><span class="pre">sp.kron</span></code> model problems, <code class="docutils literal notranslate"><span class="pre">splu</span></code> with
+<code class="docutils literal notranslate"><span class="pre">permc_spec</span></code>, <code class="docutils literal notranslate"><span class="pre">reverse_cuthill_mckee</span></code>, factor-reuse counting,
+<code class="docutils literal notranslate"><span class="pre">solve_banded</span></code>, and the Thomas algorithm.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>When even the factor is too big.</strong> COLAMD’s 30,338 nonzeros fit easily;
+the 3-D version of this matrix fills catastrophically no matter the
+ordering, and that wall is where direct methods end.
+<a class="reference internal" href="stationary-and-cg.html"><span class="std std-doc">§5.4</span></a> starts over from the <span class="math notranslate nohighlight">\(O(\mathrm{nnz})\)</span>
+matvec alone.</p></li>
+<li><p><strong>Orderings as graph theory.</strong> RCM is breadth-first search; AMD is greedy
+degree minimisation; nested dissection is the divide-and-conquer that is
+provably optimal for planar grids. Sparse elimination is graph algorithms
+wearing arithmetic.</p></li>
+<li><p><strong>The graph itself as the object.</strong>
+<a class="reference internal" href="../06-structure/graphs-laplacian.html"><span class="std std-doc">§6.1</span></a> turns the adjacency
+structure this notebook exploits into the <em>subject</em>: the graph Laplacian
+is the Poisson matrix generalised to any network.</p></li>
+<li><p><strong>Banded is a special case of structured.</strong> Toeplitz, circulant and
+low-rank-plus-sparse all admit fast solvers by exploiting what dense
+algebra ignores, and <a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html"><span class="std std-doc">§6.3</span></a>
+does it with the FFT.</p></li>
+</ul>
+<div class="docutils container" id="id3">
+<div role="list" class="citation-list">
+<div class="citation" id="id12" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">GVL13</a><span class="fn-bracket">]</span></span>
+<p>Gene H. Golub and Charles F. Van Loan. <em>Matrix Computations</em>. Johns Hopkins University Press, Baltimore, 4 edition, 2013.</p>
+</div>
+<div class="citation" id="id16" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">Saa03</a><span class="fn-bracket">]</span></span>
+<p>Yousef Saad. <em>Iterative Methods for Sparse Linear Systems</em>. SIAM, Philadelphia, 2 edition, 2003. <a class="reference external" href="https://doi.org/10.1137/1.9780898718003">doi:10.1137/1.9780898718003</a>.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/05-numerical"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="eigenvalue-algorithms.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">5.2 How Eigenvalues Are Really Computed</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="stationary-and-cg.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">5.4 Stationary Iterations and Conjugate Gradients</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#three-formats-one-matrix">Three formats, one matrix</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-model-problems">The model problems</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fill-in-and-why-ordering-matters">Fill-in, and why ordering matters</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-tridiagonal-endgame">The tridiagonal endgame</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-csr-by-hand-and-the-storage-arithmetic">Exercise 1: CSR by hand, and the storage arithmetic</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-o-mathrm-nnz-matvec-and-a-spectrum-in-closed-form">Exercise 2: The <span class="math notranslate nohighlight">\(O(\mathrm{nnz})\)</span> matvec, and a spectrum in closed form</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-fill-in-and-the-ordering-war">Exercise 3: Fill-in, and the ordering war</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-sparse-direct-solve-and-a-drum-mode-to-prove-it">Exercise 4: Sparse direct solve, and a drum mode to prove it</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-the-thomas-algorithm-eight-flops-per-unknown">Exercise 5: The Thomas algorithm: eight flops per unknown</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

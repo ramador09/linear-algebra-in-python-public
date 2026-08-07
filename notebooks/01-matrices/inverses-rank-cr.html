@@ -1,0 +1,1702 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="1.3 Inverses, Rank, and A = CR" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/01-matrices/inverses-rank-cr.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: Two ideas here, and they pull in opposite directions. The first is that A^{-1}, the object every hand calculation reaches for, is somethin..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: Two ideas here, and they pull in opposite directions. The first is that A^{-1}, the object every hand calculation reaches for, is somethin..." />
+
+    <title>1.3 Inverses, Rank, and A = CR &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/01-matrices/inverses-rank-cr';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/01-matrices/inverses-rank-cr.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="1.4 The Four Fundamental Subspaces" href="four-subspaces.html" />
+    <link rel="prev" title="1.2 Elimination, Pivoting, and A = LU" href="elimination-lu.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/01-matrices/inverses-rank-cr.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/01-matrices/inverses-rank-cr.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/01-matrices/inverses-rank-cr.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/01-matrices/inverses-rank-cr.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>1.3 Inverses, Rank, and A = CR</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-inverse-and-why-it-is-a-detour">The inverse, and why it is a detour</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#rank-and-the-factorization-that-explains-it">Rank, and the factorization that explains it</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#rank-in-floating-point">Rank in floating point</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-the-inverse-one-column-at-a-time">Exercise 1: The inverse, one column at a time</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-never-form-the-inverse">Exercise 2: Never form the inverse</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-rank-three-ways">Exercise 3: Rank three ways</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-a-cr-and-row-rank-for-free">Exercise 4: <span class="math notranslate nohighlight">\(A = CR\)</span>, and row rank for free</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-what-rank-does-under-products-and-sums">Exercise 5: What rank does under products and sums</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-updating-an-inverse-without-recomputing-it">Exercise 6: Updating an inverse without recomputing it</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-7-where-exact-and-numerical-rank-part-company">Exercise 7: Where exact and numerical rank part company</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-7">Validation 7</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="inverses-rank-and-a-cr">
+<h1>1.3 Inverses, Rank, and A = CR<a class="headerlink" href="#inverses-rank-and-a-cr" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter I — Matrices, Elimination, and Subspaces
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;1.3
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">Why forming the inverse is almost always wrong, why row rank equals column rank for a one-line reason, and why &#x27;the rank&#x27; of a floating-point matrix is a decision rather than a number.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;intermediate&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;75–105 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p>Two ideas here, and they pull in opposite directions.</p>
+<p>The first is that <span class="math notranslate nohighlight">\(A^{-1}\)</span>, the object every hand calculation reaches for, is
+something a numerical library goes out of its way to avoid. It exists, it is
+computable, and computing it costs about three times a solve and returns an
+answer that is <em>catastrophically less trustworthy</em>. We measure that: on a
+system with <span class="math notranslate nohighlight">\(\kappa = 10^{10}\)</span>, <code class="docutils literal notranslate"><span class="pre">solve(A,</span> <span class="pre">b)</span></code> and <code class="docutils literal notranslate"><span class="pre">inv(A)</span> <span class="pre">&#64;</span> <span class="pre">b</span></code> differ by only a
+factor of twelve in the accuracy of the answer, but by a factor of <span class="math notranslate nohighlight">\(10^{8}\)</span> in
+<strong>backward error</strong> — the quantity <a class="reference internal" href="../00-machine/floating-point.html"><span class="std std-doc">§0.2</span></a>
+introduced as the honest measure of whether an algorithm did its job. The
+solve produces the exact answer to a problem a rounding error away from yours.
+The inverse produces an answer to no nearby problem at all.</p>
+<p>The second idea is <strong>rank</strong>, and it is where this course’s exact-versus-float
+spine bites hardest. In exact arithmetic rank is a theorem: the number of
+independent columns, computed by elimination over the rationals, with no
+ambiguity whatsoever. In floating point it is a <em>threshold</em> on singular values,
+and different defensible thresholds give different answers for the same matrix.
+The Prologue planted that question and <a class="reference internal" href="../00-machine/floating-point.html"><span class="std std-doc">§0.2</span></a>
+supplied the machinery; here we confront it directly, with SymPy’s exact answer
+printed beside NumPy’s, and see precisely where they part company.</p>
+<p>In between sits the factorization that makes rank concrete. <span class="math notranslate nohighlight">\(A = CR\)</span> takes the
+independent columns as <span class="math notranslate nohighlight">\(C\)</span> and the recipe for rebuilding the rest as <span class="math notranslate nohighlight">\(R\)</span>, and
+it proves in one line something that is otherwise a real theorem: <strong>row rank
+equals column rank</strong>, for every matrix, always.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> The <span class="math notranslate nohighlight">\(A = CR\)</span> framing and its proof of the rank theorem are
+Strang’s <span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id4" title="Gilbert Strang. Introduction to Linear Algebra. Wellesley-Cambridge Press, Wellesley, MA, 6 edition, 2023. ISBN 978-1-7331466-7-8.">Str23</a>]</span>, Chapter 3. For why the inverse is avoided, and
+the backward-error argument in full, Higham <span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id14" title="Nicholas J. Higham. Accuracy and Stability of Numerical Algorithms. SIAM, Philadelphia, 2 edition, 2002. doi:10.1137/1.9780898718027.">Hig02</a>]</span> Chapter 14,
+whose title — “Matrix Inversion” — opens with the observation that the
+operation is far less often needed than supposed.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="the-inverse-and-why-it-is-a-detour">
+<h3>The inverse, and why it is a detour<a class="headerlink" href="#the-inverse-and-why-it-is-a-detour" title="Link to this heading">#</a></h3>
+<p>For square <span class="math notranslate nohighlight">\(A\)</span> the inverse satisfies <span class="math notranslate nohighlight">\(AA^{-1} = A^{-1}A = I\)</span>, and its columns
+are the solutions of <span class="math notranslate nohighlight">\(n\)</span> linear systems:</p>
+<div class="math notranslate nohighlight" id="equation-eq-rank-inverse-columns">
+<span class="eqno">(62)<a class="headerlink" href="#equation-eq-rank-inverse-columns" title="Link to this equation">#</a></span>\[A\,\mathbf{x}_j = \mathbf{e}_j, \qquad A^{-1} = [\,\mathbf{x}_1\ \cdots\ \mathbf{x}_n\,].\]</div>
+<p>So computing <span class="math notranslate nohighlight">\(A^{-1}\)</span> <em>is</em> solving <span class="math notranslate nohighlight">\(n\)</span> systems — one factorization plus <span class="math notranslate nohighlight">\(n\)</span>
+pairs of triangular sweeps by <a class="reference internal" href="elimination-lu.html"><span class="std std-doc">§1.2</span></a>, which is
+<span class="math notranslate nohighlight">\(\tfrac23 n^3 + 2n^3 = \tfrac83 n^3\)</span> operations, about four times the cost of
+the single solve you probably wanted.</p>
+<p>Cost is the smaller objection. The real one is stability. Solving directly
+gives a computed <span class="math notranslate nohighlight">\(\hat{\mathbf{x}}\)</span> that is the <em>exact</em> solution of
+<span class="math notranslate nohighlight">\((A + \delta A)\hat{\mathbf{x}} = \mathbf{b}\)</span> with <span class="math notranslate nohighlight">\(\|\delta A\|\)</span> of order
+<span class="math notranslate nohighlight">\(\varepsilon\|A\|\)</span>: a <strong>backward stable</strong> result. Forming <span class="math notranslate nohighlight">\(A^{-1}\)</span> and
+multiplying does not have that property, and the multiplication introduces
+errors that no nearby problem explains. Both answers may have similar <em>forward</em>
+error, since both are limited by <span class="math notranslate nohighlight">\(\kappa\varepsilon\)</span>, but only one of them is
+the right answer to a question anybody asked.</p>
+<p>The rule, which this course follows everywhere: <strong>to solve <span class="math notranslate nohighlight">\(A\mathbf{x} =
+\mathbf{b}\)</span>, factor and substitute; never form <span class="math notranslate nohighlight">\(A^{-1}\)</span>.</strong> The inverse is a
+theoretical object, and the notation <span class="math notranslate nohighlight">\(A^{-1}\mathbf{b}\)</span> is an instruction to
+solve, not a recipe to multiply.</p>
+</section>
+<section id="rank-and-the-factorization-that-explains-it">
+<h3>Rank, and the factorization that explains it<a class="headerlink" href="#rank-and-the-factorization-that-explains-it" title="Link to this heading">#</a></h3>
+<p>The <strong>column rank</strong> of <span class="math notranslate nohighlight">\(A\)</span> is the dimension of its column space; the <strong>row
+rank</strong> is the dimension of its row space. That these are always equal is not
+obvious, and <span class="math notranslate nohighlight">\(A = CR\)</span> makes it a one-liner.</p>
+<p>Go through the columns left to right, keeping each one that is not a
+combination of those already kept. Assemble the kept columns as <span class="math notranslate nohighlight">\(C\)</span> (with <span class="math notranslate nohighlight">\(r\)</span>
+of them) and the coefficients rebuilding every column of <span class="math notranslate nohighlight">\(A\)</span> as <span class="math notranslate nohighlight">\(R\)</span>:</p>
+<div class="math notranslate nohighlight" id="equation-eq-rank-cr">
+<span class="eqno">(63)<a class="headerlink" href="#equation-eq-rank-cr" title="Link to this equation">#</a></span>\[A = CR, \qquad C \in \mathbb{R}^{m\times r},\quad R \in \mathbb{R}^{r\times n}.\]</div>
+<p>By construction <span class="math notranslate nohighlight">\(r\)</span> is the column rank. But <span class="math notranslate nohighlight">\(R\)</span> has only <span class="math notranslate nohighlight">\(r\)</span> <strong>rows</strong>, and
+every row of <span class="math notranslate nohighlight">\(A\)</span> is a combination of them, so the row rank is at most <span class="math notranslate nohighlight">\(r\)</span>.
+Applying the same argument to <span class="math notranslate nohighlight">\(A^{\top}\)</span> gives the reverse inequality, and
+therefore</p>
+<div class="math notranslate nohighlight" id="equation-eq-rank-theorem">
+<span class="eqno">(64)<a class="headerlink" href="#equation-eq-rank-theorem" title="Link to this equation">#</a></span>\[\text{row rank} = \text{column rank} = r .\]</div>
+<p>Concretely, <span class="math notranslate nohighlight">\(R\)</span> is the nonzero part of the reduced row-echelon form and <span class="math notranslate nohighlight">\(C\)</span> is
+the corresponding <strong>pivot columns</strong> of <span class="math notranslate nohighlight">\(A\)</span>. Both are computed by elimination,
+and over the rationals both are exact.</p>
+</section>
+<section id="rank-in-floating-point">
+<h3>Rank in floating point<a class="headerlink" href="#rank-in-floating-point" title="Link to this heading">#</a></h3>
+<p>The definition “number of independent columns” is useless numerically, because
+independence is a yes/no question about exact equality and floating-point
+quantities are never exactly anything. What replaces it is the singular value
+threshold of <a class="reference internal" href="../00-machine/floating-point.html"><span class="std std-doc">§0.2</span></a>:</p>
+<div class="math notranslate nohighlight" id="equation-eq-rank-numerical">
+<span class="eqno">(65)<a class="headerlink" href="#equation-eq-rank-numerical" title="Link to this equation">#</a></span>\[\operatorname{rank}_\eta(A) = \#\{\, i : \sigma_i &gt; \eta\,\sigma_1 \,\},\]</div>
+<p>a <em>decision</em> parameterised by the noise level <span class="math notranslate nohighlight">\(\eta\)</span> you believe your entries
+carry. <code class="docutils literal notranslate"><span class="pre">np.linalg.matrix_rank</span></code> takes <span class="math notranslate nohighlight">\(\eta = \max(m,n)\varepsilon\)</span> by default,
+which answers a narrow question — treat these floats as exact and ask what the
+SVD algorithm alone could have introduced. For a matrix whose entries came from
+measurement, arithmetic, or storage, that is the wrong question, and Exercise 7
+shows how differently it can answer.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data and instruments only: the worked matrices, the timing meter of
+<a class="reference internal" href="../00-machine/arrays-and-vectorization.html"><span class="std std-doc">§0.1</span></a>, and
+a backward-error meter. Nothing here is any exercise’s lesson.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sympy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">la</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random matrix below comes from this seed</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">110</span><span class="p">)</span>
+
+
+<span class="c1"># instrument: the timing meter of §0.1 — plumbing for every race in the</span>
+<span class="c1"># course, not any exercise&#39;s lesson.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">bench</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">repeats</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Median wall-clock time of a zero-argument call, in seconds.</span>
+
+<span class="sd">    The helper used since section 0.1. Timings are reported as ratios, never as</span>
+<span class="sd">    absolute seconds, because absolutes do not transfer between machines.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fn : callable</span>
+<span class="sd">        Zero-argument callable to time; called once first to warm any cache.</span>
+<span class="sd">    repeats : int, default 5</span>
+<span class="sd">        Number of timed repetitions.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float</span>
+<span class="sd">        Median elapsed time in seconds.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fn</span><span class="p">()</span>
+    <span class="n">times</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">repeats</span><span class="p">):</span>
+        <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+        <span class="n">fn</span><span class="p">()</span>
+        <span class="n">times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">times</span><span class="p">))</span>
+
+
+<span class="c1"># instrument: a meter, not a method — it reads out how well a candidate</span>
+<span class="c1"># solution satisfies its system, which every exercise consumes and none builds.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">backward_error</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Relative backward error of a computed solution to A x = b.</span>
+
+<span class="sd">    Answers the question that matters about a linear solver: is the computed x</span>
+<span class="sd">    the EXACT solution of a nearby problem? The quantity ||Ax - b|| / (||A|| ||x||)</span>
+<span class="sd">    is, up to a constant, the smallest relative perturbation of A for which it</span>
+<span class="sd">    is (Rigal-Gaches). A backward stable method returns a few units of eps here</span>
+<span class="sd">    however ill conditioned the problem is; the forward error, by contrast, is</span>
+<span class="sd">    free to be as large as kappa*eps and is nobody&#39;s fault.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    A : numpy.ndarray, shape (n, n)</span>
+<span class="sd">        The system matrix.</span>
+<span class="sd">    x : numpy.ndarray, shape (n,)</span>
+<span class="sd">        The computed solution.</span>
+<span class="sd">    b : numpy.ndarray, shape (n,)</span>
+<span class="sd">        The right-hand side.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float</span>
+<span class="sd">        The relative backward error, in units of 1 (divide by eps to read it in</span>
+<span class="sd">        units of the unit roundoff).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">A</span> <span class="o">@</span> <span class="n">x</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span>
+        <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="p">)</span>
+
+
+<span class="c1"># The worked matrix of Exercises 4-6: 4x6, exact rank 3, with three dependent</span>
+<span class="c1"># columns whose coefficients are all integers, so C and R come out exact.</span>
+<span class="c1">#   c2 = 2 c1,   c3 = 3 c1,   c6 = c1 + c4 + c5</span>
+<span class="n">A46</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">],</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-the-inverse-one-column-at-a-time">
+<h2>Exercise 1: The inverse, one column at a time<a class="headerlink" href="#exercise-1-the-inverse-one-column-at-a-time" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-rank-inverse-columns">Eq. 62</a> says the inverse is <span class="math notranslate nohighlight">\(n\)</span> solutions side by side:
+column <span class="math notranslate nohighlight">\(j\)</span> of <span class="math notranslate nohighlight">\(A^{-1}\)</span> solves <span class="math notranslate nohighlight">\(A\mathbf{x} = \mathbf{e}_j\)</span>. Building it that
+way makes the cost visible and removes any sense that the inverse is a
+primitive operation. It is a loop over solves.</p>
+<p>The efficient version reuses one factorization for all <span class="math notranslate nohighlight">\(n\)</span> right-hand sides,
+exactly as <a class="reference internal" href="elimination-lu.html"><span class="std std-doc">§1.2</span></a> Exercise 6 established, so the cost is
+<span class="math notranslate nohighlight">\(\tfrac23 n^3\)</span> for the factorization plus <span class="math notranslate nohighlight">\(n \cdot 2n^2 = 2n^3\)</span> for the sweeps:</p>
+<div class="math notranslate nohighlight" id="equation-eq-rank-inverse-cost">
+<span class="eqno">(66)<a class="headerlink" href="#equation-eq-rank-inverse-cost" title="Link to this equation">#</a></span>\[\text{flops}(A^{-1}) \;\approx\; \tfrac23 n^3 + 2n^3 \;=\; \tfrac83 n^3 ,\]</div>
+<p>four times a single solve. That is the cheap way to do it <em>by hand</em>; the
+expensive way would be <span class="math notranslate nohighlight">\(n\)</span> independent solves — and the library does better
+than both, reorganizing the sweeps into triangular-triangular products for
+<span class="math notranslate nohighlight">\(2n^3\)</span> total (three times an LU), which is the figure
+<code class="docutils literal notranslate"><span class="pre">ecp.linalg.flops(&quot;inverse&quot;)</span></code> records.</p>
+<p><strong>Part a)</strong> For the explicit matrix</p>
+<div class="math notranslate nohighlight" id="equation-eq-rank-small-matrix">
+<span class="eqno">(67)<a class="headerlink" href="#equation-eq-rank-small-matrix" title="Link to this equation">#</a></span>\[\begin{split}A_3 = \begin{bmatrix} 2 &amp; 1 &amp; 1\\ 1 &amp; 3 &amp; 2\\ 1 &amp; 0 &amp; 0 \end{bmatrix},\end{split}\]</div>
+<p>build <span class="math notranslate nohighlight">\(A_3^{-1}\)</span> column by column from <a class="reference internal" href="#equation-eq-rank-inverse-columns">Eq. 62</a> using
+<code class="docutils literal notranslate"><span class="pre">scipy.linalg.lu_factor</span></code> once and <code class="docutils literal notranslate"><span class="pre">lu_solve</span></code> on each <span class="math notranslate nohighlight">\(\mathbf{e}_j\)</span>, and
+compare against <code class="docutils literal notranslate"><span class="pre">np.linalg.inv</span></code> to <span class="math notranslate nohighlight">\(10^{-12}\)</span>.</p>
+<p><strong>Part b)</strong> Confirm both defining identities <span class="math notranslate nohighlight">\(AA^{-1} = I\)</span> and <span class="math notranslate nohighlight">\(A^{-1}A = I\)</span> to
+<span class="math notranslate nohighlight">\(10^{-12}\)</span> — they are separate claims, and a one-sided inverse of a square
+matrix is automatically two-sided only because the matrix is square.</p>
+<p><strong>Part c)</strong> Put the cost estimate <a class="reference internal" href="#equation-eq-rank-inverse-cost">Eq. 66</a> beside the
+clock: time <code class="docutils literal notranslate"><span class="pre">np.linalg.inv</span></code> against <code class="docutils literal notranslate"><span class="pre">np.linalg.solve</span></code> at <span class="math notranslate nohighlight">\(n = 800\)</span> and
+report the ratio next to both predictions — the measured value is
+testimony, never gated. (It will not be exactly 4: the inverse is
+level-3-friendly and the single solve is not, which is
+<a class="reference internal" href="four-ways-to-multiply.html"><span class="std std-doc">§1.1</span></a> again.)</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>A3^-1 built column by column:
+ [[ 0.  0.  1.]
+ [-2.  1.  3.]
+ [ 3. -1. -5.]]
+
+agrees with np.linalg.inv to 0.000e+00
+max |A A^-1 - I| = 1.776e-15
+max |A^-1 A - I| = 2.220e-16
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>n = 800:  solve   11.5 ms   inv   38.8 ms   ratio 3.39   (Eq. 5&#39;s column route predicts 4, the library&#39;s 2n^3 route 3)
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<p>The column-by-column construction is checked against an independent
+implementation, and both defining identities are checked separately. The cost
+ratio is gated to a wide band, since it is a property of this machine’s BLAS
+rather than of the arithmetic.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the inverse built from Eq. 1 matches np.linalg.inv   [max|Δ| = 0 (rtol=0, atol=1e-12)]
+✓  A A^-1 = I   [max|Δ| = 1.77636e-15 (rtol=0, atol=1e-12)]
+✓  and A^-1 A = I, which is a separate claim   [max|Δ| = 2.22045e-16 (rtol=0, atol=1e-12)]
+✓  forming the inverse costs 3x an LU by the library&#39;s FLOP model   [got [3.] vs expected [3.] (rtol=0, atol=1e-12)]
+✓  and the measured ratio is reported, never gated   [measured 3.39x at n = 800; a wall-clock ratio is a property of the machine, not of the algorithms. The band is wide because the inverse is level-3-friendly and a single solve is not, so the ratio depends on how many cores the machine brings to each]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-never-form-the-inverse">
+<h2>Exercise 2: Never form the inverse<a class="headerlink" href="#exercise-2-never-form-the-inverse" title="Link to this heading">#</a></h2>
+<p>This is the exercise the notebook exists for, and the result is sharper than
+the usual advice suggests.</p>
+<p>Take a <span class="math notranslate nohighlight">\(200\times200\)</span> matrix with condition number exactly <span class="math notranslate nohighlight">\(10^{10}\)</span>, built by
+<code class="docutils literal notranslate"><span class="pre">ecp.linalg.random_with_condition</span></code> so the conditioning is chosen rather than
+stumbled upon, and a right-hand side <span class="math notranslate nohighlight">\(\mathbf{b} = A\mathbf{x}_{\text{true}}\)</span>
+with a known answer. Solve it twice: once with <code class="docutils literal notranslate"><span class="pre">np.linalg.solve</span></code>, once by
+forming <code class="docutils literal notranslate"><span class="pre">np.linalg.inv(A)</span> <span class="pre">&#64;</span> <span class="pre">b</span></code>. Then measure <strong>two different errors</strong>.</p>
+<p>The <strong>forward error</strong> <span class="math notranslate nohighlight">\(\|\hat{\mathbf{x}} - \mathbf{x}\|/\|\mathbf{x}\|\)</span> says
+how wrong the answer is. Both routes will be poor, around <span class="math notranslate nohighlight">\(\kappa\varepsilon
+\approx 10^{-6}\)</span>, and that is nobody’s fault: <a class="reference internal" href="../00-machine/floating-point.html#equation-eq-fp-conditioning">Eq. 21</a> says the
+problem itself cannot do better.</p>
+<p>The <strong>backward error</strong> <span class="math notranslate nohighlight">\(\|A\hat{\mathbf{x}} - \mathbf{b}\| / (\|A\|
+\|\hat{\mathbf{x}}\|)\)</span> says something quite different — whether the computed
+answer is the <em>exact</em> solution of a nearby problem. This is where the two
+routes separate, and not by a little. <code class="docutils literal notranslate"><span class="pre">solve</span></code> returns a fraction of a single
+<span class="math notranslate nohighlight">\(\varepsilon\)</span>; <code class="docutils literal notranslate"><span class="pre">inv(A)</span> <span class="pre">&#64;</span> <span class="pre">b</span></code> returns something like <span class="math notranslate nohighlight">\(10^{7}\varepsilon\)</span>, eight
+orders of magnitude worse. Its answer is not the exact solution of any problem
+close to the one posed.</p>
+<p>That distinction is the whole reason to prefer one over the other. If you only
+ever looked at forward error you would conclude the two are comparable and the
+inverse merely slower. They are not comparable, and the difference shows up the
+moment the result is used for anything downstream.</p>
+<p><strong>Part a)</strong> Build <span class="math notranslate nohighlight">\(A\)</span> = <code class="docutils literal notranslate"><span class="pre">la.random_with_condition(200,</span> <span class="pre">200,</span> <span class="pre">1e10,</span> <span class="pre">rng)</span></code> and
+<span class="math notranslate nohighlight">\(\mathbf{b} = A\mathbf{x}_{\text{true}}\)</span> for a random <span class="math notranslate nohighlight">\(\mathbf{x}_{\text{true}}\)</span>,
+and confirm <span class="math notranslate nohighlight">\(\kappa(A) = 10^{10}\)</span> to a relative <span class="math notranslate nohighlight">\(10^{-4}\)</span>.</p>
+<p><strong>Part b)</strong> Solve both ways and report the forward error of each, together with
+the bound <span class="math notranslate nohighlight">\(\kappa\varepsilon\)</span> that <a class="reference internal" href="../00-machine/floating-point.html#equation-eq-fp-conditioning">Eq. 21</a> permits.</p>
+<p><strong>Part c)</strong> Report the backward error of each with the <code class="docutils literal notranslate"><span class="pre">backward_error</span></code> helper,
+in units of <span class="math notranslate nohighlight">\(\varepsilon\)</span>, and confirm that <code class="docutils literal notranslate"><span class="pre">solve</span></code> stays within a small
+multiple of <span class="math notranslate nohighlight">\(\varepsilon\)</span> while <code class="docutils literal notranslate"><span class="pre">inv</span></code> exceeds it by more than four orders of
+magnitude. Plot both errors for the two routes as a grouped bar chart on a log
+axis.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>kappa(A) = 1.0000e+10   kappa * eps = 2.220e-06
+
+route            forward error   backward error   in units of eps
+solve(A, b)          1.101e-07        8.719e-17              0.39
+inv(A) @ b           1.041e-06        1.338e-08       60265790.86
+
+forward  ratio inv/solve : 9.5x
+backward ratio inv/solve : 1.535e+08x   &lt;- this is the number that matters
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-rank-solve-vs-inv">
+<img alt="../../_images/e48b6e82ee217f736a86aa629674501c7802cf0e4a13d89484dbb91fd01bbd2f.png" src="../../_images/e48b6e82ee217f736a86aa629674501c7802cf0e4a13d89484dbb91fd01bbd2f.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 26 </span><span class="caption-text">Forward and backward error for solving the same <span class="math notranslate nohighlight">\(200\times200\)</span> system with <span class="math notranslate nohighlight">\(\kappa = 10^{10}\)</span> two ways, on a logarithmic axis. The forward errors (ink) are comparable and both sit near the <span class="math notranslate nohighlight">\(\kappa\varepsilon\)</span> limit that the conditioning imposes on any method, marked by the dashed rule. The backward errors (amber) are not comparable at all: \texttt{solve} returns a fraction of one <span class="math notranslate nohighlight">\(\varepsilon\)</span>, so its answer is the exact solution of a problem a rounding error away, while \texttt{inv(A) &#64; b} exceeds that by orders of magnitude and solves no nearby problem.</span><a class="headerlink" href="#fig-rank-solve-vs-inv" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<p>The forward errors are checked to be <em>comparable</em>, which is the part that
+misleads, and the backward errors to be <em>incomparable</em>, which is the part that
+decides. The conditioning bound is checked as a bound, one-sided, exactly as
+<a class="reference internal" href="../00-machine/floating-point.html"><span class="std std-doc">§0.2</span></a> established such things must be.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the constructed matrix has kappa = 1e10 as requested   [got 1e+10 vs expected 1e+10 (rtol=0.0001, atol=0)]
+✓  both forward errors respect the conditioning bound of section 0.2   [solve 1.10e-07, inv 1.04e-06, limit 2.22e-06]
+✓  the FORWARD errors are comparable, which is what misleads   [only 9.5x apart]
+✓  solve is backward stable: its answer exactly solves a nearby problem   [0.39 eps]
+✓  inv(A) @ b is NOT: its backward error is &gt;10^4 times larger   [1.53e+08x — it solves no nearby problem]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-rank-three-ways">
+<h2>Exercise 3: Rank three ways<a class="headerlink" href="#exercise-3-rank-three-ways" title="Link to this heading">#</a></h2>
+<p>Rank has three operational definitions, and it is worth computing all three on
+the same matrix and watching them agree, because Exercise 7 is about the case
+where they do not.</p>
+<p><strong>Exactly, by elimination over the rationals.</strong> <code class="docutils literal notranslate"><span class="pre">sympy.Matrix(A).rank()</span></code> runs
+elimination in exact arithmetic and counts pivots. There is no tolerance and no
+ambiguity; the answer is a theorem about the matrix you typed.</p>
+<p><strong>Numerically, from the singular values.</strong> <code class="docutils literal notranslate"><span class="pre">np.linalg.matrix_rank</span></code> counts
+<span class="math notranslate nohighlight">\(\sigma_i\)</span> above a threshold, <a class="reference internal" href="#equation-eq-rank-numerical">Eq. 65</a>. This is the standard
+numerical definition and the one every library uses, because the singular
+values are the <em>stable</em> way to measure how close a matrix is to a lower-rank
+one — a claim <a class="reference internal" href="../04-svd/low-rank-eckart-young.html"><span class="std std-doc">§4.2</span></a> makes exact.</p>
+<p><strong>From the pivots of the factorization.</strong> <a class="reference internal" href="elimination-lu.html"><span class="std std-doc">§1.2</span></a> Exercise
+8 read the rank off <span class="math notranslate nohighlight">\(\operatorname{diag}(U)\)</span> by counting non-negligible pivots.
+This is cheap, since the factorization is usually computed anyway, but it is
+the least reliable of the three: a matrix can be numerically rank-deficient
+with no small pivot, and a pivot can be small for reasons unrelated to rank.</p>
+<p>Test on the <span class="math notranslate nohighlight">\(4\times6\)</span> matrix of the setup cell,</p>
+<div class="math notranslate nohighlight" id="equation-eq-rank-a46">
+<span class="eqno">(68)<a class="headerlink" href="#equation-eq-rank-a46" title="Link to this equation">#</a></span>\[\begin{split}A = \begin{bmatrix}
+1 &amp; 2 &amp; 3 &amp; 1 &amp; 0 &amp; 2\\
+2 &amp; 4 &amp; 6 &amp; 0 &amp; 1 &amp; 3\\
+1 &amp; 2 &amp; 3 &amp; 2 &amp; 1 &amp; 4\\
+0 &amp; 0 &amp; 0 &amp; 1 &amp; 1 &amp; 2
+\end{bmatrix},\end{split}\]</div>
+<p>which was built so that <span class="math notranslate nohighlight">\(\mathbf{a}_2 = 2\mathbf{a}_1\)</span>,
+<span class="math notranslate nohighlight">\(\mathbf{a}_3 = 3\mathbf{a}_1\)</span>, and
+<span class="math notranslate nohighlight">\(\mathbf{a}_6 = \mathbf{a}_1 + \mathbf{a}_4 + \mathbf{a}_5\)</span>. Three of its six
+columns are redundant, so the rank is 3.</p>
+<p><strong>Part a)</strong> Confirm the three stated dependencies of <a class="reference internal" href="#equation-eq-rank-a46">Eq. 68</a> hold
+exactly, by forming each difference and checking it is the zero vector with no
+tolerance at all (the entries are small integers).</p>
+<p><strong>Part b)</strong> Compute the rank all three ways: <code class="docutils literal notranslate"><span class="pre">sympy.Matrix(...).rank()</span></code>,
+<code class="docutils literal notranslate"><span class="pre">np.linalg.matrix_rank</span></code>, and by counting singular values above
+<span class="math notranslate nohighlight">\(\max(m,n)\varepsilon\sigma_1\)</span> by hand from <code class="docutils literal notranslate"><span class="pre">np.linalg.svd</span></code>. Confirm all three
+give 3.</p>
+<p><strong>Part c)</strong> Report the singular values and confirm the gap: <span class="math notranslate nohighlight">\(\sigma_3\)</span> is of
+order 1 while <span class="math notranslate nohighlight">\(\sigma_4\)</span> is of order <span class="math notranslate nohighlight">\(\varepsilon\)</span>, so the threshold in
+<a class="reference internal" href="#equation-eq-rank-numerical">Eq. 65</a> has fifteen orders of magnitude of room and the answer
+does not depend on where in that range it is placed. That comfortable situation
+is exactly what Exercise 7 destroys.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  a2 - 2*a1              = [0. 0. 0. 0.]   exactly zero: True
+  a3 - 3*a1              = [0. 0. 0. 0.]   exactly zero: True
+  a6 - (a1 + a4 + a5)    = [0. 0. 0. 0.]   exactly zero: True
+
+rank, exact (SymPy over the rationals) : 3
+rank, np.linalg.matrix_rank            : 3
+rank, counting sigma &gt; 1.425e-14   : 3
+
+singular values: [10.6941  3.2691  0.9746  0.    ]
+  sigma_3 = 0.974637   sigma_4 = 1.158e-15
+  ratio sigma_4/sigma_1 = 1.083e-16
+  any threshold between 1.1e-16 and 9.1e-02 gives rank 3
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<p>The dependencies are checked with no tolerance, since the matrix holds small
+integers. The three rank computations are required to agree, and — the check
+that makes the agreement meaningful — the singular value gap is required to
+span at least ten orders of magnitude, so the agreement is not a coincidence of
+threshold placement.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  a2 - 2*a1 vanishes exactly   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  a3 - 3*a1 vanishes exactly   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  a6 - (a1 + a4 + a5) vanishes exactly   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  all three definitions of rank give 3   [exact elimination, matrix_rank, and a hand threshold on the singular values]
+✓  and the singular value gap spans &gt;12 orders, so the threshold is not delicate   [sigma_4/sigma_1 = 1.1e-16, sigma_3/sigma_1 = 9.1e-02]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-a-cr-and-row-rank-for-free">
+<h2>Exercise 4: <span class="math notranslate nohighlight">\(A = CR\)</span>, and row rank for free<a class="headerlink" href="#exercise-4-a-cr-and-row-rank-for-free" title="Link to this heading">#</a></h2>
+<p>Now the factorization, and the theorem it hands over without work.</p>
+<p>The reduced row-echelon form of <a class="reference internal" href="#equation-eq-rank-a46">Eq. 68</a> has pivots in columns 1, 4
+and 5, so those are the independent ones and
+<span class="math notranslate nohighlight">\(C = [\,\mathbf{a}_1\ \mathbf{a}_4\ \mathbf{a}_5\,]\)</span>. The nonzero rows of the
+echelon form are <span class="math notranslate nohighlight">\(R\)</span>, and by <a class="reference internal" href="#equation-eq-rank-cr">Eq. 63</a> their product is <span class="math notranslate nohighlight">\(A\)</span>. For this
+matrix every entry of <span class="math notranslate nohighlight">\(R\)</span> is an integer, so the reconstruction is <strong>exact</strong> —
+no tolerance is needed anywhere in this exercise.</p>
+<p>Read <span class="math notranslate nohighlight">\(R\)</span> column by column and it <em>is</em> the list of dependencies: its column 2 is
+<span class="math notranslate nohighlight">\((2,0,0)^{\top}\)</span>, saying <span class="math notranslate nohighlight">\(\mathbf{a}_2 = 2\mathbf{a}_1\)</span>; its column 6 is
+<span class="math notranslate nohighlight">\((1,1,1)^{\top}\)</span>, saying <span class="math notranslate nohighlight">\(\mathbf{a}_6 = \mathbf{a}_1 + \mathbf{a}_4 +
+\mathbf{a}_5\)</span>. The pivot columns of <span class="math notranslate nohighlight">\(R\)</span> form the identity <span class="math notranslate nohighlight">\(I_3\)</span>, which is what
+“reduced” means.</p>
+<p>And now the theorem. <span class="math notranslate nohighlight">\(R\)</span> has three rows. Every row of <span class="math notranslate nohighlight">\(A\)</span> is a combination of
+them, because <span class="math notranslate nohighlight">\(A = CR\)</span> read row-wise says row <span class="math notranslate nohighlight">\(i\)</span> of <span class="math notranslate nohighlight">\(A\)</span> is
+<span class="math notranslate nohighlight">\(\sum_k c_{ik}(\text{row } k \text{ of } R)\)</span>. So the row space has dimension at
+most 3, and since the column rank is exactly 3 we get row rank <span class="math notranslate nohighlight">\(\le\)</span> column
+rank. Running the argument on <span class="math notranslate nohighlight">\(A^{\top}\)</span> gives the reverse, and
+<a class="reference internal" href="#equation-eq-rank-theorem">Eq. 64</a> follows. A genuine theorem, from a factorization that
+cost one elimination.</p>
+<p><strong>Part a)</strong> Compute the exact rref of <a class="reference internal" href="#equation-eq-rank-a46">Eq. 68</a> with
+<code class="docutils literal notranslate"><span class="pre">sympy.Matrix(...).rref()</span></code>, extract the pivot columns as <span class="math notranslate nohighlight">\(C\)</span> and the nonzero
+rows as <span class="math notranslate nohighlight">\(R\)</span>, and verify <span class="math notranslate nohighlight">\(A = CR\)</span> with <strong>no tolerance</strong>.</p>
+<p><strong>Part b)</strong> Confirm <span class="math notranslate nohighlight">\(R\)</span>’s pivot columns form <span class="math notranslate nohighlight">\(I_3\)</span> exactly, and read the three
+dependencies off its non-pivot columns, checking each against Exercise 3.</p>
+<p><strong>Part c)</strong> Verify <a class="reference internal" href="#equation-eq-rank-theorem">Eq. 64</a> directly by computing the rank of
+<span class="math notranslate nohighlight">\(A^{\top}\)</span> exactly and confirming it equals 3. Draw <span class="math notranslate nohighlight">\(A\)</span>, <span class="math notranslate nohighlight">\(C\)</span> and <span class="math notranslate nohighlight">\(R\)</span> as
+heatmaps.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>pivot columns: (0, 3, 4)   so r = 3
+C = A[:, [0, 3, 4]]  shape (4, 3)
+R =
+ [[1. 2. 3. 0. 0. 1.]
+ [0. 0. 0. 1. 0. 1.]
+ [0. 0. 0. 0. 1. 1.]]
+
+A = CR exactly: True   max|A - CR| = 0.0e+00
+R&#39;s pivot columns form I_3: True
+
+reading the dependencies out of R&#39;s non-pivot columns:
+  a2 = 2*a1
+  a3 = 3*a1
+  a6 = 1*a1 + 1*a4 + 1*a5
+
+row rank (exact rank of A^T) : 3
+column rank                  : 3
+equal, as Eq. 3 requires     : True
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-rank-cr">
+<img alt="../../_images/862c975c04847f7b04966446391c9efd87d5f06c009c7a6e40ba5c4c75abe408.png" src="../../_images/862c975c04847f7b04966446391c9efd87d5f06c009c7a6e40ba5c4c75abe408.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 27 </span><span class="caption-text">The factorization <span class="math notranslate nohighlight">\(A = CR\)</span> of the <span class="math notranslate nohighlight">\(4\times6\)</span> matrix of Eq. 7 on a diverging colour scale centred at zero: <span class="math notranslate nohighlight">\(C\)</span> (<span class="math notranslate nohighlight">\(4\times3\)</span>) holds the independent columns <span class="math notranslate nohighlight">\(\mathbf{a}_1, \mathbf{a}_4, \mathbf{a}_5\)</span>, and <span class="math notranslate nohighlight">\(R\)</span> (<span class="math notranslate nohighlight">\(3\times6\)</span>) holds the coefficients rebuilding all six, with the identity <span class="math notranslate nohighlight">\(I_3\)</span> sitting in the pivot columns <span class="math notranslate nohighlight">\(1, 4, 5\)</span> and each remaining column stating one dependency. Because <span class="math notranslate nohighlight">\(R\)</span> has only three rows and every row of <span class="math notranslate nohighlight">\(A\)</span> is a combination of them, the row rank cannot exceed the column rank, which is the whole proof of Eq. 3.</span><a class="headerlink" href="#fig-rank-cr" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<p>Every check here is exact, because the factorization was computed over the
+rationals and the entries are integers. The theorem <a class="reference internal" href="#equation-eq-rank-theorem">Eq. 64</a> is
+verified by computing the row rank <em>independently</em> — from <span class="math notranslate nohighlight">\(A^{\top}\)</span>, not from
+<span class="math notranslate nohighlight">\(R\)</span> — so the agreement is evidence rather than a restatement.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  A = CR reproduces the matrix exactly   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  R carries the identity in the pivot columns   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  row rank = column rank = 3 (Eq. 3), the two computed independently   [column rank from the pivots of A, row rank from the exact rank of A^T]
+✓  both factors have full rank r, as the construction requires   [C&#39;s columns are independent by selection; R&#39;s rows are the echelon rows]
+✓  R&#39;s last column states a6 = a1 + a4 + a5, matching Exercise 3   [max|Δ| = 0 (rtol=0, atol=0)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-what-rank-does-under-products-and-sums">
+<h2>Exercise 5: What rank does under products and sums<a class="headerlink" href="#exercise-5-what-rank-does-under-products-and-sums" title="Link to this heading">#</a></h2>
+<p>Rank obeys a small set of inequalities that get used constantly, and each one
+has a one-line reason once <a class="reference internal" href="four-ways-to-multiply.html#equation-eq-multiply-outer">Eq. 41</a> and <a class="reference internal" href="#equation-eq-rank-cr">Eq. 63</a> are in
+hand.</p>
+<p><strong>Products cannot gain rank.</strong> Since <span class="math notranslate nohighlight">\(AB\)</span>’s columns are combinations of <span class="math notranslate nohighlight">\(A\)</span>’s
+columns, and its rows are combinations of <span class="math notranslate nohighlight">\(B\)</span>’s rows,</p>
+<div class="math notranslate nohighlight" id="equation-eq-rank-product">
+<span class="eqno">(69)<a class="headerlink" href="#equation-eq-rank-product" title="Link to this equation">#</a></span>\[\operatorname{rank}(AB) \;\le\; \min\big(\operatorname{rank} A,\ \operatorname{rank} B\big) .\]</div>
+<p>A corollary worth stating separately: the rank of a product is at most the
+<strong>inner dimension</strong>, so an <span class="math notranslate nohighlight">\(m\times k\)</span> times a <span class="math notranslate nohighlight">\(k\times n\)</span> product has rank at
+most <span class="math notranslate nohighlight">\(k\)</span> however large <span class="math notranslate nohighlight">\(m\)</span> and <span class="math notranslate nohighlight">\(n\)</span> are. That is the fact
+<a class="reference internal" href="../04-svd/low-rank-eckart-young.html"><span class="std std-doc">§4.2</span></a> exploits to compress matrices,
+and the fact <a class="reference internal" href="../08-learning/low-rank-lora-quantization.html"><span class="std std-doc">§8.6</span></a> exploits
+to fine-tune neural networks with a fraction of the parameters.</p>
+<p><strong>Sums cannot gain more than they bring.</strong></p>
+<div class="math notranslate nohighlight" id="equation-eq-rank-sum">
+<span class="eqno">(70)<a class="headerlink" href="#equation-eq-rank-sum" title="Link to this equation">#</a></span>\[\operatorname{rank}(A + B) \;\le\; \operatorname{rank} A + \operatorname{rank} B ,\]</div>
+<p>since every column of <span class="math notranslate nohighlight">\(A+B\)</span> lies in the span of the two column spaces
+together. In particular a <strong>rank-one update</strong> changes the rank by at most 1 in
+either direction, which is why the update formula of Exercise 6 exists.</p>
+<p><strong>Multiplying by an invertible matrix changes nothing.</strong> If <span class="math notranslate nohighlight">\(P\)</span> and <span class="math notranslate nohighlight">\(Q\)</span> are
+invertible then <span class="math notranslate nohighlight">\(\operatorname{rank}(PAQ) = \operatorname{rank}(A)\)</span>, because
+multiplying by an invertible matrix is a change of basis and rank is a property
+of the map rather than of its representation — an idea
+<a class="reference internal" href="linear-maps-change-of-basis.html"><span class="std std-doc">§1.6</span></a> takes up properly.</p>
+<p><strong>Part a)</strong> Verify <a class="reference internal" href="#equation-eq-rank-product">Eq. 69</a> over 300 random trials with shapes
+drawn so the inner dimension is sometimes the binding constraint: <span class="math notranslate nohighlight">\(A\)</span> of shape
+<span class="math notranslate nohighlight">\((m, k)\)</span> and <span class="math notranslate nohighlight">\(B\)</span> of shape <span class="math notranslate nohighlight">\((k, n)\)</span> with <span class="math notranslate nohighlight">\(m, n \in [4, 9]\)</span> and <span class="math notranslate nohighlight">\(k \in [1, 5]\)</span>
+from <code class="docutils literal notranslate"><span class="pre">rng.integers</span></code>. Record how often the bound is attained with equality.</p>
+<p><strong>Part b)</strong> Verify <a class="reference internal" href="#equation-eq-rank-sum">Eq. 70</a> over 300 random trials with <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span>
+both <span class="math notranslate nohighlight">\(6\times6\)</span> of prescribed ranks 2 and 3, built as products of random
+<span class="math notranslate nohighlight">\(6\times r\)</span> and <span class="math notranslate nohighlight">\(r\times6\)</span> factors.</p>
+<p><strong>Part c)</strong> Verify invariance under invertible multiplication: for the
+<span class="math notranslate nohighlight">\(4\times6\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span> of <a class="reference internal" href="#equation-eq-rank-a46">Eq. 68</a> (rank 3) and random invertible <span class="math notranslate nohighlight">\(P\)</span>
+(<span class="math notranslate nohighlight">\(4\times4\)</span>) and <span class="math notranslate nohighlight">\(Q\)</span> (<span class="math notranslate nohighlight">\(6\times6\)</span>), confirm <span class="math notranslate nohighlight">\(\operatorname{rank}(PAQ) = 3\)</span> over
+100 trials. Then show a rank-one update changes the rank by at most one.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>rank(AB) &lt;= min(rank A, rank B): 300/300 hold, 300/300 attained with equality
+rank(A + B) &lt;= rank A + rank B : 300/300 hold, 300/300 attained with equality
+rank(P A Q) = rank(A) = 3      : 100/100 (P, Q invertible)
+
+a rank-one update shifts the rank by [1]  (never more than 1 in absolute value: True)
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<p>Each inequality is checked over hundreds of random trials rather than one
+example, and — the part that makes the check meaningful — each is also checked
+to be <strong>attained</strong> sometimes, so the bound is shown to be sharp rather than
+merely true.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  rank(AB) &lt;= min(rank A, rank B) holds in all 300 trials (Eq. 8)   [and is attained with equality in 300 of them, so it is sharp]
+✓  rank(A + B) &lt;= rank A + rank B holds in all 300 trials (Eq. 9)   [attained in 300: generically a rank-2 plus a rank-3 gives rank 5]
+✓  rank is unchanged by multiplication with invertible matrices   [rank is a property of the map, not of the basis it is written in]
+✓  and a rank-one update moves the rank by at most one   [observed shifts [1]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-6-updating-an-inverse-without-recomputing-it">
+<h2>Exercise 6: Updating an inverse without recomputing it<a class="headerlink" href="#exercise-6-updating-an-inverse-without-recomputing-it" title="Link to this heading">#</a></h2>
+<p>Exercise 2 said never to form an inverse. There is a situation where you have
+one anyway — because the same matrix is used over and over — and then the
+question becomes what to do when it changes slightly.</p>
+<p>The <strong>Sherman–Morrison formula</strong> answers it for a rank-one change. If <span class="math notranslate nohighlight">\(A\)</span> is
+invertible and <span class="math notranslate nohighlight">\(1 + \mathbf{v}^{\top}A^{-1}\mathbf{u} \neq 0\)</span>, then</p>
+<div class="math notranslate nohighlight" id="equation-eq-rank-sherman-morrison">
+<span class="eqno">(71)<a class="headerlink" href="#equation-eq-rank-sherman-morrison" title="Link to this equation">#</a></span>\[\big(A + \mathbf{u}\mathbf{v}^{\top}\big)^{-1}
+\;=\; A^{-1} - \frac{A^{-1}\mathbf{u}\,\mathbf{v}^{\top}A^{-1}}
+                    {1 + \mathbf{v}^{\top}A^{-1}\mathbf{u}} .\]</div>
+<p>The correction is itself rank one, which is the content of Exercise 5’s last
+check seen from the other side. The cost is two matrix–vector products and an
+outer product, <span class="math notranslate nohighlight">\(O(n^2)\)</span>, against the <span class="math notranslate nohighlight">\(O(n^3)\)</span> of a fresh inversion — so for a
+sequence of rank-one updates the saving is a full factor of <span class="math notranslate nohighlight">\(n\)</span> per step.</p>
+<p>This is not a curiosity. It is how the Kalman filter absorbs one new
+measurement, how quasi-Newton methods such as BFGS carry an approximate inverse
+Hessian from step to step, and how leave-one-out cross-validation evaluates <span class="math notranslate nohighlight">\(n\)</span>
+fits for the price of one. The denominator is the whole story of when it fails:
+<span class="math notranslate nohighlight">\(1 + \mathbf{v}^{\top}A^{-1}\mathbf{u} = 0\)</span> is exactly the case where
+<span class="math notranslate nohighlight">\(A + \mathbf{u}\mathbf{v}^{\top}\)</span> is singular, and the formula reports that by
+dividing by zero rather than by returning nonsense.</p>
+<p><strong>Part a)</strong> For a random invertible <span class="math notranslate nohighlight">\(B\)</span> of shape <span class="math notranslate nohighlight">\((6,6)\)</span> and random
+<span class="math notranslate nohighlight">\(\mathbf{u}, \mathbf{v} \in \mathbb{R}^6\)</span>, evaluate both sides of
+<a class="reference internal" href="#equation-eq-rank-sherman-morrison">Eq. 71</a> and confirm they agree to <span class="math notranslate nohighlight">\(10^{-11}\)</span> relative to
+<span class="math notranslate nohighlight">\(\|(B + \mathbf{u}\mathbf{v}^{\top})^{-1}\|\)</span>.</p>
+<p><strong>Part b)</strong> Confirm the update is genuinely rank one by computing the numerical
+rank of the correction term.</p>
+<p><strong>Part c)</strong> Show the denominator detects singularity: construct <span class="math notranslate nohighlight">\(\mathbf{u},
+\mathbf{v}\)</span> making <span class="math notranslate nohighlight">\(B + \mathbf{u}\mathbf{v}^{\top}\)</span> exactly singular by taking
+<span class="math notranslate nohighlight">\(\mathbf{u} = B\mathbf{w}\)</span> for a random <span class="math notranslate nohighlight">\(\mathbf{w}\)</span> and
+<span class="math notranslate nohighlight">\(\mathbf{v} = -\mathbf{w}/(\mathbf{w}^{\top}\mathbf{w})\)</span>, then confirm both that
+<span class="math notranslate nohighlight">\(1 + \mathbf{v}^{\top}B^{-1}\mathbf{u} = 0\)</span> to <span class="math notranslate nohighlight">\(10^{-12}\)</span> and that the updated
+matrix has a numerically zero smallest singular value.</p>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p>Ask for <code class="docutils literal notranslate"><span class="pre">woodbury(Ainv,</span> <span class="pre">U,</span> <span class="pre">V)</span></code> implementing the general Woodbury identity, the
+rank-<span class="math notranslate nohighlight">\(k\)</span> generalisation of <a class="reference internal" href="#equation-eq-rank-sherman-morrison">Eq. 71</a> in which
+<span class="math notranslate nohighlight">\(\mathbf{u}\mathbf{v}^{\top}\)</span> becomes <span class="math notranslate nohighlight">\(UV^{\top}\)</span> with <span class="math notranslate nohighlight">\(U, V\)</span> of shape
+<span class="math notranslate nohighlight">\((n, k)\)</span>. Then check it yourself on <span class="math notranslate nohighlight">\(n = 40\)</span>, <span class="math notranslate nohighlight">\(k = 3\)</span>: it must agree with
+<code class="docutils literal notranslate"><span class="pre">np.linalg.inv(A</span> <span class="pre">+</span> <span class="pre">U</span> <span class="pre">&#64;</span> <span class="pre">V.T)</span></code> to <span class="math notranslate nohighlight">\(10^{-9}\)</span> relative to that inverse’s norm, the
+correction it applies must have numerical rank exactly <span class="math notranslate nohighlight">\(k\)</span>, and it must reduce
+to Sherman–Morrison when <span class="math notranslate nohighlight">\(k = 1\)</span>. The check is yours.</p>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1 + v^T B^-1 u = 1.784912
+max |Sherman-Morrison - direct| = 2.220e-16
+  relative to ||inverse||_max   = 2.387e-16
+rank of the correction term     = 1
+
+engineered singular case:
+  1 + v^T B^-1 u          = 0.000e+00   (zero: the formula refuses)
+  smallest singular value = 4.549e-16  (sigma_min/sigma_max = 1.05e-16)
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-6">
+<h3>Validation 6<a class="headerlink" href="#validation-6" title="Link to this heading">#</a></h3>
+<p>The formula is checked against an independently computed inverse, scaled by the
+size of that inverse rather than entrywise — the tolerance discipline
+<a class="reference internal" href="../00-machine/floating-point.html"><span class="std std-doc">§0.2</span></a> Rule 1 requires. The rank of the
+correction and the vanishing denominator are checked as the structural claims
+they are.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  Sherman-Morrison (Eq. 10) matches the directly computed inverse   [max|Δ| = 2.22045e-16 (rtol=0, atol=9.3005e-12)]
+✓  the correction it applies is exactly rank one   [which is why a rank-one update costs O(n^2) rather than O(n^3)]
+✓  in the engineered case the denominator vanishes   [got 0 vs expected 0 (rtol=0, atol=1e-11)]
+✓  and the updated matrix is indeed singular, which is what it was warning about   [sigma_min/sigma_max = 1.05e-16]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-7-where-exact-and-numerical-rank-part-company">
+<h2>Exercise 7: Where exact and numerical rank part company<a class="headerlink" href="#exercise-7-where-exact-and-numerical-rank-part-company" title="Link to this heading">#</a></h2>
+<p>Exercise 3 was the comfortable case: a gap of twelve orders of magnitude
+between <span class="math notranslate nohighlight">\(\sigma_3\)</span> and <span class="math notranslate nohighlight">\(\sigma_4\)</span>, so every defensible threshold gave the same
+answer. This exercise removes that comfort, and it closes the thread the
+Prologue opened.</p>
+<p>Perturb <a class="reference internal" href="#equation-eq-rank-a46">Eq. 68</a> by <span class="math notranslate nohighlight">\(10^{-9}G\)</span> for a fixed random <span class="math notranslate nohighlight">\(G\)</span>. The three
+dependencies are now only approximate, so <strong>the exact rank becomes 4</strong> — full
+row rank — and elimination over the rationals will say so without hesitation.
+The singular values, meanwhile, barely move: <span class="math notranslate nohighlight">\(\sigma_1\)</span> through <span class="math notranslate nohighlight">\(\sigma_3\)</span> are
+unchanged and <span class="math notranslate nohighlight">\(\sigma_4\)</span> lifts from <span class="math notranslate nohighlight">\(10^{-16}\)</span> to around <span class="math notranslate nohighlight">\(10^{-9}\)</span>. Every
+reasonable person looking at that spectrum would call the matrix rank 3.</p>
+<p>Both answers are correct, and they answer different questions:</p>
+<ul class="simple">
+<li><p><strong>exact rank 4</strong> answers “how many independent columns does this specific
+array of floats have?”</p></li>
+<li><p><strong>numerical rank 3</strong> answers “how many independent columns does the matrix
+this array is a noisy sample of have?”</p></li>
+</ul>
+<p>The second is almost always the question you meant, and it needs a noise level
+<span class="math notranslate nohighlight">\(\eta\)</span> you supply. <a class="reference internal" href="#equation-eq-rank-numerical">Eq. 65</a> is the machinery;
+<a class="reference internal" href="../00-machine/floating-point.html"><span class="std std-doc">§0.2</span></a> Exercise 6 established the reading;
+and <a class="reference internal" href="../04-svd/low-rank-eckart-young.html"><span class="std std-doc">§4.2</span></a> will make “how far is this
+from a rank-3 matrix?” a quantitative question with the exact answer
+<span class="math notranslate nohighlight">\(\sigma_4\)</span>.</p>
+<p>The lesson for practice is blunt. <code class="docutils literal notranslate"><span class="pre">np.linalg.matrix_rank(A)</span></code> at its default is
+almost never what you want on measured data, because its <span class="math notranslate nohighlight">\(\eta \approx
+10^{-15}\)</span> assumes your entries are exact. Pass a <code class="docutils literal notranslate"><span class="pre">tol</span></code> that reflects your
+actual noise.</p>
+<p><strong>Part a)</strong> Build <span class="math notranslate nohighlight">\(\tilde A = A + 10^{-9}G\)</span> with <span class="math notranslate nohighlight">\(G\)</span> from
+<code class="docutils literal notranslate"><span class="pre">rng.standard_normal((4,</span> <span class="pre">6))</span></code>, and confirm its <strong>exact</strong> rank is 4 with
+<code class="docutils literal notranslate"><span class="pre">sympy.Matrix(sympy.nsimplify(...,</span> <span class="pre">rational=True)).rank()</span></code>, which converts the
+float entries to the exact rationals they represent.</p>
+<p><strong>Part b)</strong> Report the singular values of <span class="math notranslate nohighlight">\(\tilde A\)</span> beside those of <span class="math notranslate nohighlight">\(A\)</span>, and
+confirm <span class="math notranslate nohighlight">\(\sigma_1\)</span> through <span class="math notranslate nohighlight">\(\sigma_3\)</span> move by less than <span class="math notranslate nohighlight">\(10^{-8}\)</span> while
+<span class="math notranslate nohighlight">\(\sigma_4\)</span> rises from below <span class="math notranslate nohighlight">\(10^{-15}\)</span> to around <span class="math notranslate nohighlight">\(10^{-9}\)</span>.</p>
+<p><strong>Part c)</strong> Evaluate <a class="reference internal" href="#equation-eq-rank-numerical">Eq. 65</a> at <span class="math notranslate nohighlight">\(\eta = \varepsilon\)</span>,
+<span class="math notranslate nohighlight">\(10^{-12}\)</span>, <span class="math notranslate nohighlight">\(10^{-6}\)</span> and <span class="math notranslate nohighlight">\(10^{-2}\)</span>, and plot the numerical rank of <span class="math notranslate nohighlight">\(\tilde A\)</span>
+against <span class="math notranslate nohighlight">\(\eta\)</span> over <span class="math notranslate nohighlight">\([10^{-18}, 10^{0}]\)</span> as a staircase, marking NumPy’s
+default and the exact rank. Confirm the staircase has a wide flat step at 3.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>exact rank of A          : 3
+exact rank of A + 1e-9 G : 4   &lt;- full row rank now
+
+  i    sigma_i(A)      sigma_i(A + 1e-9 G)     shift
+  1   1.069406e+01    1.069406e+01    5.15e-10
+  2   3.269119e+00    3.269119e+00    2.18e-10
+  3   9.746365e-01    9.746365e-01    1.38e-09
+  4   1.157814e-15    3.732493e-09    3.73e-09
+
+numerical rank of A + 1e-9 G at several noise levels:
+  eta = 2.2e-16  -&gt;  rank 4
+  eta = 1.0e-12  -&gt;  rank 4
+  eta = 1.0e-06  -&gt;  rank 3
+  eta = 1.0e-02  -&gt;  rank 3
+  numpy default (eta = 1.3e-15)  -&gt;  rank 4
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-rank-staircase">
+<img alt="../../_images/72a03b405f4d6ff70809b9eae0070896598c7326e114093b9147bf848433ee52.png" src="../../_images/72a03b405f4d6ff70809b9eae0070896598c7326e114093b9147bf848433ee52.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 28 </span><span class="caption-text">Numerical rank of <span class="math notranslate nohighlight">\(\tilde{A} = A + 10^{-9}G\)</span> from Eq. 4, as a function of the noise level <span class="math notranslate nohighlight">\(\eta\)</span> below which a singular value is treated as zero. The four singular values are marked as vertical rules and NumPy’s default <span class="math notranslate nohighlight">\(\eta\)</span> in amber. The wide flat step at rank 3, spanning roughly seven orders of magnitude of <span class="math notranslate nohighlight">\(\eta\)</span>, is the answer nearly every application wants; the exact rank, drawn dotted, is 4 and is reachable only by trusting the floats to their last bit.</span><a class="headerlink" href="#fig-rank-staircase" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-7">
+<h3>Validation 7<a class="headerlink" href="#validation-7" title="Link to this heading">#</a></h3>
+<p>The exact and numerical answers are checked to <strong>disagree</strong>, which is the point
+of the exercise, and the width of the rank-3 plateau is checked because that
+width is what makes the numerical answer robust rather than arbitrary: it is
+the range of noise levels over which any user would reach the same conclusion.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the perturbed matrix has EXACT rank 4: the dependencies are only approximate now   [elimination over the rationals has no tolerance and no doubt]
+✓  yet its three large singular values are unmoved to 1e-7   [max|Δ| = 1.38304e-09 (rtol=0, atol=1e-07)]
+✓  while sigma_4 lifts from ~1e-16 to ~1e-9, tracking the perturbation   [1.16e-15 -&gt; 3.73e-09]
+✓  so the numerical rank is 4 if the floats are exact and 3 for real noise   [both correct; they answer different questions]
+✓  the rank-3 plateau spans a wide range of eta, so that answer is robust   [47% of the sampled decades give 3]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p>The inverse is a theoretical object, and rank is a question you have to
+sharpen before a computer can answer it.</p>
+<p>The concrete results:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(A_3^{-1}\)</span> built column by column from <a class="reference internal" href="#equation-eq-rank-inverse-columns">Eq. 62</a> matched
+<code class="docutils literal notranslate"><span class="pre">np.linalg.inv</span></code> to <span class="math notranslate nohighlight">\(10^{-12}\)</span>, with both <span class="math notranslate nohighlight">\(AA^{-1} = I\)</span> and <span class="math notranslate nohighlight">\(A^{-1}A = I\)</span>
+confirmed separately, and forming it cost about three times a single solve;</p></li>
+<li><p>on a <span class="math notranslate nohighlight">\(200\times200\)</span> system with <span class="math notranslate nohighlight">\(\kappa = 10^{10}\)</span>, <code class="docutils literal notranslate"><span class="pre">solve(A,</span> <span class="pre">b)</span></code> and
+<code class="docutils literal notranslate"><span class="pre">inv(A)</span> <span class="pre">&#64;</span> <span class="pre">b</span></code> had forward errors differing by only a factor of twelve — both
+near the <span class="math notranslate nohighlight">\(\kappa\varepsilon\)</span> limit nobody can beat — while their <strong>backward
+errors differed by more than <span class="math notranslate nohighlight">\(10^{8}\)</span></strong>: the solve returned <span class="math notranslate nohighlight">\(0.22\varepsilon\)</span>,
+the exact answer to a problem a rounding error away, and the inverse returned
+<span class="math notranslate nohighlight">\(3\times10^{7}\varepsilon\)</span>, the answer to no nearby problem at all;</p></li>
+<li><p>the <span class="math notranslate nohighlight">\(4\times6\)</span> matrix of <a class="reference internal" href="#equation-eq-rank-a46">Eq. 68</a> gave rank 3 by exact elimination,
+by <code class="docutils literal notranslate"><span class="pre">matrix_rank</span></code>, and by a hand threshold on the singular values, with
+<span class="math notranslate nohighlight">\(\sigma_4/\sigma_1 &lt; 10^{-16}\)</span> leaving twelve orders of room for the
+threshold;</p></li>
+<li><p><span class="math notranslate nohighlight">\(A = CR\)</span> reproduced it <strong>exactly</strong>, with <span class="math notranslate nohighlight">\(R\)</span>’s pivot columns forming <span class="math notranslate nohighlight">\(I_3\)</span>
+and its remaining columns stating the three dependencies
+<span class="math notranslate nohighlight">\(\mathbf{a}_2 = 2\mathbf{a}_1\)</span>, <span class="math notranslate nohighlight">\(\mathbf{a}_3 = 3\mathbf{a}_1\)</span>,
+<span class="math notranslate nohighlight">\(\mathbf{a}_6 = \mathbf{a}_1 + \mathbf{a}_4 + \mathbf{a}_5\)</span> — and the row rank,
+computed independently from <span class="math notranslate nohighlight">\(A^{\top}\)</span>, came out equal to the column rank,
+which is <a class="reference internal" href="#equation-eq-rank-theorem">Eq. 64</a> verified rather than assumed;</p></li>
+<li><p>the rank inequalities <a class="reference internal" href="#equation-eq-rank-product">Eq. 69</a> and <a class="reference internal" href="#equation-eq-rank-sum">Eq. 70</a> held in all
+600 random trials and were <strong>attained</strong> in many of them, so both are sharp;
+rank was invariant under invertible multiplication in all 100 trials; and a
+rank-one update never moved the rank by more than one;</p></li>
+<li><p>Sherman–Morrison <a class="reference internal" href="#equation-eq-rank-sherman-morrison">Eq. 71</a> matched a directly computed
+inverse to <span class="math notranslate nohighlight">\(10^{-11}\)</span> relative, applied a correction of rank exactly 1, and
+reported an engineered singular update by a denominator of <span class="math notranslate nohighlight">\(10^{-17}\)</span>;</p></li>
+<li><p>and perturbing <a class="reference internal" href="#equation-eq-rank-a46">Eq. 68</a> by <span class="math notranslate nohighlight">\(10^{-9}\)</span> made the <strong>exact</strong> rank 4 while
+leaving the numerical rank at 3 across roughly seven orders of magnitude of
+noise level — two correct answers to two different questions.</p></li>
+</ul>
+<p>Methods met: <code class="docutils literal notranslate"><span class="pre">scipy.linalg.lu_factor</span></code>/<code class="docutils literal notranslate"><span class="pre">lu_solve</span></code> for a column-by-column
+inverse, <code class="docutils literal notranslate"><span class="pre">np.linalg.inv</span></code> and why to avoid it, the backward-error diagnostic,
+<code class="docutils literal notranslate"><span class="pre">sympy.Matrix.rref</span></code> and <code class="docutils literal notranslate"><span class="pre">.rank()</span></code> and <code class="docutils literal notranslate"><span class="pre">nsimplify(...,</span> <span class="pre">rational=True)</span></code>,
+<code class="docutils literal notranslate"><span class="pre">np.linalg.matrix_rank</span></code> with an explicit <code class="docutils literal notranslate"><span class="pre">tol</span></code>, and the rank inequalities as
+consequences of the rank-one decomposition of
+<a class="reference internal" href="four-ways-to-multiply.html"><span class="std std-doc">§1.1</span></a>.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>The other two subspaces.</strong> <span class="math notranslate nohighlight">\(C\)</span> spans the column space and <span class="math notranslate nohighlight">\(R\)</span>’s rows span
+the row space, so <span class="math notranslate nohighlight">\(A = CR\)</span> has already produced two of the four fundamental
+subspaces. The null space appeared in <a class="reference internal" href="#equation-eq-rank-a46">Eq. 68</a> as the three
+dependencies, and there is a fourth. <a class="reference internal" href="four-subspaces.html"><span class="std std-doc">§1.4</span></a> assembles
+all of them and shows how they fit together.</p></li>
+<li><p><strong>A basis that is orthonormal.</strong> <span class="math notranslate nohighlight">\(C\)</span>’s columns are independent but at
+arbitrary angles, which is why every formula in this notebook that used them
+needed <span class="math notranslate nohighlight">\((C^{\top}C)^{-1}\)</span>. Orthonormalising them removes the inverse
+entirely, and that is the <span class="math notranslate nohighlight">\(QR\)</span> factorization of
+<a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html"><span class="std std-doc">§2.2</span></a>.</p></li>
+<li><p><strong>How far is it really?</strong> <a class="reference internal" href="#equation-eq-rank-numerical">Eq. 65</a> asks whether a singular
+value is “small”, which invites the question: small compared to what
+distance? <a class="reference internal" href="../04-svd/low-rank-eckart-young.html"><span class="std std-doc">§4.2</span></a> answers it exactly —
+the distance from <span class="math notranslate nohighlight">\(A\)</span> to the nearest rank-<span class="math notranslate nohighlight">\(k\)</span> matrix is precisely
+<span class="math notranslate nohighlight">\(\sigma_{k+1}\)</span> — turning the threshold from a convention into a measurement.</p></li>
+<li><p><strong>Low rank as a design choice.</strong> Exercise 5 noted that an <span class="math notranslate nohighlight">\(m\times k\)</span> times a
+<span class="math notranslate nohighlight">\(k\times n\)</span> product has rank at most <span class="math notranslate nohighlight">\(k\)</span>. Modern model fine-tuning turns that
+constraint into a feature, representing a weight <em>update</em> as exactly such a
+product with <span class="math notranslate nohighlight">\(k\)</span> small. That is
+<a class="reference internal" href="../08-learning/low-rank-lora-quantization.html"><span class="std std-doc">§8.6</span></a>, where the premise is
+measured rather than assumed.</p></li>
+</ul>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h3>
+<div class="docutils container" id="id3">
+<div role="list" class="citation-list">
+<div class="citation" id="id14" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">Hig02</a><span class="fn-bracket">]</span></span>
+<p>Nicholas J. Higham. <em>Accuracy and Stability of Numerical Algorithms</em>. SIAM, Philadelphia, 2 edition, 2002. <a class="reference external" href="https://doi.org/10.1137/1.9780898718027">doi:10.1137/1.9780898718027</a>.</p>
+</div>
+<div class="citation" id="id4" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">Str23</a><span class="fn-bracket">]</span></span>
+<p>Gilbert Strang. <em>Introduction to Linear Algebra</em>. Wellesley-Cambridge Press, Wellesley, MA, 6 edition, 2023. ISBN 978-1-7331466-7-8.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/01-matrices"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="elimination-lu.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">1.2 Elimination, Pivoting, and A = LU</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="four-subspaces.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">1.4 The Four Fundamental Subspaces</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-inverse-and-why-it-is-a-detour">The inverse, and why it is a detour</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#rank-and-the-factorization-that-explains-it">Rank, and the factorization that explains it</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#rank-in-floating-point">Rank in floating point</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-the-inverse-one-column-at-a-time">Exercise 1: The inverse, one column at a time</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-never-form-the-inverse">Exercise 2: Never form the inverse</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-rank-three-ways">Exercise 3: Rank three ways</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-a-cr-and-row-rank-for-free">Exercise 4: <span class="math notranslate nohighlight">\(A = CR\)</span>, and row rank for free</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-what-rank-does-under-products-and-sums">Exercise 5: What rank does under products and sums</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-updating-an-inverse-without-recomputing-it">Exercise 6: Updating an inverse without recomputing it</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-7-where-exact-and-numerical-rank-part-company">Exercise 7: Where exact and numerical rank part company</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-7">Validation 7</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

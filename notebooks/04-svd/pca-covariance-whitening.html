@@ -1,0 +1,1449 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="4.3 PCA, Covariance, and Whitening" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/04-svd/pca-covariance-whitening.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: Principal component analysis is the most widely used algorithm this course will meet, and this notebook’s claim is that there is nothing i..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: Principal component analysis is the most widely used algorithm this course will meet, and this notebook’s claim is that there is nothing i..." />
+
+    <title>4.3 PCA, Covariance, and Whitening &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/04-svd/pca-covariance-whitening';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/04-svd/pca-covariance-whitening.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="4.4 Randomized SVD and Sketching" href="randomized-svd-sketching.html" />
+    <link rel="prev" title="4.2 Low-Rank Approximation and Eckart–Young" href="low-rank-eckart-young.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter IV — The Singular Value Decomposition</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/04-svd/pca-covariance-whitening.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/04-svd/pca-covariance-whitening.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/04-svd/pca-covariance-whitening.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/04-svd/pca-covariance-whitening.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>4.3 PCA, Covariance, and Whitening</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-data-matrix-centred">The data matrix, centred</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pca-is-the-svd">PCA is the SVD</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#whitening">Whitening</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pca-is-not-regression">PCA is not regression</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-two-routes-one-answer-and-why-one-of-them-is-the-method">Exercise 1: Two routes, one answer, and why one of them is the method</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-digits-scores-scree-and-eckartyoung-in-costume">Exercise 2: The digits: scores, scree, and Eckart–Young in costume</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-eigendigits-and-reconstruction-as-a-budget">Exercise 3: Eigendigits, and reconstruction as a budget</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-whitening-pca-run-backwards">Exercise 4: Whitening: PCA run backwards</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-the-uncentred-trap-and-the-line-pca-actually-fits">Exercise 5: The uncentred trap, and the line PCA actually fits</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="pca-covariance-and-whitening">
+<h1>4.3 PCA, Covariance, and Whitening<a class="headerlink" href="#pca-covariance-and-whitening" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter IV — The Singular Value Decomposition
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;4.3
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">Principal component analysis is the SVD of a centred data matrix — nothing more — and every one of its promises is an identity from the last two notebooks wearing statistical clothes. Forget the centring, though, and the first component quietly points at the mean.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;advanced&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;105–135 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p>Principal component analysis is the most widely used algorithm this course
+will meet, and this notebook’s claim is that there is nothing in it beyond
+<a class="reference internal" href="svd-geometry.html"><span class="std std-doc">§4.1</span></a> and <a class="reference internal" href="low-rank-eckart-young.html"><span class="std std-doc">§4.2</span></a>: PCA <em>is</em>
+the SVD of a centred data matrix. The principal directions are right singular
+vectors, the variances are <span class="math notranslate nohighlight">\(\sigma_i^2/(n-1)\)</span>, the “explained variance” is
+Frobenius energy, and the reconstruction guarantee is Eckart–Young verbatim.
+Every statistical promise is a linear-algebra identity already measured, and
+this notebook re-measures each in its new costume — down to agreement with
+<code class="docutils literal notranslate"><span class="pre">sklearn.decomposition.PCA</span></code> at <span class="math notranslate nohighlight">\(3\times10^{-16}\)</span>, which is to say: sklearn
+computes the same SVD.</p>
+<p>Two things here are genuinely new. <strong>Whitening</strong> runs PCA backwards, using
+<span class="math notranslate nohighlight">\(C^{-1/2}\)</span> to manufacture uncorrelated unit-variance coordinates — the inverse
+of the trick that <em>generated</em> correlated data in
+<a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html"><span class="std std-doc">§3.3</span></a>. And the notebook
+closes with two cautionary measurements: what happens when the centring is
+skipped (the first component swings to point at the mean, cosine <span class="math notranslate nohighlight">\(0.99998\)</span>),
+and how the PCA line differs from the regression line — same cloud, two
+different questions, two measurably different answers.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> Strang <span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id8" title="Gilbert Strang. Linear Algebra and Learning from Data. Wellesley-Cambridge Press, Wellesley, MA, 2019. ISBN 978-0-6926-3939-8.">Str19</a>]</span> Chapter I.9; Hastie, Tibshirani
+and Friedman <span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id44" title="Trevor Hastie, Robert Tibshirani, and Jerome Friedman. The Elements of Statistical Learning. Springer, 2 edition, 2009. doi:10.1007/978-0-387-84858-7.">HTF09</a>]</span> §14.5; Deisenroth, Faisal and Ong
+<span class="bibtex-citation" id="id3">[<a class="reference internal" href="#id43" title="Marc Peter Deisenroth, A. Aldo Faisal, and Cheng Soon Ong. Mathematics for Machine Learning. Cambridge University Press, 2020. doi:10.1017/9781108679930.">DFO20</a>]</span> Chapter 10 for the probabilistic reading. The digits
+data ships with scikit-learn <span class="bibtex-citation" id="id4">[<a class="reference internal" href="#id55" title="Fabian Pedregosa, Gaël Varoquaux, Alexandre Gramfort, and others. Scikit-learn: machine learning in Python. Journal of Machine Learning Research, 12:2825–2830, 2011.">PVG+11</a>]</span> — no download.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="the-data-matrix-centred">
+<h3>The data matrix, centred<a class="headerlink" href="#the-data-matrix-centred" title="Link to this heading">#</a></h3>
+<p>Data arrives as <span class="math notranslate nohighlight">\(X \in \mathbb{R}^{n\times d}\)</span>: <span class="math notranslate nohighlight">\(n\)</span> samples in rows, <span class="math notranslate nohighlight">\(d\)</span>
+features in columns. PCA begins by subtracting each column’s mean,</p>
+<div class="math notranslate nohighlight" id="equation-eq-pca-centre">
+<span class="eqno">(201)<a class="headerlink" href="#equation-eq-pca-centre" title="Link to this equation">#</a></span>\[X_c = X - \mathbf{1}\bar{\mathbf{x}}^{\top},
+\qquad \bar{\mathbf{x}} = \tfrac{1}{n}X^{\top}\mathbf{1},\]</div>
+<p>and the centring is not a nicety — Exercise 5 measures what happens without
+it. The <strong>sample covariance</strong> is then the Gram matrix</p>
+<div class="math notranslate nohighlight" id="equation-eq-pca-covariance">
+<span class="eqno">(202)<a class="headerlink" href="#equation-eq-pca-covariance" title="Link to this equation">#</a></span>\[C = \frac{X_c^{\top}X_c}{n-1} \in \mathbb{R}^{d\times d},\]</div>
+<p>symmetric positive semidefinite by
+<a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html"><span class="std std-doc">§3.3</span></a>, so the spectral
+theorem applies in full: <span class="math notranslate nohighlight">\(C = Q\Lambda Q^{\top}\)</span> with orthonormal <span class="math notranslate nohighlight">\(Q\)</span> and
+<span class="math notranslate nohighlight">\(\lambda_1 \ge \dots \ge \lambda_d \ge 0\)</span>.</p>
+</section>
+<section id="pca-is-the-svd">
+<h3>PCA is the SVD<a class="headerlink" href="#pca-is-the-svd" title="Link to this heading">#</a></h3>
+<p>Write the economy SVD <span class="math notranslate nohighlight">\(X_c = U\Sigma V^{\top}\)</span>. Then
+<span class="math notranslate nohighlight">\(C = V\bigl(\Sigma^2/(n-1)\bigr)V^{\top}\)</span>, so</p>
+<div class="math notranslate nohighlight" id="equation-eq-pca-svd">
+<span class="eqno">(203)<a class="headerlink" href="#equation-eq-pca-svd" title="Link to this equation">#</a></span>\[\mathbf{q}_i = \mathbf{v}_i,
+\qquad
+\lambda_i = \frac{\sigma_i^2}{n-1} :\]</div>
+<p>the principal directions are the right singular vectors of the centred data
+and the variances are its scaled squared singular values. Computing PCA
+through <code class="docutils literal notranslate"><span class="pre">eigh(C)</span></code> and through <code class="docutils literal notranslate"><span class="pre">svd(X_c)</span></code> must therefore agree exactly — and
+the second is how it is <em>done</em>, because forming <span class="math notranslate nohighlight">\(C\)</span> squares the condition
+number, the sin measured in
+<a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html"><span class="std std-doc">§2.3</span></a>.</p>
+<p>The <strong>scores</strong> (coordinates of each sample in the principal basis) and the
+rank-<span class="math notranslate nohighlight">\(k\)</span> <strong>reconstruction</strong> are</p>
+<div class="math notranslate nohighlight" id="equation-eq-pca-scores">
+<span class="eqno">(204)<a class="headerlink" href="#equation-eq-pca-scores" title="Link to this equation">#</a></span>\[Z = X_cV = U\Sigma,
+\qquad
+X_c^{(k)} = Z_{[:, :k]}V_{[:, :k]}^{\top} = U_k\Sigma_kV_k^{\top},\]</div>
+<p>and the second equality says the reconstruction is <em>exactly</em> the truncated SVD
+of <a class="reference internal" href="low-rank-eckart-young.html"><span class="std std-doc">§4.2</span></a>, so Eckart–Young prices it:</p>
+<div class="math notranslate nohighlight" id="equation-eq-pca-eckart">
+<span class="eqno">(205)<a class="headerlink" href="#equation-eq-pca-eckart" title="Link to this equation">#</a></span>\[\bigl\|X_c - X_c^{(k)}\bigr\|_F^2
+  = \sum_{i&gt;k}\sigma_i^2
+  = (n-1)\sum_{i&gt;k}\lambda_i .\]</div>
+<p>The <strong>explained-variance ratio</strong> of component <span class="math notranslate nohighlight">\(i\)</span> is
+<span class="math notranslate nohighlight">\(\lambda_i/\sum_j\lambda_j\)</span> — Frobenius energy fractions, renamed.</p>
+</section>
+<section id="whitening">
+<h3>Whitening<a class="headerlink" href="#whitening" title="Link to this heading">#</a></h3>
+<p>Whitening seeks <span class="math notranslate nohighlight">\(W\)</span> with <span class="math notranslate nohighlight">\(\operatorname{Cov}(X_cW) = I\)</span>: coordinates that are
+uncorrelated with unit variance. Two standard choices,</p>
+<div class="math notranslate nohighlight" id="equation-eq-pca-whiten">
+<span class="eqno">(206)<a class="headerlink" href="#equation-eq-pca-whiten" title="Link to this equation">#</a></span>\[W_{\text{PCA}} = Q\Lambda^{-1/2},
+\qquad
+W_{\text{ZCA}} = Q\Lambda^{-1/2}Q^{\top} = C^{-1/2},\]</div>
+<p>both work, and they differ by the rotation <span class="math notranslate nohighlight">\(Q^{\top}\)</span>: ZCA is the <em>symmetric</em>
+inverse square root — the matrix-function <span class="math notranslate nohighlight">\(C^{-1/2}\)</span> — and is the whitener
+that stays closest to the identity. This is
+<a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html"><span class="std std-doc">§3.3</span></a>’s sampling trick
+run in reverse: there <span class="math notranslate nohighlight">\(L\)</span> manufactured correlation from white noise; here
+<span class="math notranslate nohighlight">\(C^{-1/2}\)</span> removes it.</p>
+</section>
+<section id="pca-is-not-regression">
+<h3>PCA is not regression<a class="headerlink" href="#pca-is-not-regression" title="Link to this heading">#</a></h3>
+<p>On a 2-D cloud, the regression line minimises <strong>vertical</strong> residuals
+<span class="math notranslate nohighlight">\(\sum(y_i - a x_i)^2\)</span>; the first principal axis minimises <strong>perpendicular</strong>
+ones — total least squares. Different objectives, different lines, and the
+perpendicular residual has a closed form: its sum of squares is
+<span class="math notranslate nohighlight">\((n-1)\lambda_{\min}\)</span>, the variance PCA discards.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data only: the two-dimensional cloud and the digits. PCA-via-SVD — the
+method this notebook crowns — is built in Exercise 1, where the crowning
+is the lesson.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_digits</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.decomposition</span><span class="w"> </span><span class="kn">import</span> <span class="n">PCA</span> <span class="k">as</span> <span class="n">SKPCA</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">la</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random array below comes from this seed</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+
+<span class="c1"># The 2-D worked example: 400 points from the correlated Gaussian of 3.3&#39;s</span>
+<span class="c1"># sampling trick, with covariance [[3, 1.4], [1.4, 1]] and mean (2, -1).</span>
+<span class="n">N2</span> <span class="o">=</span> <span class="mi">400</span>
+<span class="n">SIGMA2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">1.4</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.4</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]])</span>
+<span class="n">MU2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">])</span>
+<span class="n">X2</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cholesky</span><span class="p">(</span><span class="n">SIGMA2</span><span class="p">)</span> <span class="o">@</span> <span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="n">N2</span><span class="p">)))</span><span class="o">.</span><span class="n">T</span> <span class="o">+</span> <span class="n">MU2</span>
+
+<span class="c1"># The real data: scikit-learn&#39;s bundled 1797 handwritten digits, 64 features.</span>
+<span class="n">DIGITS</span> <span class="o">=</span> <span class="n">load_digits</span><span class="p">()</span>
+<span class="n">XD</span> <span class="o">=</span> <span class="n">DIGITS</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>          <span class="c1"># (1797, 64)</span>
+<span class="n">YD</span> <span class="o">=</span> <span class="n">DIGITS</span><span class="o">.</span><span class="n">target</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-two-routes-one-answer-and-why-one-of-them-is-the-method">
+<h2>Exercise 1: Two routes, one answer, and why one of them is the method<a class="headerlink" href="#exercise-1-two-routes-one-answer-and-why-one-of-them-is-the-method" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-pca-svd">Eq. 203</a> says <code class="docutils literal notranslate"><span class="pre">eigh</span></code> on the covariance and <code class="docutils literal notranslate"><span class="pre">svd</span></code> on the centred data
+are the same computation. This exercise runs both on the 400-point cloud
+<code class="docutils literal notranslate"><span class="pre">X2</span></code>, drawn from the correlated Gaussian with
+<span class="math notranslate nohighlight">\(\Sigma = \left[\begin{smallmatrix}3&amp;1.4\\1.4&amp;1\end{smallmatrix}\right]\)</span> and
+mean <span class="math notranslate nohighlight">\((2, -1)\)</span> by the Cholesky trick of
+<a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html"><span class="std std-doc">§3.3</span></a>.</p>
+<p><strong>Part a)</strong> Centre with <code class="docutils literal notranslate"><span class="pre">Xc</span> <span class="pre">=</span> <span class="pre">X2</span> <span class="pre">-</span> <span class="pre">X2.mean(axis=0)</span></code> and form the covariance
+<span class="math notranslate nohighlight">\(C = X_c^{\top}X_c/(n-1)\)</span> per <a class="reference internal" href="#equation-eq-pca-covariance">Eq. 202</a>. Confirm it matches
+<code class="docutils literal notranslate"><span class="pre">np.cov(X2.T)</span></code> to <span class="math notranslate nohighlight">\(10^{-12}\)</span> and estimates the true <span class="math notranslate nohighlight">\(\Sigma\)</span> to within <span class="math notranslate nohighlight">\(15\%\)</span>
+per entry — it is a 400-sample estimate, not the truth.</p>
+<p><strong>Part b)</strong> Compute <code class="docutils literal notranslate"><span class="pre">lam_e,</span> <span class="pre">Q</span> <span class="pre">=</span> <span class="pre">np.linalg.eigh(C)</span></code> (ascending, per
+<a class="reference internal" href="../03-eigenvalues/spectral-theorem.html"><span class="std std-doc">§3.2</span></a>) and the SVD route via
+your own <code class="docutils literal notranslate"><span class="pre">pca_svd(X2)</span></code> — write it: centre, economy SVD, variances
+<span class="math notranslate nohighlight">\(\sigma_i^2/(n-1)\)</span>, components as rows of <span class="math notranslate nohighlight">\(V^{\top}\)</span>. Confirm the
+variances agree to a relative <span class="math notranslate nohighlight">\(10^{-10}\)</span> after
+ordering, and confirm the <em>directions</em> agree as <strong>projectors</strong>
+<span class="math notranslate nohighlight">\(\mathbf{v}\mathbf{v}^{\top}\)</span> to <span class="math notranslate nohighlight">\(10^{-12}\)</span> — the sign of each vector is the
+library’s choice, as it has been since
+<a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html"><span class="std std-doc">§3.1</span></a>.</p>
+<p><strong>Write <code class="docutils literal notranslate"><span class="pre">pca_svd</span></code> yourself</strong> — the implementation is the lesson.</p>
+<p><strong>Part c)</strong> Confirm <span class="math notranslate nohighlight">\(\operatorname{tr}C = \sum_i\lambda_i\)</span> to <span class="math notranslate nohighlight">\(10^{-12}\)</span>: the
+total variance is basis-independent, which is what makes “explained variance”
+a meaningful fraction.</p>
+<p><strong>Part d)</strong> Confirm the variance interpretation directly: the sample variance
+of the projections <span class="math notranslate nohighlight">\(X_c\mathbf{v}_1\)</span> equals <span class="math notranslate nohighlight">\(\lambda_1\)</span> to a relative
+<span class="math notranslate nohighlight">\(10^{-10}\)</span>, and likewise for <span class="math notranslate nohighlight">\(\mathbf{v}_2\)</span> — and that <span class="math notranslate nohighlight">\(\mathbf{v}_1\)</span> beats
+<span class="math notranslate nohighlight">\(10^{3}\)</span> random unit directions, none of whose projection variances exceeds
+<span class="math notranslate nohighlight">\(\lambda_1\)</span>. That maximisation is the Rayleigh-quotient characterisation of
+<a class="reference internal" href="../03-eigenvalues/spectral-theorem.html"><span class="std std-doc">§3.2</span></a>, applied to <span class="math notranslate nohighlight">\(C\)</span>.</p>
+<p><strong>Part e)</strong> Draw the cloud with both principal axes through the sample mean,
+each scaled to <span class="math notranslate nohighlight">\(2\sqrt{\lambda_i}\)</span> — the <span class="math notranslate nohighlight">\(2\sigma\)</span> extent along its
+direction.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C =
+[[2.97813385 1.47756412]
+ [1.47756412 1.08176685]]
+matches np.cov to 0.00e+00; estimates the true Sigma to 8.2% worst-entry
+
+variances: eigh [3.78558347 0.27431722]  svd [3.78558347 0.27431722]  (rel gap 5.9e-16)
+directions as projectors: 5.55e-17;  tr C - sum lam = 2.7e-15
+
+var along v_1, v_2: [3.78558347 0.27431722]  = lam to 3.5e-16
+best of 1000 random directions: 3.7854 &lt;= lam_1 = 3.7856  (1.0000x)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-pca-cloud">
+<img alt="../../_images/fd4e5d31c08b34ea856cd43a9312464485aa21ba5f1771e44af94beb02ebf143.png" src="../../_images/fd4e5d31c08b34ea856cd43a9312464485aa21ba5f1771e44af94beb02ebf143.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 79 </span><span class="caption-text">The 400-point cloud drawn from the correlated Gaussian with <span class="math notranslate nohighlight">\(\Sigma = \left[\begin{smallmatrix}3&amp;1.4\\1.4&amp;1\end{smallmatrix}\right]\)</span>, with the two principal axes through the sample mean, each drawn to <span class="math notranslate nohighlight">\(\pm2\sqrt{\lambda_i}\)</span> – the two-sigma extent along its own direction. The first axis carries variance <span class="math notranslate nohighlight">\(\lambda_1 = 3.79\)</span> and the second <span class="math notranslate nohighlight">\(\lambda_2 = 0.27\)</span>: the same ellipse geometry as the Cholesky sampling picture of the positive-definiteness notebook, now read off the data instead of imposed on it.</span><a class="headerlink" href="#fig-pca-cloud" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<p>The two routes are compared as projectors, not vectors — sign freedom, as
+always — and the maximisation claim is tested against random challengers the
+same way Courant–Fischer was: by counting violations, of which there are none.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  C = Xc^T Xc/(n-1) is np.cov exactly (Eq. 2)   [0 &lt; 1e-12]
+✓  eigh on C and svd on Xc give the same variances (Eq. 3)   [max|Δ| = 2.22045e-15 (rtol=1e-10, atol=0)]
+✓  and the same directions, compared as projectors (Eq. 3)   [the sign of each vector is the library&#39;s choice; the projector is not [5.55112e-17 &lt; 1e-12]]
+✓  total variance is basis-independent: tr C = sum lam   [2.66454e-15 &lt; 1e-12]
+✓  lam_i IS the variance along v_i, and no direction of 1000 beats v_1   [projection variances [3.7856 0.2743] against lam [3.7856 0.2743]; best random direction reaches 1.0000 of lam_1 — the Rayleigh quotient of 3.2, applied to C]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-the-digits-scores-scree-and-eckartyoung-in-costume">
+<h2>Exercise 2: The digits: scores, scree, and Eckart–Young in costume<a class="headerlink" href="#exercise-2-the-digits-scores-scree-and-eckartyoung-in-costume" title="Link to this heading">#</a></h2>
+<p>The real data is scikit-learn’s 1797 handwritten digits: <span class="math notranslate nohighlight">\(n = 1797\)</span> samples,
+<span class="math notranslate nohighlight">\(d = 64\)</span> features (the pixels of an <span class="math notranslate nohighlight">\(8\times8\)</span> image), bundled offline. This
+exercise runs the full PCA pipeline on it and checks each statistical claim
+against the linear-algebra identity it renames.</p>
+<p><strong>Part a)</strong> Run <code class="docutils literal notranslate"><span class="pre">pca_svd(XD)</span></code> and form the scores <span class="math notranslate nohighlight">\(Z = X_cV\)</span> per
+<a class="reference internal" href="#equation-eq-pca-scores">Eq. 204</a>. Confirm <span class="math notranslate nohighlight">\(Z = U\Sigma\)</span> to <span class="math notranslate nohighlight">\(10^{-10}\)</span> (computing <span class="math notranslate nohighlight">\(U\Sigma\)</span>
+from the SVD directly), and confirm the scores are <strong>uncorrelated</strong>: the
+off-diagonal entries of <span class="math notranslate nohighlight">\(\operatorname{Cov}(Z)\)</span> are below
+<span class="math notranslate nohighlight">\(10^{-10}\lambda_1\)</span>, which is the orthogonality of <span class="math notranslate nohighlight">\(V\)</span> speaking.</p>
+<p><strong>Part b)</strong> Compute the explained-variance ratios <span class="math notranslate nohighlight">\(\lambda_i/\sum\lambda_j\)</span>.
+The first two are <span class="math notranslate nohighlight">\(14.9\%\)</span> and <span class="math notranslate nohighlight">\(13.6\%\)</span> — two components carry <span class="math notranslate nohighlight">\(28.5\%\)</span> of
+64-dimensional pixel variance. Confirm the ratios match
+<code class="docutils literal notranslate"><span class="pre">sklearn.decomposition.PCA(n_components=10).fit(XD).explained_variance_ratio_</span></code>
+to <span class="math notranslate nohighlight">\(10^{-8}\)</span>. sklearn is not consulted for the answer; it is confirmed to
+<em>be</em> this computation.</p>
+<p><strong>Part c)</strong> Confirm <a class="reference internal" href="#equation-eq-pca-eckart">Eq. 205</a> at <span class="math notranslate nohighlight">\(k = 5, 10, 20\)</span>: the squared
+Frobenius reconstruction error equals <span class="math notranslate nohighlight">\(\sum_{i&gt;k}\sigma_i^2\)</span> to a relative
+<span class="math notranslate nohighlight">\(10^{-9}\)</span>. This is Eckart–Young, and it prices every choice of <span class="math notranslate nohighlight">\(k\)</span> from the
+scree plot alone before any reconstruction is formed — exactly as in
+<a class="reference internal" href="low-rank-eckart-young.html"><span class="std std-doc">§4.2</span></a>.</p>
+<p><strong>Part d)</strong> Report how many components reach <span class="math notranslate nohighlight">\(90\%\)</span> cumulative explained
+variance (21), and confirm the cumulative curve is monotone with the last
+value <span class="math notranslate nohighlight">\(1\)</span> to <span class="math notranslate nohighlight">\(10^{-12}\)</span>.</p>
+<p><strong>Part e)</strong> Draw the scree plot with its cumulative curve, and the 1797
+digits in the plane of their first two scores, coloured by label — the
+classic picture, with the classes visibly organised by two numbers per image.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>scores Z = Xc V: matches U Sigma (|.|) to 1.29e-13
+scores uncorrelated: worst off-diagonal 3.82e-13 against lam_1 = 179.0
+
+explained variance: first two 14.9%, 13.6% (cumulative 28.5%)
+against sklearn PCA: 2.64e-16
+k =  5: reconstruction error^2 9.8245e+05 = tail energy 9.8245e+05  (rel gap 5.9e-16)
+k = 10: reconstruction error^2 5.6518e+05 = tail energy 5.6518e+05  (rel gap 2.1e-16)
+k = 20: reconstruction error^2 2.2821e+05 = tail energy 2.2821e+05  (rel gap 5.1e-16)
+
+90% of the variance needs 21 of 64 components; cumulative curve ends at 1.000000000000
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-pca-digits">
+<img alt="../../_images/18bf1bce65f24cb9b40da5545fa3f4d221ebc50cec8fa23399d6194ab21600fd.png" src="../../_images/18bf1bce65f24cb9b40da5545fa3f4d221ebc50cec8fa23399d6194ab21600fd.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 80 </span><span class="caption-text">Left: the scree plot of the 1797 handwritten digits – explained-variance ratio <span class="math notranslate nohighlight">\(\lambda_i/\sum\lambda_j\)</span> per component (bars) with the cumulative curve, reaching <span class="math notranslate nohighlight">\(90\%\)</span> at 21 of 64 components. Right: every digit placed by its first two scores <span class="math notranslate nohighlight">\(\mathbf{z} = (X_c\mathbf{v}_1, X_c\mathbf{v}_2)\)</span>, coloured by label; two numbers per image already organise the ten classes into visible (overlapping) territories. The axes carry <span class="math notranslate nohighlight">\(14.9\%\)</span> and <span class="math notranslate nohighlight">\(13.6\%\)</span> of the total pixel variance, per Eq. 3.</span><a class="headerlink" href="#fig-pca-digits" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<p>The sklearn comparison is the sociological check — an industrial-standard
+implementation agreeing to <span class="math notranslate nohighlight">\(10^{-8}\)</span> says PCA <em>is</em> this SVD, not a cousin of
+it — while the reconstruction identity is the mathematical one, Eckart–Young
+priced from the spectrum exactly as in the previous notebook.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the scores are U Sigma, and they are exactly uncorrelated (Eq. 4)   [Z vs U Sigma to 1.3e-13; worst score covariance off-diagonal 3.8e-13 — the orthogonality of V, read statistically]
+✓  sklearn&#39;s explained-variance ratios ARE these, to 1e-8   [sklearn.decomposition.PCA computes the same centred SVD [2.63678e-16 &lt; 1e-08]]
+✓  the k-component reconstruction error is the tail energy (Eq. 5)   [Eckart-Young in statistical costume, at k = 5, 10, 20 [5.92475e-16 &lt; 1e-09]]
+✓  90% of the pixel variance lives in 21 of 64 components   [cumulative curve monotone, ending at 1.000000000000]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-eigendigits-and-reconstruction-as-a-budget">
+<h2>Exercise 3: Eigendigits, and reconstruction as a budget<a class="headerlink" href="#exercise-3-eigendigits-and-reconstruction-as-a-budget" title="Link to this heading">#</a></h2>
+<p>The principal directions of image data are themselves images, and looking at
+them explains what the scores measure. This exercise draws the first sixteen
+— the <strong>eigendigits</strong> — and watches a single digit reassemble as components
+are added back per <a class="reference internal" href="#equation-eq-pca-scores">Eq. 204</a>.</p>
+<p><strong>Part a)</strong> Reshape the first sixteen rows of <span class="math notranslate nohighlight">\(V^{\top}\)</span> to <span class="math notranslate nohighlight">\(8\times8\)</span> and
+draw them. Confirm each has unit norm to <span class="math notranslate nohighlight">\(10^{-12}\)</span> and that the sixteen are
+mutually orthogonal to <span class="math notranslate nohighlight">\(10^{-12}\)</span> — they are rows of an orthogonal matrix,
+whatever else they look like.</p>
+<p><strong>Part b)</strong> Reconstruct digit number 3 (the same “3” as
+<a class="reference internal" href="low-rank-eckart-young.html"><span class="std std-doc">§4.2</span></a>) at <span class="math notranslate nohighlight">\(k = 5, 10, 20\)</span> via
+<span class="math notranslate nohighlight">\(\bar{\mathbf{x}} + \sum_{i\le k}z_i\mathbf{v}_i\)</span>, and report the relative
+error against the original at each <span class="math notranslate nohighlight">\(k\)</span>. Confirm it decreases and that the
+<span class="math notranslate nohighlight">\(k = 64\)</span> reconstruction is exact to <span class="math notranslate nohighlight">\(10^{-10}\)</span>.</p>
+<p><strong>Part c)</strong> Confirm the mean matters: the <span class="math notranslate nohighlight">\(k = 0\)</span> “reconstruction” — the mean
+image alone — already carries the digit-shaped blur that all 1797 samples
+share, with relative error <span class="math notranslate nohighlight">\(57\%\)</span> against this digit; the components only
+encode the <em>departure</em> from it.</p>
+<p><strong>Part d)</strong> Draw the reconstruction sequence beside the original.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>first 16 components: unit norm to 1.3e-15, mutually orthogonal to 2.7e-15
+k =  0: relative reconstruction error 0.5693
+k =  5: relative reconstruction error 0.3667
+k = 10: relative reconstruction error 0.2739
+k = 20: relative reconstruction error 0.2079
+k = 64: relative reconstruction error 0.0000
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-pca-eigendigits">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[]
+</pre></div>
+</div>
+<figcaption>
+<p><span class="caption-number">Fig. 81 </span><span class="caption-text">Top: the first sixteen principal components of the digits data, reshaped to <span class="math notranslate nohighlight">\(8\times8\)</span> – the eigendigits, on a diverging scale because loadings are signed. Each is a unit vector, mutually orthogonal to <span class="math notranslate nohighlight">\(10^{-13}\)</span>; the early ones encode coarse stroke structure and the later ones progressively finer corrections. Bottom: digit number 3 rebuilt as <span class="math notranslate nohighlight">\(\bar{\mathbf{x}} + \sum_{i \le k} z_i\mathbf{v}_i\)</span> for growing <span class="math notranslate nohighlight">\(k\)</span>. The <span class="math notranslate nohighlight">\(k=0\)</span> panel is the dataset mean – already a digit-shaped blur, <span class="math notranslate nohighlight">\(57\%\)</span> from this particular 3 – and twenty components of the available 64 bring it to <span class="math notranslate nohighlight">\(21\%\)</span>.</span><a class="headerlink" href="#fig-pca-eigendigits" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<figure class="align-default" id="id5">
+<img alt="../../_images/994aeb7c8145926549ea22d5f219adc0324048f467848f95824abb594c7208f3.png" src="../../_images/994aeb7c8145926549ea22d5f219adc0324048f467848f95824abb594c7208f3.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 82 </span><span class="caption-text">Top: the first sixteen principal components of the digits data, reshaped to <span class="math notranslate nohighlight">\(8\times8\)</span> – the eigendigits, on a diverging scale because loadings are signed. Each is a unit vector, mutually orthogonal to <span class="math notranslate nohighlight">\(10^{-13}\)</span>; the early ones encode coarse stroke structure and the later ones progressively finer corrections. Bottom: digit number 3 rebuilt as <span class="math notranslate nohighlight">\(\bar{\mathbf{x}} + \sum_{i \le k} z_i\mathbf{v}_i\)</span> for growing <span class="math notranslate nohighlight">\(k\)</span>. The <span class="math notranslate nohighlight">\(k=0\)</span> panel is the dataset mean – already a digit-shaped blur, <span class="math notranslate nohighlight">\(57\%\)</span> from this particular 3 – and twenty components of the available 64 bring it to <span class="math notranslate nohighlight">\(21\%\)</span>.</span><a class="headerlink" href="#id5" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<p>The orthogonality check is what separates “sixteen suggestive pictures” from
+“rows of an orthogonal matrix”: the eigendigits are constrained objects, and
+the constraint is verified rather than admired.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the sixteen eigendigits are orthonormal, whatever they look like   [unit norms to 1.3e-15, mutual orthogonality to 2.7e-15]
+✓  the reconstruction improves monotonically and is exact at k = d (Eq. 4)   [errors 0.367 &gt; 0.274 &gt; 0.208, and 1.0e-15 with all 64 components]
+✓  while the mean alone is already within 57% of this digit   [relative error 0.569 at k = 0: the components encode only the departure from what every sample shares]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-whitening-pca-run-backwards">
+<h2>Exercise 4: Whitening: PCA run backwards<a class="headerlink" href="#exercise-4-whitening-pca-run-backwards" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html"><span class="std std-doc">§3.3</span></a> <em>built</em> correlation:
+<span class="math notranslate nohighlight">\(\mathbf{x} = L\mathbf{z}\)</span> gave white noise the covariance <span class="math notranslate nohighlight">\(LL^{\top}\)</span>.
+Whitening inverts that. This exercise applies both whiteners of
+<a class="reference internal" href="#equation-eq-pca-whiten">Eq. 206</a> to the 2-D cloud and verifies what each does and what
+distinguishes them.</p>
+<p><strong>Part a)</strong> Build <span class="math notranslate nohighlight">\(W_{\text{PCA}} = Q\Lambda^{-1/2}\)</span> and
+<span class="math notranslate nohighlight">\(W_{\text{ZCA}} = Q\Lambda^{-1/2}Q^{\top}\)</span> from <code class="docutils literal notranslate"><span class="pre">eigh(C2)</span></code>. Confirm both give
+<span class="math notranslate nohighlight">\(\operatorname{Cov}(X_cW) = I_2\)</span> to <span class="math notranslate nohighlight">\(10^{-10}\)</span>.</p>
+<p><strong>Part b)</strong> Confirm <span class="math notranslate nohighlight">\(W_{\text{ZCA}} = C^{-1/2}\)</span> as a matrix function: its
+square times <span class="math notranslate nohighlight">\(C\)</span> is <span class="math notranslate nohighlight">\(I\)</span> to <span class="math notranslate nohighlight">\(10^{-12}\)</span>, and it is symmetric to <span class="math notranslate nohighlight">\(10^{-14}\)</span>,
+while <span class="math notranslate nohighlight">\(W_{\text{PCA}}\)</span> is not symmetric. The two whiteners differ by the
+rotation <span class="math notranslate nohighlight">\(Q^{\top}\)</span>, and rotating white data leaves it white — confirm that
+too, by checking <span class="math notranslate nohighlight">\(\operatorname{Cov}\)</span> is still <span class="math notranslate nohighlight">\(I\)</span> after applying a random
+rotation to the ZCA output.</p>
+<p><strong>Part c)</strong> Confirm ZCA is the whitener nearest the identity:
+<span class="math notranslate nohighlight">\(\|W_{\text{ZCA}} - I\|_F &lt; \|W_{\text{PCA}} - I\|_F\)</span>, which is why it is the
+choice when the coordinates mean something.</p>
+<p><strong>Part d)</strong> Close the loop with <a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html"><span class="std std-doc">§3.3</span></a>:
+whiten the cloud, then re-colour it with the <em>true</em> <span class="math notranslate nohighlight">\(\Sigma\)</span>’s Cholesky
+factor, and confirm the recoloured covariance matches <span class="math notranslate nohighlight">\(\Sigma\)</span> to the
+sampling accuracy of Part a) of Exercise 1 (<span class="math notranslate nohighlight">\(15\%\)</span>) — manufacture and removal
+of correlation are the same operation with the triangle inverted.</p>
+<p><strong>Part e)</strong> Draw the cloud, its PCA-whitened version, and its ZCA-whitened
+version on equal axes: both whitened clouds are round, and the ZCA one is
+visibly the <em>least rotated</em> relative to the original.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>whitened covariances: PCA route 2.00e-15 from I, ZCA 1.78e-15
+W_zca^2 C = I to 8.88e-16; symmetric to 0.0e+00 (PCA whitener asymmetry 1.224)
+rotated white data is still white: 2.22e-15
+distance to the identity: ZCA 1.0310 &lt; PCA 2.1381
+whiten, then re-colour with the true Sigma&#39;s Cholesky: covariance within 0.0% of Sigma
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-pca-whiten">
+<img alt="../../_images/6e94c889d299c982a2f21f5359f7a0be04eaede06d5700c3709214493a220f02.png" src="../../_images/6e94c889d299c982a2f21f5359f7a0be04eaede06d5700c3709214493a220f02.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 83 </span><span class="caption-text">The centred cloud (left), its PCA-whitened version <span class="math notranslate nohighlight">\(X_cQ\Lambda^{-1/2}\)</span> (centre), and its ZCA-whitened version <span class="math notranslate nohighlight">\(X_cC^{-1/2}\)</span> (right), on equal axes. Both whitened clouds have covariance <span class="math notranslate nohighlight">\(I_2\)</span> to <span class="math notranslate nohighlight">\(10^{-15}\)</span> – round, unit scale – but the PCA whitener has rotated the data onto its principal axes while ZCA, the symmetric inverse square root, leaves it in the orientation nearest the original. Whitening is the Cholesky colouring trick of the positive-definiteness notebook run in reverse.</span><a class="headerlink" href="#fig-pca-whiten" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<p>The matrix-function reading is the check with content: <span class="math notranslate nohighlight">\(W_{\text{ZCA}}\)</span>
+squaring against <span class="math notranslate nohighlight">\(C\)</span> to the identity certifies it as <span class="math notranslate nohighlight">\(C^{-1/2}\)</span>, an object
+<a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html"><span class="std std-doc">§3.6</span></a> will construct
+in general — and the closed loop with the colouring trick ties the two
+notebooks into one statement.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  both whiteners produce identity covariance (Eq. 6)   [PCA route 2.0e-15, ZCA 1.8e-15 from I_2]
+✓  ZCA is the SYMMETRIC inverse square root C^{-1/2}; the PCA whitener is not   [W^2 C = I to 8.9e-16, symmetry 0.0e+00 against the PCA whitener&#39;s 1.224 asymmetry]
+✓  and whiteness survives rotation, which is why W is only unique up to one   [2.22045e-15 &lt; 1e-10]
+✓  ZCA is the whitener nearest the identity   [||W - I||_F: 1.0310 against 2.1381]
+✓  whiten-then-recolour reproduces the true Sigma to sampling accuracy   [colouring (3.3) and whitening are one operation, inverted [1.33227e-15 &lt; 0.2]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-the-uncentred-trap-and-the-line-pca-actually-fits">
+<h2>Exercise 5: The uncentred trap, and the line PCA actually fits<a class="headerlink" href="#exercise-5-the-uncentred-trap-and-the-line-pca-actually-fits" title="Link to this heading">#</a></h2>
+<p>Two closing measurements, each guarding a standard mistake.</p>
+<p><strong>Skipping the centring.</strong> Run the SVD on the <em>raw</em> digits matrix and its
+first right singular vector is not a principal direction at all: it points at
+the <strong>mean</strong>. The rank-one term <span class="math notranslate nohighlight">\(\sigma_1\mathbf{u}_1\mathbf{v}_1^{\top}\)</span> of
+an uncentred data matrix is busy representing <span class="math notranslate nohighlight">\(\mathbf{1}\bar{\mathbf{x}}^{\top}\)</span>,
+and every “component” after it is contaminated by the leftovers.</p>
+<p><strong>PCA is not regression.</strong> On the 2-D cloud, the regression of <span class="math notranslate nohighlight">\(x_2\)</span> on
+<span class="math notranslate nohighlight">\(x_1\)</span> minimises vertical residuals; the first principal axis minimises
+perpendicular ones. Two objectives, two different slopes — and the
+perpendicular one comes with the exact identity that its residual sum of
+squares is <span class="math notranslate nohighlight">\((n-1)\lambda_2\)</span>, the variance PCA discards.</p>
+<p><strong>Part a)</strong> Compute the SVD of the raw <code class="docutils literal notranslate"><span class="pre">XD</span></code> and report
+<span class="math notranslate nohighlight">\(|\cos\theta|\)</span> between <span class="math notranslate nohighlight">\(\mathbf{v}_1^{\text{raw}}\)</span> and the mean image
+<span class="math notranslate nohighlight">\(\bar{\mathbf{x}}\)</span>: it is <span class="math notranslate nohighlight">\(0.99998\)</span>. Report also
+<span class="math notranslate nohighlight">\(\sigma_1^{\text{raw}} = 2193\)</span> against the centred <span class="math notranslate nohighlight">\(\sigma_1 = 567\)</span>: the
+“leading component” of uncentred data is mostly the mean, amplified
+<span class="math notranslate nohighlight">\(3.9\times\)</span>.</p>
+<p><strong>Part b)</strong> Confirm the centred <span class="math notranslate nohighlight">\(\mathbf{v}_1\)</span> is <em>not</em> the mean direction:
+<span class="math notranslate nohighlight">\(|\cos\theta| &lt; 0.6\)</span> there. Centring is what makes the components describe
+variation rather than location.</p>
+<p><strong>Part c)</strong> On the cloud, compute the regression slope
+<span class="math notranslate nohighlight">\(\hat{a} = \sum x_1x_2 / \sum x_1^2\)</span> (centred data) and the PCA slope from
+<span class="math notranslate nohighlight">\(\mathbf{v}_1\)</span>. They differ: <span class="math notranslate nohighlight">\(0.496\)</span> against <span class="math notranslate nohighlight">\(0.546\)</span> — a <span class="math notranslate nohighlight">\(10\%\)</span> disagreement
+on the same 400 points. Confirm the two are distinct by more than <span class="math notranslate nohighlight">\(5\%\)</span> and
+that <em>neither</em> is wrong: each minimises exactly its own objective, checked in
+Part d).</p>
+<p><strong>Part d)</strong> Verify both optimality claims by perturbation: over 200 slopes
+in a <span class="math notranslate nohighlight">\(\pm20\%\)</span> bracket around each optimum, no candidate beats the regression
+slope on vertical residuals, and none beats the PCA slope on perpendicular
+ones. And confirm the closed form: the perpendicular residual sum of squares
+at the PCA slope equals <span class="math notranslate nohighlight">\((n-1)\lambda_2\)</span> to a relative <span class="math notranslate nohighlight">\(10^{-12}\)</span>.</p>
+<p><strong>Part e)</strong> Draw the cloud with both lines, and the two residual objectives
+as curves over the slope bracket, each minimised at its own line.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>uncentred v_1 vs mean direction: |cos| = 0.99998
+  sigma_1 raw 2193.1 against centred 567.0 (3.9x)
+centred v_1 vs mean direction:   |cos| = 0.006
+
+regression slope 0.4961  vs  PCA (TLS) slope 0.5465  (10.1% apart)
+no candidate beats regression on vertical residuals: True
+no candidate beats PCA on perpendicular residuals:  True
+perp SS at the PCA slope = (n-1) lam_2 to a relative 7.8e-16
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-pca-tls">
+<img alt="../../_images/068abb734ed5fe615b1c9a75348b587545b65a0a5f3e490116bd9803b899f79d.png" src="../../_images/068abb734ed5fe615b1c9a75348b587545b65a0a5f3e490116bd9803b899f79d.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 84 </span><span class="caption-text">Left: the centred cloud with the regression line of <span class="math notranslate nohighlight">\(x_2\)</span> on <span class="math notranslate nohighlight">\(x_1\)</span> (navy, slope <span class="math notranslate nohighlight">\(0.496\)</span>, minimising vertical residuals) and the first principal axis (amber, slope <span class="math notranslate nohighlight">\(0.546\)</span>, minimising perpendicular residuals) – two objectives, two lines, ten per cent apart on the same 400 points. Right: the two residual objectives over a bracket of candidate slopes, each minimised at its own line and not at the other’s; the perpendicular objective’s minimum value is exactly <span class="math notranslate nohighlight">\((n-1)\lambda_2\)</span>, the variance PCA discards.</span><a class="headerlink" href="#fig-pca-tls" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p>The scores of Exercise 2 used all 1797 samples to <em>build</em> the basis and then
+projected the same samples onto it. Ask your assistant for a
+<code class="docutils literal notranslate"><span class="pre">pca_transform(X_train,</span> <span class="pre">X_new,</span> <span class="pre">k)</span></code> that fits the mean and components on one
+set and projects another — the split every real pipeline uses. Then check it
+against the mathematics rather than against sklearn’s output: verify (i) on
+<code class="docutils literal notranslate"><span class="pre">X_new</span> <span class="pre">=</span> <span class="pre">X_train</span></code> it reproduces Exercise 2’s scores to <span class="math notranslate nohighlight">\(10^{-10}\)</span>, (ii) the
+<em>train</em>-set reconstruction error at rank <span class="math notranslate nohighlight">\(k\)</span> still equals the tail energy of
+Eq. 5 exactly, while (iii) the <em>held-out</em> reconstruction error is strictly
+larger for every <span class="math notranslate nohighlight">\(k\)</span> tested — Eckart–Young optimises the matrix it was given,
+and the gap between (ii) and (iii) is the honest definition of overfitting a
+basis. The check is yours.</p>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<p>Both optimality claims are tested by perturbation, because “minimises” is a
+claim about a neighbourhood, not a formula — and the trap checks are gated on
+the <em>measured</em> cosines, which is what makes “always centre first” an observed
+fact about this data rather than advice.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  uncentred PCA&#39;s first component points at the MEAN (Eq. 1)   [|cos| = 0.99998 with sigma_1 inflated 3.9x: the leading rank-one term is representing location, not variation]
+✓  while the centred first component does not   [|cos| = 0.006: centring is what points the basis at the variance]
+✓  the PCA line and the regression line are measurably different lines   [slopes 0.5465 against 0.4961 on the same 400 points: perpendicular and vertical residuals are different objectives]
+✓  and each is optimal for exactly its own objective, by perturbation   [200 candidate slopes in a +/-20% bracket: none beats regression on vertical SS, none beats the principal axis on perpendicular SS]
+✓  with the PCA line&#39;s perpendicular SS equal to (n-1) lam_2 exactly   [the discarded variance IS the residual [7.79014e-16 &lt; 1e-12]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p><strong>PCA is the SVD of the centred data matrix.</strong> On the 2-D cloud, <code class="docutils literal notranslate"><span class="pre">eigh</span></code> on
+<span class="math notranslate nohighlight">\(C\)</span> and <code class="docutils literal notranslate"><span class="pre">svd</span></code> on <span class="math notranslate nohighlight">\(X_c\)</span> agreed to <span class="math notranslate nohighlight">\(10^{-16}\)</span> as projectors with variances
+matching to <span class="math notranslate nohighlight">\(10^{-15}\)</span> relative; <span class="math notranslate nohighlight">\(\operatorname{tr}C = \sum\lambda_i\)</span> to
+<span class="math notranslate nohighlight">\(10^{-15}\)</span>; and <span class="math notranslate nohighlight">\(\lambda_i\)</span> <em>is</em> the projection variance along
+<span class="math notranslate nohighlight">\(\mathbf{v}_i\)</span>, with none of <span class="math notranslate nohighlight">\(10^{3}\)</span> random directions beating
+<span class="math notranslate nohighlight">\(\mathbf{v}_1\)</span> — the Rayleigh quotient of
+<a class="reference internal" href="../03-eigenvalues/spectral-theorem.html"><span class="std std-doc">§3.2</span></a> in statistical clothes.</p>
+<p><strong>The statistical vocabulary is renamed linear algebra, verified item by
+item.</strong> On the 1797 digits: scores <span class="math notranslate nohighlight">\(= U\Sigma\)</span> and exactly uncorrelated;
+explained-variance ratios matching <code class="docutils literal notranslate"><span class="pre">sklearn</span></code> to <span class="math notranslate nohighlight">\(3\times10^{-16}\)</span>;
+reconstruction error equal to the tail energy at <span class="math notranslate nohighlight">\(k = 5, 10, 20\)</span> to
+<span class="math notranslate nohighlight">\(10^{-15}\)</span> relative — Eckart–Young pricing every <span class="math notranslate nohighlight">\(k\)</span> from the scree plot
+before anything is formed. <span class="math notranslate nohighlight">\(90\%\)</span> of the pixel variance lives in 21 of 64
+components, and the sixteen eigendigits are orthonormal to <span class="math notranslate nohighlight">\(10^{-13}\)</span>
+whatever they look like.</p>
+<p><strong>Whitening inverts the colouring trick.</strong> Both whiteners produced identity
+covariance to <span class="math notranslate nohighlight">\(10^{-15}\)</span>; <span class="math notranslate nohighlight">\(W_{\text{ZCA}}\)</span> certified itself as the symmetric
+<span class="math notranslate nohighlight">\(C^{-1/2}\)</span> (its square times <span class="math notranslate nohighlight">\(C\)</span> is <span class="math notranslate nohighlight">\(I\)</span> to <span class="math notranslate nohighlight">\(10^{-13}\)</span>) and is the whitener
+nearest the identity, while whiteness survived a random rotation — the
+non-uniqueness made visible. Whiten-then-recolour reproduced the true
+<span class="math notranslate nohighlight">\(\Sigma\)</span> to sampling accuracy, closing the loop with
+<a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html"><span class="std std-doc">§3.3</span></a>.</p>
+<p><strong>Two traps, measured.</strong> Uncentred, the first singular vector of the digits
+points at the mean with <span class="math notranslate nohighlight">\(|\cos| = 0.99998\)</span> and <span class="math notranslate nohighlight">\(\sigma_1\)</span> inflated
+<span class="math notranslate nohighlight">\(3.9\times\)</span> — the leading “component” is location, not variation. And the
+PCA line is not the regression line: slopes <span class="math notranslate nohighlight">\(0.546\)</span> against <span class="math notranslate nohighlight">\(0.496\)</span> on the
+same cloud, each optimal for exactly its own residual by a 200-candidate
+perturbation test, with the perpendicular residual equal to <span class="math notranslate nohighlight">\((n-1)\lambda_2\)</span>
+to <span class="math notranslate nohighlight">\(10^{-13}\)</span> relative.</p>
+<p><strong>Methods introduced.</strong> <code class="docutils literal notranslate"><span class="pre">pca_svd</span></code> (centring + economy SVD, never forming
+<span class="math notranslate nohighlight">\(C\)</span>), scores and loadings, explained-variance and scree plots,
+<code class="docutils literal notranslate"><span class="pre">sklearn.decomposition.PCA</span></code> as a cross-check, eigendigit galleries,
+PCA and ZCA whitening, whiten-recolour round trips, and the
+vertical-versus-perpendicular residual comparison.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>When even one pass over the data is too much.</strong> The digits SVD was
+instant; at web scale the centred data matrix does not fit anywhere.
+<a class="reference internal" href="randomized-svd-sketching.html"><span class="std std-doc">§4.4</span></a> gets the leading components from a
+handful of matrix–vector products, with a failure probability one can set.</p></li>
+<li><p><strong>What pure noise looks like.</strong> The scree plot’s tail was not zero, and
+deciding where signal ends needs a null model: the Marchenko–Pastur law for
+the singular values of pure noise, against which a component either stands
+out or does not.</p></li>
+<li><p><strong><span class="math notranslate nohighlight">\(C^{-1/2}\)</span> in general.</strong> ZCA needed the inverse square root of one
+well-conditioned <span class="math notranslate nohighlight">\(2\times2\)</span>; the matrix-function machinery of
+<a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html"><span class="std std-doc">§3.6</span></a> builds <span class="math notranslate nohighlight">\(f(A)\)</span>
+for general <span class="math notranslate nohighlight">\(f\)</span>, and the whitening here is its simplest useful case.</p></li>
+<li><p><strong>Centring as a projection.</strong> Subtracting the mean is multiplication by
+<span class="math notranslate nohighlight">\(I - \tfrac{1}{n}\mathbf{1}\mathbf{1}^{\top}\)</span>, an orthogonal projector of
+rank <span class="math notranslate nohighlight">\(n-1\)</span> — which is why uncentred PCA wastes its first component on
+<span class="math notranslate nohighlight">\(\mathbf{1}\)</span>: that direction was never projected out.
+<a class="reference internal" href="../06-structure/graphs-laplacian.html"><span class="std std-doc">§6.1</span></a> meets the same projector as
+the null space of every graph Laplacian.</p></li>
+</ul>
+<div class="docutils container" id="id6">
+<div role="list" class="citation-list">
+<div class="citation" id="id43" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">DFO20</a><span class="fn-bracket">]</span></span>
+<p>Marc Peter Deisenroth, A. Aldo Faisal, and Cheng Soon Ong. <em>Mathematics for Machine Learning</em>. Cambridge University Press, 2020. <a class="reference external" href="https://doi.org/10.1017/9781108679930">doi:10.1017/9781108679930</a>.</p>
+</div>
+<div class="citation" id="id44" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">HTF09</a><span class="fn-bracket">]</span></span>
+<p>Trevor Hastie, Robert Tibshirani, and Jerome Friedman. <em>The Elements of Statistical Learning</em>. Springer, 2 edition, 2009. <a class="reference external" href="https://doi.org/10.1007/978-0-387-84858-7">doi:10.1007/978-0-387-84858-7</a>.</p>
+</div>
+<div class="citation" id="id55" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">PVG+11</a><span class="fn-bracket">]</span></span>
+<p>Fabian Pedregosa, Gaël Varoquaux, Alexandre Gramfort, and others. Scikit-learn: machine learning in Python. <em>Journal of Machine Learning Research</em>, 12:2825–2830, 2011.</p>
+</div>
+<div class="citation" id="id8" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">Str19</a><span class="fn-bracket">]</span></span>
+<p>Gilbert Strang. <em>Linear Algebra and Learning from Data</em>. Wellesley-Cambridge Press, Wellesley, MA, 2019. ISBN 978-0-6926-3939-8.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/04-svd"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="low-rank-eckart-young.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">4.2 Low-Rank Approximation and Eckart–Young</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="randomized-svd-sketching.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">4.4 Randomized SVD and Sketching</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-data-matrix-centred">The data matrix, centred</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pca-is-the-svd">PCA is the SVD</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#whitening">Whitening</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pca-is-not-regression">PCA is not regression</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-two-routes-one-answer-and-why-one-of-them-is-the-method">Exercise 1: Two routes, one answer, and why one of them is the method</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-digits-scores-scree-and-eckartyoung-in-costume">Exercise 2: The digits: scores, scree, and Eckart–Young in costume</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-eigendigits-and-reconstruction-as-a-budget">Exercise 3: Eigendigits, and reconstruction as a budget</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-whitening-pca-run-backwards">Exercise 4: Whitening: PCA run backwards</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-the-uncentred-trap-and-the-line-pca-actually-fits">Exercise 5: The uncentred trap, and the line PCA actually fits</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

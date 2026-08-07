@@ -1,0 +1,1388 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="6.1 Graphs, Incidence Matrices, and the Laplacian" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/06-structure/graphs-laplacian.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: Chapter V computed with matrices whose structure came from a grid. Chapter VI widens the lens: structure of any shape, starting with the m..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: Chapter V computed with matrices whose structure came from a grid. Chapter VI widens the lens: structure of any shape, starting with the m..." />
+
+    <title>6.1 Graphs, Incidence Matrices, and the Laplacian &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/06-structure/graphs-laplacian';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/06-structure/graphs-laplacian.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="6.2 Markov Chains, Perron–Frobenius, and PageRank" href="markov-perron-pagerank.html" />
+    <link rel="prev" title="Chapter VI — Structure, Graphs, and Fast Algorithms" href="index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/06-structure/graphs-laplacian.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/06-structure/graphs-laplacian.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/06-structure/graphs-laplacian.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/06-structure/graphs-laplacian.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>6.1 Graphs, Incidence Matrices, and the Laplacian</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-incidence-matrix-and-the-laplacian">The incidence matrix and the Laplacian</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fiedler-s-eigenvalue-and-cutting-graphs">Fiedler’s eigenvalue, and cutting graphs</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#trees-and-resistors">Trees and resistors</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-the-dictionary-l-b-top-b-d-a-exactly">Exercise 1: The dictionary: <span class="math notranslate nohighlight">\(L = B^{\top}B = D - A\)</span>, exactly</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-null-space-counts-components">Exercise 2: The null space counts components</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-a-zoo-of-spectra-and-the-poisson-matrix-in-disguise">Exercise 3: A zoo of spectra, and the Poisson matrix in disguise</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-spectral-bisection-the-sign-pattern-is-the-cut">Exercise 4: Spectral bisection: the sign pattern is the cut</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-the-matrix-tree-theorem-against-brute-force">Exercise 5: The matrix-tree theorem, against brute force</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-resistor-networks-l-physics-and-the-four-subspaces">Exercise 6: Resistor networks: <span class="math notranslate nohighlight">\(L^{+}\)</span>, physics, and the four subspaces</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="graphs-incidence-matrices-and-the-laplacian">
+<h1>6.1 Graphs, Incidence Matrices, and the Laplacian<a class="headerlink" href="#graphs-incidence-matrices-and-the-laplacian" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter VI — Structure, Graphs, and Fast Algorithms
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;6.1
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">A graph is a matrix wearing a disguise: the incidence matrix turns edges into rows, its Gram matrix is the Laplacian, the null space counts connected components, the second eigenvector cuts clusters, a cofactor counts spanning trees — and Kirchhoff&#x27;s laws turn out to be the four fundamental subspaces doing physics.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;advanced&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;105–135 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p>Chapter V computed with matrices whose structure came from a grid. Chapter VI
+widens the lens: structure of <em>any</em> shape, starting with the most general
+discrete structure there is — a graph. The dictionary is exact. Build the
+<strong>incidence matrix</strong> <span class="math notranslate nohighlight">\(B\)</span> (one row per edge, <span class="math notranslate nohighlight">\(-1\)</span> and <span class="math notranslate nohighlight">\(+1\)</span> marking its
+ends) and the graph’s whole anatomy becomes linear algebra: the <strong>Laplacian</strong>
+<span class="math notranslate nohighlight">\(L = B^{\top}B = D - A\)</span> (an equality of integer matrices, gated <em>exactly</em>),
+its null space spanned by the indicator vectors of connected components,
+its second eigenvalue — Fiedler’s algebraic connectivity
+<span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id34" title="Miroslav Fiedler. Algebraic connectivity of graphs. Czechoslovak Mathematical Journal, 23(2):298–305, 1973. doi:10.21136/CMJ.1973.101168.">Fie73</a>]</span> — measuring how hard the graph is to cut, and the sign
+pattern of the matching eigenvector <em>performing</em> the cut: spectral
+bisection recovers a planted two-cluster structure exactly, with a 29-fold
+spectral gap certifying the verdict.</p>
+<p>The closing exercises are the classical theorems, checked against brute
+force and physics. The <strong>matrix-tree theorem</strong> says one cofactor of <span class="math notranslate nohighlight">\(L\)</span>
+counts spanning trees; this notebook counts all 24 of the worked graph’s
+trees by exhaustive enumeration and matches the determinant integer for
+integer. And the electrical reading — edges as unit resistors — makes
+<span class="math notranslate nohighlight">\(L^{+}\)</span> compute <strong>effective resistance</strong>, verified against the series and
+parallel rules every physics course teaches, plus Foster’s theorem
+(the resistances over edges sum to exactly <span class="math notranslate nohighlight">\(n - 1\)</span>), plus Kirchhoff’s two
+laws landing on the four fundamental subspaces of <span class="math notranslate nohighlight">\(B\)</span>: currents balance
+because <span class="math notranslate nohighlight">\(B^{\top}\)</span> says so, voltages close around loops because the cycle
+space is <span class="math notranslate nohighlight">\(B^{\top}\)</span>’s null space. <a class="reference internal" href="../01-matrices/four-subspaces.html"><span class="std std-doc">§1.4</span></a>’s
+abstract picture, with electrons in it.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> Strang <span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id7" title="Gilbert Strang. Introduction to Linear Algebra. Wellesley-Cambridge Press, Wellesley, MA, 6 edition, 2023. ISBN 978-1-7331466-7-8.">Str23</a>]</span> Section 3.5 for incidence matrices
+and the four-subspace reading; von Luxburg <span class="bibtex-citation" id="id3">[<a class="reference internal" href="#id33" title="Ulrike von Luxburg. A tutorial on spectral clustering. Statistics and Computing, 17(4):395–416, 2007. doi:10.1007/s11222-007-9033-z.">vL07</a>]</span> for
+spectral clustering; Fiedler’s original <span class="bibtex-citation" id="id4">[<a class="reference internal" href="#id34" title="Miroslav Fiedler. Algebraic connectivity of graphs. Czechoslovak Mathematical Journal, 23(2):298–305, 1973. doi:10.21136/CMJ.1973.101168.">Fie73</a>]</span>. Everything
+here is exact or eigvalsh-grade — the numerics are Chapter V’s, at rest.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="the-incidence-matrix-and-the-laplacian">
+<h3>The incidence matrix and the Laplacian<a class="headerlink" href="#the-incidence-matrix-and-the-laplacian" title="Link to this heading">#</a></h3>
+<p>Orient each of the <span class="math notranslate nohighlight">\(m\)</span> edges arbitrarily; the incidence matrix
+<span class="math notranslate nohighlight">\(B \in \mathbb{R}^{m\times n}\)</span> has <span class="math notranslate nohighlight">\(B_{e,i} = -1\)</span>, <span class="math notranslate nohighlight">\(B_{e,j} = +1\)</span> for edge
+<span class="math notranslate nohighlight">\(e = (i, j)\)</span>. Then, with <span class="math notranslate nohighlight">\(D\)</span> the diagonal of degrees and <span class="math notranslate nohighlight">\(A\)</span> the adjacency
+matrix,</p>
+<div class="math notranslate nohighlight" id="equation-eq-gl-laplacian">
+<span class="eqno">(248)<a class="headerlink" href="#equation-eq-gl-laplacian" title="Link to this equation">#</a></span>\[L \;=\; B^{\top}B \;=\; D - A, \qquad
+x^{\top}Lx \;=\; \sum_{(i,j)\in E}(x_i - x_j)^2 \;\ge\; 0 ,\]</div>
+<p>an identity of integer matrices (the orientation cancels in the Gram
+product) and an explicit certificate that <span class="math notranslate nohighlight">\(L\)</span> is positive semidefinite.
+The quadratic form says everything: <span class="math notranslate nohighlight">\(Lx = 0\)</span> iff <span class="math notranslate nohighlight">\(x\)</span> is constant on every
+connected component, so</p>
+<div class="math notranslate nohighlight" id="equation-eq-gl-nullspace">
+<span class="eqno">(249)<a class="headerlink" href="#equation-eq-gl-nullspace" title="Link to this equation">#</a></span>\[\dim \operatorname{null}(L) \;=\; \#\{\text{connected components}\},\]</div>
+<p>and the eigenvalue <span class="math notranslate nohighlight">\(0\)</span> has the component indicators as its eigenspace.</p>
+</section>
+<section id="fiedler-s-eigenvalue-and-cutting-graphs">
+<h3>Fiedler’s eigenvalue, and cutting graphs<a class="headerlink" href="#fiedler-s-eigenvalue-and-cutting-graphs" title="Link to this heading">#</a></h3>
+<p>For a connected graph the second-smallest eigenvalue <span class="math notranslate nohighlight">\(\lambda_2 &gt; 0\)</span> — the
+<strong>algebraic connectivity</strong> — and its eigenvector <span class="math notranslate nohighlight">\(v_2\)</span> minimizes the edge
+quadratic <span class="math notranslate nohighlight">\(\sum (x_i - x_j)^2\)</span> among unit vectors orthogonal to the
+constant. A graph that is two dense clusters joined by a few edges can make
+this quadratic tiny by putting one cluster at <span class="math notranslate nohighlight">\(+\)</span> and the other at <span class="math notranslate nohighlight">\(-\)</span>:
+the sign pattern of <span class="math notranslate nohighlight">\(v_2\)</span> <em>is</em> the cut. On a path graph the same
+minimization gives the smoothest non-constant profile — a discrete cosine,
+<span class="math notranslate nohighlight">\(v_2(i) \propto \cos\bigl(\pi(i + \tfrac12)/n\bigr)\)</span>, with eigenvalues
+<span class="math notranslate nohighlight">\(2 - 2\cos(k\pi/n)\)</span>: <a class="reference internal" href="../05-numerical/sparse-matrices.html"><span class="std std-doc">§5.3</span></a>’s
+Poisson spectrum, rediscovered as graph theory.</p>
+</section>
+<section id="trees-and-resistors">
+<h3>Trees and resistors<a class="headerlink" href="#trees-and-resistors" title="Link to this heading">#</a></h3>
+<p>Two classical theorems close the loop. The <strong>matrix-tree theorem</strong>: delete
+any one row and column of <span class="math notranslate nohighlight">\(L\)</span>; the determinant of what remains counts the
+spanning trees. And the <strong>electrical network</strong>: edges as unit resistors,
+a current injected at <span class="math notranslate nohighlight">\(i\)</span> and drawn at <span class="math notranslate nohighlight">\(j\)</span>, potentials
+<span class="math notranslate nohighlight">\(x = L^{+}(e_i - e_j)\)</span>, and</p>
+<div class="math notranslate nohighlight" id="equation-eq-gl-reff">
+<span class="eqno">(250)<a class="headerlink" href="#equation-eq-gl-reff" title="Link to this equation">#</a></span>\[R_{\text{eff}}(i,j) \;=\; (e_i - e_j)^{\top}L^{+}(e_i - e_j),
+\qquad \sum_{(i,j)\in E} R_{\text{eff}}(i,j) \;=\; n - 1\]</div>
+<p>(Foster’s theorem — the sum over <em>edges</em> is an integer, whatever the
+graph). Kirchhoff’s current law is <span class="math notranslate nohighlight">\(B^{\top}y = f\)</span> (flows balance at
+nodes); the voltage law is <span class="math notranslate nohighlight">\(y \perp \operatorname{null}(B^{\top})\)</span>
+(drops cancel around cycles) — the four subspaces of
+<a class="reference internal" href="../01-matrices/four-subspaces.html"><span class="std std-doc">§1.4</span></a>, carrying current.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data and instruments only: the worked graph’s edges and layout, and a
+matplotlib graph-drawing helper. The incidence matrix and Laplacian —
+the notebook’s dictionary — are built in Exercise 1.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">combinations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">la</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random array below comes from this seed</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+
+<span class="c1"># The worked graph: 8 nodes, 10 edges, drawn with these hand-laid positions.</span>
+<span class="c1"># Two triangles sharing structure on the left, a diamond on the right, one</span>
+<span class="c1"># pendant node — enough anatomy for every theorem below.</span>
+<span class="n">EDGES</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+         <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">)]</span>
+<span class="n">N_NODES</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">POS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.7</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+                <span class="p">[</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">1.7</span><span class="p">],</span> <span class="p">[</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">],</span> <span class="p">[</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]])</span>
+
+
+
+
+<span class="c1"># instrument: matplotlib plumbing — nodes, edges, labels; no linear algebra</span>
+<span class="c1"># inside, and no exercise&#39;s lesson.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">draw_graph</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">edges</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Draw a small graph with matplotlib primitives (no graph library).&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">edges</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="o">*</span><span class="nb">zip</span><span class="p">(</span><span class="n">pos</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">pos</span><span class="p">[</span><span class="n">j</span><span class="p">]),</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#9aa3b8&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.3</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">colors</span> <span class="k">if</span> <span class="n">colors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[</span><span class="s2">&quot;#16213e&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">pos</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">pos</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="mi">340</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">c</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+               <span class="n">edgecolors</span><span class="o">=</span><span class="s2">&quot;#16213e&quot;</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mf">1.2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">labels</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pos</span><span class="p">):</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">),</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+                        <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-the-dictionary-l-b-top-b-d-a-exactly">
+<h2>Exercise 1: The dictionary: <span class="math notranslate nohighlight">\(L = B^{\top}B = D - A\)</span>, exactly<a class="headerlink" href="#exercise-1-the-dictionary-l-b-top-b-d-a-exactly" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-gl-laplacian">Eq. 248</a> is an identity of integer matrices, and integer
+arithmetic below <span class="math notranslate nohighlight">\(2^{53}\)</span> is exact in floating point — so for once the
+course’s no-exact-comparison rule steps aside, deliberately.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">incidence(edges,</span> <span class="pre">n)</span></code> — one row per edge, <span class="math notranslate nohighlight">\(-1\)</span> at the
+tail, <span class="math notranslate nohighlight">\(+1\)</span> at the head — and with it build the incidence matrix of the worked
+graph and print it: 10 rows (edges), 8 columns (nodes), each row one <span class="math notranslate nohighlight">\(-1\)</span>
+and one <span class="math notranslate nohighlight">\(+1\)</span>.</p>
+<p><strong>Part b)</strong> Form <span class="math notranslate nohighlight">\(L = B^{\top}B\)</span>, the degree matrix <span class="math notranslate nohighlight">\(D\)</span> (diagonal of row
+sums of the adjacency matrix), and <span class="math notranslate nohighlight">\(A\)</span> itself. Gate
+<code class="docutils literal notranslate"><span class="pre">np.array_equal(L,</span> <span class="pre">D</span> <span class="pre">-</span> <span class="pre">A)</span></code> — <strong>exactly</strong>, because every entry is a small
+integer and the Gram product cancels the arbitrary edge orientations.</p>
+<p><strong>Part c)</strong> Certify positive semidefiniteness twice: by the identity
+<span class="math notranslate nohighlight">\(x^{\top}Lx = \sum_{(i,j)}(x_i - x_j)^2\)</span> evaluated on 100 random vectors
+(never negative), and by <code class="docutils literal notranslate"><span class="pre">np.linalg.eigvalsh</span></code> (<span class="math notranslate nohighlight">\(\lambda_{\min}\)</span> within
+<span class="math notranslate nohighlight">\(100\,\varepsilon\lVert L\rVert\)</span> of zero — the constant vector is in the
+null space, so <span class="math notranslate nohighlight">\(0\)</span> <em>is</em> an eigenvalue).</p>
+<p><strong>Part d)</strong> Draw the graph beside <code class="docutils literal notranslate"><span class="pre">la.sparsity_pattern</span></code> of <span class="math notranslate nohighlight">\(L\)</span>: the
+pattern is the adjacency structure plus the diagonal, which is the entire
+point — the Laplacian <em>is</em> the graph.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>incidence matrix B (edges x nodes):
+[[-1  1  0  0  0  0  0  0]
+ [-1  0  1  0  0  0  0  0]
+ [ 0 -1  1  0  0  0  0  0]
+ [ 0 -1  0  1  0  0  0  0]
+ [ 0  0 -1  1  0  0  0  0]
+ [ 0  0  0 -1  1  0  0  0]
+ [ 0  0  0  0 -1  1  0  0]
+ [ 0  0  0  0 -1  0  1  0]
+ [ 0  0  0  0  0 -1  1  0]
+ [ 0  0  0  0  0  0 -1  1]]
+
+L == B&#39;B == D - A exactly: True
+degrees: [2 3 3 3 3 2 3 1]
+x&#39;Lx vs sum of squared edge differences: 2.1e-14
+spectrum: [-0.      0.2786  1.1116  2.3154  3.4664  4.      4.      4.828 ]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-gl-graph">
+<img alt="../../_images/527b64325da4ea2af6e74ab1bbdb4a08059eebc71121592d3324646db246474d.png" src="../../_images/527b64325da4ea2af6e74ab1bbdb4a08059eebc71121592d3324646db246474d.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 110 </span><span class="caption-text">The worked graph and its Laplacian. Left: 8 nodes and 10 edges – two triangles sharing an edge on the left, a diamond on the right, one pendant node (7). Right: the sparsity pattern of <span class="math notranslate nohighlight">\(L\)</span> – the diagonal carries the degrees, the off-diagonal <span class="math notranslate nohighlight">\(-1\)</span>s are exactly the adjacency structure. The matrix does not encode the graph; it IS the graph, and every theorem in this notebook is a fact about this one picture read through Eq. 1.</span><a class="headerlink" href="#fig-gl-graph" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  L = B&#39;B = D - A as an exact identity of integer matrices (Eq. 1)   [small integers are exactly representable and the Gram product cancels the arbitrary orientations — the legitimate exact comparison]
+✓  and x&#39;Lx is the sum of squared edge differences: psd by identity   [the quadratic form certificate on 100 random vectors — nonnegativity needs no eigenvalue computation at all]
+✓  with lambda_1 = 0 to eigvalsh accuracy   [the constant vector is in the null space by Eq. 1; the tolerance is scaled by the matrix, per the course&#39;s rules [7.58074e-16 &lt; 1.07203e-13]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-the-null-space-counts-components">
+<h2>Exercise 2: The null space counts components<a class="headerlink" href="#exercise-2-the-null-space-counts-components" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-gl-nullspace">Eq. 249</a> turns a topology question into a rank computation.</p>
+<p><strong>Part a)</strong> For the (connected) worked graph, confirm the zero eigenvalue
+is simple: exactly one eigenvalue below <span class="math notranslate nohighlight">\(10^{-8}\)</span>, the rest above the
+algebraic connectivity <span class="math notranslate nohighlight">\(\lambda_2 = 0.24\)</span> — the counting is robust because
+the spectral gap is <span class="math notranslate nohighlight">\(O(1)\)</span>, not because the arithmetic is exact.</p>
+<p><strong>Part b)</strong> Now break it deliberately: delete edges <span class="math notranslate nohighlight">\((3,4)\)</span> and <span class="math notranslate nohighlight">\((6,7)\)</span>,
+leaving three components <span class="math notranslate nohighlight">\(\{0,1,2,3\}\)</span>, <span class="math notranslate nohighlight">\(\{4,5,6\}\)</span>, <span class="math notranslate nohighlight">\(\{7\}\)</span>. Gate
+exactly three eigenvalues below <span class="math notranslate nohighlight">\(10^{-8}\)</span>, with the fourth at <span class="math notranslate nohighlight">\(O(1)\)</span>.</p>
+<p><strong>Part c)</strong> Confirm the eigenspace is the indicator space: for each
+component <span class="math notranslate nohighlight">\(C\)</span>, the indicator vector <span class="math notranslate nohighlight">\(\mathbf{1}_C\)</span> satisfies
+<span class="math notranslate nohighlight">\(\lVert L\,\mathbf{1}_C\rVert = 0\)</span> <em>exactly</em> (integer arithmetic — each row
+of <span class="math notranslate nohighlight">\(L\mathbf{1}_C\)</span> sums integers that cancel).</p>
+<p><strong>Part d)</strong> Confirm the rank bookkeeping: <code class="docutils literal notranslate"><span class="pre">np.linalg.matrix_rank</span></code> of the
+broken graph’s <span class="math notranslate nohighlight">\(L\)</span> is <span class="math notranslate nohighlight">\(n - 3 = 5\)</span>, and of its incidence matrix likewise —
+rank is the number of nodes minus the number of components, for any graph.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>connected graph: 1 zero eigenvalue(s), lambda_2 = 0.2786
+after cutting (3,4) and (6,7): 3 zero eigenvalues, fourth eigenvalue 2.0000
+L times each component indicator is exactly zero: True
+rank(L_cut) = 5, rank(B_cut) = 5 (n - c = 5)
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the multiplicity of eigenvalue zero counts connected components (Eq. 2)   [1 for the connected graph, 3 after two edges are cut — the count is robust because the spectral gap to the first nonzero eigenvalue is O(1), a property of the graph, not of the arithmetic]
+✓  with the component indicators exactly in the null space   [each row of L times an indicator sums integers that cancel — exact zero, legitimately]
+✓  and rank(L) = rank(B) = n minus the component count   [the null space of Eq. 2 seen from the rank side, for both the Laplacian and the incidence matrix]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-a-zoo-of-spectra-and-the-poisson-matrix-in-disguise">
+<h2>Exercise 3: A zoo of spectra, and the Poisson matrix in disguise<a class="headerlink" href="#exercise-3-a-zoo-of-spectra-and-the-poisson-matrix-in-disguise" title="Link to this heading">#</a></h2>
+<p>Whole families of graphs have closed-form spectra, and one of them is an
+old friend.</p>
+<p><strong>Part a)</strong> Build Laplacians for the path <span class="math notranslate nohighlight">\(P_{30}\)</span>, the cycle <span class="math notranslate nohighlight">\(C_{30}\)</span>,
+and the complete graph <span class="math notranslate nohighlight">\(K_{30}\)</span>. Confirm the closed forms with
+<code class="docutils literal notranslate"><span class="pre">np.linalg.eigvalsh</span></code>, each sorted against its prediction:</p>
+<ul class="simple">
+<li><p>path: <span class="math notranslate nohighlight">\(\lambda_k = 2 - 2\cos(k\pi/30)\)</span>, <span class="math notranslate nohighlight">\(k = 0,\dots,29\)</span> — gate to
+<span class="math notranslate nohighlight">\(10^{-12}\)</span>;</p></li>
+<li><p>cycle: <span class="math notranslate nohighlight">\(\lambda_k = 2 - 2\cos(2\pi k/30)\)</span> — gate to <span class="math notranslate nohighlight">\(10^{-12}\)</span>;</p></li>
+<li><p>complete: <span class="math notranslate nohighlight">\(\{0\}\cup\{30\text{ (29-fold)}\}\)</span> — gate to <span class="math notranslate nohighlight">\(10^{-12}\)</span>.</p></li>
+</ul>
+<p><strong>Part b)</strong> The path Laplacian <em>is</em> <a class="reference internal" href="../05-numerical/sparse-matrices.html"><span class="std std-doc">§5.3</span></a>’s
+1-D Poisson matrix with free (Neumann) ends — the grid was a graph all
+along. Its second eigenvector is the smoothest non-constant profile:
+gate <span class="math notranslate nohighlight">\(|v_2^{\top}c| &gt; 1 - 10^{-10}\)</span> against the normalized discrete cosine
+<span class="math notranslate nohighlight">\(c_i = \cos\bigl(\pi(i+\tfrac12)/30\bigr)\)</span>.</p>
+<p><strong>Part c)</strong> Build the zoo’s Laplacians and report their spectra; the four
+of them (path, cycle, complete, and Exercise 4’s clustered graph) are drawn
+as columns of dots in Exercise 4’s combined figure, beside the graph they
+calibrate.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>closed-form gaps: path 1.8e-15, cycle 1.8e-15, complete 6.0e-14
+path v_2 vs discrete cosine: |alignment| = 1.000000000000
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  path, cycle and complete-graph spectra match their closed forms   [gaps 2e-15, 2e-15, 6e-14: 2 - 2cos(k pi/n), 2 - 2cos(2 pi k/n), and {0, n} — three families, one eigvalsh]
+✓  and the path&#39;s Fiedler vector is the discrete cosine   [the smoothest non-constant profile — 5.3&#39;s Poisson eigenvector, rediscovered as graph theory]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-spectral-bisection-the-sign-pattern-is-the-cut">
+<h2>Exercise 4: Spectral bisection: the sign pattern is the cut<a class="headerlink" href="#exercise-4-spectral-bisection-the-sign-pattern-is-the-cut" title="Link to this heading">#</a></h2>
+<p>The planted-cluster test, fully deterministic: two complete graphs
+<span class="math notranslate nohighlight">\(K_{10}\)</span> joined by exactly two bridge edges <span class="math notranslate nohighlight">\((0, 15)\)</span> and <span class="math notranslate nohighlight">\((2, 17)\)</span>.</p>
+<p><strong>Part a)</strong> Build the graph and its Laplacian (<span class="math notranslate nohighlight">\(n = 20\)</span>,
+<span class="math notranslate nohighlight">\(m = 2\binom{10}{2} + 2 = 92\)</span> edges). Compute the spectrum: the Fiedler
+value <span class="math notranslate nohighlight">\(\lambda_2 = 0.343\)</span> sits far below <span class="math notranslate nohighlight">\(\lambda_3 = 10.0\)</span> — a 29-fold
+gap, which is the certificate that a <em>single</em> cut direction dominates.</p>
+<p><strong>Part b)</strong> Gate the bisection: the sign pattern of <span class="math notranslate nohighlight">\(v_2\)</span> puts nodes
+<span class="math notranslate nohighlight">\(0\!-\!9\)</span> on one side and <span class="math notranslate nohighlight">\(10\!-\!19\)</span> on the other, <strong>exactly</strong> — and the
+smallest component magnitude is <span class="math notranslate nohighlight">\(0.19\)</span>, so the signs are nowhere near a
+rounding decision (that margin, not luck, is what makes an exact gate
+legitimate here).</p>
+<p><strong>Part c)</strong> Confirm the cut it found is the planted one by counting: the
+edges crossing the sign boundary are exactly the 2 bridges, against 90
+intra-cluster edges.</p>
+<p><strong>Part d)</strong> Draw the graph with nodes coloured by <span class="math notranslate nohighlight">\(\operatorname{sign}(v_2)\)</span>
+— two rings, two colours, two bridges — and the clustered spectrum joins
+the zoo figure: one near-zero straggler (<span class="math notranslate nohighlight">\(\lambda_2\)</span>) under a bulk at
+<span class="math notranslate nohighlight">\(\lambda \approx 10\)</span>, the picture of “almost two components”.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>clustered graph: m = 92 edges, lambda_2 = 0.3431, lambda_3 = 10.0000 (gap 29x)
+sign pattern recovers the planted split exactly: True (smallest |component| 0.191 — nowhere near a rounding decision)
+edges crossing the cut: 2 of 92 (the two planted bridges)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-gl-bisect">
+<img alt="../../_images/9f4518d40dd1a560a79cfdca88333de5e7973f8931b2a379f200d1631f1e586d.png" src="../../_images/9f4518d40dd1a560a79cfdca88333de5e7973f8931b2a379f200d1631f1e586d.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 111 </span><span class="caption-text">Spectral bisection, verdict and certificate. Left: the planted graph – two complete clusters of ten joined by exactly two bridge edges – with nodes coloured by the sign of the Fiedler vector: the split is recovered exactly, and the smallest vector component (0.19) is two orders above any rounding decision. Right: the spectra of the four zoo graphs. The path and cycle fill smooth cosine bands, the complete graph piles 29 copies onto <span class="math notranslate nohighlight">\(\lambda = 30\)</span>, and the clustered graph shows the diagnostic shape: one straggler eigenvalue at 0.34 far below the bulk at 10 – the spectral signature of ‘almost two components’ that makes the bisection trustworthy.</span><a class="headerlink" href="#fig-gl-bisect" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the Fiedler value sits far below the bulk: one cut direction dominates   [lambda_2 = 0.343 against lambda_3 = 10.0 — the 29x gap is the certificate that bisection is answering a well-posed question]
+✓  spectral bisection recovers the planted clusters exactly   [all twenty signs correct, smallest component 0.19: the exact gate is legitimate because the margin is O(1), not because signs are always safe]
+✓  and the cut it found is the planted one: exactly the two bridges cross   [2 crossing edges out of 92 — the sign pattern read back as a cut, counted exactly]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-the-matrix-tree-theorem-against-brute-force">
+<h2>Exercise 5: The matrix-tree theorem, against brute force<a class="headerlink" href="#exercise-5-the-matrix-tree-theorem-against-brute-force" title="Link to this heading">#</a></h2>
+<p>Kirchhoff’s 1847 theorem: any cofactor of <span class="math notranslate nohighlight">\(L\)</span> counts the spanning trees.
+For the worked graph the claim is checkable by exhaustive enumeration —
+which is exactly what this exercise does.</p>
+<p><strong>Part a)</strong> Compute the cofactor: delete row and column 0 of <span class="math notranslate nohighlight">\(L\)</span> and take
+<code class="docutils literal notranslate"><span class="pre">np.linalg.det</span></code> of the <span class="math notranslate nohighlight">\(7\times7\)</span> remainder. The determinant of an integer
+matrix is an integer; round it (the float error, about <span class="math notranslate nohighlight">\(10^{-14}\)</span>, is ten
+orders below the spacing of integers).</p>
+<p><strong>Part b)</strong> Write <code class="docutils literal notranslate"><span class="pre">is_spanning_tree(subset)</span></code>: a union–find over the 8
+nodes that returns whether 7 given edges connect everything without a
+cycle.</p>
+<p><strong>Write this one yourself</strong> — union–find is three small functions, and it
+is the certificate the theorem is checked against.</p>
+<p><strong>Part c)</strong> Enumerate all <span class="math notranslate nohighlight">\(\binom{10}{7} = 120\)</span> edge subsets of size 7,
+count the spanning trees, and gate the <strong>exact integer equality</strong> with the
+cofactor: 24 = 24.</p>
+<p><strong>Part d)</strong> Confirm the theorem’s invariance: the cofactor is the same
+(24) whichever row/column <span class="math notranslate nohighlight">\(i\)</span> is deleted — all 8 deletions agree after
+rounding.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>cofactor det(L with row/col 0 deleted): 24.000000000000 -&gt; 24
+exhaustive enumeration over C(10,7) = 120 subsets: 24 spanning trees
+all 8 cofactors: [24, 24, 24, 24, 24, 24, 24, 24]
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the matrix-tree cofactor equals the brute-force spanning-tree count   [24 = 24, integer against integer: a determinant computed in floats, rounded across a 1e-14 error to a count certified by union-find enumeration]
+✓  and every cofactor agrees — the theorem&#39;s stated invariance   [deleting any row and column gives 24: the choice of grounded node is arbitrary, as the electrical reading of Exercise 6 explains]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-6-resistor-networks-l-physics-and-the-four-subspaces">
+<h2>Exercise 6: Resistor networks: <span class="math notranslate nohighlight">\(L^{+}\)</span>, physics, and the four subspaces<a class="headerlink" href="#exercise-6-resistor-networks-l-physics-and-the-four-subspaces" title="Link to this heading">#</a></h2>
+<p>Read every edge as a 1-ohm resistor. Linear algebra becomes circuit
+theory, and the classical rules become checks on <a class="reference internal" href="#equation-eq-gl-reff">Eq. 250</a>.</p>
+<p><strong>Part a)</strong> Effective resistance via the pseudoinverse
+(<a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html"><span class="std std-doc">§2.4</span></a>):
+<span class="math notranslate nohighlight">\(R_{\text{eff}}(i,j) = (e_i - e_j)^{\top}L^{+}(e_i - e_j)\)</span>. Gate the two
+closed forms every physics course teaches, on clean graphs: the ends of
+the path <span class="math notranslate nohighlight">\(P_{10}\)</span> give <span class="math notranslate nohighlight">\(R = 9\)</span> (nine resistors in series), and adjacent
+nodes of the cycle <span class="math notranslate nohighlight">\(C_{10}\)</span> give <span class="math notranslate nohighlight">\(R = 9/10\)</span> (1 Ω in parallel with 9 Ω) —
+both to <span class="math notranslate nohighlight">\(10^{-10}\)</span>.</p>
+<p><strong>Part b)</strong> Foster’s theorem on the worked graph: the effective
+resistances summed over its ten <em>edges</em> equal exactly <span class="math notranslate nohighlight">\(n - 1 = 7\)</span> — gate
+to <span class="math notranslate nohighlight">\(10^{-10}\)</span>. (An integer from a pseudoinverse: the theorem is doing the
+arithmetic.)</p>
+<p><strong>Part c)</strong> Kirchhoff’s current law as the row space at work: inject one
+ampere at node 0, extract at node 7, solve <span class="math notranslate nohighlight">\(x = L^{+}(e_0 - e_7)\)</span> for the
+potentials, get edge currents <span class="math notranslate nohighlight">\(y = Bx\)</span>. Gate <span class="math notranslate nohighlight">\(B^{\top}y = e_0 - e_7\)</span> to
+<span class="math notranslate nohighlight">\(10^{-12}\)</span> — the residual is pseudoinverse-grade rounding (measured
+<span class="math notranslate nohighlight">\(2\times10^{-14}\)</span>), and the gate keeps a 40x margin against another BLAS’s
+path per Rule 8. Current balances at every node, with the net one ampere
+appearing only at the terminals.</p>
+<p><strong>Part d)</strong> Kirchhoff’s voltage law as the null space of <span class="math notranslate nohighlight">\(B^{\top}\)</span>: the
+cycle space has dimension <span class="math notranslate nohighlight">\(m - n + 1 = 3\)</span> (gate via
+<code class="docutils literal notranslate"><span class="pre">np.linalg.matrix_rank</span></code>), and a basis <span class="math notranslate nohighlight">\(Z\)</span> of it (from the SVD’s trailing
+right singular vectors of <span class="math notranslate nohighlight">\(B^{\top}\)</span>) satisfies <span class="math notranslate nohighlight">\(Z^{\top}y = 0\)</span> to
+<span class="math notranslate nohighlight">\(10^{-13}\)</span>: potential drops cancel around every loop <em>because</em> <span class="math notranslate nohighlight">\(y = Bx\)</span>
+lives in the column space of <span class="math notranslate nohighlight">\(B\)</span>, which is orthogonal to the cycle space.
+<a class="reference internal" href="../01-matrices/four-subspaces.html"><span class="std std-doc">§1.4</span></a>, carrying current.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>path ends: R_eff = 9.000000000000  (series: 9)
+cycle neighbours: R_eff = 0.900000000000  (1 || 9 = 0.9)
+Foster&#39;s sum over the 10 edges: 7.000000000000  (exact: n - 1 = 7)
+
+Kirchhoff current law: max |B&#39;y - f| = 2.0e-15
+potentials (node 0 to 7): [3.667 3.167 3.167 2.667 1.667 1.333 1.    0.   ]
+R_eff(0,7) = 3.6667 ohms
+cycle space dimension: 3 (m - n + 1 = 3); max |Z&#39;y| = 3.9e-16
+</pre></div>
+</div>
+</div>
+</div>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p>Effective resistance is a <em>distance</em> on the graph — and a better one than
+hop count for cluster structure. Ask your assistant for
+<code class="docutils literal notranslate"><span class="pre">resistance_matrix(L)</span></code> returning all pairwise <span class="math notranslate nohighlight">\(R_{\text{eff}}\)</span>, then check
+it against the mathematics rather than a demo: (i) on the path graph,
+<span class="math notranslate nohighlight">\(R_{\text{eff}}(i,j) = |i - j|\)</span> exactly (series law, all pairs); (ii) it
+is a metric — verify the triangle inequality over every triple of the
+worked graph; (iii) on Exercise 4’s planted graph, the largest
+intra-cluster resistance is smaller than the smallest inter-cluster one
+(compute both, state the margin). The check is yours.</p>
+</div>
+<section id="validation-6">
+<h3>Validation 6<a class="headerlink" href="#validation-6" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the pseudoinverse reproduces the series and parallel resistor rules   [path ends 7.1e-15-close to 9, cycle neighbours 0.0e+00-close to 9/10: Eq. 3 against the physics classroom]
+✓  Foster&#39;s theorem: edge resistances sum to exactly n - 1   [7.000000000000 against 7 — an integer emerging from ten pseudoinverse quadratic forms, because the trace of L+ L is the rank]
+✓  Kirchhoff&#39;s current law holds at every node   [B&#39;y = f: flows balance except the one ampere at the terminals — the row space of B doing physics [1.9984e-15 &lt; 1e-12]]
+✓  and the voltage law is the cycle space: drops cancel around all 3 loops   [null(B&#39;) has dimension m - n + 1 = 3 and Z&#39;y = 0 to 4e-16: y = Bx lies in col(B), orthogonal to the cycle space — the four subspaces of 1.4, carrying current]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p><strong>The dictionary is exact.</strong> <span class="math notranslate nohighlight">\(L = B^{\top}B = D - A\)</span> gated as an identity
+of integer matrices; positive semidefiniteness certified twice (the
+edge-difference quadratic on 100 random vectors, and
+<span class="math notranslate nohighlight">\(\lambda_1 = -2\times10^{-16}\)</span>); the null space counted components —
+1 connected, exactly 3 after cutting two edges, with the component
+indicators annihilated <em>exactly</em> and the rank landing on <span class="math notranslate nohighlight">\(n - c\)</span> both for
+<span class="math notranslate nohighlight">\(L\)</span> and for <span class="math notranslate nohighlight">\(B\)</span>.</p>
+<p><strong>Spectra come in closed forms, and one is an old friend.</strong> Path, cycle
+and complete-graph spectra matched <span class="math notranslate nohighlight">\(2 - 2\cos(k\pi/n)\)</span>,
+<span class="math notranslate nohighlight">\(2 - 2\cos(2\pi k/n)\)</span> and <span class="math notranslate nohighlight">\(\{0, n\}\)</span> to <span class="math notranslate nohighlight">\(10^{-14}\)</span>; the path’s Fiedler
+vector aligned with the discrete cosine to <span class="math notranslate nohighlight">\(1 - 10^{-12}\)</span> — the 1-D
+Poisson matrix of <a class="reference internal" href="../05-numerical/sparse-matrices.html"><span class="std std-doc">§5.3</span></a> was a graph
+Laplacian all along.</p>
+<p><strong>The sign pattern is the cut, when the gap certifies it.</strong> On two
+<span class="math notranslate nohighlight">\(K_{10}\)</span>s joined by two bridges, <span class="math notranslate nohighlight">\(\lambda_2 = 0.343\)</span> sat 29-fold below
+<span class="math notranslate nohighlight">\(\lambda_3\)</span>; the Fiedler signs recovered the planted split exactly with a
+smallest component of <span class="math notranslate nohighlight">\(0.19\)</span> — the exact gate justified by an <span class="math notranslate nohighlight">\(O(1)\)</span>
+margin, not by optimism — and the cut crossed exactly the 2 planted
+bridges out of 92 edges.</p>
+<p><strong>The classical theorems survive brute force.</strong> The matrix-tree cofactor
+said 24; union–find enumeration over all 120 edge subsets said 24; all
+eight cofactors agree. The pseudoinverse reproduced the series (9) and
+parallel (9/10) resistor rules to <span class="math notranslate nohighlight">\(10^{-12}\)</span>, Foster’s sum landed on the
+integer 7, Kirchhoff’s current law held at rounding level
+(<span class="math notranslate nohighlight">\(2\times10^{-14}\)</span>), and the voltage law
+turned out to be a statement about <span class="math notranslate nohighlight">\(\operatorname{null}(B^{\top})\)</span> — three
+loops, orthogonal to every realizable current, exactly as
+<a class="reference internal" href="../01-matrices/four-subspaces.html"><span class="std std-doc">§1.4</span></a> promised in the abstract.</p>
+<p><strong>Methods introduced.</strong> <code class="docutils literal notranslate"><span class="pre">incidence</span></code>/<code class="docutils literal notranslate"><span class="pre">laplacian</span></code> constructors, quadratic-form
+psd certificates, null-space component counting, the closed-form spectrum
+zoo, Fiedler vectors and spectral bisection with gap certificates,
+matrix-tree cofactors against union–find enumeration, effective resistance
+via <code class="docutils literal notranslate"><span class="pre">np.linalg.pinv</span></code>, Foster’s theorem, and Kirchhoff’s laws as subspace
+statements.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>From bisection to clustering.</strong> Normalized Laplacians, <span class="math notranslate nohighlight">\(k\)</span>-means on
+the first <span class="math notranslate nohighlight">\(k\)</span> eigenvectors, and the conductance guarantees of Cheeger’s
+inequality are the industrial extension of Exercise 4
+<span class="bibtex-citation" id="id5">[<a class="reference internal" href="#id33" title="Ulrike von Luxburg. A tutorial on spectral clustering. Statistics and Computing, 17(4):395–416, 2007. doi:10.1007/s11222-007-9033-z.">vL07</a>]</span> — <a class="reference internal" href="kernels-gram-matrix.html"><span class="std std-doc">§6.5</span></a> meets them
+again from the kernel side.</p></li>
+<li><p><strong>Random walks live here too.</strong> <span class="math notranslate nohighlight">\(D^{-1}A\)</span> is a Markov transition matrix,
+and its spectral gap controls mixing —
+<a class="reference internal" href="markov-perron-pagerank.html"><span class="std std-doc">§6.2</span></a> makes that the whole story, with
+PageRank as the guest star.</p></li>
+<li><p><strong>The circulant shortcut.</strong> The cycle’s cosine spectrum is no accident:
+every circulant matrix is diagonalized by the DFT, which is
+<a class="reference internal" href="circulant-toeplitz-fft.html"><span class="std std-doc">§6.3</span></a>’s fast algorithm.</p></li>
+<li><p><strong>Laplacians at scale.</strong> Spectral graph theory’s production face is
+<a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html"><span class="std std-doc">§5.5</span></a>’s machinery:
+Lanczos for the Fiedler pair, multigrid-preconditioned CG for
+<span class="math notranslate nohighlight">\(L x = f\)</span> — the two chapters meeting in the middle.</p></li>
+</ul>
+<div class="docutils container" id="id6">
+<div role="list" class="citation-list">
+<div class="citation" id="id34" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Fie73<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id4">2</a>)</span>
+<p>Miroslav Fiedler. Algebraic connectivity of graphs. <em>Czechoslovak Mathematical Journal</em>, 23(2):298–305, 1973. <a class="reference external" href="https://doi.org/10.21136/CMJ.1973.101168">doi:10.21136/CMJ.1973.101168</a>.</p>
+</div>
+<div class="citation" id="id7" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">Str23</a><span class="fn-bracket">]</span></span>
+<p>Gilbert Strang. <em>Introduction to Linear Algebra</em>. Wellesley-Cambridge Press, Wellesley, MA, 6 edition, 2023. ISBN 978-1-7331466-7-8.</p>
+</div>
+<div class="citation" id="id33" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>vL07<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id3">1</a>,<a role="doc-backlink" href="#id5">2</a>)</span>
+<p>Ulrike von Luxburg. A tutorial on spectral clustering. <em>Statistics and Computing</em>, 17(4):395–416, 2007. <a class="reference external" href="https://doi.org/10.1007/s11222-007-9033-z">doi:10.1007/s11222-007-9033-z</a>.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/06-structure"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Chapter VI — Structure, Graphs, and Fast Algorithms</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="markov-perron-pagerank.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">6.2 Markov Chains, Perron–Frobenius, and PageRank</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-incidence-matrix-and-the-laplacian">The incidence matrix and the Laplacian</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fiedler-s-eigenvalue-and-cutting-graphs">Fiedler’s eigenvalue, and cutting graphs</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#trees-and-resistors">Trees and resistors</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-the-dictionary-l-b-top-b-d-a-exactly">Exercise 1: The dictionary: <span class="math notranslate nohighlight">\(L = B^{\top}B = D - A\)</span>, exactly</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-null-space-counts-components">Exercise 2: The null space counts components</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-a-zoo-of-spectra-and-the-poisson-matrix-in-disguise">Exercise 3: A zoo of spectra, and the Poisson matrix in disguise</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-spectral-bisection-the-sign-pattern-is-the-cut">Exercise 4: Spectral bisection: the sign pattern is the cut</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-the-matrix-tree-theorem-against-brute-force">Exercise 5: The matrix-tree theorem, against brute force</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-resistor-networks-l-physics-and-the-four-subspaces">Exercise 6: Resistor networks: <span class="math notranslate nohighlight">\(L^{+}\)</span>, physics, and the four subspaces</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

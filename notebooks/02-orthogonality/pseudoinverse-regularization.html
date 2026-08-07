@@ -1,0 +1,2150 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="2.4 The Pseudoinverse, Rank Deficiency, and Regularization" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/02-orthogonality/pseudoinverse-regularization.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: Every method in §2.3 assumed A has independent columns. That assumption is doing more work than it looks: it is what makes A^{\top}A inver..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: Every method in §2.3 assumed A has independent columns. That assumption is doing more work than it looks: it is what makes A^{\top}A inver..." />
+
+    <title>2.4 The Pseudoinverse, Rank Deficiency, and Regularization &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/02-orthogonality/pseudoinverse-regularization';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/02-orthogonality/pseudoinverse-regularization.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="2.5 Orthogonal Bases in Function Space" href="function-space-bases.html" />
+    <link rel="prev" title="2.3 Least Squares Four Ways" href="least-squares-four-ways.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter II — Orthogonality and Least Squares</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/02-orthogonality/pseudoinverse-regularization.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/02-orthogonality/pseudoinverse-regularization.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/02-orthogonality/pseudoinverse-regularization.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/02-orthogonality/pseudoinverse-regularization.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>2.4 The Pseudoinverse, Rank Deficiency, and Regularization</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-pseudoinverse">The pseudoinverse</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#truncation-and-why-an-exact-pseudoinverse-is-not-always-what-one-wants">Truncation, and why an exact pseudoinverse is not always what one wants</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tikhonov-regularization">Tikhonov regularization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ill-posed-not-merely-ill-conditioned">Ill-posed, not merely ill-conditioned</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-lambda-from-the-data">Choosing <span class="math notranslate nohighlight">\(\lambda\)</span> from the data</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#changing-the-penalty">Changing the penalty</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-building-a-and-the-four-conditions-that-pin-it-down">Exercise 1: Building <span class="math notranslate nohighlight">\(A^{+}\)</span>, and the four conditions that pin it down</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-pseudoinverse-is-discontinuous-and-rcond-is-the-reason">Exercise 2: The pseudoinverse is discontinuous, and <code class="docutils literal notranslate"><span class="pre">rcond</span></code> is the reason</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-minimum-norm-solution-and-what-the-normal-equations-do-instead">Exercise 3: The minimum-norm solution, and what the normal equations do instead</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-filter-factors-truncation-and-ridge-are-one-formula">Exercise 4: Filter factors: truncation and ridge are one formula</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-an-ill-posed-problem-and-why-solve-cannot-survive-it">Exercise 5: An ill-posed problem, and why <code class="docutils literal notranslate"><span class="pre">solve</span></code> cannot survive it</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-the-repair-and-the-bias-it-is-bought-with">Exercise 6: The repair, and the bias it is bought with</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-7-choosing-lambda-without-the-answer-key">Exercise 7: Choosing <span class="math notranslate nohighlight">\(\lambda\)</span> without the answer key</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-7">Validation 7</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-8-changing-the-penalty-ell-1-and-why-it-gives-exact-zeros">Exercise 8: Changing the penalty: <span class="math notranslate nohighlight">\(\ell^1\)</span>, and why it gives exact zeros</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-8">Validation 8</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="the-pseudoinverse-rank-deficiency-and-regularization">
+<h1>2.4 The Pseudoinverse, Rank Deficiency, and Regularization<a class="headerlink" href="#the-pseudoinverse-rank-deficiency-and-regularization" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter II — Orthogonality and Least Squares
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;2.4
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">What to do when the columns are dependent, the answer is not unique, or the problem is ill-posed — ending in a deblurring that float64 destroys by sixteen orders of magnitude and one well-chosen parameter repairs.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;advanced&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;105–135 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p>Every method in <a class="reference internal" href="least-squares-four-ways.html"><span class="std std-doc">§2.3</span></a> assumed <span class="math notranslate nohighlight">\(A\)</span> has
+independent columns. That assumption is doing more work than it looks: it is
+what makes <span class="math notranslate nohighlight">\(A^{\top}A\)</span> invertible, what makes <span class="math notranslate nohighlight">\(R\)</span> nonsingular, and what makes
+the least-squares answer <em>unique</em>. Drop it and the normal equations become
+singular, <span class="math notranslate nohighlight">\(QR\)</span> has a zero on its diagonal, and the question “what is the
+solution?” stops having an answer, because there are infinitely many.</p>
+<p>The <strong>pseudoinverse</strong> <span class="math notranslate nohighlight">\(A^{+}\)</span> is the object that survives. It exists for every
+matrix — square or not, full rank or not — it agrees with <span class="math notranslate nohighlight">\(A^{-1}\)</span> whenever the
+inverse exists, and when the answer is not unique it makes a specific choice:
+the solution of smallest norm. It is built from the SVD in one line, which is
+the third time in this course that the SVD has been the factorization that
+keeps working after the others have stopped.</p>
+<p>Then the harder half. A problem can fail to have a usable answer not because
+the matrix is singular but because it is <em>ill-posed</em>: the forward map genuinely
+destroys information, so no algorithm can return it. The worked example is
+deblurring a 1-D signal. Blurring it is a matrix multiply. Undoing it is
+<code class="docutils literal notranslate"><span class="pre">np.linalg.solve</span></code>, and that call returns an answer wrong by a factor of
+<span class="math notranslate nohighlight">\(2\times10^{15}\)</span> — not because <code class="docutils literal notranslate"><span class="pre">solve</span></code> is bad, but because the blur operator’s
+smallest singular values are <span class="math notranslate nohighlight">\(10^{-18}\)</span> and inverting them amplifies the noise
+in the last decimal place into the dominant term. The repair is
+<strong>regularization</strong>: deliberately answering a slightly different question whose
+answer is stable. One parameter, chosen from the data without knowing the
+truth, brings the error back to 3.5%.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> Golub and Van Loan <span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id19" title="Gene H. Golub and Charles F. Van Loan. Matrix Computations. Johns Hopkins University Press, Baltimore, 4 edition, 2013.">GVL13</a>]</span> §5.5 for the pseudoinverse;
+Hansen <span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id39" title="Per Christian Hansen. Discrete Inverse Problems: Insight and Algorithms. SIAM, Philadelphia, 2010. doi:10.1137/1.9780898718836.">Han10</a>]</span> is the book for everything after Exercise 4 —
+filter factors, the discrete Picard condition, the L-curve — and is
+unusually readable. Penrose’s original four conditions are
+<span class="bibtex-citation" id="id3">[<a class="reference internal" href="#id65" title="Roger Penrose. A generalized inverse for matrices. Mathematical Proceedings of the Cambridge Philosophical Society, 51(3):406–413, 1955. doi:10.1017/S0305004100030401.">Pen55</a>]</span>; the <span class="math notranslate nohighlight">\(\ell^1\)</span> material is Tibshirani
+<span class="bibtex-citation" id="id4">[<a class="reference internal" href="#id62" title="Robert Tibshirani. Regression shrinkage and selection via the lasso. Journal of the Royal Statistical Society, Series B, 58(1):267–288, 1996. doi:10.1111/j.2517-6161.1996.tb02080.x.">Tib96</a>]</span> and Hastie, Tibshirani and Friedman
+<span class="bibtex-citation" id="id5">[<a class="reference internal" href="#id48" title="Trevor Hastie, Robert Tibshirani, and Jerome Friedman. The Elements of Statistical Learning. Springer, 2 edition, 2009. doi:10.1007/978-0-387-84858-7.">HTF09</a>]</span> Chapter 3.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="the-pseudoinverse">
+<h3>The pseudoinverse<a class="headerlink" href="#the-pseudoinverse" title="Link to this heading">#</a></h3>
+<p>Let <span class="math notranslate nohighlight">\(A\)</span> be <span class="math notranslate nohighlight">\(m\times n\)</span> with rank <span class="math notranslate nohighlight">\(r\)</span> and economy SVD
+<span class="math notranslate nohighlight">\(A = U\Sigma V^{\top}\)</span>, where <span class="math notranslate nohighlight">\(\Sigma = \operatorname{diag}(\sigma_1 \ge \dots
+\ge \sigma_r &gt; 0, 0, \dots, 0)\)</span>. The <strong>Moore–Penrose pseudoinverse</strong> is</p>
+<div class="math notranslate nohighlight" id="equation-eq-pinv-svd">
+<span class="eqno">(118)<a class="headerlink" href="#equation-eq-pinv-svd" title="Link to this equation">#</a></span>\[A^{+} = V\Sigma^{+}U^{\top}, \qquad
+\Sigma^{+} = \operatorname{diag}\!\left(
+  \tfrac{1}{\sigma_1}, \dots, \tfrac{1}{\sigma_r}, 0, \dots, 0\right).\]</div>
+<p>The rule is: <strong>invert what you can, and zero what you cannot</strong>. The zeros are
+not an approximation or a convenience; they are what makes <span class="math notranslate nohighlight">\(A^{+}\)</span> unique.</p>
+<p>Penrose’s characterisation is that <span class="math notranslate nohighlight">\(A^{+}\)</span> is the <em>only</em> matrix satisfying all
+four of</p>
+<div class="math notranslate nohighlight" id="equation-eq-pinv-mp">
+<span class="eqno">(119)<a class="headerlink" href="#equation-eq-pinv-mp" title="Link to this equation">#</a></span>\[AA^{+}A = A, \qquad A^{+}AA^{+} = A^{+}, \qquad
+(AA^{+})^{\top} = AA^{+}, \qquad (A^{+}A)^{\top} = A^{+}A .\]</div>
+<p>The first two say <span class="math notranslate nohighlight">\(A^{+}\)</span> is a <em>generalized</em> inverse (each matrix undoes the
+other on the part of the space where that is possible); the last two say the
+two products are <strong>symmetric</strong>, hence orthogonal projectors. Indeed</p>
+<div class="math notranslate nohighlight" id="equation-eq-pinv-projectors">
+<span class="eqno">(120)<a class="headerlink" href="#equation-eq-pinv-projectors" title="Link to this equation">#</a></span>\[AA^{+} = P_{\mathcal{C}(A)}, \qquad A^{+}A = P_{\mathcal{R}(A)},\]</div>
+<p>the orthogonal projectors onto the column space and the row space, exactly the
+objects <a class="reference internal" href="../01-matrices/four-subspaces.html"><span class="std std-doc">§1.4</span></a> built by hand. Since a
+projector’s trace is its rank, <span class="math notranslate nohighlight">\(\operatorname{tr}(AA^{+}) = r\)</span> — a cheap and
+strict check.</p>
+<p>When <span class="math notranslate nohighlight">\(A\)</span> is square and nonsingular, <a class="reference internal" href="#equation-eq-pinv-svd">Eq. 118</a> gives <span class="math notranslate nohighlight">\(A^{+} = A^{-1}\)</span>.
+When <span class="math notranslate nohighlight">\(A\)</span> is tall with independent columns it gives the least-squares solution
+operator <span class="math notranslate nohighlight">\((A^{\top}A)^{-1}A^{\top}\)</span> of <a class="reference internal" href="projections-normal-equations.html"><span class="std std-doc">§2.1</span></a>.
+The general statement covering both:</p>
+<div class="math notranslate nohighlight" id="equation-eq-pinv-minnorm">
+<span class="eqno">(121)<a class="headerlink" href="#equation-eq-pinv-minnorm" title="Link to this equation">#</a></span>\[A^{+}\mathbf{b} = \operatorname*{arg\,min}
+  \left\{\|\mathbf{x}\|_2 \;:\;
+  \mathbf{x} \in \operatorname*{arg\,min}_{\mathbf{z}}
+  \|A\mathbf{z} - \mathbf{b}\|_2 \right\}.\]</div>
+<p>Among all vectors that minimise the residual, <span class="math notranslate nohighlight">\(A^{+}\mathbf{b}\)</span> is the shortest.
+Both minimisations matter: the outer one because the residual may not be zero,
+the inner one because the minimiser may not be unique.</p>
+</section>
+<section id="truncation-and-why-an-exact-pseudoinverse-is-not-always-what-one-wants">
+<h3>Truncation, and why an exact pseudoinverse is not always what one wants<a class="headerlink" href="#truncation-and-why-an-exact-pseudoinverse-is-not-always-what-one-wants" title="Link to this heading">#</a></h3>
+<p><span class="math notranslate nohighlight">\(A^{+}\)</span> inverts every nonzero singular value, and “nonzero” is a decision no
+floating-point computation can make. Worse, the inversion is <em>unstable</em> where
+<span class="math notranslate nohighlight">\(\sigma_i\)</span> is small: a component of <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> along <span class="math notranslate nohighlight">\(\mathbf{u}_i\)</span> is
+amplified by <span class="math notranslate nohighlight">\(1/\sigma_i\)</span>. The <strong>truncated SVD</strong> solution simply stops early,</p>
+<div class="math notranslate nohighlight" id="equation-eq-pinv-tsvd">
+<span class="eqno">(122)<a class="headerlink" href="#equation-eq-pinv-tsvd" title="Link to this equation">#</a></span>\[\mathbf{x}_k = \sum_{i=1}^{k}
+  \frac{\mathbf{u}_i^{\top}\mathbf{b}}{\sigma_i}\,\mathbf{v}_i ,\]</div>
+<p>discarding the directions whose inversion would do more harm than good.</p>
+</section>
+<section id="tikhonov-regularization">
+<h3>Tikhonov regularization<a class="headerlink" href="#tikhonov-regularization" title="Link to this heading">#</a></h3>
+<p>The smoother alternative penalises the solution’s size rather than truncating:</p>
+<div class="math notranslate nohighlight" id="equation-eq-pinv-tikhonov">
+<span class="eqno">(123)<a class="headerlink" href="#equation-eq-pinv-tikhonov" title="Link to this equation">#</a></span>\[\mathbf{x}_\lambda = \operatorname*{arg\,min}_{\mathbf{x}}
+  \left\{ \|A\mathbf{x} - \mathbf{b}\|_2^2
+         + \lambda\|\mathbf{x}\|_2^2 \right\}
+  = (A^{\top}\!A + \lambda I)^{-1}A^{\top}\mathbf{b} ,
+  \qquad \lambda &gt; 0 .\]</div>
+<p>This goes by <strong>ridge regression</strong> in statistics and <strong>weight decay</strong> in machine
+learning; all three are <a class="reference internal" href="#equation-eq-pinv-tikhonov">Eq. 123</a>. Adding <span class="math notranslate nohighlight">\(\lambda I\)</span> shifts every
+eigenvalue of <span class="math notranslate nohighlight">\(A^{\top}A\)</span> up by <span class="math notranslate nohighlight">\(\lambda\)</span>, so the matrix is positive definite
+for any <span class="math notranslate nohighlight">\(\lambda &gt; 0\)</span> <em>whatever the rank of <span class="math notranslate nohighlight">\(A\)</span></em>, and the solution always
+exists and is always unique.</p>
+<p>Substituting the SVD reveals what it really does:</p>
+<div class="math notranslate nohighlight" id="equation-eq-pinv-filter">
+<span class="eqno">(124)<a class="headerlink" href="#equation-eq-pinv-filter" title="Link to this equation">#</a></span>\[\mathbf{x}_\lambda = \sum_{i=1}^{n} f_i(\lambda)\,
+  \frac{\mathbf{u}_i^{\top}\mathbf{b}}{\sigma_i}\,\mathbf{v}_i ,
+\qquad
+f_i(\lambda) = \frac{\sigma_i^2}{\sigma_i^2 + \lambda} .\]</div>
+<p>The <span class="math notranslate nohighlight">\(f_i\)</span> are the <strong>filter factors</strong>. Each is a smooth switch: <span class="math notranslate nohighlight">\(f_i \approx 1\)</span>
+where <span class="math notranslate nohighlight">\(\sigma_i \gg \sqrt{\lambda}\)</span> and <span class="math notranslate nohighlight">\(f_i \approx \sigma_i^2/\lambda \approx
+0\)</span> where <span class="math notranslate nohighlight">\(\sigma_i \ll \sqrt{\lambda}\)</span>. Truncation <a class="reference internal" href="#equation-eq-pinv-tsvd">Eq. 122</a> is the
+same formula with the hard filter <span class="math notranslate nohighlight">\(f_i = 1\)</span> for <span class="math notranslate nohighlight">\(i \le k\)</span> and <span class="math notranslate nohighlight">\(0\)</span> after, so the
+two methods differ only in the shape of one switch. The sum
+<span class="math notranslate nohighlight">\(\sum_i f_i(\lambda)\)</span> is the <strong>effective number of degrees of freedom</strong>: how
+many directions the fit is actually using.</p>
+<p>Forming <span class="math notranslate nohighlight">\(A^{\top}A\)</span> in <a class="reference internal" href="#equation-eq-pinv-tikhonov">Eq. 123</a> squares the condition number, the
+precise sin of <a class="reference internal" href="least-squares-four-ways.html"><span class="std std-doc">§2.3</span></a>. The cure is the same as
+there — never form it. Note that</p>
+<div class="math notranslate nohighlight" id="equation-eq-pinv-stacked">
+<span class="eqno">(125)<a class="headerlink" href="#equation-eq-pinv-stacked" title="Link to this equation">#</a></span>\[\begin{split}\|A\mathbf{x} - \mathbf{b}\|_2^2 + \lambda\|\mathbf{x}\|_2^2
+= \left\| \begin{bmatrix} A \\ \sqrt{\lambda}\,I \end{bmatrix}\mathbf{x}
+         - \begin{bmatrix} \mathbf{b} \\ \mathbf{0} \end{bmatrix} \right\|_2^2 ,\end{split}\]</div>
+<p>so Tikhonov is an ordinary least-squares problem on a stacked
+<span class="math notranslate nohighlight">\((m+n)\times n\)</span> matrix, solvable by <span class="math notranslate nohighlight">\(QR\)</span> with no <span class="math notranslate nohighlight">\(A^{\top}A\)</span> anywhere.</p>
+</section>
+<section id="ill-posed-not-merely-ill-conditioned">
+<h3>Ill-posed, not merely ill-conditioned<a class="headerlink" href="#ill-posed-not-merely-ill-conditioned" title="Link to this heading">#</a></h3>
+<p>A discretised integral equation — a blur, a heat equation run backwards, a
+tomographic projection — has singular values that decay <em>exponentially</em> to
+zero, with no gap and no natural cut-off. The useful diagnostic is the
+<strong>discrete Picard condition</strong>: the solution is recoverable only where the data
+coefficients <span class="math notranslate nohighlight">\(|\mathbf{u}_i^{\top}\mathbf{b}|\)</span> decay <em>faster</em> than the
+<span class="math notranslate nohighlight">\(\sigma_i\)</span>, so that the ratios in <a class="reference internal" href="#equation-eq-pinv-tsvd">Eq. 122</a> stay bounded,</p>
+<div class="math notranslate nohighlight" id="equation-eq-pinv-picard">
+<span class="eqno">(126)<a class="headerlink" href="#equation-eq-pinv-picard" title="Link to this equation">#</a></span>\[\frac{|\mathbf{u}_i^{\top}\mathbf{b}|}{\sigma_i} \;\lesssim\; \text{const}.\]</div>
+<p>Noise puts a floor under <span class="math notranslate nohighlight">\(|\mathbf{u}_i^{\top}\mathbf{b}|\)</span>: past the index
+where <span class="math notranslate nohighlight">\(\sigma_i\)</span> drops below that floor the ratio explodes, and every term
+beyond it is amplified noise. That crossover is where to stop, and it can be
+read off the data alone.</p>
+</section>
+<section id="choosing-lambda-from-the-data">
+<h3>Choosing <span class="math notranslate nohighlight">\(\lambda\)</span> from the data<a class="headerlink" href="#choosing-lambda-from-the-data" title="Link to this heading">#</a></h3>
+<p>The <strong>L-curve</strong> <span class="bibtex-citation" id="id6">[<a class="reference internal" href="#id39" title="Per Christian Hansen. Discrete Inverse Problems: Insight and Algorithms. SIAM, Philadelphia, 2010. doi:10.1137/1.9780898718836.">Han10</a>]</span> plots <span class="math notranslate nohighlight">\(\log\|\mathbf{x}_\lambda\|\)</span> against
+<span class="math notranslate nohighlight">\(\log\|A\mathbf{x}_\lambda - \mathbf{b}\|\)</span> as <span class="math notranslate nohighlight">\(\lambda\)</span> sweeps. Large <span class="math notranslate nohighlight">\(\lambda\)</span>
+gives a small solution and a large residual (over-smoothed); small <span class="math notranslate nohighlight">\(\lambda\)</span>
+gives the reverse (noise-dominated). The curve is L-shaped and the <strong>corner</strong>,
+the point of maximum curvature, is the compromise. The <strong>discrepancy
+principle</strong> is the alternative when the noise level <span class="math notranslate nohighlight">\(\delta\)</span> is known: choose
+the largest <span class="math notranslate nohighlight">\(\lambda\)</span> with <span class="math notranslate nohighlight">\(\|A\mathbf{x}_\lambda - \mathbf{b}\| \le \delta\)</span>,
+on the reasoning that fitting the data more closely than its own accuracy is
+fitting noise.</p>
+</section>
+<section id="changing-the-penalty">
+<h3>Changing the penalty<a class="headerlink" href="#changing-the-penalty" title="Link to this heading">#</a></h3>
+<p>Nothing forces the penalty to be <span class="math notranslate nohighlight">\(\|\mathbf{x}\|_2^2\)</span>. Replacing it by the
+<span class="math notranslate nohighlight">\(1\)</span>-norm gives</p>
+<div class="math notranslate nohighlight" id="equation-eq-pinv-lasso">
+<span class="eqno">(127)<a class="headerlink" href="#equation-eq-pinv-lasso" title="Link to this equation">#</a></span>\[\mathbf{x}_\lambda^{\ell^1} = \operatorname*{arg\,min}_{\mathbf{x}}
+  \left\{ \tfrac{1}{2}\|A\mathbf{x} - \mathbf{b}\|_2^2
+         + \lambda\|\mathbf{x}\|_1 \right\},\]</div>
+<p>the <strong>lasso</strong> <span class="bibtex-citation" id="id7">[<a class="reference internal" href="#id62" title="Robert Tibshirani. Regression shrinkage and selection via the lasso. Journal of the Royal Statistical Society, Series B, 58(1):267–288, 1996. doi:10.1111/j.2517-6161.1996.tb02080.x.">Tib96</a>]</span>. It has no closed form and no SVD
+expansion, and its solutions are <strong>sparse</strong>: entries are set to <em>exactly</em> zero,
+not merely made small. The geometric reason is the shape of the unit ball,
+which <a class="reference internal" href="../00-machine/vectors-norms-inner-products.html"><span class="std std-doc">§0.3</span></a> drew — the
+<span class="math notranslate nohighlight">\(\ell^1\)</span> ball has corners, and corners lie on the coordinate axes.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data and instruments only: the worked matrices and an error meter. The
+pseudoinverse itself is built in Exercise 1, where it is the lesson.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">qr</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">draw</span><span class="p">,</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">la</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random array below comes from this seed</span>
+<span class="c1"># The deconvolution&#39;s noise gets its own generator so that its realisation — and</span>
+<span class="c1"># therefore every number quoted in Exercises 5 to 7 — does not depend on how many</span>
+<span class="c1"># draws the earlier exercises happened to make from `rng`.</span>
+<span class="n">rng_blur</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">110</span><span class="p">)</span>
+
+<span class="c1"># The rank-3 matrix of the Prologue: its third column is the sum of the first</span>
+<span class="c1"># two, so no algorithm can invert it and every method in 2.3 fails on it.</span>
+<span class="n">A_DEP</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+                  <span class="p">[</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+                  <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">],</span>
+                  <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">]])</span>
+
+
+<span class="c1"># instrument: an error meter against the known answer — reporting currency,</span>
+<span class="c1"># not any exercise&#39;s lesson.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">relative_error</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x_true</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Relative 2-norm error of a computed vector against the exact one.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">x_true</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x_true</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-building-a-and-the-four-conditions-that-pin-it-down">
+<h2>Exercise 1: Building <span class="math notranslate nohighlight">\(A^{+}\)</span>, and the four conditions that pin it down<a class="headerlink" href="#exercise-1-building-a-and-the-four-conditions-that-pin-it-down" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-pinv-svd">Eq. 118</a> is a three-line construction: take the SVD, reciprocate the
+singular values above a cut-off, zero the rest, and reassemble with <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span>
+swapped. What is worth dwelling on is the <em>uniqueness</em>. Many matrices <span class="math notranslate nohighlight">\(G\)</span>
+satisfy <span class="math notranslate nohighlight">\(AGA = A\)</span> — that alone is a weak condition with a large solution set.
+All four of <a class="reference internal" href="#equation-eq-pinv-mp">Eq. 119</a> together are satisfied by exactly one matrix, and
+<a class="reference internal" href="#equation-eq-pinv-svd">Eq. 118</a> is it. That is why the four are worth checking one at a time
+rather than accepting the construction on trust.</p>
+<p>The test matrix is the <span class="math notranslate nohighlight">\(4\times4\)</span> matrix of the Prologue,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A = \begin{bmatrix}
+2 &amp; 1 &amp; 3 &amp; 0\\ 3 &amp; 4 &amp; 7 &amp; 0\\ 1 &amp; 2 &amp; 3 &amp; -1\\ 0 &amp; 1 &amp; 1 &amp; 2
+\end{bmatrix},
+\end{split}\]</div>
+<p>available as <code class="docutils literal notranslate"><span class="pre">A_DEP</span></code> above. Its third column is the sum of the first two, so
+its rank is 3 and its fourth singular value is exactly zero in exact
+arithmetic. It is singular, so <code class="docutils literal notranslate"><span class="pre">np.linalg.inv</span></code> is meaningless on it and
+<code class="docutils literal notranslate"><span class="pre">np.linalg.solve</span></code> will return nonsense or raise.</p>
+<p><strong>Part a)</strong> Take the full SVD with <code class="docutils literal notranslate"><span class="pre">U,</span> <span class="pre">s,</span> <span class="pre">Vt</span> <span class="pre">=</span> <span class="pre">np.linalg.svd(A_DEP)</span></code> and report
+the four singular values. Fix the cut-off <code class="docutils literal notranslate"><span class="pre">cut</span> <span class="pre">=</span> <span class="pre">1e-10</span> <span class="pre">*</span> <span class="pre">s[0]</span></code>, set
+<code class="docutils literal notranslate"><span class="pre">r</span> <span class="pre">=</span> <span class="pre">int((s</span> <span class="pre">&gt;</span> <span class="pre">cut).sum())</span></code>, and confirm <span class="math notranslate nohighlight">\(r = 3\)</span>.</p>
+<p><strong>Part b)</strong> Build <span class="math notranslate nohighlight">\(A^{+}\)</span> from <a class="reference internal" href="#equation-eq-pinv-svd">Eq. 118</a> as a two-line construction:
+form <code class="docutils literal notranslate"><span class="pre">s_plus</span> <span class="pre">=</span> <span class="pre">np.zeros_like(s)</span></code>, set <code class="docutils literal notranslate"><span class="pre">s_plus[:r]</span> <span class="pre">=</span> <span class="pre">1.0</span> <span class="pre">/</span> <span class="pre">s[:r]</span></code>, then
+<code class="docutils literal notranslate"><span class="pre">A_plus</span> <span class="pre">=</span> <span class="pre">(Vt.T</span> <span class="pre">*</span> <span class="pre">s_plus)</span> <span class="pre">&#64;</span> <span class="pre">U.T</span></code> — the broadcast <code class="docutils literal notranslate"><span class="pre">Vt.T</span> <span class="pre">*</span> <span class="pre">s_plus</span></code> scales column
+<span class="math notranslate nohighlight">\(i\)</span> of <span class="math notranslate nohighlight">\(V\)</span> by <span class="math notranslate nohighlight">\(1/\sigma_i\)</span>, which is <span class="math notranslate nohighlight">\(V\Sigma^{+}\)</span> without materialising the
+diagonal matrix. Compare against <code class="docutils literal notranslate"><span class="pre">np.linalg.pinv(A_DEP)</span></code> entrywise; the two
+should agree to <span class="math notranslate nohighlight">\(10^{-14}\)</span>.</p>
+<p><strong>Write this one yourself</strong> — the implementation is the lesson.</p>
+<p><strong>Part c)</strong> Check all four Moore–Penrose conditions <a class="reference internal" href="#equation-eq-pinv-mp">Eq. 119</a> by
+computing the maximum absolute entry of <span class="math notranslate nohighlight">\(AA^{+}A - A\)</span>, of <span class="math notranslate nohighlight">\(A^{+}AA^{+} - A^{+}\)</span>,
+of <span class="math notranslate nohighlight">\((AA^{+})^{\top} - AA^{+}\)</span>, and of <span class="math notranslate nohighlight">\((A^{+}A)^{\top} - A^{+}A\)</span>. All four come
+out below <span class="math notranslate nohighlight">\(4\times10^{-15}\)</span>.</p>
+<p><strong>Part d)</strong> Confirm <a class="reference internal" href="#equation-eq-pinv-projectors">Eq. 120</a>. Form <code class="docutils literal notranslate"><span class="pre">P_col</span> <span class="pre">=</span> <span class="pre">A_DEP</span> <span class="pre">&#64;</span> <span class="pre">A_plus</span></code> and
+<code class="docutils literal notranslate"><span class="pre">P_row</span> <span class="pre">=</span> <span class="pre">A_plus</span> <span class="pre">&#64;</span> <span class="pre">A_DEP</span></code>, and check that each is idempotent
+(<span class="math notranslate nohighlight">\(P^2 = P\)</span> to <span class="math notranslate nohighlight">\(10^{-14}\)</span>), that each has trace 3 to <span class="math notranslate nohighlight">\(10^{-12}\)</span>, and that
+<code class="docutils literal notranslate"><span class="pre">P_col</span></code> equals <code class="docutils literal notranslate"><span class="pre">U[:,</span> <span class="pre">:r]</span> <span class="pre">&#64;</span> <span class="pre">U[:,</span> <span class="pre">:r].T</span></code> to <span class="math notranslate nohighlight">\(10^{-14}\)</span> — the projector built from
+the first three left singular vectors, exactly as in
+<a class="reference internal" href="../01-matrices/four-subspaces.html"><span class="std std-doc">§1.4</span></a>.</p>
+<p><strong>Part e)</strong> Report <span class="math notranslate nohighlight">\(\max_{ij}|(AA^{+} - I)_{ij}|\)</span>, which comes out <span class="math notranslate nohighlight">\(0.420\)</span>.
+This is the number that says <span class="math notranslate nohighlight">\(A^{+}\)</span> is <em>not</em> an inverse: <span class="math notranslate nohighlight">\(AA^{+}\)</span> is a
+projector of rank 3 in a 4-dimensional space, and no rank-3 matrix can be the
+identity.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>singular values of A: [1.01238e+01 2.27099e+00 1.16222e+00 2.15466e-16]
+cut-off 1e-10 * sigma_1 = 1.0124e-09  -&gt;  numerical rank r = 3
+sigma_4 / sigma_1 = 2.128e-17   (exactly zero in exact arithmetic)
+
+A+ =
+[[ 0.51961 -0.02241 -0.30532 -0.15266]
+ [-0.45098  0.08683  0.30812  0.15406]
+ [ 0.06863  0.06443  0.0028   0.0014 ]
+ [ 0.11765  0.0084  -0.2605   0.36975]]
+
+agreement with np.linalg.pinv : 5.551e-17
+
+the four Moore-Penrose conditions, as max |residual entry|:
+  A A+ A = A           1.776e-15
+  A+ A A+ = A+         2.776e-16
+  (A A+)^T = A A+      1.110e-16
+  (A+ A)^T = A+ A      4.996e-16
+
+P_col = A A+ : idempotent to 6.661e-16, trace = 3.000000000000
+P_row = A+ A : idempotent to 6.661e-16, trace = 3.000000000000
+P_col against U_r U_r^T : 3.331e-16
+P_row against V_r V_r^T : 8.882e-16
+
+max |A A+ - I| = 0.4202   &lt;- A+ is NOT an inverse
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<p>The four conditions are checked separately rather than as a single aggregate,
+because they say four different things: the first two make <span class="math notranslate nohighlight">\(A^{+}\)</span> a
+generalized inverse, the last two make the two products <em>orthogonal</em>
+projectors. The trace check is the strictest of the lot — a projector’s trace
+is its rank, an integer, so any drift shows immediately.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  Moore-Penrose condition A A+ A = A (Eq. 2)   [max |residual entry| = 1.776e-15]
+✓  Moore-Penrose condition A+ A A+ = A+ (Eq. 2)   [max |residual entry| = 2.776e-16]
+✓  Moore-Penrose condition (A A+)^T = A A+ (Eq. 2)   [max |residual entry| = 1.110e-16]
+✓  Moore-Penrose condition (A+ A)^T = A+ A (Eq. 2)   [max |residual entry| = 4.996e-16]
+✓  the hand-built V Sigma^+ U^T agrees with np.linalg.pinv (Eq. 1)   [max|Δ| = 5.55112e-17 (rtol=0, atol=1e-14)]
+✓  tr(A A+) = tr(A+ A) = rank(A) = 3 (Eq. 3): a projector&#39;s trace is its rank   [max|Δ| = 1.33227e-15 (rtol=0, atol=1e-12)]
+✓  A A+ is the orthogonal projector onto the column space (Eq. 3)   [max|Δ| = 3.33067e-16 (rtol=0, atol=1e-14)]
+✓  and A A+ is emphatically not the identity   [max |A A+ - I| = 0.4202: a rank-3 projector cannot be the 4-by-4 identity, so A+ is a generalized inverse and not an inverse]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-the-pseudoinverse-is-discontinuous-and-rcond-is-the-reason">
+<h2>Exercise 2: The pseudoinverse is discontinuous, and <code class="docutils literal notranslate"><span class="pre">rcond</span></code> is the reason<a class="headerlink" href="#exercise-2-the-pseudoinverse-is-discontinuous-and-rcond-is-the-reason" title="Link to this heading">#</a></h2>
+<p>Matrix inversion is continuous wherever it is defined: perturb a nonsingular
+<span class="math notranslate nohighlight">\(A\)</span> slightly and <span class="math notranslate nohighlight">\(A^{-1}\)</span> moves slightly. The pseudoinverse has no such
+guarantee. <span class="math notranslate nohighlight">\(A^{+}\)</span> is a <strong>discontinuous</strong> function of <span class="math notranslate nohighlight">\(A\)</span> at every matrix where
+the rank can change, and rank-deficient matrices are exactly those matrices.</p>
+<p>The mechanism is visible in <a class="reference internal" href="#equation-eq-pinv-svd">Eq. 118</a>. A perturbation that lifts
+<span class="math notranslate nohighlight">\(\sigma_4\)</span> from <span class="math notranslate nohighlight">\(0\)</span> to <span class="math notranslate nohighlight">\(\delta\)</span> does not perturb <span class="math notranslate nohighlight">\(A^{+}\)</span> by <span class="math notranslate nohighlight">\(O(\delta)\)</span>; it
+<em>adds a whole new term</em> of size <span class="math notranslate nohighlight">\(1/\delta\)</span>. The map <span class="math notranslate nohighlight">\(\sigma \mapsto 1/\sigma\)</span>
+has no limit at <span class="math notranslate nohighlight">\(0\)</span>, so as <span class="math notranslate nohighlight">\(\delta \to 0^{+}\)</span> the pseudoinverse of the
+perturbed matrix diverges, while the pseudoinverse of the limit matrix is
+perfectly finite. There is no repair available in exact arithmetic. What there
+is instead is a <em>decision</em>, and <code class="docutils literal notranslate"><span class="pre">rcond</span></code> is where it is made: every singular
+value below <code class="docutils literal notranslate"><span class="pre">rcond</span> <span class="pre">*</span> <span class="pre">s[0]</span></code> is declared zero and dropped.</p>
+<p>The Prologue asked what happens to a rank-3 matrix perturbed by <span class="math notranslate nohighlight">\(10^{-12}\)</span>, and
+left the question open. This exercise answers it.</p>
+<p><strong>Part a)</strong> For each <span class="math notranslate nohighlight">\(\delta \in \{0, 10^{-14}, 10^{-12}, 10^{-10},
+10^{-8}\}\)</span>, form <code class="docutils literal notranslate"><span class="pre">A_d</span> <span class="pre">=</span> <span class="pre">A_DEP.copy()</span></code> and add <span class="math notranslate nohighlight">\(\delta\)</span> to the single entry
+<code class="docutils literal notranslate"><span class="pre">A_d[3,</span> <span class="pre">2]</span></code>. Report the smallest singular value from
+<code class="docutils literal notranslate"><span class="pre">np.linalg.svd(A_d,</span> <span class="pre">compute_uv=False)</span></code>, the rank from
+<code class="docutils literal notranslate"><span class="pre">np.linalg.matrix_rank(A_d)</span></code>, and the spectral norm
+<code class="docutils literal notranslate"><span class="pre">np.linalg.norm(np.linalg.pinv(A_d),</span> <span class="pre">2)</span></code> using the <strong>default</strong> <code class="docutils literal notranslate"><span class="pre">rcond</span></code>.</p>
+<p><strong>Part b)</strong> Identify the jump. Between <span class="math notranslate nohighlight">\(\delta = 10^{-14}\)</span> and
+<span class="math notranslate nohighlight">\(\delta = 10^{-12}\)</span> the norm of the pseudoinverse rises from <span class="math notranslate nohighlight">\(0.860\)</span> to
+<span class="math notranslate nohighlight">\(5.35\times10^{12}\)</span>, a factor of <span class="math notranslate nohighlight">\(6\times10^{12}\)</span>, in response to a change of
+<span class="math notranslate nohighlight">\(10^{-12}\)</span> in one entry of <code class="docutils literal notranslate"><span class="pre">A_DEP</span></code>, whose largest entry is 7. Confirm the jump
+is at least <span class="math notranslate nohighlight">\(10^{12}\)</span>, and confirm it coincides with <code class="docutils literal notranslate"><span class="pre">matrix_rank</span></code> changing
+from 3 to 4.</p>
+<p><strong>Part c)</strong> Explain the threshold quantitatively. <code class="docutils literal notranslate"><span class="pre">np.linalg.pinv</span></code> drops
+singular values below <code class="docutils literal notranslate"><span class="pre">rcond</span> <span class="pre">*</span> <span class="pre">s[0]</span></code> with <code class="docutils literal notranslate"><span class="pre">rcond</span> <span class="pre">=</span> <span class="pre">1e-15</span></code> by default, so the
+cut-off here is <span class="math notranslate nohighlight">\(1.0\times10^{-14}\)</span>. Report <span class="math notranslate nohighlight">\(\sigma_4\)</span> for each <span class="math notranslate nohighlight">\(\delta\)</span> and
+confirm the jump happens exactly where <span class="math notranslate nohighlight">\(\sigma_4\)</span> crosses that cut-off: at
+<span class="math notranslate nohighlight">\(\delta = 10^{-14}\)</span>, <span class="math notranslate nohighlight">\(\sigma_4 = 1.7\times10^{-15}\)</span> is below it and gets
+dropped; at <span class="math notranslate nohighlight">\(\delta = 10^{-12}\)</span>, <span class="math notranslate nohighlight">\(\sigma_4 = 1.9\times10^{-13}\)</span> is above it and
+gets inverted.</p>
+<p><strong>Part d)</strong> Show that the decision is yours to make. Repeat Part a) with
+<code class="docutils literal notranslate"><span class="pre">np.linalg.pinv(A_d,</span> <span class="pre">rcond=1e-10)</span></code> and confirm <span class="math notranslate nohighlight">\(\|A^{+}\|_2\)</span> is <em>identical</em> to
+eight significant figures across <span class="math notranslate nohighlight">\(\delta = 0, 10^{-14}, 10^{-12}, 10^{-10}\)</span>,
+and only moves at <span class="math notranslate nohighlight">\(\delta = 10^{-8}\)</span>. Choosing <code class="docutils literal notranslate"><span class="pre">rcond</span></code> is choosing what counts
+as noise — and there is no default that is right for every problem, which is
+the entire content of this exercise.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>pinv default cut-off = rcond * sigma_1 = 1e-15 * 10.12383 = 1.0124e-14
+
+   delta      sigma_4  below cut?  rank   |A+|_2 default   |A+|_2 rcond=1e-10
+   0e+00   2.1547e-16        True     3       8.6042e-01       8.60421255e-01
+   1e-14   2.0469e-15        True     3       8.6042e-01       8.60421255e-01
+   1e-12   1.8713e-13       False     4       5.3438e+12       8.60421255e-01
+   1e-10   1.8712e-11       False     4       5.3441e+10       8.60421255e-01
+   1e-08   1.8712e-09       False     4       5.3442e+08       5.34415517e+08
+
+jump between delta=1e-14 and delta=1e-12: factor 6.211e+12
+caused by a change of 1e-12 in one entry of a matrix with max |a_ij| = 7
+1 / sigma_4 at delta=1e-12 = 5.3438e+12   &lt;- the new term&#39;s size
+
+with rcond pinned at 1e-10 the answer does not move until sigma_4 crosses 1e-10 * sigma_1 = 1.0124e-09
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<p>The check is not that the pseudoinverse is large — it is that a <span class="math notranslate nohighlight">\(10^{-12}\)</span>
+perturbation moves it by <span class="math notranslate nohighlight">\(10^{12}\)</span>, which is the definition of a discontinuity
+reached numerically. The second half confirms the discontinuity is <em>removable
+by decision</em>: with <code class="docutils literal notranslate"><span class="pre">rcond</span></code> pinned, the same perturbations change nothing.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  a 1e-12 perturbation changes |A+|_2 by a factor above 1e12 (Eq. 1)   [|A+|_2 goes from 0.8604 to 5.3438e+12: the pseudoinverse is discontinuous where the rank can change]
+✓  and the jump coincides exactly with matrix_rank changing from 3 to 4   [ranks [3, 3, 4, 4, 4] for deltas [&#39;0e+00&#39;, &#39;1e-14&#39;, &#39;1e-12&#39;, &#39;1e-10&#39;, &#39;1e-08&#39;]]
+✓  the threshold is where sigma_4 crosses rcond * sigma_1, not anywhere else   [sigma_4 = 2.047e-15 &lt; 1.012e-14 &lt; 1.871e-13]
+✓  with rcond=1e-10 pinned, the first four perturbations change nothing   [max|Δ| = 6.50591e-13 (rtol=1e-08, atol=0)]
+✓  and rcond=1e-10 moves only once sigma_4 crosses ITS cut-off   [|A+|_2 = 5.344e+08 at delta = 1e-8, where sigma_4 = 1.871e-09 exceeds 1e-10 * sigma_1 = 1.012e-09]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-the-minimum-norm-solution-and-what-the-normal-equations-do-instead">
+<h2>Exercise 3: The minimum-norm solution, and what the normal equations do instead<a class="headerlink" href="#exercise-3-the-minimum-norm-solution-and-what-the-normal-equations-do-instead" title="Link to this heading">#</a></h2>
+<p>When <span class="math notranslate nohighlight">\(A\)</span> is <span class="math notranslate nohighlight">\(m\times n\)</span> with <span class="math notranslate nohighlight">\(m &lt; n\)</span> and full row rank, <span class="math notranslate nohighlight">\(A\mathbf{x} =
+\mathbf{b}\)</span> has infinitely many exact solutions: a particular one plus anything
+in the null space, which here has dimension <span class="math notranslate nohighlight">\(n - m\)</span>. Every one of them fits the
+data perfectly, so “smallest residual” cannot choose between them.
+<a class="reference internal" href="#equation-eq-pinv-minnorm">Eq. 121</a> chooses by a second criterion, the norm, and
+<a class="reference internal" href="../01-matrices/four-subspaces.html"><span class="std std-doc">§1.4</span></a> already showed why that criterion
+picks out exactly one vector: split any solution as <span class="math notranslate nohighlight">\(\mathbf{x} =
+\mathbf{x}_{\text{row}} + \mathbf{x}_{\text{null}}\)</span>, note the two parts are
+orthogonal, and Pythagoras gives
+<span class="math notranslate nohighlight">\(\|\mathbf{x}\|^2 = \|\mathbf{x}_{\text{row}}\|^2 +
+\|\mathbf{x}_{\text{null}}\|^2\)</span>. Adding null-space content can only lengthen
+the vector, so the shortest solution is the one with none: the row-space
+component, which is <span class="math notranslate nohighlight">\(A^{+}\mathbf{b}\)</span>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-pinv-minnorm">
+<img alt="../../_images/f068999fbe98333646d5456a7bc5b40b10bc02fdad768a7a2d232e208a3a3763.png" src="../../_images/f068999fbe98333646d5456a7bc5b40b10bc02fdad768a7a2d232e208a3a3763.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 45 </span><span class="caption-text">The minimum-norm solution in the smallest possible case: one equation <span class="math notranslate nohighlight">\(2x_1 + x_2 = 2\)</span> in two unknowns, whose solution set is the dashed line. The amber circle is the smallest circle centred at the origin that reaches the line, and it reaches it at exactly one point, <span class="math notranslate nohighlight">\(A^{+}\mathbf{b} = (0.8,\, 0.4)\)</span> with norm <span class="math notranslate nohighlight">\(0.894\)</span> – so the minimum-norm solution is the foot of the perpendicular from the origin. Any other solution, such as <span class="math notranslate nohighlight">\(\mathbf{x}_{\mathrm{alt}}\)</span> with norm <span class="math notranslate nohighlight">\(1.234\)</span>, lies on a strictly larger dotted circle. The axis stubs mark the origin.</span><a class="headerlink" href="#fig-pinv-minnorm" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<p>The system for this exercise is the <span class="math notranslate nohighlight">\(3\times6\)</span> matrix</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A_{\text{wide}} = \begin{bmatrix}
+1 &amp; 2 &amp; 0 &amp; 1 &amp; -1 &amp; 3\\
+0 &amp; 1 &amp; 1 &amp; -2 &amp; 2 &amp; 1\\
+2 &amp; 0 &amp; -1 &amp; 3 &amp; 1 &amp; 0
+\end{bmatrix},
+\qquad
+\mathbf{b} = \begin{bmatrix} 6\\ 2\\ 5\end{bmatrix},
+\end{split}\]</div>
+<p>which has rank 3 and therefore a 3-dimensional null space and a
+3-parameter family of exact solutions.</p>
+<p><strong>Part a)</strong> Build <code class="docutils literal notranslate"><span class="pre">A_wide</span></code> and <code class="docutils literal notranslate"><span class="pre">b_wide</span></code> as written above, confirm
+<code class="docutils literal notranslate"><span class="pre">np.linalg.matrix_rank(A_wide)</span></code> is 3, and compute
+<code class="docutils literal notranslate"><span class="pre">x_mn</span> <span class="pre">=</span> <span class="pre">np.linalg.pinv(A_wide)</span> <span class="pre">&#64;</span> <span class="pre">b_wide</span></code>. Report it and its norm, which comes
+out <span class="math notranslate nohighlight">\(2.0217\)</span>, and confirm the residual <span class="math notranslate nohighlight">\(\|A\mathbf{x} - \mathbf{b}\|_2\)</span> is
+below <span class="math notranslate nohighlight">\(10^{-13}\)</span> — it is an exact solution, not a least-squares compromise.</p>
+<p><strong>Part b)</strong> Confirm <code class="docutils literal notranslate"><span class="pre">np.linalg.lstsq(A_wide,</span> <span class="pre">b_wide,</span> <span class="pre">rcond=None)[0]</span></code> returns
+the <em>same</em> vector to <span class="math notranslate nohighlight">\(10^{-13}\)</span>. This is worth knowing: <code class="docutils literal notranslate"><span class="pre">lstsq</span></code> is documented
+as returning the minimum-norm least-squares solution, and on an underdetermined
+system that is the minimum-norm exact solution.</p>
+<p><strong>Part c)</strong> Extract a null-space basis from the full SVD:
+<code class="docutils literal notranslate"><span class="pre">Uw,</span> <span class="pre">sw,</span> <span class="pre">Vtw</span> <span class="pre">=</span> <span class="pre">np.linalg.svd(A_wide)</span></code> and <code class="docutils literal notranslate"><span class="pre">N</span> <span class="pre">=</span> <span class="pre">Vtw[3:].T</span></code>, of shape <code class="docutils literal notranslate"><span class="pre">(6,</span> <span class="pre">3)</span></code>.
+Confirm <span class="math notranslate nohighlight">\(\|A_{\text{wide}}N\|_{\max} &lt; 10^{-13}\)</span> and that
+<span class="math notranslate nohighlight">\(\|N^{\top}\mathbf{x}_{\text{mn}}\|_{\max} &lt; 10^{-13}\)</span>, so the minimum-norm
+solution has no null-space component at all.</p>
+<p><strong>Part d)</strong> Test <a class="reference internal" href="#equation-eq-pinv-minnorm">Eq. 121</a> by brute force. Draw
+<code class="docutils literal notranslate"><span class="pre">coef</span> <span class="pre">=</span> <span class="pre">rng.standard_normal((10_000,</span> <span class="pre">3))</span></code> and form the <span class="math notranslate nohighlight">\(10^4\)</span> alternative
+solutions <code class="docutils literal notranslate"><span class="pre">alts</span> <span class="pre">=</span> <span class="pre">x_mn</span> <span class="pre">+</span> <span class="pre">coef</span> <span class="pre">&#64;</span> <span class="pre">N.T</span></code>. Confirm every one has residual below
+<span class="math notranslate nohighlight">\(10^{-13}\)</span> (they are all genuine solutions) and that every one has norm at
+least <span class="math notranslate nohighlight">\(\|\mathbf{x}_{\text{mn}}\|\)</span>. Also confirm Pythagoras holds to <span class="math notranslate nohighlight">\(10^{-13}\)</span>:
+<span class="math notranslate nohighlight">\(\|\mathbf{x}_{\text{alt}}\|^2 = \|\mathbf{x}_{\text{mn}}\|^2 +
+\|\text{coef}\cdot N^{\top}\|^2\)</span> for each of the <span class="math notranslate nohighlight">\(10^4\)</span>.</p>
+<p><strong>Part e)</strong> Now the cautionary half. Form the <span class="math notranslate nohighlight">\(6\times6\)</span> Gram matrix
+<span class="math notranslate nohighlight">\(A^{\top}A\)</span>, which is singular in exact arithmetic because
+<span class="math notranslate nohighlight">\(\operatorname{rank}(A^{\top}A) = \operatorname{rank}(A) = 3 &lt; 6\)</span>, and solve
+the normal equations anyway with
+<code class="docutils literal notranslate"><span class="pre">np.linalg.solve(A_wide.T</span> <span class="pre">&#64;</span> <span class="pre">A_wide,</span> <span class="pre">A_wide.T</span> <span class="pre">&#64;</span> <span class="pre">b_wide)</span></code>. Report
+<code class="docutils literal notranslate"><span class="pre">np.linalg.cond</span></code> and <code class="docutils literal notranslate"><span class="pre">np.linalg.det</span></code> of the Gram matrix, and report whether the
+call raises.</p>
+<p>It does <strong>not</strong> raise. Floating-point LU never meets an exactly zero pivot, so
+it returns a vector, and that vector solves the system to <span class="math notranslate nohighlight">\(10^{-14}\)</span>: a
+perfectly valid member of the 3-parameter solution family. It is simply not the
+minimum-norm member. Confirm that its norm strictly exceeds
+<span class="math notranslate nohighlight">\(\|\mathbf{x}_{\text{mn}}\| = 2.0217\)</span>, and verify the mechanism exactly by
+checking Pythagoras once more: <span class="math notranslate nohighlight">\(\|\mathbf{x}_{\text{ne}}\|^2 -
+\|\mathbf{x}_{\text{mn}}\|^2 = \|N^{\top}\mathbf{x}_{\text{ne}}\|^2\)</span> to
+<span class="math notranslate nohighlight">\(10^{-12}\)</span>, so the whole of the excess is null-space content that the
+minimum-norm solution does not carry.</p>
+<p><em>How much</em> longer is deliberately not stated here, and neither is <span class="math notranslate nohighlight">\(\kappa\)</span> or
+the determinant: which member of the family LU lands on depends on its pivot
+sequence, which depends on the BLAS, so the numbers this cell prints differ
+between machines. That is the sharper version of the warning. The normal
+equations on a rank-deficient system do not merely return the wrong answer;
+they return a machine-dependent one, with no exception, no warning, and a
+residual that looks perfect.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>rank(A_wide) = 3 of 3 rows, 6 columns -&gt; null space has dimension 3
+x_mn  = [ 1.00697  0.85017 -0.0453   0.72474  0.76655  1.1115 ]
+|x_mn| = 2.021660, residual = 5.892e-15
+lstsq returns the same vector to 5.551e-16
+
+null-space basis N has shape (6, 3); |A N|_max = 1.110e-15
+|N^T x_mn|_max = 7.563e-16   &lt;- no null-space component
+
+10,000 alternative solutions:
+  worst residual            : 1.209e-14  (all exact solutions)
+  smallest norm found       : 2.022439
+  |x_mn|                    : 2.021660  &lt;- smaller
+  worst Pythagoras violation: 2.132e-14
+
+the normal equations on a rank-deficient Gram matrix:
+  rank(A^T A) = 3 of 6 -&gt; singular in exact arithmetic
+  cond(A^T A) = 1.870e+32, det(A^T A) = 5.885e-44   (both past 1/eps; machine-dependent)
+  np.linalg.solve did NOT raise; it returned
+  x_ne = [-0.15344  2.42761 -1.63879  0.83362  1.16724  0.54395]
+  residual = 0.000e+00  (a valid solution)
+  |x_ne|   = 3.309944  against |x_mn| = 2.021660  -&gt; 1.637 times longer ON THIS MACHINE
+  the excess is null-space content: |x_ne|^2 - |x_mn|^2 = 6.868620 against |N^T x_ne|^2 = 6.868620
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<p>The minimum-norm property is checked against <span class="math notranslate nohighlight">\(10^4\)</span> genuine competitors rather
+than asserted, and Pythagoras is checked on every one of them, because the
+orthogonal split is the <em>reason</em> the property holds. The last check records
+what the normal equations returned: not an error, and not the right answer.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  A+ b solves the underdetermined system exactly (Eq. 4)   [max|Δ| = 5.32907e-15 (rtol=0, atol=1e-13)]
+✓  np.linalg.lstsq returns the same minimum-norm solution   [max|Δ| = 5.55112e-16 (rtol=0, atol=1e-13)]
+✓  A+ b lies entirely in the row space: no null-space component (Eq. 3)   [|N^T x_mn|_max = 7.563e-16 for the 3-dimensional null space]
+✓  and it is the shortest of 10,000 exact solutions (Eq. 4)   [every alternative solves to 1.21e-14; the shortest found was 2.022439 against |A+ b| = 2.021660]
+✓  Pythagoras holds for all 10,000: |x|^2 = |x_row|^2 + |x_null|^2   [max|Δ| = 2.13163e-14 (rtol=0, atol=1e-12)]
+✓  the normal equations returned a VALID but longer solution, silently   [residual 0.00e+00 with norm 3.3099 against the minimum 2.0217: no exception was raised, and HOW much longer is a LAPACK pivot-order detail that differs between machines, so only &#39;strictly longer&#39; is gated]
+✓  and the entire excess is null-space content, by Pythagoras (Eq. 4)   [got [6.86862] vs expected [6.86862] (rtol=1e-09, atol=1e-12)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-filter-factors-truncation-and-ridge-are-one-formula">
+<h2>Exercise 4: Filter factors: truncation and ridge are one formula<a class="headerlink" href="#exercise-4-filter-factors-truncation-and-ridge-are-one-formula" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-pinv-filter">Eq. 124</a> says something stronger than “here is another method”. It
+says truncation and Tikhonov are the <em>same computation</em> differing only in a
+sequence of numbers <span class="math notranslate nohighlight">\(f_1, \dots, f_n\)</span> multiplying the SVD expansion. Truncation
+uses a step, <span class="math notranslate nohighlight">\(f_i = \mathbb{1}[i \le k]\)</span>; Tikhonov uses the smooth switch
+<span class="math notranslate nohighlight">\(\sigma_i^2/(\sigma_i^2 + \lambda)\)</span>, which is <span class="math notranslate nohighlight">\(\tfrac{1}{2}\)</span> exactly where
+<span class="math notranslate nohighlight">\(\sigma_i = \sqrt{\lambda}\)</span>. Seeing them this way makes the whole family
+visible at once, and makes <span class="math notranslate nohighlight">\(\sqrt{\lambda}\)</span> readable directly off a plot of the
+singular values.</p>
+<p>The test matrix is <code class="docutils literal notranslate"><span class="pre">la.random_with_condition(60,</span> <span class="pre">12,</span> <span class="pre">1e2,</span> <span class="pre">rng)</span></code>, of shape
+<span class="math notranslate nohighlight">\((60, 12)\)</span> with condition number exactly <span class="math notranslate nohighlight">\(10^{2}\)</span> and singular values in
+geometric progression from 1 to <span class="math notranslate nohighlight">\(0.01\)</span>; the right-hand side is
+<code class="docutils literal notranslate"><span class="pre">b_r</span> <span class="pre">=</span> <span class="pre">A_r</span> <span class="pre">&#64;</span> <span class="pre">x_r</span> <span class="pre">+</span> <span class="pre">0.01</span> <span class="pre">*</span> <span class="pre">rng.standard_normal(60)</span></code> for
+<code class="docutils literal notranslate"><span class="pre">x_r</span> <span class="pre">=</span> <span class="pre">rng.standard_normal(12)</span></code>. It is deliberately well conditioned, so that
+every discrepancy below is the algebra and not the arithmetic. Part f) then
+repeats one comparison on <code class="docutils literal notranslate"><span class="pre">la.random_with_condition(60,</span> <span class="pre">12,</span> <span class="pre">1e6,</span> <span class="pre">rng)</span></code>, where
+that stops being true.</p>
+<p><strong>Part a)</strong> Verify the three routes to <span class="math notranslate nohighlight">\(\mathbf{x}_\lambda\)</span> agree. For
+<span class="math notranslate nohighlight">\(\lambda \in \{10^{-6}, 10^{-8}, 10^{-10}, 10^{-12}\}\)</span> compute it three ways:
+the matrix form <a class="reference internal" href="#equation-eq-pinv-tikhonov">Eq. 123</a> with
+<code class="docutils literal notranslate"><span class="pre">np.linalg.solve(A_r.T</span> <span class="pre">&#64;</span> <span class="pre">A_r</span> <span class="pre">+</span> <span class="pre">lam</span> <span class="pre">*</span> <span class="pre">np.eye(12),</span> <span class="pre">A_r.T</span> <span class="pre">&#64;</span> <span class="pre">b_r)</span></code>; the filter form
+<a class="reference internal" href="#equation-eq-pinv-filter">Eq. 124</a> as <code class="docutils literal notranslate"><span class="pre">Vr.T</span> <span class="pre">&#64;</span> <span class="pre">((sr**2</span> <span class="pre">/</span> <span class="pre">(sr**2</span> <span class="pre">+</span> <span class="pre">lam))</span> <span class="pre">*</span> <span class="pre">(Ur.T</span> <span class="pre">&#64;</span> <span class="pre">b_r)</span> <span class="pre">/</span> <span class="pre">sr)</span></code>
+from the economy SVD <code class="docutils literal notranslate"><span class="pre">Ur,</span> <span class="pre">sr,</span> <span class="pre">Vr</span> <span class="pre">=</span> <span class="pre">np.linalg.svd(A_r,</span> <span class="pre">full_matrices=False)</span></code>;
+and the stacked form <a class="reference internal" href="#equation-eq-pinv-stacked">Eq. 125</a> by building the <span class="math notranslate nohighlight">\((72, 12)\)</span> matrix
+<code class="docutils literal notranslate"><span class="pre">np.vstack([A_r,</span> <span class="pre">np.sqrt(lam)</span> <span class="pre">*</span> <span class="pre">np.eye(12)])</span></code>, the length-72 right-hand side
+<code class="docutils literal notranslate"><span class="pre">np.concatenate([b_r,</span> <span class="pre">np.zeros(12)])</span></code>, and solving it with
+<code class="docutils literal notranslate"><span class="pre">scipy.linalg.qr(...,</span> <span class="pre">mode=&quot;economic&quot;)</span></code> followed by a triangular solve. All
+three agree to <span class="math notranslate nohighlight">\(10^{-12}\)</span> here.</p>
+<p><strong>Part b)</strong> Confirm the <span class="math notranslate nohighlight">\(\lambda \to 0\)</span> limit <em>and its rate</em>. Compute
+<span class="math notranslate nohighlight">\(\|\mathbf{x}_\lambda - \mathbf{x}_{\text{LS}}\|_\infty\)</span> against
+<code class="docutils literal notranslate"><span class="pre">x_ls</span> <span class="pre">=</span> <span class="pre">np.linalg.lstsq(A_r,</span> <span class="pre">b_r,</span> <span class="pre">rcond=None)[0]</span></code> for the same four <span class="math notranslate nohighlight">\(\lambda\)</span>,
+and confirm the deviation falls by a factor of 100 each time — the bias
+introduced by ridge is <span class="math notranslate nohighlight">\(O(\lambda)\)</span>, not <span class="math notranslate nohighlight">\(O(\sqrt{\lambda})\)</span> or
+<span class="math notranslate nohighlight">\(O(\lambda^2)\)</span>. Check the ratio of consecutive deviations is <span class="math notranslate nohighlight">\(100\)</span> to within
+10%. The four <span class="math notranslate nohighlight">\(\lambda\)</span> are chosen below <span class="math notranslate nohighlight">\(\sigma_{\min}^2 = 10^{-4}\)</span>, since
+the linear regime is where <span class="math notranslate nohighlight">\(\lambda\)</span> is small compared to the eigenvalues it
+is being added to.</p>
+<p><strong>Part c)</strong> Confirm the <span class="math notranslate nohighlight">\(\lambda \to \infty\)</span> limit <em>and its rate</em>. For
+<span class="math notranslate nohighlight">\(\lambda = 10^{3}, 10^{6}, 10^{9}\)</span> check that
+<span class="math notranslate nohighlight">\(\|\mathbf{x}_\lambda\| \to \|A^{\top}\mathbf{b}\|/\lambda\)</span>, which follows from
+<a class="reference internal" href="#equation-eq-pinv-tikhonov">Eq. 123</a> because <span class="math notranslate nohighlight">\(\lambda I\)</span> dominates <span class="math notranslate nohighlight">\(A^{\top}A\)</span>. Agreement
+should reach 6 significant figures by <span class="math notranslate nohighlight">\(\lambda = 10^{6}\)</span>.</p>
+<p><strong>Part d)</strong> Compute the effective degrees of freedom
+<span class="math notranslate nohighlight">\(\sum_i f_i(\lambda)\)</span> for <span class="math notranslate nohighlight">\(\lambda\)</span> ranging over <code class="docutils literal notranslate"><span class="pre">np.logspace(-14,</span> <span class="pre">2,</span> <span class="pre">25)</span></code>,
+and confirm it decreases monotonically from 12 (all directions used) toward 0
+(none), and that it equals 12 to within <span class="math notranslate nohighlight">\(10^{-6}\)</span> at <span class="math notranslate nohighlight">\(\lambda = 10^{-14}\)</span>.</p>
+<p><strong>Part e)</strong> Plot the filter factors against <span class="math notranslate nohighlight">\(\sigma_i\)</span> on log-log axes for
+<span class="math notranslate nohighlight">\(\lambda \in \{10^{-2}, 10^{-4}, 10^{-6}\}\)</span>, with the truncation step at
+<span class="math notranslate nohighlight">\(k = 6\)</span> drawn for comparison, and mark <span class="math notranslate nohighlight">\(\sqrt{\lambda}\)</span> on the <span class="math notranslate nohighlight">\(\sigma\)</span> axis
+for each <span class="math notranslate nohighlight">\(\lambda\)</span>. Confirm numerically that <span class="math notranslate nohighlight">\(f_i = \tfrac{1}{2}\)</span> to
+<span class="math notranslate nohighlight">\(10^{-12}\)</span> wherever <span class="math notranslate nohighlight">\(\sigma_i = \sqrt{\lambda}\)</span>, by evaluating the filter
+function at <span class="math notranslate nohighlight">\(\sigma = \sqrt{\lambda}\)</span> directly.</p>
+<p><strong>Part f)</strong> Now show where the textbook formula stops being usable. Build
+<code class="docutils literal notranslate"><span class="pre">A_ill</span> <span class="pre">=</span> <span class="pre">la.random_with_condition(60,</span> <span class="pre">12,</span> <span class="pre">1e6,</span> <span class="pre">rng)</span></code> with
+<code class="docutils literal notranslate"><span class="pre">b_ill</span> <span class="pre">=</span> <span class="pre">A_ill</span> <span class="pre">&#64;</span> <span class="pre">x_ill</span> <span class="pre">+</span> <span class="pre">0.01</span> <span class="pre">*</span> <span class="pre">rng.standard_normal(60)</span></code> for
+<code class="docutils literal notranslate"><span class="pre">x_ill</span> <span class="pre">=</span> <span class="pre">rng.standard_normal(12)</span></code>, and repeat the matrix-versus-filter and
+stacked-versus-filter comparison of Part a) at
+<span class="math notranslate nohighlight">\(\lambda \in \{10^{-2}, 10^{-4}, 10^{-6}, 10^{-8}\}\)</span>. The two forms are
+algebraically identical, but the matrix form disagrees with the filter form by
+<span class="math notranslate nohighlight">\(2\times10^{-7}\)</span> at <span class="math notranslate nohighlight">\(\lambda = 10^{-8}\)</span> while the stacked form disagrees by
+<span class="math notranslate nohighlight">\(7\times10^{-12}\)</span>: a factor of 30,000. Confirm that the matrix form’s error
+stays under <span class="math notranslate nohighlight">\(\kappa^2\varepsilon = 2.2\times10^{-4}\)</span> and the stacked form’s
+under <span class="math notranslate nohighlight">\(\kappa\varepsilon = 2.2\times10^{-10}\)</span>, the two rates
+<a class="reference internal" href="least-squares-four-ways.html"><span class="std std-doc">§2.3</span></a> measured. Forming <span class="math notranslate nohighlight">\(A^{\top}A\)</span> costs the
+same square here as it did there, and <a class="reference internal" href="#equation-eq-pinv-stacked">Eq. 125</a> avoids it for the
+same reason <span class="math notranslate nohighlight">\(QR\)</span> did.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>A_r has shape (60, 12), cond = 1.000000e+02, sigma_min^2 = 1.0000e-04
+
+   lambda  |matrix-filter|  |stacked-filter|  |x_lam - x_LS|_inf    eff. dof
+    1e-06        1.151e-12         1.421e-14         1.87568e-02   11.982490
+    1e-08        1.077e-12         8.826e-15         1.89370e-04   11.999824
+    1e-10        9.779e-13         9.326e-15         1.89388e-06   11.999998
+    1e-12        1.235e-12         1.421e-14         1.89388e-08   12.000000
+
+ratios of consecutive deviations: [&#39;99.0483&#39;, &#39;99.9904&#39;, &#39;99.9999&#39;]
+  -&gt; the ridge bias is O(lambda): a 100-fold drop in lambda gives a 100-fold drop in the bias
+
+the large-lambda limit |x_lam| -&gt; |A^T b| / lambda:
+  lambda = 1e+03:  |x_lam| = 1.523615e-03   predicted 1.525111e-03
+  lambda = 1e+06:  |x_lam| = 1.525109e-06   predicted 1.525111e-06
+  lambda = 1e+09:  |x_lam| = 1.525111e-09   predicted 1.525111e-09
+
+effective dof runs from 12.000000000 at lambda = 1e-14 down to 1.7510e-02 at lambda = 1e2 (12 columns in all)
+filter value at sigma = sqrt(lambda), for the three lambdas: [0.5 0.5 0.5]
+
+the same three routes on a matrix with cond = 1.0000e+06:
+   lambda  |matrix-filter|  |stacked-filter|      ratio
+    1e-02        8.826e-15         6.717e-15        1.3
+    1e-04        4.950e-13         1.127e-14       43.9
+    1e-06        8.808e-11         2.558e-13      344.4
+    1e-08        1.484e-07         2.782e-11     5332.9
+  kappa^2 * eps = 2.220e-04  bounds the matrix form
+  kappa   * eps = 2.220e-10  bounds the stacked form
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-pinv-filters">
+<img alt="../../_images/fdcb401ffa3a238080e0459ed818631adf0ac8cd028fa864a5552f98e7980fe3.png" src="../../_images/fdcb401ffa3a238080e0459ed818631adf0ac8cd028fa864a5552f98e7980fe3.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 46 </span><span class="caption-text">Filter factors <span class="math notranslate nohighlight">\(f_i = \sigma_i^2/(\sigma_i^2+\lambda)\)</span> against the singular value <span class="math notranslate nohighlight">\(\sigma_i\)</span> of the <span class="math notranslate nohighlight">\(60\times12\)</span> test matrix, on log-log axes, for <span class="math notranslate nohighlight">\(\lambda = 10^{-2}, 10^{-4}, 10^{-6}\)</span> (amber), beside the hard truncation filter at <span class="math notranslate nohighlight">\(k=6\)</span> (navy step). Each dotted vertical line marks <span class="math notranslate nohighlight">\(\sigma = \sqrt{\lambda}\)</span>, where the corresponding smooth filter passes through exactly <span class="math notranslate nohighlight">\(1/2\)</span>; the markers are the twelve actual singular values of the matrix. Tikhonov and truncated-SVD regularization are the same expansion, Eq. 7, differing only in the shape of this switch.</span><a class="headerlink" href="#fig-pinv-filters" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<p>The three routes are checked against each other rather than against a
+reference, since none of them is more “correct” than the others in exact
+arithmetic. The limits are checked with their <em>rates</em>, which is much stricter
+than checking a limit: a wrong formula can easily reach the right limit by the
+wrong route.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the matrix, filter, and stacked-QR forms all agree (Eqs. 6, 7, 8)   [worst matrix-vs-filter 1.24e-12, worst stacked-vs-filter 1.42e-14, over lambda from 1e-6 to 1e-12 at kappa = 100]
+✓  the ridge bias is O(lambda): a 100-fold drop in lambda drops it 100-fold   [max|Δ| = 0.951663 (rtol=0.1, atol=0)]
+✓  and as lambda -&gt; infinity, |x_lam| -&gt; |A^T b| / lambda (Eq. 6)   [max|Δ| = 1.49709e-12 (rtol=1e-05, atol=0)]
+✓  the effective dof falls monotonically from 12 to 0 as lambda grows (Eq. 7)   [12.000000000 at lambda = 1e-14 down to 1.751e-02 at lambda = 1e2, strictly decreasing throughout]
+✓  and f = 1/2 exactly where sigma = sqrt(lambda), the filter&#39;s midpoint   [max|Δ| = 0 (rtol=0, atol=1e-12)]
+✓  at kappa = 1e6 the matrix form is orders worse than the stacked form   [1.48e-07 against 2.78e-11 at lambda = 1e-8, a factor of 5333: forming A^T A squares the condition number here exactly as it did in 2.3]
+✓  and each form stays inside its own predicted rate   [matrix 1.48e-07 &lt; kappa^2 eps = 2.22e-04; stacked 2.78e-11 &lt; kappa eps = 2.22e-10]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-an-ill-posed-problem-and-why-solve-cannot-survive-it">
+<h2>Exercise 5: An ill-posed problem, and why <code class="docutils literal notranslate"><span class="pre">solve</span></code> cannot survive it<a class="headerlink" href="#exercise-5-an-ill-posed-problem-and-why-solve-cannot-survive-it" title="Link to this heading">#</a></h2>
+<p>Everything so far has been <em>ill-conditioned</em>: hard, but with a finite <span class="math notranslate nohighlight">\(\kappa\)</span>
+and a definite number of digits lost. An <strong>ill-posed</strong> problem is different in
+kind. Discretising a smoothing integral operator gives a matrix whose singular
+values decay exponentially with no floor, so <span class="math notranslate nohighlight">\(\kappa\)</span> is not a large number but
+a meaningless one, and the smallest singular values encode information the
+forward map genuinely erased.</p>
+<p>The example is 1-D Gaussian blur on <span class="math notranslate nohighlight">\(n = 200\)</span> equispaced points of <span class="math notranslate nohighlight">\([0,1]\)</span>,
+available as <code class="docutils literal notranslate"><span class="pre">la.gaussian_blur(200,</span> <span class="pre">0.03)</span></code>. Row <span class="math notranslate nohighlight">\(i\)</span> of that matrix samples</p>
+<div class="math notranslate nohighlight">
+\[
+K(t_i, t_j) = \frac{1}{w\sqrt{2\pi}}\,
+  \exp\!\left(-\frac{(t_i - t_j)^2}{2w^2}\right), \qquad w = 0.03,
+\]</div>
+<p>on the midpoint grid <span class="math notranslate nohighlight">\(t_i = (i + \tfrac{1}{2})/200\)</span> and multiplies by the
+quadrature weight <span class="math notranslate nohighlight">\(h = 1/200\)</span>, so <span class="math notranslate nohighlight">\(A\mathbf{x}\)</span> is the discretised convolution
+and every row sums to 1. The matrix is symmetric and Toeplitz. The test signal
+is</p>
+<div class="math notranslate nohighlight">
+\[
+x_j = \exp\!\left(-\tfrac{1}{2}\left(\tfrac{t_j - 0.22}{0.05}\right)^{2}\right)
+      + 0.8\cdot\mathbb{1}\!\left[0.55 &lt; t_j &lt; 0.72\right],
+\]</div>
+<p>a smooth bump beside a sharp box, chosen so that one signal exercises both the
+regime regularization handles well and the regime it handles badly. The data is
+<span class="math notranslate nohighlight">\(\mathbf{b} = A\mathbf{x}_{\text{true}} + \mathbf{e}\)</span> with <span class="math notranslate nohighlight">\(\mathbf{e}\)</span> scaled
+to exactly <span class="math notranslate nohighlight">\(0.1\%\)</span> of <span class="math notranslate nohighlight">\(\|A\mathbf{x}_{\text{true}}\|\)</span>.</p>
+<p><strong>Part a)</strong> Build <code class="docutils literal notranslate"><span class="pre">A_blur</span> <span class="pre">=</span> <span class="pre">la.gaussian_blur(200,</span> <span class="pre">0.03)</span></code>, the grid
+<code class="docutils literal notranslate"><span class="pre">t</span> <span class="pre">=</span> <span class="pre">(np.arange(200)</span> <span class="pre">+</span> <span class="pre">0.5)</span> <span class="pre">/</span> <span class="pre">200</span></code>, the signal <code class="docutils literal notranslate"><span class="pre">x_true</span></code> as written above, and
+<code class="docutils literal notranslate"><span class="pre">b_clean</span> <span class="pre">=</span> <span class="pre">A_blur</span> <span class="pre">&#64;</span> <span class="pre">x_true</span></code>. Draw the noise as
+<code class="docutils literal notranslate"><span class="pre">e</span> <span class="pre">=</span> <span class="pre">rng_blur.standard_normal(200)</span></code>, rescale it with
+<code class="docutils literal notranslate"><span class="pre">e</span> <span class="pre">*=</span> <span class="pre">1e-3</span> <span class="pre">*</span> <span class="pre">np.linalg.norm(b_clean)</span> <span class="pre">/</span> <span class="pre">np.linalg.norm(e)</span></code>, and set
+<code class="docutils literal notranslate"><span class="pre">b_blur</span> <span class="pre">=</span> <span class="pre">b_clean</span> <span class="pre">+</span> <span class="pre">e</span></code>. Confirm <span class="math notranslate nohighlight">\(\|\mathbf{e}\|/\|\mathbf{b}_{\text{clean}}\| =
+10^{-3}\)</span> to <span class="math notranslate nohighlight">\(10^{-12}\)</span>.</p>
+<p><strong>Part b)</strong> Take <code class="docutils literal notranslate"><span class="pre">Ub,</span> <span class="pre">sb,</span> <span class="pre">Vtb</span> <span class="pre">=</span> <span class="pre">np.linalg.svd(A_blur)</span></code> and report how many
+singular values exceed <span class="math notranslate nohighlight">\(\varepsilon\sigma_1\)</span>: about 100 of 200. The rest are
+below the level at which <code class="docutils literal notranslate"><span class="pre">float64</span></code> can distinguish them from zero, so
+<code class="docutils literal notranslate"><span class="pre">np.linalg.cond</span></code> returns a number with no meaning. The <em>exact</em> count is not a
+reproducible quantity and should not be treated as one — the values either side
+of the threshold are themselves rounding error, so a different LAPACK driver
+returns a different count for the same matrix. Confirm only that the count
+falls between 60 and 140, that <code class="docutils literal notranslate"><span class="pre">np.linalg.cond(A_blur)</span></code> exceeds
+<span class="math notranslate nohighlight">\(1/\varepsilon\)</span>, and report <span class="math notranslate nohighlight">\(\sigma_{40}/\sigma_1\)</span>, which <em>is</em> reproducible at
+<span class="math notranslate nohighlight">\(1.5\times10^{-3}\)</span> — the decay is exponential, not algebraic.</p>
+<p><strong>Part c)</strong> Solve it naively with <code class="docutils literal notranslate"><span class="pre">np.linalg.solve(A_blur,</span> <span class="pre">b_blur)</span></code> and report
+the relative error against <code class="docutils literal notranslate"><span class="pre">x_true</span></code>, which comes out near <span class="math notranslate nohighlight">\(3\times10^{15}\)</span>, and
+the norm of the returned vector against <span class="math notranslate nohighlight">\(\|\mathbf{x}_{\text{true}}\| = 6.28\)</span>.
+Then do the same on the <strong>noiseless</strong> data <code class="docutils literal notranslate"><span class="pre">b_clean</span></code>: the error is still <span class="math notranslate nohighlight">\(629\)</span>.
+This is the fact worth pausing on. With no measurement noise at all, the
+rounding error already present in <code class="docutils literal notranslate"><span class="pre">b_clean</span></code> at the <span class="math notranslate nohighlight">\(10^{-16}\)</span> level is enough
+to destroy the answer, because <span class="math notranslate nohighlight">\(1/\sigma_{200} = 8.8\times10^{16}\)</span>.</p>
+<p><strong>Part d)</strong> Test the discrete Picard condition <a class="reference internal" href="#equation-eq-pinv-picard">Eq. 126</a>. Compute
+the ratios <span class="math notranslate nohighlight">\(|\mathbf{u}_i^{\top}\mathbf{b}|/\sigma_i\)</span> for both <code class="docutils literal notranslate"><span class="pre">b_clean</span></code> and
+<code class="docutils literal notranslate"><span class="pre">b_blur</span></code>. Report them across the whole spectrum, but <em>check</em> them only on the
+indices with <span class="math notranslate nohighlight">\(\sigma_i &gt; 10^{-10}\sigma_1\)</span>, where both the singular values and
+the data coefficients are genuine numbers rather than rounding error: the clean
+ratios stay below 5 there while the noisy ratios exceed <span class="math notranslate nohighlight">\(10^{5}\)</span>. Across the
+full resolvable spectrum the separation reaches twelve orders. Report the noise
+floor
+on <span class="math notranslate nohighlight">\(|\mathbf{u}_i^{\top}\mathbf{b}|\)</span> as <code class="docutils literal notranslate"><span class="pre">np.median(coef_noisy[120:])</span></code> and confirm
+it is around <span class="math notranslate nohighlight">\(2\times10^{-4}\)</span>, the same order as
+<span class="math notranslate nohighlight">\(\|\mathbf{e}\|/\sqrt{200} = 4.0\times10^{-4}\)</span>.</p>
+<p><strong>Part e)</strong> Plot the singular values on a log axis together with
+<span class="math notranslate nohighlight">\(|\mathbf{u}_i^{\top}\mathbf{b}|\)</span> for the clean and noisy data, all against
+<span class="math notranslate nohighlight">\(i\)</span>. The crossover — where the noisy coefficients level off onto their floor
+while <span class="math notranslate nohighlight">\(\sigma_i\)</span> keeps falling — is where the solution stops being recoverable,
+and it is visible without knowing <span class="math notranslate nohighlight">\(\mathbf{x}_{\text{true}}\)</span>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>A_blur is (200, 200), symmetric to 0.0e+00, row sums 0.533245 to 1.000000
+noise level |e| / |b_clean| = 1.000000e-03
+
+singular values above eps * sigma_1: 97 of 200
+  sigma_1   = 0.995863
+  sigma_40  / sigma_1 = 1.520e-03
+  sigma_100 / sigma_1 = 1.839e-16  (below eps = 2.22e-16)
+  np.linalg.cond returns 1.534e+18, a number past 1/eps = 4.50e+15 and therefore meaningless
+
+|x_true| = 6.2837
+naive solve on the NOISY data    : rel err = 3.1200e+14, |x| = 1.9605e+15
+naive solve on the NOISELESS data: rel err = 4.6338e+01, |x| = 2.9125e+02
+  1 / sigma_200 = 4.965e+16  &lt;- the amplification applied to the last decimal place
+
+discrete Picard, over the 76 indices with sigma &gt; 1e-10 * sigma_1 (where both quantities are meaningful):
+  max |u^T b_clean| / sigma = 4.0328   (bounded)
+  max |u^T b_noisy| / sigma = 2.4181e+06   (not)
+and over all 97 indices with sigma &gt; eps * sigma_1:
+  max |u^T b_clean| / sigma = 4.0328
+  max |u^T b_noisy| / sigma = 2.0668e+12   &lt;- twelve orders apart
+  noise floor on |u^T b|    = 2.5972e-04, against |e|/sqrt(n) = 4.0392e-04
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-pinv-picard">
+<img alt="../../_images/da2ee6f88f401e6ee03886789f7347fa23af2a72bd72eb85255b383b97b4e63d.png" src="../../_images/da2ee6f88f401e6ee03886789f7347fa23af2a72bd72eb85255b383b97b4e63d.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 47 </span><span class="caption-text">The discrete Picard condition for the <span class="math notranslate nohighlight">\(200\times200\)</span> Gaussian blur operator with <span class="math notranslate nohighlight">\(w=0.03\)</span>. The navy curve is the singular-value spectrum <span class="math notranslate nohighlight">\(\sigma_i\)</span>, decaying exponentially through the dotted line at <span class="math notranslate nohighlight">\(\varepsilon\sigma_1\)</span> below which float64 cannot resolve it. The amber curve is <span class="math notranslate nohighlight">\(|\mathbf{u}_i^{\top}\mathbf{b}|\)</span> for the noiseless data, which decays faster than <span class="math notranslate nohighlight">\(\sigma_i\)</span> across the whole range where <span class="math notranslate nohighlight">\(\sigma_i\)</span> is resolvable; the grey curve is the same quantity for data carrying 0.1% noise, which levels off onto the noise floor near <span class="math notranslate nohighlight">\(3\times10^{-4}\)</span>. Past the crossover the ratio in Eq. 9 explodes and every further SVD term is amplified noise, which is readable from the data alone.</span><a class="headerlink" href="#fig-pinv-picard" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<p>The naive failure is checked on both the noisy and the noiseless data, because
+the second is the stronger statement: the problem is not that the measurement
+was imperfect, it is that inverting <span class="math notranslate nohighlight">\(\sigma \approx 10^{-18}\)</span> turns the last
+bit of any <code class="docutils literal notranslate"><span class="pre">float64</span></code> vector into the dominant term. The Picard check is the
+constructive half, and uses only <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> and <span class="math notranslate nohighlight">\(A\)</span> — never
+<span class="math notranslate nohighlight">\(\mathbf{x}_{\text{true}}\)</span>.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the noise is exactly 0.1% of the clean data in the 2-norm   [got [0.001] vs expected [0.001] (rtol=1e-12, atol=0)]
+✓  roughly half the 200 singular values fall below eps * sigma_1   [97 of 200 above the threshold on this machine (the exact count is a LAPACK-driver detail, since the values either side of it ARE rounding error), and cond = 1.53e+18 exceeds 1/eps = 4.50e+15, so kappa is not a measurable quantity here]
+✓  and the decay is exponential: sigma_40 / sigma_1 = 1.5e-3   [got [0.00152] vs expected [0.00152] (rtol=0.01, atol=0)]
+✓  np.linalg.solve on the noisy data is wrong by more than 12 orders   [relative error 3.120e+14, returning a vector of norm 1.960e+15 for a signal of norm 6.284]
+✓  and it fails on NOISELESS data too: float64 rounding is already enough   [relative error 4.634e+01 with no measurement noise at all, because 1/sigma_200 = 4.97e+16]
+✓  the noiseless data satisfies the discrete Picard condition (Eq. 9)   [max |u^T b| / sigma = 4.0328 over the 76 indices with sigma &gt; 1e-10 * sigma_1]
+✓  the noisy data violates it, over that same range of genuine numbers   [max ratio 2.418e+06 against 4.033 clean: the noise floor 2.60e-04 on |u^T b| stops the decay while sigma keeps falling. Extended to every index above eps * sigma_1 the noisy ratio reaches 2.07e+12, but that far tail is rounding error and is reported rather than gated]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-6-the-repair-and-the-bias-it-is-bought-with">
+<h2>Exercise 6: The repair, and the bias it is bought with<a class="headerlink" href="#exercise-6-the-repair-and-the-bias-it-is-bought-with" title="Link to this heading">#</a></h2>
+<p>Regularization does not solve the problem posed. It solves a nearby problem
+whose answer is stable, and the gap between the two is a <strong>bias</strong> that no
+amount of data removes. That trade is the whole subject, so it is worth
+measuring both halves rather than celebrating the first.</p>
+<p>The signal of Exercise 5 was built with two regions on purpose. On
+<span class="math notranslate nohighlight">\(t &lt; 0.45\)</span> it is a smooth Gaussian bump, exactly the kind of function a penalty
+on <span class="math notranslate nohighlight">\(\|\mathbf{x}\|_2\)</span> treats gently. On <span class="math notranslate nohighlight">\(0.50 &lt; t &lt; 0.80\)</span> it is a box with two
+jump discontinuities, which the same penalty rounds off, because a sharp edge
+needs large high-frequency components and those are precisely what
+<a class="reference internal" href="#equation-eq-pinv-filter">Eq. 124</a> suppresses. One signal, two verdicts.</p>
+<p><strong>Part a)</strong> Sweep <span class="math notranslate nohighlight">\(\lambda\)</span> over <code class="docutils literal notranslate"><span class="pre">np.logspace(-12,</span> <span class="pre">1,</span> <span class="pre">261)</span></code>, computing
+<span class="math notranslate nohighlight">\(\mathbf{x}_\lambda\)</span> by the filter form <a class="reference internal" href="#equation-eq-pinv-filter">Eq. 124</a> from <code class="docutils literal notranslate"><span class="pre">Ub,</span> <span class="pre">sb,</span> <span class="pre">Vtb</span></code>
+— never the matrix form, whose <span class="math notranslate nohighlight">\(A^{\top}A\)</span> would square an already meaningless
+condition number. Record <code class="docutils literal notranslate"><span class="pre">relative_error(x_lam,</span> <span class="pre">x_true)</span></code> for each, and report
+the best <span class="math notranslate nohighlight">\(\lambda\)</span> and the error there. The minimum is near
+<span class="math notranslate nohighlight">\(\lambda = 2\times10^{-5}\)</span> with a relative error of <span class="math notranslate nohighlight">\(0.136\)</span>.</p>
+<p><strong>Part b)</strong> Report the improvement factor over the naive solve of Exercise 5,
+which exceeds <span class="math notranslate nohighlight">\(10^{16}\)</span>, and confirm it is at least <span class="math notranslate nohighlight">\(10^{6}\)</span>.</p>
+<p><strong>Part c)</strong> Split the error by region. Using the masks <code class="docutils literal notranslate"><span class="pre">t</span> <span class="pre">&lt;</span> <span class="pre">0.45</span></code> and
+<code class="docutils literal notranslate"><span class="pre">(t</span> <span class="pre">&gt;</span> <span class="pre">0.50)</span> <span class="pre">&amp;</span> <span class="pre">(t</span> <span class="pre">&lt;</span> <span class="pre">0.80)</span></code>, report the relative error of the best
+<span class="math notranslate nohighlight">\(\mathbf{x}_\lambda\)</span> separately on each. The smooth region comes out at
+<span class="math notranslate nohighlight">\(0.013\)</span> and the box region at <span class="math notranslate nohighlight">\(0.182\)</span>, a factor of 14. Confirm the smooth
+region is below <span class="math notranslate nohighlight">\(0.06\)</span> and that the box region is at least 3 times worse. The
+aggregate <span class="math notranslate nohighlight">\(0.136\)</span> is not a uniform 13.6% error: it is 1.3% where the signal is
+smooth and 18% where it is not, and quoting only the aggregate would hide
+which of those two the method is responsible for.</p>
+<p><strong>Part d)</strong> Sweep the truncation parameter <span class="math notranslate nohighlight">\(k\)</span> from 1 to 200 using
+<a class="reference internal" href="#equation-eq-pinv-tsvd">Eq. 122</a>, and report the best <span class="math notranslate nohighlight">\(k\)</span> and its error. It lands at
+<span class="math notranslate nohighlight">\(k = 39\)</span> with an error within 1% of the best Tikhonov error — the two filters
+do equally well, as <a class="reference internal" href="#equation-eq-pinv-filter">Eq. 124</a> suggests they should. Confirm the best
+<span class="math notranslate nohighlight">\(k\)</span> falls where <span class="math notranslate nohighlight">\(\sigma_k\)</span> is comparable to the noise level <span class="math notranslate nohighlight">\(10^{-3}\sigma_1\)</span>:
+<span class="math notranslate nohighlight">\(\sigma_{39}/\sigma_1 = 2.1\times10^{-3}\)</span>, so the truncation stops precisely
+where the data stops carrying signal, which is what Exercise 5 predicted from
+the Picard plot alone.</p>
+<p><strong>Part e)</strong> Plot the reconstruction at three values of <span class="math notranslate nohighlight">\(\lambda\)</span> — one far too
+small (<span class="math notranslate nohighlight">\(10^{-12}\)</span>), the best one, and one far too large (<span class="math notranslate nohighlight">\(10^{-1}\)</span>) — against
+<code class="docutils literal notranslate"><span class="pre">x_true</span></code> and against the blurred data <code class="docutils literal notranslate"><span class="pre">b_blur</span></code>, on one figure. Confirm from the
+numbers that the too-small <span class="math notranslate nohighlight">\(\lambda\)</span> has <span class="math notranslate nohighlight">\(\|\mathbf{x}_\lambda\| &gt;
+10\,\|\mathbf{x}_{\text{true}}\|\)</span> (noise amplification: it comes out 73 times
+larger) while the too-large one has <span class="math notranslate nohighlight">\(\|\mathbf{x}_\lambda\| &lt;
+\|\mathbf{x}_{\text{true}}\|\)</span> (over-smoothing).</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>best lambda over the sweep : 2.2387e-05
+  relative error           : 0.1362
+  naive relative error     : 3.1200e+14
+  improvement factor       : 2.2907e+15
+
+the same reconstruction, split by region:
+  smooth bump, t &lt; 0.45      : 0.0132
+  box, 0.50 &lt; t &lt; 0.80       : 0.1823   (13.79 times worse)
+  the aggregate 0.1362 is an average of two very different regimes
+
+best truncation k = 39, relative error 0.1354
+  sigma_39 / sigma_1 = 2.082e-03, against the noise level 1e-3
+  Tikhonov 0.1362 against truncation 0.1354: the two filters do equally well
+
+      lambda      |x_lam|      rel err
+    1.00e-12     457.2221      72.7547   too small
+    2.24e-05       6.2200       0.1362   best
+    1.00e-01       5.4829       0.2185   too large
+                   6.2837                |x_true|
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-pinv-deblur">
+<img alt="../../_images/e015a17543bcd3c902490721671af200d5ab512755a7fdfd7c77c73ef7687ee8.png" src="../../_images/e015a17543bcd3c902490721671af200d5ab512755a7fdfd7c77c73ef7687ee8.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 48 </span><span class="caption-text">Deblurring the 200-point signal. Left: the true signal (navy) and the blurred, 0.1%-noisy data actually available (grey), showing how much structure the forward map destroyed. Centre: the reconstruction at <span class="math notranslate nohighlight">\(\lambda = 10^{-12}\)</span>, on its own vertical scale because it oscillates between <span class="math notranslate nohighlight">\(-66\)</span> and <span class="math notranslate nohighlight">\(+88\)</span> – amplified noise, and the reason the naive solve of Exercise 5 fails. Right: the sweep’s best <span class="math notranslate nohighlight">\(\lambda = 2.2\times10^{-5}\)</span> (amber) and an over-smoothed <span class="math notranslate nohighlight">\(\lambda = 10^{-1}\)</span> (dotted navy) against the true signal (navy). The best reconstruction recovers the smooth bump to 1.3% and rounds the box’s corners at 18%, which is the bias regularization is bought with.</span><a class="headerlink" href="#fig-pinv-deblur" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-6">
+<h3>Validation 6<a class="headerlink" href="#validation-6" title="Link to this heading">#</a></h3>
+<p>The headline improvement is checked, but so is the bias: a notebook that
+reported only the <span class="math notranslate nohighlight">\(10^{16}\)</span> gain would be selling the method rather than
+teaching it. The regional split is the honest form of the result.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  regularization beats the naive solve by more than six orders (Eq. 7)   [relative error 0.1362 at lambda = 2.239e-05 against 3.120e+14 naive: a factor of 2.291e+15]
+✓  on the smooth part of the signal the reconstruction is good   [relative error 0.0132 for t &lt; 0.45]
+✓  but the box&#39;s edges are rounded off: that bias is what was bought   [0.1823 on 0.50 &lt; t &lt; 0.80 against 0.0132 on the smooth region, a factor of 13.79; a penalty on |x| suppresses exactly the high-frequency components a jump needs]
+✓  truncation at its best k does as well as Tikhonov at its best lambda   [got [0.13541] vs expected [0.1362] (rtol=0.06, atol=0)]
+✓  and the best truncation stops where sigma_k meets the noise level   [sigma_39 / sigma_1 = 2.082e-03 against a noise level of 1e-3: the Picard plot of Exercise 5 located this without x_true]
+✓  and the two failure modes are visible in the norm alone   [|x| = 457.2221 at lambda = 1e-12 (noise amplified, 73 times too large) and 5.4829 at lambda = 1e-1 (over-smoothed), against |x_true| = 6.2837]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-7-choosing-lambda-without-the-answer-key">
+<h2>Exercise 7: Choosing <span class="math notranslate nohighlight">\(\lambda\)</span> without the answer key<a class="headerlink" href="#exercise-7-choosing-lambda-without-the-answer-key" title="Link to this heading">#</a></h2>
+<p>Exercise 6 chose <span class="math notranslate nohighlight">\(\lambda\)</span> by minimising the error against
+<span class="math notranslate nohighlight">\(\mathbf{x}_{\text{true}}\)</span>, which is cheating: if <span class="math notranslate nohighlight">\(\mathbf{x}_{\text{true}}\)</span>
+were available there would be nothing to compute. That sweep produced an
+<em>oracle</em> <span class="math notranslate nohighlight">\(\lambda\)</span>, useful only as a yardstick. A usable method must read
+<span class="math notranslate nohighlight">\(\lambda\)</span> off <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> alone.</p>
+<p>Two such methods are standard. The <strong>L-curve</strong> plots
+<span class="math notranslate nohighlight">\(\log\|\mathbf{x}_\lambda\|\)</span> against
+<span class="math notranslate nohighlight">\(\log\|A\mathbf{x}_\lambda - \mathbf{b}\|\)</span>; the curve turns sharply where
+further reduction of the residual starts costing a great deal of solution norm,
+and that corner is the estimate. Its curvature, for a curve given
+parametrically as <span class="math notranslate nohighlight">\((u(\lambda), v(\lambda))\)</span>, is</p>
+<div class="math notranslate nohighlight" id="equation-eq-pinv-curvature">
+<span class="eqno">(128)<a class="headerlink" href="#equation-eq-pinv-curvature" title="Link to this equation">#</a></span>\[\kappa_{\text{L}} = \frac{u'v'' - v'u''}{\left(u'^2 + v'^2\right)^{3/2}} ,\]</div>
+<p>computed here by central differences with <code class="docutils literal notranslate"><span class="pre">np.gradient</span></code>. The <strong>discrepancy
+principle</strong> instead uses a known noise level <span class="math notranslate nohighlight">\(\delta = \|\mathbf{e}\|\)</span> and
+picks the <span class="math notranslate nohighlight">\(\lambda\)</span> whose residual matches it, on the argument that driving the
+residual below the noise means fitting the noise.</p>
+<p>The honest test of either is not whether it recovers the oracle <span class="math notranslate nohighlight">\(\lambda\)</span> — it
+will not — but whether the <span class="math notranslate nohighlight">\(\lambda\)</span> it does return gives an error close to the
+oracle’s.</p>
+<p><strong>Part a)</strong> For each <span class="math notranslate nohighlight">\(\lambda\)</span> in the sweep of Exercise 6, compute
+<span class="math notranslate nohighlight">\(\|A\mathbf{x}_\lambda - \mathbf{b}\|_2\)</span> and <span class="math notranslate nohighlight">\(\|\mathbf{x}_\lambda\|_2\)</span> with
+<code class="docutils literal notranslate"><span class="pre">np.linalg.norm</span></code>, take <code class="docutils literal notranslate"><span class="pre">np.log</span></code> of both, and plot the L-curve. Confirm with
+<code class="docutils literal notranslate"><span class="pre">np.diff</span></code> that the residual increases monotonically with <span class="math notranslate nohighlight">\(\lambda\)</span> and the
+solution norm decreases monotonically: the curve is traversed in one
+direction, which is what makes a corner meaningful.</p>
+<p><strong>Part b)</strong> Locate the corner. With <code class="docutils literal notranslate"><span class="pre">u</span> <span class="pre">=</span> <span class="pre">np.log(res)</span></code> and <code class="docutils literal notranslate"><span class="pre">v</span> <span class="pre">=</span> <span class="pre">np.log(sol)</span></code>,
+apply <code class="docutils literal notranslate"><span class="pre">np.gradient</span></code> twice to each, evaluate <a class="reference internal" href="#equation-eq-pinv-curvature">Eq. 128</a>, and take
+<code class="docutils literal notranslate"><span class="pre">np.nanargmax</span></code>. Report the corner’s <span class="math notranslate nohighlight">\(\lambda\)</span>, and the relative error of
+<span class="math notranslate nohighlight">\(\mathbf{x}_\lambda\)</span> there against <code class="docutils literal notranslate"><span class="pre">x_true</span></code>.</p>
+<p><strong>Part c)</strong> Compare against the oracle. Report the ratio of the corner’s error
+to the oracle’s error, and separately the gap in <span class="math notranslate nohighlight">\(\log_{10}\lambda\)</span>. The corner
+lands <span class="math notranslate nohighlight">\(1.4\)</span> decades below the oracle <span class="math notranslate nohighlight">\(\lambda\)</span> and costs <span class="math notranslate nohighlight">\(17\%\)</span> more error.
+Confirm the error ratio is below <span class="math notranslate nohighlight">\(1.6\)</span>.</p>
+<p><strong>Part d)</strong> Apply the discrepancy principle. With <span class="math notranslate nohighlight">\(\delta = \|\mathbf{e}\|_2\)</span>
+known, find the sweep index with <code class="docutils literal notranslate"><span class="pre">np.argmin(np.abs(res_sweep</span> <span class="pre">-</span> <span class="pre">delta))</span></code>, which
+minimises <span class="math notranslate nohighlight">\(\bigl|\|A\mathbf{x}_\lambda - \mathbf{b}\|_2 - \delta\bigr|\)</span>; report its
+<span class="math notranslate nohighlight">\(\lambda\)</span> and error, and confirm its residual matches <span class="math notranslate nohighlight">\(\delta\)</span> to <span class="math notranslate nohighlight">\(12\%\)</span> — the
+<span class="math notranslate nohighlight">\(\lambda\)</span> grid steps by a factor of <span class="math notranslate nohighlight">\(1.12\)</span>, so the nearest grid point can miss
+the exact level by several per cent — and its
+error ratio is below <span class="math notranslate nohighlight">\(1.6\)</span> as well. It lands <span class="math notranslate nohighlight">\(0.6\)</span> decades <em>above</em> the oracle
+and costs only <span class="math notranslate nohighlight">\(1.2\%\)</span>.</p>
+<p>The two estimates therefore disagree with each other about <span class="math notranslate nohighlight">\(\lambda\)</span> by two
+full decades while disagreeing about the error by 16%. That is the practical
+content of this exercise: the error surface is flat near its minimum, so a
+parameter-choice rule does not have to find <span class="math notranslate nohighlight">\(\lambda\)</span> accurately to be useful,
+and reporting how well it recovered <span class="math notranslate nohighlight">\(\lambda\)</span> would badly misstate how well it
+performed. Confirm the two <span class="math notranslate nohighlight">\(\lambda\)</span> differ by more than one decade while both
+error ratios stay under <span class="math notranslate nohighlight">\(1.6\)</span>.</p>
+<p><strong>Part e)</strong> Plot the L-curve on log-log axes with the corner, the oracle
+<span class="math notranslate nohighlight">\(\lambda\)</span>, and the discrepancy <span class="math notranslate nohighlight">\(\lambda\)</span> all marked, so the flatness of the
+error near the minimum is visible as the three markers sitting close together
+on the curve’s elbow.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>residual increases with lambda: True
+solution norm decreases with lambda: True
+
+method                         lambda    rel err   / oracle
+oracle (uses x_true)       2.2387e-05     0.1362     1.0000
+L-curve corner             8.9125e-07     0.1590     1.1677
+discrepancy principle      8.9125e-05     0.1379     1.0122
+
+log10 lambda gaps against the oracle: corner -1.400, discrepancy +0.600 decades
+the two estimates differ from EACH OTHER by 2.000 decades in lambda and 15.6% in error
+residual at the discrepancy lambda: 5.68664e-03 against delta = |e| = 5.71234e-03
+
+the error surface is flat near its minimum, so a parameter-choice rule need not find lambda accurately to be useful
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-pinv-lcurve">
+<img alt="../../_images/907413bb28b86f276f0246ccc17d029ae2aef5eb12358b66ca5ca90043fb79ff.png" src="../../_images/907413bb28b86f276f0246ccc17d029ae2aef5eb12358b66ca5ca90043fb79ff.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 49 </span><span class="caption-text">Choosing <span class="math notranslate nohighlight">\(\lambda\)</span> for the deblurring problem. Left: the L-curve, solution norm <span class="math notranslate nohighlight">\(\|\mathbf{x}_\lambda\|_2\)</span> against residual norm <span class="math notranslate nohighlight">\(\|A\mathbf{x}_\lambda - \mathbf{b}\|_2\)</span> on log-log axes as <span class="math notranslate nohighlight">\(\lambda\)</span> sweeps 261 values from <span class="math notranslate nohighlight">\(10^{-12}\)</span> to <span class="math notranslate nohighlight">\(10\)</span>; the vertical branch is noise amplification and the horizontal branch over-smoothing, and the corner of maximum curvature from Eq. 10 is marked. Right: the relative error against the unavailable true signal, as a function of the same <span class="math notranslate nohighlight">\(\lambda\)</span>, with three choices marked – the L-curve corner (navy), the discrepancy principle (grey), and the oracle minimum (amber). The two data-driven rules disagree about <span class="math notranslate nohighlight">\(\lambda\)</span> by two decades and about the error by 16%, because the minimum is flat over more than three decades of <span class="math notranslate nohighlight">\(\lambda\)</span>.</span><a class="headerlink" href="#fig-pinv-lcurve" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-7">
+<h3>Validation 7<a class="headerlink" href="#validation-7" title="Link to this heading">#</a></h3>
+<p>The gate is on the <em>error</em> the parameter choice delivers, not on the parameter
+itself. Gating on <span class="math notranslate nohighlight">\(\lambda\)</span> would fail a method that is working perfectly well,
+since the whole finding here is that <span class="math notranslate nohighlight">\(\lambda\)</span> is poorly determined while the
+error is not.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the L-curve is traversed monotonically, so its corner is well defined   [residual rises and solution norm falls across all 261 values of lambda]
+✓  the L-curve corner, using only A and b, lands near the oracle&#39;s error   [error 0.1590 at lambda = 8.913e-07 against the oracle&#39;s 0.1362 at 2.239e-05: a ratio of 1.1677]
+✓  and so does the discrepancy principle, from the noise level alone   [error 0.1379 at lambda = 8.913e-05, a ratio of 1.0122]
+✓  the discrepancy choice does match the residual to the noise level   [got [0.00569] vs expected [0.00571] (rtol=0.12, atol=0)]
+✓  even though the two rules disagree about lambda by more than a decade   [corner 8.913e-07 against discrepancy 8.913e-05, a gap of 2.000 decades, for errors differing by only 15.6%: the error surface is flat near its minimum, so recovering lambda is not the goal]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-8-changing-the-penalty-ell-1-and-why-it-gives-exact-zeros">
+<h2>Exercise 8: Changing the penalty: <span class="math notranslate nohighlight">\(\ell^1\)</span>, and why it gives exact zeros<a class="headerlink" href="#exercise-8-changing-the-penalty-ell-1-and-why-it-gives-exact-zeros" title="Link to this heading">#</a></h2>
+<p>Every method so far penalised <span class="math notranslate nohighlight">\(\|\mathbf{x}\|_2^2\)</span>, and every solution it
+returned had all <span class="math notranslate nohighlight">\(n\)</span> entries nonzero. That is not an accident of the examples.
+<a class="reference internal" href="#equation-eq-pinv-filter">Eq. 124</a> multiplies each SVD coefficient by a factor strictly
+between 0 and 1, so nothing is ever set exactly to zero. Ridge <em>shrinks</em>; it
+does not <em>select</em>.</p>
+<p>Replacing the penalty with <span class="math notranslate nohighlight">\(\|\mathbf{x}\|_1\)</span> changes that completely.
+<a class="reference internal" href="../00-machine/vectors-norms-inner-products.html"><span class="std std-doc">§0.3</span></a> drew the <span class="math notranslate nohighlight">\(\ell^1\)</span> unit
+ball as a diamond, and the diamond’s corners are exactly the points where
+coordinates vanish. Minimising subject to a linear constraint means inflating
+the ball until it first touches the solution set, and a diamond touches
+a generic line at a corner while a circle touches at a smooth point.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-pinv-l1ball">
+<img alt="../../_images/ea0dc0b7ebad469b62a1e0c7c1c1e5e28aacf56153624f3d5573edac5f4669a0.png" src="../../_images/ea0dc0b7ebad469b62a1e0c7c1c1e5e28aacf56153624f3d5573edac5f4669a0.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 50 </span><span class="caption-text">Why the <span class="math notranslate nohighlight">\(1\)</span>-norm produces exact zeros, in two dimensions. The dashed line is the solution set of <span class="math notranslate nohighlight">\(2x_1 + x_2 = 2\)</span>. The amber circle is the smallest <span class="math notranslate nohighlight">\(\ell^2\)</span> ball reaching it, touching at the smooth point <span class="math notranslate nohighlight">\((0.8,\,0.4)\)</span> with both coordinates nonzero; the navy diamond is the smallest <span class="math notranslate nohighlight">\(\ell^1\)</span> ball reaching it, touching at the corner <span class="math notranslate nohighlight">\((1,\,0)\)</span>, where the second coordinate is exactly zero. The corners of the <span class="math notranslate nohighlight">\(\ell^1\)</span> ball lie on the coordinate axes, so a generic constraint meets it at a sparse point. The axis stubs mark the origin.</span><a class="headerlink" href="#fig-pinv-l1ball" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<p><a class="reference internal" href="#equation-eq-pinv-lasso">Eq. 127</a> has no closed form, but it has a clean iteration. The
+<strong>soft-thresholding</strong> operator</p>
+<div class="math notranslate nohighlight" id="equation-eq-pinv-soft">
+<span class="eqno">(129)<a class="headerlink" href="#equation-eq-pinv-soft" title="Link to this equation">#</a></span>\[S_\tau(v) = \operatorname{sign}(v)\max(|v| - \tau,\, 0)\]</div>
+<p>is the exact minimiser of <span class="math notranslate nohighlight">\(\tfrac{1}{2}(z - v)^2 + \tau|z|\)</span> over <span class="math notranslate nohighlight">\(z\)</span>, and
+<strong>ISTA</strong> (iterative shrinkage-thresholding) alternates a gradient step on the
+smooth part with one application of it:</p>
+<div class="math notranslate nohighlight" id="equation-eq-pinv-ista">
+<span class="eqno">(130)<a class="headerlink" href="#equation-eq-pinv-ista" title="Link to this equation">#</a></span>\[\mathbf{x}^{(j+1)} = S_{\lambda/L}\!\left(
+  \mathbf{x}^{(j)} + \tfrac{1}{L}A^{\top}
+  \bigl(\mathbf{b} - A\mathbf{x}^{(j)}\bigr)\right),
+\qquad L = \|A\|_2^2 .\]</div>
+<p>Convergence is guaranteed for any step size <span class="math notranslate nohighlight">\(1/L\)</span> with <span class="math notranslate nohighlight">\(L \ge \|A\|_2^2\)</span>
+<span class="bibtex-citation" id="id8">[<a class="reference internal" href="#id63" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183–202, 2009. doi:10.1137/080716542.">BT09</a>]</span>. The optimality condition for <a class="reference internal" href="#equation-eq-pinv-lasso">Eq. 127</a> is a
+subgradient statement, and it is exact, which makes it the ideal validation:
+writing <span class="math notranslate nohighlight">\(\mathbf{g} = A^{\top}(\mathbf{b} - A\mathbf{x})\)</span>,</p>
+<div class="math notranslate nohighlight" id="equation-eq-pinv-kkt">
+<span class="eqno">(131)<a class="headerlink" href="#equation-eq-pinv-kkt" title="Link to this equation">#</a></span>\[g_i = \lambda\operatorname{sign}(x_i) \;\text{ where } x_i \ne 0,
+\qquad |g_i| \le \lambda \;\text{ where } x_i = 0 .\]</div>
+<p>The test problem is a sparse recovery in the compressed-sensing regime: an
+<span class="math notranslate nohighlight">\(80\times200\)</span> matrix <code class="docutils literal notranslate"><span class="pre">A_sp</span> <span class="pre">=</span> <span class="pre">rng_sp.standard_normal((80,</span> <span class="pre">200))</span> <span class="pre">/</span> <span class="pre">np.sqrt(80)</span></code>
+with <code class="docutils literal notranslate"><span class="pre">rng_sp</span> <span class="pre">=</span> <span class="pre">np.random.default_rng(1)</span></code>, a true signal with exactly 6 nonzeros
+at positions <code class="docutils literal notranslate"><span class="pre">rng_sp.choice(200,</span> <span class="pre">size=6,</span> <span class="pre">replace=False)</span></code> and values
+<code class="docutils literal notranslate"><span class="pre">rng_sp.uniform(1.0,</span> <span class="pre">3.0,</span> <span class="pre">6)</span> <span class="pre">*</span> <span class="pre">rng_sp.choice([-1.0,</span> <span class="pre">1.0],</span> <span class="pre">6)</span></code>, and data
+<code class="docutils literal notranslate"><span class="pre">b_sp</span> <span class="pre">=</span> <span class="pre">A_sp</span> <span class="pre">&#64;</span> <span class="pre">x_sparse</span> <span class="pre">+</span> <span class="pre">1e-3</span> <span class="pre">*</span> <span class="pre">rng_sp.standard_normal(80)</span></code>. The system is
+underdetermined by 120, so without a prior there is no hope; with the right
+prior there is.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">soft(v,</span> <span class="pre">tau)</span></code> implementing <a class="reference internal" href="#equation-eq-pinv-soft">Eq. 129</a> with
+<code class="docutils literal notranslate"><span class="pre">np.sign</span></code> and <code class="docutils literal notranslate"><span class="pre">np.maximum</span></code>, and verify it exactly rather than by eye. For 2000
+values <code class="docutils literal notranslate"><span class="pre">v</span> <span class="pre">=</span> <span class="pre">np.random.default_rng(3).standard_normal(2000)</span> <span class="pre">*</span> <span class="pre">3</span></code> and
+<span class="math notranslate nohighlight">\(\tau = 0.7\)</span>, confirm that where <span class="math notranslate nohighlight">\(z = S_\tau(v) \ne 0\)</span> the stationarity
+condition <span class="math notranslate nohighlight">\(z - v + \tau\operatorname{sign}(z) = 0\)</span> holds to <span class="math notranslate nohighlight">\(10^{-15}\)</span>, and
+that where <span class="math notranslate nohighlight">\(z = 0\)</span> one has <span class="math notranslate nohighlight">\(|v| \le \tau\)</span>.</p>
+<p><strong>Part b)</strong> Write <code class="docutils literal notranslate"><span class="pre">ista(A,</span> <span class="pre">b,</span> <span class="pre">lam,</span> <span class="pre">n_iter=2000)</span></code> implementing
+<a class="reference internal" href="#equation-eq-pinv-ista">Eq. 130</a>, starting from <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">=</span> <span class="pre">np.zeros(A.shape[1])</span></code> and using
+<code class="docutils literal notranslate"><span class="pre">L</span> <span class="pre">=</span> <span class="pre">np.linalg.norm(A,</span> <span class="pre">2)</span> <span class="pre">**</span> <span class="pre">2</span></code>. Return the final iterate. Confirm 2000
+iterations suffice by comparing against a 20000-iteration run at
+<span class="math notranslate nohighlight">\(\lambda = 0.05\)</span>: the two should agree to <span class="math notranslate nohighlight">\(10^{-12}\)</span>.</p>
+<p><strong>Write this one yourself</strong> — the implementation is the lesson.</p>
+<p><strong>Part c)</strong> Run it for <span class="math notranslate nohighlight">\(\lambda \in \{0.5, 0.2, 0.1, 0.05, 0.02, 0.01,
+0.005\}\)</span>. For each, report the number of entries with <span class="math notranslate nohighlight">\(|x_i| &gt; 10^{-10}\)</span>,
+whether that support equals the true support exactly, and the relative error.
+The first five values all recover the support <strong>exactly</strong> — 6 nonzeros in the
+right 6 of 200 positions — while <span class="math notranslate nohighlight">\(\lambda \le 0.01\)</span> starts admitting spurious
+entries.</p>
+<p><strong>Part d)</strong> Compare against <span class="math notranslate nohighlight">\(\ell^2\)</span> at the same <span class="math notranslate nohighlight">\(\lambda = 0.05\)</span>. Compute the
+ridge solution <code class="docutils literal notranslate"><span class="pre">np.linalg.solve(A_sp.T</span> <span class="pre">&#64;</span> <span class="pre">A_sp</span> <span class="pre">+</span> <span class="pre">0.05</span> <span class="pre">*</span> <span class="pre">np.eye(200),</span> <span class="pre">A_sp.T</span> <span class="pre">&#64;</span> <span class="pre">b_sp)</span></code> and the minimum-norm solution <code class="docutils literal notranslate"><span class="pre">np.linalg.pinv(A_sp)</span> <span class="pre">&#64;</span> <span class="pre">b_sp</span></code>. Report the
+number of nonzero entries of each (200 in both cases), the smallest absolute
+entry of the ridge solution (about <span class="math notranslate nohighlight">\(4\times10^{-3}\)</span> — small, but not zero), the
+relative error of each (about 0.785), and the fraction of each solution’s norm
+sitting <em>off</em> the true support. For <span class="math notranslate nohighlight">\(\ell^1\)</span> that fraction is exactly 0; for
+ridge it is about 0.78, so nearly four fifths of the <span class="math notranslate nohighlight">\(\ell^2\)</span> answer is in the
+wrong places.</p>
+<p><strong>Part e)</strong> Verify optimality with <a class="reference internal" href="#equation-eq-pinv-kkt">Eq. 131</a> at <span class="math notranslate nohighlight">\(\lambda = 0.05\)</span>.
+Compute <span class="math notranslate nohighlight">\(\mathbf{g} = A^{\top}(\mathbf{b} - A\mathbf{x})\)</span> and check that
+<span class="math notranslate nohighlight">\(|g_i - \lambda\operatorname{sign}(x_i)| &lt; 10^{-12}\)</span> on the support and that
+<span class="math notranslate nohighlight">\(\max_{i \notin \text{supp}}|g_i|/\lambda \le 1\)</span>. This is an exact
+characterisation of the minimiser, so it confirms ISTA converged to the true
+solution of <a class="reference internal" href="#equation-eq-pinv-lasso">Eq. 127</a> and not merely to somewhere quiet.</p>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p>ISTA converges at rate <span class="math notranslate nohighlight">\(O(1/j)\)</span>; FISTA <span class="bibtex-citation" id="id9">[<a class="reference internal" href="#id63" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183–202, 2009. doi:10.1137/080716542.">BT09</a>]</span> reaches <span class="math notranslate nohighlight">\(O(1/j^2)\)</span> by
+extrapolating each iterate along the line through the previous two, at
+essentially no extra cost per step. Ask your assistant to write <code class="docutils literal notranslate"><span class="pre">fista(A,</span> <span class="pre">b,</span> <span class="pre">lam,</span> <span class="pre">n_iter)</span></code> with the momentum sequence <span class="math notranslate nohighlight">\(t_{j+1} = (1 + \sqrt{1 + 4t_j^2})/2\)</span>.
+Then check it yourself, and check it against the mathematics rather than
+against ISTA’s output: run it at <span class="math notranslate nohighlight">\(\lambda = 0.05\)</span> and verify the KKT conditions
+<a class="reference internal" href="#equation-eq-pinv-kkt">Eq. 131</a> hold for <em>its</em> iterate to <span class="math notranslate nohighlight">\(10^{-12}\)</span> on the support and
+<span class="math notranslate nohighlight">\(|g_i| \le \lambda\)</span> off it. Both algorithms minimise the same convex function,
+so both must satisfy the same exact condition — and how many iterations each
+needs to get there is then a fair comparison. The check is yours.</p>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>A_sp is (80, 200): underdetermined by 120 dimensions
+true support [ 14  36  81  97 112 142] with values [-2.8    -2.7735  2.2159  2.8716  1.5147 -2.1105]
+
+soft-thresholding, on 2000 values with tau = 0.7:
+  where z != 0, |z - v + tau sign(z)| &lt;= 6.661e-16
+  where z == 0, max |v| = 0.696979 &lt;= tau = 0.7
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2000 iterations against 20000: 0.000e+00
+
+  lambda  nonzeros  support exact    rel err
+   0.500         6           True    0.22043
+   0.200         6           True    0.08801
+   0.100         6           True    0.04387
+   0.050         6           True    0.02180
+   0.020         6           True    0.00856
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>   0.010         7          False    0.00416
+   0.005         9          False    0.00211
+
+at lambda = 0.05, three penalties on the same data:
+                    nonzeros   rel err  min |entry|  mass off support
+l1 (ISTA)                  6   0.02180    0.000e+00            0.0000
+l2 (ridge)               200   0.78537    4.356e-03            0.7845
+min-norm (A+)            200   0.78506    1.343e-03            0.7843
+
+KKT conditions (Eq. 14) at lambda = 0.05:
+  on the support : max |g_i - lambda sign(x_i)| = 2.331e-15
+  off it         : max |g_i| / lambda = 0.955300  (must be &lt;= 1)
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-8">
+<h3>Validation 8<a class="headerlink" href="#validation-8" title="Link to this heading">#</a></h3>
+<p>Sparsity is checked as an exact count of exact zeros, not as “small entries”,
+because the distinction is the entire point of the exercise. Optimality is
+checked by the KKT conditions <a class="reference internal" href="#equation-eq-pinv-kkt">Eq. 131</a>, which characterise the
+minimiser exactly, rather than by watching the objective stop changing.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  soft-thresholding is the exact minimiser of (z-v)^2/2 + tau|z| (Eq. 12)   [stationarity holds to 6.66e-16 where z != 0, and every v with z = 0 satisfies |v| = 0.6970 &lt;= tau = 0.7]
+✓  2000 ISTA iterations have converged (against 20000) (Eq. 13)   [max|Δ| = 0 (rtol=0, atol=1e-12)]
+✓  l1 recovers the exact 6-element support of 200 for every lambda &gt;= 0.02   [support sizes [6, 6, 6, 6, 6] at lambda [0.5, 0.2, 0.1, 0.05, 0.02], each equal to the true support]
+✓  while l2 sets nothing to zero: all 200 entries survive (Eq. 7)   [the smallest ridge entry is 4.356e-03 — small, but not zero; the filter factors are strictly between 0 and 1, so they shrink without selecting]
+✓  and the l2 answer puts most of its mass in the wrong places   [0.7845 of the ridge solution&#39;s norm lies off the true support, against exactly 0.0e+00 for l1]
+✓  and the ISTA iterate satisfies the exact KKT conditions (Eq. 14)   [max |g - lambda sign(x)| = 2.33e-15 on the support and max |g|/lambda = 0.955300 off it: this is the true lasso minimiser, not merely a converged-looking iterate]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p><strong>The pseudoinverse exists for every matrix, and is pinned down by four
+conditions.</strong> Built from the SVD as <span class="math notranslate nohighlight">\(A^{+} = V\Sigma^{+}U^{\top}\)</span>
+<a class="reference internal" href="#equation-eq-pinv-svd">Eq. 118</a> — inverting what is above a cut-off and zeroing what is below
+— it satisfied all four Moore–Penrose conditions <a class="reference internal" href="#equation-eq-pinv-mp">Eq. 119</a> to
+<span class="math notranslate nohighlight">\(4\times10^{-15}\)</span> and agreed with <code class="docutils literal notranslate"><span class="pre">np.linalg.pinv</span></code> to <span class="math notranslate nohighlight">\(10^{-16}\)</span>. Its two
+products are the orthogonal projectors of <a class="reference internal" href="#equation-eq-pinv-projectors">Eq. 120</a>, with traces
+equal to the rank 3 to twelve digits, and <span class="math notranslate nohighlight">\(\max|AA^{+} - I| = 0.420\)</span>: emphatically
+not an inverse.</p>
+<p><strong>It is discontinuous, and <code class="docutils literal notranslate"><span class="pre">rcond</span></code> is where that is decided.</strong> Adding <span class="math notranslate nohighlight">\(10^{-12}\)</span>
+to one entry of the rank-3 matrix moved <span class="math notranslate nohighlight">\(\|A^{+}\|_2\)</span> from <span class="math notranslate nohighlight">\(0.860\)</span> to
+<span class="math notranslate nohighlight">\(5.35\times10^{12}\)</span>, a factor of <span class="math notranslate nohighlight">\(6\times10^{12}\)</span>, exactly as <span class="math notranslate nohighlight">\(\sigma_4\)</span> crossed
+the default cut-off <span class="math notranslate nohighlight">\(10^{-15}\sigma_1 = 1.0\times10^{-14}\)</span>. With <code class="docutils literal notranslate"><span class="pre">rcond=1e-10</span></code>
+pinned, the same perturbations changed the answer by nothing at all.</p>
+<p><strong>When the answer is not unique, <span class="math notranslate nohighlight">\(A^{+}\)</span> picks the shortest one.</strong> On a
+<span class="math notranslate nohighlight">\(3\times6\)</span> system with a 3-dimensional null space, <span class="math notranslate nohighlight">\(A^{+}\mathbf{b}\)</span> had norm
+<span class="math notranslate nohighlight">\(2.0217\)</span> and was shorter than all <span class="math notranslate nohighlight">\(10^{4}\)</span> randomly generated exact solutions,
+with Pythagoras holding to <span class="math notranslate nohighlight">\(10^{-13}\)</span> on every one. The normal equations on the
+same system did not raise: they returned an equally valid but strictly longer
+solution, whose entire excess is null-space content, and <em>how</em> much longer
+turned out to differ between this machine and the CI runner, because which
+member of the solution family LU lands on is a pivot-order detail.</p>
+<p><strong>Truncation and Tikhonov are one formula with two switches.</strong> At <span class="math notranslate nohighlight">\(\kappa = 100\)</span>
+the filter form <a class="reference internal" href="#equation-eq-pinv-filter">Eq. 124</a> matched the matrix form and the
+stacked-<span class="math notranslate nohighlight">\(QR\)</span> form <a class="reference internal" href="#equation-eq-pinv-stacked">Eq. 125</a> to <span class="math notranslate nohighlight">\(6\times10^{-13}\)</span>; the ridge bias fell
+by a factor of 100 for each 100-fold drop in <span class="math notranslate nohighlight">\(\lambda\)</span> (measured ratios 99.05,
+99.99, 100.00, so it is <span class="math notranslate nohighlight">\(O(\lambda)\)</span>); <span class="math notranslate nohighlight">\(\|\mathbf{x}_\lambda\|\)</span> approached
+<span class="math notranslate nohighlight">\(\|A^{\top}\mathbf{b}\|/\lambda\)</span> to six figures; and the effective degrees of
+freedom ran monotonically from <span class="math notranslate nohighlight">\(12.000000000\)</span> to <span class="math notranslate nohighlight">\(0.0175\)</span>. At <span class="math notranslate nohighlight">\(\kappa = 10^{6}\)</span>
+the agreement broke: the matrix form drifted to <span class="math notranslate nohighlight">\(2\times10^{-7}\)</span> while the
+stacked form held <span class="math notranslate nohighlight">\(7\times10^{-12}\)</span>, a factor of 30,000, each staying inside its
+own rate (<span class="math notranslate nohighlight">\(\kappa^2\varepsilon\)</span> and <span class="math notranslate nohighlight">\(\kappa\varepsilon\)</span>) exactly as in
+<a class="reference internal" href="least-squares-four-ways.html"><span class="std std-doc">§2.3</span></a>.</p>
+<p><strong>Ill-posed is a different condition from ill-conditioned.</strong> The <span class="math notranslate nohighlight">\(200\times200\)</span>
+Gaussian blur has only about 100 singular values above <span class="math notranslate nohighlight">\(\varepsilon\sigma_1\)</span> —
+the exact count is a LAPACK-driver detail, since the values either side of the
+threshold are themselves rounding error — so its <span class="math notranslate nohighlight">\(\kappa\)</span> is not measurable. <code class="docutils literal notranslate"><span class="pre">np.linalg.solve</span></code> was wrong by <span class="math notranslate nohighlight">\(2.9\times10^{15}\)</span> on
+<span class="math notranslate nohighlight">\(0.1\%\)</span>-noisy data — and still wrong by a factor of 629 on <em>noiseless</em> data,
+because <span class="math notranslate nohighlight">\(1/\sigma_{200} = 8.8\times10^{16}\)</span> amplifies rounding error alone. The
+discrete Picard ratios <a class="reference internal" href="#equation-eq-pinv-picard">Eq. 126</a> stayed below 4.03 for the clean data
+and exceeded <span class="math notranslate nohighlight">\(10^{12}\)</span> for the noisy, which locates the failure using only <span class="math notranslate nohighlight">\(A\)</span>
+and <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> — checked over the range where both quantities are genuine
+numbers rather than rounding error, and reported beyond it.</p>
+<p><strong>Regularization repairs it, and the bias is the price.</strong> The best <span class="math notranslate nohighlight">\(\lambda\)</span>
+brought the relative error to <span class="math notranslate nohighlight">\(0.136\)</span>, an improvement of <span class="math notranslate nohighlight">\(2.2\times10^{16}\)</span> — but
+that aggregate splits into <span class="math notranslate nohighlight">\(0.013\)</span> on the smooth part of the signal and <span class="math notranslate nohighlight">\(0.182\)</span>
+on the box, whose corners a penalty on <span class="math notranslate nohighlight">\(\|\mathbf{x}\|_2\)</span> necessarily rounds off,
+a factor of 14 between the two regimes. Truncation at its best <span class="math notranslate nohighlight">\(k = 39\)</span> did
+equally well, and <span class="math notranslate nohighlight">\(\sigma_{39}/\sigma_1 = 2.1\times10^{-3}\)</span> sits at the noise
+level, exactly where the Picard plot said to stop.</p>
+<p><strong><span class="math notranslate nohighlight">\(\lambda\)</span> can be chosen without the answer.</strong> The L-curve corner
+<a class="reference internal" href="#equation-eq-pinv-curvature">Eq. 128</a> landed 1.4 decades below the oracle <span class="math notranslate nohighlight">\(\lambda\)</span> and cost
+17% more error; the discrepancy principle landed 0.6 decades above it and cost
+1.2%. Neither used <span class="math notranslate nohighlight">\(\mathbf{x}_{\text{true}}\)</span>. The two disagreed with each other
+about <span class="math notranslate nohighlight">\(\lambda\)</span> by two decades and about the error by 16%, which is the useful
+form of the result: the minimum is flat, so a parameter-choice rule need not
+find <span class="math notranslate nohighlight">\(\lambda\)</span> accurately to be worth using.</p>
+<p><strong>A different penalty gives a different kind of answer.</strong> With <span class="math notranslate nohighlight">\(\ell^1\)</span> and
+ISTA <a class="reference internal" href="#equation-eq-pinv-ista">Eq. 130</a>, five values of <span class="math notranslate nohighlight">\(\lambda\)</span> recovered the <em>exact</em> 6-element
+support out of 200 unknowns from 80 measurements, with zero mass off the true
+support and the exact KKT conditions <a class="reference internal" href="#equation-eq-pinv-kkt">Eq. 131</a> satisfied to <span class="math notranslate nohighlight">\(2\times10^{-15}\)</span>.
+Ridge at the same <span class="math notranslate nohighlight">\(\lambda\)</span> left all 200 entries nonzero and put 78% of its norm
+in the wrong places.</p>
+<p><strong>Methods introduced.</strong> <code class="docutils literal notranslate"><span class="pre">np.linalg.pinv</span></code> and its <code class="docutils literal notranslate"><span class="pre">rcond</span></code>, the hand-built
+<span class="math notranslate nohighlight">\(V\Sigma^{+}U^{\top}\)</span>, <code class="docutils literal notranslate"><span class="pre">np.linalg.matrix_rank</span></code>, null-space bases from the full
+SVD, the truncated-SVD and Tikhonov filters, the stacked <span class="math notranslate nohighlight">\(QR\)</span> formulation,
+<code class="docutils literal notranslate"><span class="pre">ecp.linalg.gaussian_blur</span></code>, the discrete Picard plot, L-curve curvature by
+<code class="docutils literal notranslate"><span class="pre">np.gradient</span></code>, the discrepancy principle, soft-thresholding and ISTA.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>A penalty that knows about smoothness.</strong> Tikhonov penalised
+<span class="math notranslate nohighlight">\(\|\mathbf{x}\|_2\)</span>, which is why it rounded the box’s corners. Penalising
+<span class="math notranslate nohighlight">\(\|L\mathbf{x}\|_2\)</span> for <span class="math notranslate nohighlight">\(L\)</span> a finite-difference operator penalises
+<em>roughness</em> instead, and the <span class="math notranslate nohighlight">\(\ell^1\)</span> version of that (total variation)
+reconstructs edges sharply. Both are solved by the same machinery: the
+generalized SVD replaces the ordinary one, and ISTA needs only a different
+proximal operator.</p></li>
+<li><p><strong>What the filter factors are hiding.</strong> The whole of Exercises 4 through 7
+rested on having the SVD, which for a <span class="math notranslate nohighlight">\(200\times200\)</span> matrix is free and for a
+<span class="math notranslate nohighlight">\(10^{6}\times10^{6}\)</span> one is unthinkable.
+<a class="reference internal" href="../05-numerical/stationary-and-cg.html"><span class="std std-doc">§5.4</span></a> builds iterative solvers that
+never factorize at all, and there the <em>iteration count</em> becomes the
+regularization parameter: stopping early filters the small singular values
+for exactly the reason truncation does.</p></li>
+<li><p><strong>The same algebra, under other names.</strong> Ridge regression, weight decay, and
+Tikhonov regularization are <a class="reference internal" href="#equation-eq-pinv-tikhonov">Eq. 123</a> three times over, and the
+effective degrees of freedom <span class="math notranslate nohighlight">\(\sum_i f_i\)</span> is the quantity that explains why a
+model with more parameters than data can still generalize.
+<a class="reference internal" href="../08-learning/learning-as-least-squares.html"><span class="std std-doc">§8.1</span></a> returns to this with
+the singular spectra of trained weight matrices.</p></li>
+<li><p><strong>Why the SVD keeps winning.</strong> Three notebooks in a row have ended with the
+SVD succeeding where the alternatives failed.
+<a class="reference internal" href="../04-svd/svd-geometry.html"><span class="std std-doc">§4.1</span></a> stops treating it as a tool and makes it
+the subject, starting from the question of what <span class="math notranslate nohighlight">\(\sigma_i\)</span> actually <em>means</em>.</p></li>
+</ul>
+<div class="docutils container" id="id10">
+<div role="list" class="citation-list">
+<div class="citation" id="id63" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>BT09<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id8">1</a>,<a role="doc-backlink" href="#id9">2</a>)</span>
+<p>Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. <em>SIAM Journal on Imaging Sciences</em>, 2(1):183–202, 2009. <a class="reference external" href="https://doi.org/10.1137/080716542">doi:10.1137/080716542</a>.</p>
+</div>
+<div class="citation" id="id19" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">GVL13</a><span class="fn-bracket">]</span></span>
+<p>Gene H. Golub and Charles F. Van Loan. <em>Matrix Computations</em>. Johns Hopkins University Press, Baltimore, 4 edition, 2013.</p>
+</div>
+<div class="citation" id="id39" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Han10<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id2">1</a>,<a role="doc-backlink" href="#id6">2</a>)</span>
+<p>Per Christian Hansen. <em>Discrete Inverse Problems: Insight and Algorithms</em>. SIAM, Philadelphia, 2010. <a class="reference external" href="https://doi.org/10.1137/1.9780898718836">doi:10.1137/1.9780898718836</a>.</p>
+</div>
+<div class="citation" id="id48" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">HTF09</a><span class="fn-bracket">]</span></span>
+<p>Trevor Hastie, Robert Tibshirani, and Jerome Friedman. <em>The Elements of Statistical Learning</em>. Springer, 2 edition, 2009. <a class="reference external" href="https://doi.org/10.1007/978-0-387-84858-7">doi:10.1007/978-0-387-84858-7</a>.</p>
+</div>
+<div class="citation" id="id65" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">Pen55</a><span class="fn-bracket">]</span></span>
+<p>Roger Penrose. A generalized inverse for matrices. <em>Mathematical Proceedings of the Cambridge Philosophical Society</em>, 51(3):406–413, 1955. <a class="reference external" href="https://doi.org/10.1017/S0305004100030401">doi:10.1017/S0305004100030401</a>.</p>
+</div>
+<div class="citation" id="id62" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Tib96<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id4">1</a>,<a role="doc-backlink" href="#id7">2</a>)</span>
+<p>Robert Tibshirani. Regression shrinkage and selection via the lasso. <em>Journal of the Royal Statistical Society, Series B</em>, 58(1):267–288, 1996. <a class="reference external" href="https://doi.org/10.1111/j.2517-6161.1996.tb02080.x">doi:10.1111/j.2517-6161.1996.tb02080.x</a>.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/02-orthogonality"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="least-squares-four-ways.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">2.3 Least Squares Four Ways</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="function-space-bases.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">2.5 Orthogonal Bases in Function Space</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-pseudoinverse">The pseudoinverse</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#truncation-and-why-an-exact-pseudoinverse-is-not-always-what-one-wants">Truncation, and why an exact pseudoinverse is not always what one wants</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tikhonov-regularization">Tikhonov regularization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ill-posed-not-merely-ill-conditioned">Ill-posed, not merely ill-conditioned</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-lambda-from-the-data">Choosing <span class="math notranslate nohighlight">\(\lambda\)</span> from the data</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#changing-the-penalty">Changing the penalty</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-building-a-and-the-four-conditions-that-pin-it-down">Exercise 1: Building <span class="math notranslate nohighlight">\(A^{+}\)</span>, and the four conditions that pin it down</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-pseudoinverse-is-discontinuous-and-rcond-is-the-reason">Exercise 2: The pseudoinverse is discontinuous, and <code class="docutils literal notranslate"><span class="pre">rcond</span></code> is the reason</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-minimum-norm-solution-and-what-the-normal-equations-do-instead">Exercise 3: The minimum-norm solution, and what the normal equations do instead</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-filter-factors-truncation-and-ridge-are-one-formula">Exercise 4: Filter factors: truncation and ridge are one formula</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-an-ill-posed-problem-and-why-solve-cannot-survive-it">Exercise 5: An ill-posed problem, and why <code class="docutils literal notranslate"><span class="pre">solve</span></code> cannot survive it</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-the-repair-and-the-bias-it-is-bought-with">Exercise 6: The repair, and the bias it is bought with</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-7-choosing-lambda-without-the-answer-key">Exercise 7: Choosing <span class="math notranslate nohighlight">\(\lambda\)</span> without the answer key</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-7">Validation 7</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-8-changing-the-penalty-ell-1-and-why-it-gives-exact-zeros">Exercise 8: Changing the penalty: <span class="math notranslate nohighlight">\(\ell^1\)</span>, and why it gives exact zeros</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-8">Validation 8</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

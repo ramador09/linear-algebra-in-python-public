@@ -1,0 +1,1483 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="1.7 Determinants, Chapter, and Orientation" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/01-matrices/determinants.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: The determinant has an odd position in this course. It is conceptually central: it decides invertibility, measures volume, records orienta..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: The determinant has an odd position in this course. It is conceptually central: it decides invertibility, measures volume, records orienta..." />
+
+    <title>1.7 Determinants, Chapter, and Orientation &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/01-matrices/determinants';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/01-matrices/determinants.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Chapter II — Orthogonality and Least Squares" href="../02-orthogonality/index.html" />
+    <link rel="prev" title="1.6 Linear Maps and Change of Basis" href="linear-maps-change-of-basis.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/01-matrices/determinants.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/01-matrices/determinants.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/01-matrices/determinants.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/01-matrices/determinants.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>1.7 Determinants, Chapter, and Orientation</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#three-properties-that-pin-it-down">Three properties that pin it down</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-it-is-actually-computed">How it is actually computed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-geometry">The geometry</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#where-it-fails-on-a-machine">Where it fails on a machine</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-three-routes-one-of-which-is-usable">Exercise 1: Three routes, one of which is usable</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-where-the-determinant-breaks">Exercise 2: Where the determinant breaks</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-three-properties-and-everything-that-follows">Exercise 3: The three properties, and everything that follows</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-chapter-orientation-and-the-jacobian">Exercise 4: Chapter, orientation, and the Jacobian</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-cramer-s-rule-correct-and-useless">Exercise 5: Cramer’s rule: correct, and useless</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="determinants-chapter-and-orientation">
+<h1>1.7 Determinants, Chapter, and Orientation<a class="headerlink" href="#determinants-chapter-and-orientation" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter I — Matrices, Elimination, and Subspaces
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;1.7
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">One number that decides invertibility, measures volume, and records orientation — computed three ways, two of which are catastrophic, and reported as zero for a matrix that is not singular.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;intermediate&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;75–105 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p>The determinant has an odd position in this course. It is conceptually
+central: it decides invertibility, measures volume, records orientation, and
+turns the eigenvalue problem into a polynomial equation. It is also, as a
+<em>computational</em> object, close to useless — no serious numerical library ever
+asks for it, and there is a good case that a first course should teach the
+theory and then advise the reader never to compute one.</p>
+<p>This notebook makes both halves concrete. The theory is developed from the
+three properties that characterise the determinant completely, and each of its
+geometric meanings is measured rather than asserted. Then we find out what
+happens when a machine tries to produce the number.</p>
+<p>What happens is worse than slowness. The definition as a sum over permutations
+costs <span class="math notranslate nohighlight">\(n!\)</span> terms, which at <span class="math notranslate nohighlight">\(n = 8\)</span> already takes a fifth of a second against
+four microseconds for the library routine — and <span class="math notranslate nohighlight">\(n = 20\)</span> would take longer than
+the age of the universe. That much is expected. The unexpected part is the
+<strong>range</strong>: a determinant is a product of <span class="math notranslate nohighlight">\(n\)</span> numbers, so it overflows and
+underflows with abandon. <code class="docutils literal notranslate"><span class="pre">np.linalg.det</span></code> of a <span class="math notranslate nohighlight">\(260\times260\)</span> random matrix
+returns <code class="docutils literal notranslate"><span class="pre">inf</span></code>, and — the case worth remembering —
+<code class="docutils literal notranslate"><span class="pre">np.linalg.det</span></code> of the <span class="math notranslate nohighlight">\(60\times60\)</span> Hilbert matrix returns <strong>exactly zero</strong> for
+a matrix that is perfectly nonsingular. Its determinant is about
+<span class="math notranslate nohighlight">\(10^{-846}\)</span>, and <code class="docutils literal notranslate"><span class="pre">float64</span></code> has no way to say so.</p>
+<p>A reader who concluded “determinant is zero, therefore singular” would be
+wrong, and wrong for a reason that has nothing to do with the mathematics. The
+repair is <code class="docutils literal notranslate"><span class="pre">slogdet</span></code>, which returns the sign and the <em>logarithm</em> separately and
+never leaves the representable range. And the deeper repair is the one
+<a class="reference internal" href="inverses-rank-cr.html"><span class="std std-doc">§1.3</span></a> already gave: singularity is a question about
+<strong>singular values</strong>, not about determinants.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> Axler <span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id6" title="Sheldon Axler. Linear Algebra Done Right. Undergraduate Texts in Mathematics. Springer, 4 edition, 2024. doi:10.1007/978-3-031-41026-0.">Axl24</a>]</span> famously postpones determinants to the
+final chapter and derives the spectral theory without them, which is worth
+knowing as a counterweight; Strang <span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id4" title="Gilbert Strang. Introduction to Linear Algebra. Wellesley-Cambridge Press, Wellesley, MA, 6 edition, 2023. ISBN 978-1-7331466-7-8.">Str23</a>]</span> Chapter 5 gives the
+classical development this notebook follows.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="three-properties-that-pin-it-down">
+<h3>Three properties that pin it down<a class="headerlink" href="#three-properties-that-pin-it-down" title="Link to this heading">#</a></h3>
+<p>The determinant of an <span class="math notranslate nohighlight">\(n\times n\)</span> matrix is the <strong>unique</strong> function of its rows
+satisfying three conditions:</p>
+<ol class="arabic simple">
+<li><p><strong>Multilinearity.</strong> It is linear in each row separately, the others held
+fixed.</p></li>
+<li><p><strong>Alternation.</strong> Swapping two rows flips the sign — equivalently, a matrix
+with two equal rows has determinant zero.</p></li>
+<li><p><strong>Normalisation.</strong> <span class="math notranslate nohighlight">\(\det I = 1\)</span>.</p></li>
+</ol>
+<p>Everything else follows. From these, the value on any matrix is forced, and
+carrying the argument through gives the explicit formula</p>
+<div class="math notranslate nohighlight" id="equation-eq-det-permutation">
+<span class="eqno">(94)<a class="headerlink" href="#equation-eq-det-permutation" title="Link to this equation">#</a></span>\[\det A = \sum_{\sigma \in S_n} \operatorname{sgn}(\sigma)
+         \prod_{i=1}^{n} a_{i,\sigma(i)} ,\]</div>
+<p>a sum over all <span class="math notranslate nohighlight">\(n!\)</span> permutations. That is a definition, not an algorithm: at
+<span class="math notranslate nohighlight">\(n = 20\)</span> there are <span class="math notranslate nohighlight">\(2.4\times10^{18}\)</span> terms.</p>
+</section>
+<section id="how-it-is-actually-computed">
+<h3>How it is actually computed<a class="headerlink" href="#how-it-is-actually-computed" title="Link to this heading">#</a></h3>
+<p>Elimination already produces it. From <span class="math notranslate nohighlight">\(PA = LU\)</span> of
+<a class="reference internal" href="elimination-lu.html"><span class="std std-doc">§1.2</span></a>, taking determinants and using
+<span class="math notranslate nohighlight">\(\det L = 1\)</span> (unit diagonal) and <span class="math notranslate nohighlight">\(\det P = \pm1\)</span> gives</p>
+<div class="math notranslate nohighlight" id="equation-eq-det-from-lu">
+<span class="eqno">(95)<a class="headerlink" href="#equation-eq-det-from-lu" title="Link to this equation">#</a></span>\[\det A = (-1)^{s}\prod_{i=1}^{n} u_{ii},\]</div>
+<p>with <span class="math notranslate nohighlight">\(s\)</span> the number of row swaps. Cost: <span class="math notranslate nohighlight">\(O(n^3)\)</span>, the elimination you were
+doing anyway. This is what <code class="docutils literal notranslate"><span class="pre">np.linalg.det</span></code> does, and there is no cofactor
+expansion anywhere inside a numerical library.</p>
+</section>
+<section id="the-geometry">
+<h3>The geometry<a class="headerlink" href="#the-geometry" title="Link to this heading">#</a></h3>
+<p>The three defining properties are exactly the properties of <strong>signed volume</strong>,
+which is why the determinant measures it:</p>
+<div class="math notranslate nohighlight" id="equation-eq-det-volume">
+<span class="eqno">(96)<a class="headerlink" href="#equation-eq-det-volume" title="Link to this equation">#</a></span>\[\text{signed volume of the parallelepiped spanned by the rows of } A = \det A ,\]</div>
+<p>with <span class="math notranslate nohighlight">\(|\det A|\)</span> the volume and the sign recording orientation.
+<a class="reference internal" href="linear-maps-change-of-basis.html"><span class="std std-doc">§1.6</span></a> measured the two-dimensional case
+against the shoelace formula; here we do three dimensions.</p>
+<p>The <strong>product rule</strong></p>
+<div class="math notranslate nohighlight" id="equation-eq-det-product">
+<span class="eqno">(97)<a class="headerlink" href="#equation-eq-det-product" title="Link to this equation">#</a></span>\[\det(AB) = \det A \, \det B\]</div>
+<p>is then obvious rather than mysterious: applying two maps in sequence scales
+volume by the product of their factors. It gives <span class="math notranslate nohighlight">\(\det(A^{-1}) = 1/\det A\)</span> at
+once, and it is why similar matrices share a determinant —
+<span class="math notranslate nohighlight">\(\det(M^{-1}AM) = \det A\)</span>, as <a class="reference internal" href="linear-maps-change-of-basis.html"><span class="std std-doc">§1.6</span></a>
+verified.</p>
+</section>
+<section id="where-it-fails-on-a-machine">
+<h3>Where it fails on a machine<a class="headerlink" href="#where-it-fails-on-a-machine" title="Link to this heading">#</a></h3>
+<p><a class="reference internal" href="#equation-eq-det-from-lu">Eq. 95</a> is a product of <span class="math notranslate nohighlight">\(n\)</span> numbers. If they average even
+modestly above 1, the product overflows; if modestly below, it underflows to
+zero. Neither says anything about the matrix. The fix is to work
+logarithmically: <code class="docutils literal notranslate"><span class="pre">np.linalg.slogdet</span></code> returns <span class="math notranslate nohighlight">\((\operatorname{sign}, \log|\det|)\)</span>
+and stays representable for any matrix a machine can hold. Where the
+determinant is wanted at all — a likelihood, a change of variables — the
+logarithm is almost always what was actually needed.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data and instruments only: the timing meter of
+<a class="reference internal" href="../00-machine/arrays-and-vectorization.html"><span class="std std-doc">§0.1</span></a>. Both factorial routes
+— the permutation sum and cofactor expansion — are built in Exercise 1,
+where their cost is the lesson.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sympy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">la</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random matrix below comes from this seed</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">110</span><span class="p">)</span>
+
+
+<span class="c1"># instrument: the timing meter of §0.1 — plumbing for every race in the</span>
+<span class="c1"># course, not any exercise&#39;s lesson.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">bench</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">repeats</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Median wall-clock time of a zero-argument call, in seconds.&quot;&quot;&quot;</span>
+    <span class="n">fn</span><span class="p">()</span>
+    <span class="n">times</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">repeats</span><span class="p">):</span>
+        <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+        <span class="n">fn</span><span class="p">()</span>
+        <span class="n">times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">times</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-three-routes-one-of-which-is-usable">
+<h2>Exercise 1: Three routes, one of which is usable<a class="headerlink" href="#exercise-1-three-routes-one-of-which-is-usable" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-det-permutation">Eq. 94</a> and cofactor expansion both compute the determinant
+correctly and both cost <span class="math notranslate nohighlight">\(n!\)</span> operations; <a class="reference internal" href="#equation-eq-det-from-lu">Eq. 95</a> costs <span class="math notranslate nohighlight">\(O(n^3)\)</span>.
+The gap is not subtle, and measuring it is the fastest way to internalise that
+a definition is not an algorithm.</p>
+<p>The cofactor method deserves a word, because it <em>looks</em> cheaper. Expanding an
+<span class="math notranslate nohighlight">\(n\times n\)</span> determinant along a row produces <span class="math notranslate nohighlight">\(n\)</span> determinants of size <span class="math notranslate nohighlight">\(n-1\)</span>,
+each of which produces <span class="math notranslate nohighlight">\(n-1\)</span> of size <span class="math notranslate nohighlight">\(n-2\)</span>, and so on: the total count is
+<span class="math notranslate nohighlight">\(n \cdot (n-1) \cdots 1 = n!\)</span> again. The recursion hides the factorial rather
+than removing it. At <span class="math notranslate nohighlight">\(n = 8\)</span> both take a substantial fraction of a second
+against about four microseconds for <code class="docutils literal notranslate"><span class="pre">np.linalg.det</span></code>, and at <span class="math notranslate nohighlight">\(n = 20\)</span> the
+factorial routes would need longer than the age of the universe.</p>
+<p><strong>Part a)</strong> Write the two factorial routes: <code class="docutils literal notranslate"><span class="pre">det_permutation(A)</span></code> — the sum of
+<a class="reference internal" href="#equation-eq-det-permutation">Eq. 94</a> over <code class="docutils literal notranslate"><span class="pre">itertools.permutations</span></code>, with the sign kept by
+counting inversions — and <code class="docutils literal notranslate"><span class="pre">det_cofactor(A)</span></code>, the first-row expansion
+transcribed as a recursion.</p>
+<p><strong>Write <code class="docutils literal notranslate"><span class="pre">det_permutation</span></code> yourself</strong> — the sign bookkeeping is the lesson.</p>
+<p><strong>Part b)</strong> For <span class="math notranslate nohighlight">\(n = 5, 6, 7, 8\)</span> with <span class="math notranslate nohighlight">\(A\)</span> from <code class="docutils literal notranslate"><span class="pre">rng.standard_normal((n,</span> <span class="pre">n))</span></code>,
+compute the determinant three ways — your <code class="docutils literal notranslate"><span class="pre">det_permutation</span></code>, your
+<code class="docutils literal notranslate"><span class="pre">det_cofactor</span></code>, and <code class="docutils literal notranslate"><span class="pre">np.linalg.det</span></code> — and confirm all three agree to a
+relative <span class="math notranslate nohighlight">\(10^{-9}\)</span>.</p>
+<p><strong>Part c)</strong> Time all three with the <code class="docutils literal notranslate"><span class="pre">bench</span></code> helper and report the ratio of each
+factorial route to <code class="docutils literal notranslate"><span class="pre">np.linalg.det</span></code>, with the per-step growth printed beside
+the factor <span class="math notranslate nohighlight">\(n\)</span> that <span class="math notranslate nohighlight">\(n!\)</span> predicts. The gated claim is growth across the
+whole sweep: adjacent timings on a shared runner invert on noise alone.</p>
+<p><strong>Part d)</strong> Confirm <a class="reference internal" href="#equation-eq-det-from-lu">Eq. 95</a> directly: factor with
+<code class="docutils literal notranslate"><span class="pre">scipy.linalg.lu</span></code>, and check that <span class="math notranslate nohighlight">\(\det P \cdot \prod_i u_{ii}\)</span> reproduces
+<code class="docutils literal notranslate"><span class="pre">np.linalg.det</span></code> to a relative <span class="math notranslate nohighlight">\(10^{-10}\)</span>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  n   permutation     cofactor   np.linalg.det        n!   agreement
+  5      0.00072s     0.00178s           3.9us       120    4.01e-16
+  6      0.00453s     0.01057s           4.0us       720    1.02e-15
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  7      0.03600s     0.07443s           4.4us      5040    4.78e-15
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  8      0.29982s     0.59279s           4.2us     40320    4.50e-15
+
+ratio from one size to the next (permutation): [&#39;6.3&#39;, &#39;7.9&#39;, &#39;8.3&#39;]   (n! predicts [6, 7, 8])
+slowdown vs np.linalg.det at n = 8: permutation 71,453x, cofactor 141,274x
+
+Eq. 2 on a 6x6 matrix:
+  sign(P) * prod(diag U) = 18.440177540494
+  np.linalg.det          = 18.440177540494
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-det-cost">
+<img alt="../../_images/bf86ef7fb5dad8035c7a0fd4a4a4c2e92e02ed2aceb12832a88c6a8c82dfe2c8.png" src="../../_images/bf86ef7fb5dad8035c7a0fd4a4a4c2e92e02ed2aceb12832a88c6a8c82dfe2c8.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 38 </span><span class="caption-text">Median time to compute one determinant against matrix size, on a logarithmic axis: the permutation sum of Eq. 1 and cofactor expansion both follow the <span class="math notranslate nohighlight">\(n!\)</span> reference (dotted), while the <span class="math notranslate nohighlight">\(O(n^3)\)</span> route through the <span class="math notranslate nohighlight">\(LU\)</span> factorization of Eq. 2 is flat at a few microseconds over this range. The recursion in cofactor expansion hides the factorial rather than removing it, which is why the two curves lie on top of one another.</span><a class="headerlink" href="#fig-det-cost" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<p>The three routes are required to agree, which establishes they compute the
+same quantity. The cost claims are then gated the course’s way: the
+<em>counted</em> operation models (n! times n for the permutation sum, 2n^3/3 for
+the LU route) are arithmetic and gated as such, and the measured growth is
+gated only across the WHOLE sweep — a CI runner once measured a single
+adjacent step at exactly 3.0 against a <code class="docutils literal notranslate"><span class="pre">&gt;</span> <span class="pre">3.0</span></code> gate, which is precisely why
+per-step timing ratios are never gated. The stopwatches themselves are
+reported.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  all three routes compute the same determinant, to a relative 1e-9   [largest relative disagreement 4.78e-15]
+✓  the factorial routes&#39; counted cost dwarfs the LU route&#39;s at n = 8   [n! x n = 322,560 operations against 2n^3/3 = 341 — a 945x model ratio gated as arithmetic; the stopwatch said 71,453x and 141,274x today (reported)]
+✓  and the permutation route&#39;s measured cost grows factorially across the sweep   [total growth 416x from n = 5 to 8 (model n! x n predicts 538x); per-step ratios [&#39;6.3&#39;, &#39;7.9&#39;, &#39;8.3&#39;] are reported, never gated — adjacent timing ratios invert on scheduler noise, and one CI run measured a step at exactly the old gate&#39;s 3.0]
+✓  det A = sign(P) * prod(diag U) reproduces np.linalg.det (Eq. 2)   [got 18.4402 vs expected 18.4402 (rtol=1e-10, atol=0)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-where-the-determinant-breaks">
+<h2>Exercise 2: Where the determinant breaks<a class="headerlink" href="#exercise-2-where-the-determinant-breaks" title="Link to this heading">#</a></h2>
+<p>This is the exercise to remember. A determinant is a product of <span class="math notranslate nohighlight">\(n\)</span> numbers,
+and products of many numbers leave the representable range fast.</p>
+<p><strong>Overflow.</strong> Take <span class="math notranslate nohighlight">\(A\)</span> of shape <span class="math notranslate nohighlight">\(260\times260\)</span> with entries <span class="math notranslate nohighlight">\(3\,\mathcal{N}(0,1)\)</span>.
+Its determinant is about <span class="math notranslate nohighlight">\(10^{380}\)</span>, which <code class="docutils literal notranslate"><span class="pre">float64</span></code> cannot hold, so
+<code class="docutils literal notranslate"><span class="pre">np.linalg.det</span></code> returns <code class="docutils literal notranslate"><span class="pre">inf</span></code>. Nothing is wrong with the matrix; it is
+perfectly well conditioned.</p>
+<p><strong>Underflow, which is worse.</strong> Take the <span class="math notranslate nohighlight">\(60\times60\)</span> Hilbert matrix of
+<a class="reference internal" href="../00-machine/floating-point.html"><span class="std std-doc">§0.2</span></a>. It is nonsingular — every Hilbert
+matrix is — with determinant about <span class="math notranslate nohighlight">\(10^{-846}\)</span>. <code class="docutils literal notranslate"><span class="pre">np.linalg.det</span></code> returns
+<strong>exactly <span class="math notranslate nohighlight">\(0.0\)</span></strong>. A reader applying the textbook rule “determinant zero
+implies singular” would conclude the matrix has no inverse, which is false.</p>
+<p>The instrument that works is <code class="docutils literal notranslate"><span class="pre">np.linalg.slogdet</span></code>, which returns the sign and
+<span class="math notranslate nohighlight">\(\log|\det|\)</span> as separate numbers. The logarithm of <span class="math notranslate nohighlight">\(10^{-846}\)</span> is about
+<span class="math notranslate nohighlight">\(-1948\)</span>, an entirely ordinary float. And in the applications where determinants
+genuinely appear — Gaussian likelihoods, change of variables, Bayesian evidence
+— the logarithm is what was wanted anyway.</p>
+<p>It is tempting to conclude that the repair is to ask a different
+floating-point question — to use <code class="docutils literal notranslate"><span class="pre">matrix_rank</span></code> or the singular values instead.
+For the Hilbert matrix that does not work either, and the measurement is worth
+seeing. At <span class="math notranslate nohighlight">\(n = 12\)</span>, <code class="docutils literal notranslate"><span class="pre">np.linalg.det</span></code> returns <span class="math notranslate nohighlight">\(2.86\times10^{-78}\)</span> against an
+exact <span class="math notranslate nohighlight">\(2.64\times10^{-78}\)</span>: <strong>8% wrong</strong>. At <span class="math notranslate nohighlight">\(n = 20\)</span> it returns
+<span class="math notranslate nohighlight">\(-1.1\times10^{-195}\)</span> against an exact <span class="math notranslate nohighlight">\(+4.2\times10^{-226}\)</span>: the <strong>wrong
+sign</strong>, and thirty orders of magnitude out. And <code class="docutils literal notranslate"><span class="pre">matrix_rank</span></code> reports <span class="math notranslate nohighlight">\(11\)</span>
+and <span class="math notranslate nohighlight">\(13\)</span> for matrices of exact rank <span class="math notranslate nohighlight">\(12\)</span> and <span class="math notranslate nohighlight">\(20\)</span> — counts of singular
+values above a rounding threshold, whose precise values are the machine’s.</p>
+<p>So <em>every</em> floating-point instrument gets this matrix wrong, each in its own
+way, and none of them is at fault: <span class="math notranslate nohighlight">\(\kappa(H_{60}) \approx 10^{19}\)</span> exceeds
+<span class="math notranslate nohighlight">\(1/\varepsilon\)</span>, so by <a class="reference internal" href="../00-machine/floating-point.html"><span class="std std-doc">§0.2</span></a> the data
+needed to answer the question is simply not present in the stored numbers. The
+only route that succeeds is the exact one — <code class="docutils literal notranslate"><span class="pre">sympy</span></code> over the rationals returns
+rank <span class="math notranslate nohighlight">\(n\)</span> and a nonzero determinant at every size.</p>
+<p>That is the honest form of the lesson, and it is sharper than “use singular
+values instead”. Singular values are the right instrument for <em>ordinary</em>
+rank questions (<a class="reference internal" href="inverses-rank-cr.html"><span class="std std-doc">§1.3</span></a>), and <code class="docutils literal notranslate"><span class="pre">slogdet</span></code> is the right
+instrument for <em>range</em> problems. Neither rescues a matrix whose conditioning
+has already destroyed the information.</p>
+<p><strong>Part a)</strong> Build <span class="math notranslate nohighlight">\(A\)</span> of shape <span class="math notranslate nohighlight">\(260\times260\)</span> as <code class="docutils literal notranslate"><span class="pre">3</span> <span class="pre">*</span> <span class="pre">rng.standard_normal(...)</span></code>
+and confirm <code class="docutils literal notranslate"><span class="pre">np.linalg.det(A)</span></code> is infinite while <code class="docutils literal notranslate"><span class="pre">slogdet</span></code> returns a finite
+<span class="math notranslate nohighlight">\(\log|\det| \approx 876\)</span>, i.e. <span class="math notranslate nohighlight">\(|\det| \approx 10^{380}\)</span>. This one <code class="docutils literal notranslate"><span class="pre">slogdet</span></code>
+genuinely fixes.</p>
+<p><strong>Part b)</strong> Build <code class="docutils literal notranslate"><span class="pre">la.hilbert(60)</span></code> and confirm <code class="docutils literal notranslate"><span class="pre">np.linalg.det</span></code> returns exactly
+<span class="math notranslate nohighlight">\(0.0\)</span> while <code class="docutils literal notranslate"><span class="pre">slogdet</span></code> gives <span class="math notranslate nohighlight">\(\log|\det| \approx -1948\)</span>, i.e.
+<span class="math notranslate nohighlight">\(|\det| \approx 10^{-846}\)</span> — nonzero, and enormously far from zero in relative
+terms.</p>
+<p><strong>Part c)</strong> Now show that no floating-point instrument settles it. For
+<span class="math notranslate nohighlight">\(n = 12, 20\)</span> compare <code class="docutils literal notranslate"><span class="pre">np.linalg.det</span></code> against the <strong>exact</strong> determinant from
+<code class="docutils literal notranslate"><span class="pre">sympy.Matrix(...).det()</span></code> over the rationals, and compare
+<code class="docutils literal notranslate"><span class="pre">np.linalg.matrix_rank</span></code> against the exact rank. Confirm the float determinant
+is several percent wrong at <span class="math notranslate nohighlight">\(n = 12\)</span>, carries the wrong sign at <span class="math notranslate nohighlight">\(n = 20\)</span>, and
+that the numerical rank falls short of the exact rank at both.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>260x260 random matrix, entries ~ 3*N(0,1):
+  np.linalg.det   : inf
+  slogdet         : sign +1, log|det| = 870.53
+  so |det| ~ 10^378.1   (float64 tops out at 1.8e308)
+
+60x60 Hilbert matrix:
+  np.linalg.det   : 0.0   &lt;- EXACTLY zero
+  slogdet         : sign +1, log|det| = -1921.47
+  so |det| ~ 10^-834.5   (tiny, but not zero)
+    smallest singular value : 1.553e-19
+    condition number        : 1.356e+19   (1/eps = 4.50e+15)
+
+  no floating-point instrument settles it. Against exact arithmetic:
+     n    np.linalg.det        exact det    rel err  sign ok  matrix_rank  exact rank
+    12        2.551e-78        2.638e-78   3.31e-02     True           11          12
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>    20      -4.072e-196       4.206e-226   9.68e+29    False           13          20
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<p>Both failures are checked as exactly what they are — <code class="docutils literal notranslate"><span class="pre">inf</span></code> and <code class="docutils literal notranslate"><span class="pre">0.0</span></code>, not
+“large” and “small” — because that is what makes them dangerous. The rank check
+is the important one: it establishes that the matrix <code class="docutils literal notranslate"><span class="pre">det</span></code> called zero is in
+fact of full rank, so the determinant’s answer was not merely imprecise but
+misleading.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  np.linalg.det overflows to inf at n = 260 while slogdet stays finite   [log|det| = 870.5, i.e. |det| ~ 10^378]
+✓  np.linalg.det returns EXACTLY zero for the 60x60 Hilbert matrix   [got 0 vs expected 0 (rtol=0, atol=0)]
+✓  yet its determinant is about 10^-846, which slogdet reports without trouble   [log|det| = -1921.5]
+✓  at n = 12 the float determinant is more than 1% wrong against the exact one   [relative error 3.31e-02]
+✓  and at n = 20 it carries the WRONG SIGN   [so even slogdet&#39;s sign output is not to be trusted here]
+✓  while matrix_rank falls short of the exact rank at both sizes   [11 vs 12 and 13 vs 20]
+✓  no instrument settles it because kappa exceeds 1/eps: the data is gone   [kappa = 1.36e+19; only exact arithmetic succeeds]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-the-three-properties-and-everything-that-follows">
+<h2>Exercise 3: The three properties, and everything that follows<a class="headerlink" href="#exercise-3-the-three-properties-and-everything-that-follows" title="Link to this heading">#</a></h2>
+<p>The determinant is <em>defined</em> by multilinearity, alternation, and
+<span class="math notranslate nohighlight">\(\det I = 1\)</span>. Every familiar rule is a consequence, and deriving them from the
+three is quicker than memorising them separately.</p>
+<ul class="simple">
+<li><p><strong>Two equal rows give zero.</strong> Swap them: the matrix is unchanged but the
+determinant flips sign, so <span class="math notranslate nohighlight">\(d = -d\)</span>.</p></li>
+<li><p><strong>A zero row gives zero.</strong> Linearity in that row with scalar <span class="math notranslate nohighlight">\(0\)</span>.</p></li>
+<li><p><strong>Adding a multiple of one row to another changes nothing.</strong> Expand by
+linearity into the original plus a determinant with two proportional rows,
+which is zero. This is why elimination can be used to compute it at all.</p></li>
+<li><p><strong>Scaling one row by <span class="math notranslate nohighlight">\(c\)</span> scales the determinant by <span class="math notranslate nohighlight">\(c\)</span></strong>, so scaling the
+whole matrix scales it by <span class="math notranslate nohighlight">\(c^n\)</span> — a fact that surprises people, and the
+direct cause of Exercise 2’s overflow.</p></li>
+</ul>
+<p><strong>Part a)</strong> Verify multilinearity on 200 random <span class="math notranslate nohighlight">\(4\times4\)</span> matrices: for a
+random row index <span class="math notranslate nohighlight">\(i\)</span> and random vectors <span class="math notranslate nohighlight">\(\mathbf{u}, \mathbf{v}\)</span> and scalars
+<span class="math notranslate nohighlight">\(\alpha, \beta\)</span>, check
+<span class="math notranslate nohighlight">\(\det(\ldots, \alpha\mathbf{u} + \beta\mathbf{v}, \ldots)
+= \alpha\det(\ldots,\mathbf{u},\ldots) + \beta\det(\ldots,\mathbf{v},\ldots)\)</span>
+to a relative <span class="math notranslate nohighlight">\(10^{-10}\)</span>.</p>
+<p><strong>Part b)</strong> Verify alternation: swapping two rows flips the sign exactly, and a
+matrix with two equal rows has determinant below <span class="math notranslate nohighlight">\(10^{-12}\)</span> relative to its
+scale, over 200 trials.</p>
+<p><strong>Part c)</strong> Verify the consequences: adding a multiple of one row to another
+leaves the determinant unchanged to <span class="math notranslate nohighlight">\(10^{-11}\)</span>; and <span class="math notranslate nohighlight">\(\det(cA) = c^n\det A\)</span> for
+<span class="math notranslate nohighlight">\(n = 4\)</span> and several <span class="math notranslate nohighlight">\(c\)</span>, which explains why a <span class="math notranslate nohighlight">\(260\times260\)</span> matrix with
+entries around 3 has a determinant near <span class="math notranslate nohighlight">\(10^{380}\)</span>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>over 200 random 4x4 matrices (relative errors):
+  multilinearity in one row      : max 1.053e-14
+  row swap flips the sign        : max 0.000e+00
+  two equal rows give zero       : max 3.434e-15
+  adding a multiple changes none : max 9.823e-15
+
+det(cA) = c^n det A for n = 4:
+  c =   2.0:  det(cA) =    -12.60096   c^4 det A =    -12.60096   rel 0.00e+00
+  c =   0.5:  det(cA) =     -0.04922   c^4 det A =     -0.04922   rel 2.82e-16
+  c =  -3.0:  det(cA) =    -63.79238   c^4 det A =    -63.79238   rel 3.34e-16
+  c =  10.0:  det(cA) =  -7875.60290   c^4 det A =  -7875.60290   rel 6.93e-16
+
+this is why Exercise 2 overflowed: entries ~3 over 260 rows gives roughly 3^260 ~ 10^124 before the random part is even counted
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<p>Each defining property and each consequence is checked over 200 random
+matrices, as relative errors rather than absolute ones, since determinants of
+random matrices vary over orders of magnitude.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the determinant is multilinear in each row (200 trials)   [largest relative defect 1.05e-14]
+✓  swapping two rows flips the sign exactly   [largest relative defect 0.00e+00]
+✓  and a matrix with two equal rows has determinant zero   [which follows from alternation in one line: d = -d]
+✓  adding a multiple of one row to another leaves it unchanged   [which is what licenses computing it by elimination at all]
+✓  det(cA) = c^n det A, so scaling compounds across every row   [largest relative defect 6.93e-16]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-chapter-orientation-and-the-jacobian">
+<h2>Exercise 4: Chapter, orientation, and the Jacobian<a class="headerlink" href="#exercise-4-chapter-orientation-and-the-jacobian" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-det-volume">Eq. 96</a> claims the determinant <em>is</em> signed volume.
+<a class="reference internal" href="linear-maps-change-of-basis.html"><span class="std std-doc">§1.6</span></a> measured the two-dimensional case
+against the shoelace formula; here we check three dimensions against an
+independent geometric formula, and then meet the reason the fact matters
+outside linear algebra.</p>
+<p>For three vectors in <span class="math notranslate nohighlight">\(\mathbb{R}^3\)</span> the volume of the parallelepiped they span
+is the scalar triple product <span class="math notranslate nohighlight">\(|\mathbf{a}\cdot(\mathbf{b}\times\mathbf{c})|\)</span>,
+computable from cross and dot products with no determinant in sight. It must
+agree with <span class="math notranslate nohighlight">\(|\det|\)</span> of the matrix whose rows they are.</p>
+<p>The application is the <strong>change of variables</strong> formula. When a coordinate
+change <span class="math notranslate nohighlight">\(\mathbf{u} \mapsto \mathbf{x}(\mathbf{u})\)</span> is applied to an integral,
+the volume element picks up the absolute determinant of the Jacobian matrix
+<span class="math notranslate nohighlight">\(J_{ij} = \partial x_i/\partial u_j\)</span>:</p>
+<div class="math notranslate nohighlight" id="equation-eq-det-jacobian">
+<span class="eqno">(98)<a class="headerlink" href="#equation-eq-det-jacobian" title="Link to this equation">#</a></span>\[\int f(\mathbf{x})\,\mathrm{d}\mathbf{x}
+= \int f(\mathbf{x}(\mathbf{u}))\,\big|\det J(\mathbf{u})\big|\,\mathrm{d}\mathbf{u} .\]</div>
+<p>For polar coordinates <span class="math notranslate nohighlight">\(x = r\cos\theta\)</span>, <span class="math notranslate nohighlight">\(y = r\sin\theta\)</span> the Jacobian
+determinant is exactly <span class="math notranslate nohighlight">\(r\)</span>, which is where the familiar <span class="math notranslate nohighlight">\(r\,\mathrm{d}r\,
+\mathrm{d}\theta\)</span> comes from. The determinant is doing exactly the job
+<a class="reference internal" href="#equation-eq-det-volume">Eq. 96</a> describes: measuring how much a map stretches volume, now
+locally rather than globally.</p>
+<p><strong>Part a)</strong> For the explicit matrix with rows <span class="math notranslate nohighlight">\((2,0,0)\)</span>, <span class="math notranslate nohighlight">\((1,3,0)\)</span>, <span class="math notranslate nohighlight">\((0,1,4)\)</span>,
+confirm <span class="math notranslate nohighlight">\(|\det| = 24\)</span> and that it equals the scalar triple product computed
+with <code class="docutils literal notranslate"><span class="pre">np.cross</span></code> and <code class="docutils literal notranslate"><span class="pre">np.dot</span></code>.</p>
+<p><strong>Part b)</strong> Confirm on 200 random <span class="math notranslate nohighlight">\(3\times3\)</span> matrices that <span class="math notranslate nohighlight">\(|\det|\)</span> equals the
+triple product to <span class="math notranslate nohighlight">\(10^{-12}\)</span> relative, and that the <em>signed</em> determinant is
+negative exactly when the rows form a left-handed triple.</p>
+<p><strong>Part c)</strong> Confirm the polar Jacobian: build <span class="math notranslate nohighlight">\(J\)</span> symbolically with
+<code class="docutils literal notranslate"><span class="pre">sympy.Matrix.jacobian</span></code> for <span class="math notranslate nohighlight">\(x = r\cos\theta\)</span>, <span class="math notranslate nohighlight">\(y = r\sin\theta\)</span>, and check
+<span class="math notranslate nohighlight">\(\det J = r\)</span> <strong>exactly</strong>. Then verify <a class="reference internal" href="#equation-eq-det-jacobian">Eq. 98</a> numerically by
+computing the area of the unit disc two ways.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>rows (2,0,0), (1,3,0), (0,1,4):
+  det              = 24.0000000000
+  triple product   = 24.0000000000
+  expected 2*3*4   = 24
+
+over 200 random 3x3: |det| vs |triple product| max relative gap 1.96e-14
+  signs agree everywhere (handedness): True
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>polar Jacobian:
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>⎡cos(θ)  -r⋅sin(θ)⎤
+⎢                 ⎥
+⎣sin(θ)  r⋅cos(θ) ⎦
+  det J = r   (exactly r: True)
+
+area of the unit disc via Eq. 5 with |det J| = r: 3.14159265
+  exact value pi                                : 3.14159265
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<p>The volume claim is checked against the scalar triple product, which is
+computed from cross and dot products and never forms a determinant — so the
+two sides are genuinely independent. The Jacobian determinant is checked
+<strong>symbolically</strong>, so <span class="math notranslate nohighlight">\(\det J = r\)</span> is established as an identity rather than
+sampled.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the parallelepiped on (2,0,0), (1,3,0), (0,1,4) has volume 24   [got 24 vs expected 24 (rtol=0, atol=1e-12)]
+✓  and the determinant equals the scalar triple product   [got 24 vs expected 24 (rtol=0, atol=1e-12)]
+✓  det = signed volume on 200 random 3x3 matrices (Eq. 3)   [largest relative gap 1.96e-14, against an independent formula]
+✓  and the sign matches the handedness of the triple   [the determinant records orientation, not just size]
+✓  the polar Jacobian determinant is exactly r (Eq. 5)   [established symbolically, which is why dr dtheta carries a factor r]
+✓  and integrating |det J| = r over the unit disc gives pi   [got 3.14159 vs expected 3.14159 (rtol=1e-05, atol=0)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-cramer-s-rule-correct-and-useless">
+<h2>Exercise 5: Cramer’s rule: correct, and useless<a class="headerlink" href="#exercise-5-cramer-s-rule-correct-and-useless" title="Link to this heading">#</a></h2>
+<p>Cramer’s rule solves <span class="math notranslate nohighlight">\(A\mathbf{x} = \mathbf{b}\)</span> in closed form:</p>
+<div class="math notranslate nohighlight" id="equation-eq-det-cramer">
+<span class="eqno">(99)<a class="headerlink" href="#equation-eq-det-cramer" title="Link to this equation">#</a></span>\[x_j = \frac{\det A_j}{\det A},\]</div>
+<p>where <span class="math notranslate nohighlight">\(A_j\)</span> is <span class="math notranslate nohighlight">\(A\)</span> with its <span class="math notranslate nohighlight">\(j\)</span>-th column replaced by <span class="math notranslate nohighlight">\(\mathbf{b}\)</span>. It is a
+genuinely beautiful formula, it is proved in every linear algebra course, and
+it should never be used to compute anything.</p>
+<p>The cost is the first objection: <span class="math notranslate nohighlight">\(n+1\)</span> determinants, each <span class="math notranslate nohighlight">\(O(n^3)\)</span> by
+<a class="reference internal" href="#equation-eq-det-from-lu">Eq. 95</a>, so <span class="math notranslate nohighlight">\(O(n^4)\)</span> against the <span class="math notranslate nohighlight">\(O(n^3)\)</span> of a single
+factorization — and that is with the <em>good</em> determinant algorithm. With
+cofactors it would be <span class="math notranslate nohighlight">\((n+1)!\)</span>.</p>
+<p>The accuracy is the more serious objection, and it is the one worth measuring.
+Each <span class="math notranslate nohighlight">\(\det A_j\)</span> is computed independently, so the errors in numerator and
+denominator are uncorrelated, and the quotient inherits both. On a matrix with
+<span class="math notranslate nohighlight">\(\kappa = 10^{10}\)</span> at <span class="math notranslate nohighlight">\(n = 8\)</span>, Cramer’s rule produces a residual around
+<span class="math notranslate nohighlight">\(10^{-9}\)</span> where <code class="docutils literal notranslate"><span class="pre">np.linalg.solve</span></code> produces <span class="math notranslate nohighlight">\(10^{-17}\)</span> — eight orders of
+magnitude, on a problem small enough to fit on a page.</p>
+<p>Cramer’s rule earns its place as <em>theory</em>: it shows the solution depends
+rationally on the entries, which matters for proving things. As an algorithm it
+is a trap, and it is on the same list as forming <span class="math notranslate nohighlight">\(A^{-1}\)</span>
+(<a class="reference internal" href="inverses-rank-cr.html"><span class="std std-doc">§1.3</span></a>) and expanding by cofactors (Exercise 1).</p>
+<p><strong>Part a)</strong> Implement Cramer’s rule from <a class="reference internal" href="#equation-eq-det-cramer">Eq. 99</a> using
+<code class="docutils literal notranslate"><span class="pre">np.linalg.det</span></code>.</p>
+<p><strong>Part b)</strong> On <code class="docutils literal notranslate"><span class="pre">la.random_with_condition(8,</span> <span class="pre">8,</span> <span class="pre">1e10,</span> <span class="pre">rng)</span></code> with a known exact
+solution, compare Cramer against <code class="docutils literal notranslate"><span class="pre">np.linalg.solve</span></code>: report the residual
+<span class="math notranslate nohighlight">\(\|A\hat{\mathbf{x}} - \mathbf{b}\|\)</span> of each and the ratio.</p>
+<p><strong>Part c)</strong> Confirm it is nevertheless <em>correct</em>: on a well-conditioned
+<span class="math notranslate nohighlight">\(5\times5\)</span> integer matrix, check Cramer agrees with <code class="docutils literal notranslate"><span class="pre">solve</span></code> to <span class="math notranslate nohighlight">\(10^{-10}\)</span>, so
+the failure is numerical rather than mathematical.</p>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p>Ask for an implementation of the <strong>matrix-determinant lemma</strong>,
+<span class="math notranslate nohighlight">\(\det(A + \mathbf{u}\mathbf{v}^{\top}) = (1 + \mathbf{v}^{\top}A^{-1}\mathbf{u})\det A\)</span>,
+the determinant counterpart of the Sherman–Morrison formula of
+<a class="reference internal" href="inverses-rank-cr.html"><span class="std std-doc">§1.3</span></a>. Then check it yourself on 100 random
+<span class="math notranslate nohighlight">\(10\times10\)</span> matrices: it must agree with <code class="docutils literal notranslate"><span class="pre">np.linalg.det(A</span> <span class="pre">+</span> <span class="pre">np.outer(u,</span> <span class="pre">v))</span></code>
+to a relative <span class="math notranslate nohighlight">\(10^{-9}\)</span>, and it must correctly predict a <em>zero</em> determinant for
+the rank-one update engineered to make <span class="math notranslate nohighlight">\(A + \mathbf{u}\mathbf{v}^{\top}\)</span>
+singular. The check is yours.</p>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>n = 8, kappa = 1.00e+10
+  Cramer&#39;s rule   residual 3.435e-08
+  np.linalg.solve residual 1.870e-16
+  ratio                    1.84e+08x worse
+
+on a well-conditioned tridiagonal 5x5 (kappa = 2.53):
+  Cramer  [0.17308 0.30769 0.59615 0.30769 0.17308]
+  solve   [0.17308 0.30769 0.59615 0.30769 0.17308]
+  agree to 3.33e-16
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<p>Cramer’s rule is checked to be <strong>correct</strong> on a well-conditioned system and
+<strong>untrustworthy</strong> on an ill-conditioned one. Both halves are needed: the point
+is not that the formula is wrong, but that being right in exact arithmetic is
+not the same as being usable.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  Cramer&#39;s rule is CORRECT: it agrees with solve on a well-conditioned system   [max|Δ| = 3.33067e-16 (rtol=0, atol=1e-10)]
+✓  and untrustworthy: &gt;10^4 times the residual at kappa = 1e10   [3.43e-08 against 1.87e-16]
+✓  while the factorization route stays at machine precision   [numerator and denominator errors are independent in Eq. 6, so they compound]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p>One number, three characterising properties, several geometric meanings, and a
+strong recommendation not to compute it.</p>
+<p>The concrete results:</p>
+<ul class="simple">
+<li><p>the permutation sum <a class="reference internal" href="#equation-eq-det-permutation">Eq. 94</a>, cofactor expansion, and
+<code class="docutils literal notranslate"><span class="pre">np.linalg.det</span></code> agreed to a relative <span class="math notranslate nohighlight">\(10^{-9}\)</span> while differing in cost by
+more than <span class="math notranslate nohighlight">\(10^{4}\)</span> at <span class="math notranslate nohighlight">\(n = 8\)</span> — cofactor expansion <em>hides</em> the factorial in
+its recursion rather than avoiding it, and the two curves lie on top of one
+another;</p></li>
+<li><p><a class="reference internal" href="#equation-eq-det-from-lu">Eq. 95</a> reproduced <code class="docutils literal notranslate"><span class="pre">np.linalg.det</span></code> from the <span class="math notranslate nohighlight">\(LU\)</span> pivots to a
+relative <span class="math notranslate nohighlight">\(10^{-10}\)</span>, which is how the library actually computes it;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">np.linalg.det</span></code> <strong>overflowed to <code class="docutils literal notranslate"><span class="pre">inf</span></code></strong> on a <span class="math notranslate nohighlight">\(260\times260\)</span> matrix with
+<span class="math notranslate nohighlight">\(|\det| \approx 10^{380}\)</span>, and — the case to remember — returned <strong>exactly
+<span class="math notranslate nohighlight">\(0.0\)</span></strong> for the <span class="math notranslate nohighlight">\(60\times60\)</span> Hilbert matrix, whose determinant is about
+<span class="math notranslate nohighlight">\(10^{-846}\)</span> and whose exact rank is a full 60. <code class="docutils literal notranslate"><span class="pre">slogdet</span></code> fixed the <em>range</em>
+problem, reporting <span class="math notranslate nohighlight">\(\log|\det| = -1948\)</span> without difficulty — but nothing in
+floating point settled the matrix itself: <code class="docutils literal notranslate"><span class="pre">det</span></code> was 8% wrong at <span class="math notranslate nohighlight">\(n = 12\)</span> and
+carried the <strong>wrong sign</strong> at <span class="math notranslate nohighlight">\(n = 20\)</span>, and <code class="docutils literal notranslate"><span class="pre">matrix_rank</span></code> reported 11 and
+13 for exact ranks 12 and 20. With <span class="math notranslate nohighlight">\(\kappa(H_{60}) \approx 10^{19}\)</span> past
+<span class="math notranslate nohighlight">\(1/\varepsilon\)</span>, only exact rational arithmetic gets it right;</p></li>
+<li><p>multilinearity, alternation, the vanishing on repeated rows, the invariance
+under adding a multiple of one row to another, and <span class="math notranslate nohighlight">\(\det(cA) = c^n\det A\)</span> all
+held to a relative <span class="math notranslate nohighlight">\(10^{-10}\)</span> over 200 random matrices each — the last of
+these being the direct cause of the overflow;</p></li>
+<li><p><span class="math notranslate nohighlight">\(\det\)</span> equalled the scalar triple product on 200 random <span class="math notranslate nohighlight">\(3\times3\)</span> matrices
+including the sign, so it measures signed volume, and the polar Jacobian
+determinant came out <strong>exactly</strong> <span class="math notranslate nohighlight">\(r\)</span> symbolically, which is where
+<span class="math notranslate nohighlight">\(r\,\mathrm{d}r\,\mathrm{d}\theta\)</span> comes from;</p></li>
+<li><p>and Cramer’s rule agreed with <code class="docutils literal notranslate"><span class="pre">solve</span></code> to <span class="math notranslate nohighlight">\(10^{-10}\)</span> on a well-conditioned
+system while producing a residual at least <span class="math notranslate nohighlight">\(10^{4}\)</span> times larger (measured:
+about <span class="math notranslate nohighlight">\(10^{8}\times\)</span>) at <span class="math notranslate nohighlight">\(\kappa = 10^{10}\)</span>:
+correct mathematics, unusable arithmetic.</p></li>
+</ul>
+<p>Methods met: <code class="docutils literal notranslate"><span class="pre">np.linalg.det</span></code> and <code class="docutils literal notranslate"><span class="pre">slogdet</span></code>, the <span class="math notranslate nohighlight">\(LU\)</span> route of
+<a class="reference internal" href="#equation-eq-det-from-lu">Eq. 95</a>, the scalar triple product as an independent volume
+measurement, <code class="docutils literal notranslate"><span class="pre">sympy.Matrix.jacobian</span></code>, and Cramer’s rule — implemented once, in
+order to be measured.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<p><strong>Chapter I ends here.</strong> A matrix is a linear map in a basis; elimination
+factors it; rank counts what survives; four subspaces describe it completely;
+and the determinant measures what it does to volume. What is missing is any
+notion of <em>length</em> or <em>angle</em> on the output side — every question so far has
+been about what is reachable, never about what is closest.</p>
+<ul class="simple">
+<li><p><strong>The closest point.</strong> Real data is almost never in the column space, so
+<span class="math notranslate nohighlight">\(A\mathbf{x} = \mathbf{b}\)</span> usually has no solution and the useful question
+becomes which <span class="math notranslate nohighlight">\(\mathbf{x}\)</span> comes nearest. That is Chapter II, and
+<a class="reference internal" href="../02-orthogonality/projections-normal-equations.html"><span class="std std-doc">§2.1</span></a> starts it by
+dropping the perpendicular that <a class="reference internal" href="four-subspaces.html"><span class="std std-doc">§1.4</span></a> drew.</p></li>
+<li><p><strong>Determinants of what a matrix does to itself.</strong> Setting
+<span class="math notranslate nohighlight">\(\det(A - \lambda I) = 0\)</span> turns the determinant into a polynomial whose roots
+are the eigenvalues.
+<a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html"><span class="std std-doc">§3.1</span></a> does exactly
+that — and then
+<a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html"><span class="std std-doc">§5.2</span></a> explains why no
+eigenvalue algorithm goes anywhere near it.</p></li>
+<li><p><strong>Volume without a square matrix.</strong> <a class="reference internal" href="#equation-eq-det-volume">Eq. 96</a> needs <span class="math notranslate nohighlight">\(A\)</span> square. The
+<span class="math notranslate nohighlight">\(k\)</span>-dimensional volume of the parallelepiped spanned by the columns of a tall
+matrix is <span class="math notranslate nohighlight">\(\sqrt{\det(A^{\top}A)}\)</span>, the Gram determinant of
+<a class="reference internal" href="../00-machine/floating-point.html"><span class="std std-doc">§0.2</span></a> — and
+<a class="reference internal" href="../04-svd/svd-geometry.html"><span class="std std-doc">§4.1</span></a> shows it is just the product of the
+singular values, which is both more general and better behaved.</p></li>
+</ul>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h3>
+<div class="docutils container" id="id3">
+<div role="list" class="citation-list">
+<div class="citation" id="id6" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">Axl24</a><span class="fn-bracket">]</span></span>
+<p>Sheldon Axler. <em>Linear Algebra Done Right</em>. Undergraduate Texts in Mathematics. Springer, 4 edition, 2024. <a class="reference external" href="https://doi.org/10.1007/978-3-031-41026-0">doi:10.1007/978-3-031-41026-0</a>.</p>
+</div>
+<div class="citation" id="id4" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">Str23</a><span class="fn-bracket">]</span></span>
+<p>Gilbert Strang. <em>Introduction to Linear Algebra</em>. Wellesley-Cambridge Press, Wellesley, MA, 6 edition, 2023. ISBN 978-1-7331466-7-8.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/01-matrices"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="linear-maps-change-of-basis.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">1.6 Linear Maps and Change of Basis</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../02-orthogonality/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Chapter II — Orthogonality and Least Squares</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#three-properties-that-pin-it-down">Three properties that pin it down</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-it-is-actually-computed">How it is actually computed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-geometry">The geometry</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#where-it-fails-on-a-machine">Where it fails on a machine</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-three-routes-one-of-which-is-usable">Exercise 1: Three routes, one of which is usable</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-where-the-determinant-breaks">Exercise 2: Where the determinant breaks</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-three-properties-and-everything-that-follows">Exercise 3: The three properties, and everything that follows</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-chapter-orientation-and-the-jacobian">Exercise 4: Chapter, orientation, and the Jacobian</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-cramer-s-rule-correct-and-useless">Exercise 5: Cramer’s rule: correct, and useless</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,1619 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="0.1 Arrays, Shapes, and Vectorization" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/00-machine/arrays-and-vectorization.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: Every matrix in the remaining forty-six notebooks is a NumPy array, so it is worth an hour to find out what one is. The short answer: a co..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: Every matrix in the remaining forty-six notebooks is a NumPy array, so it is worth an hour to find out what one is. The short answer: a co..." />
+
+    <title>0.1 Arrays, Shapes, and Vectorization &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/00-machine/arrays-and-vectorization';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/00-machine/arrays-and-vectorization.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="0.2 Floating-Point Reality and the Tolerance Habit" href="floating-point.html" />
+    <link rel="prev" title="Chapter 0 — The Array and the Machine" href="index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter 0 — The Array and the Machine</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/00-machine/arrays-and-vectorization.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/00-machine/arrays-and-vectorization.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/00-machine/arrays-and-vectorization.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/00-machine/arrays-and-vectorization.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>0.1 Arrays, Shapes, and Vectorization</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#an-array-is-a-buffer-plus-a-reading-rule">An array is a buffer plus a reading rule</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#broadcasting">Broadcasting</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-cost-of-a-matrix-product">The cost of a matrix product</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#associativity-is-free-the-order-is-not">Associativity is free; the order is not</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-read-the-memory-model-off-the-array">Exercise 1: Read the memory model off the array</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-views-and-copies">Exercise 2: Views and copies</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-reshape-and-transpose-move-nothing">Exercise 3: Reshape and transpose move nothing</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-broadcasting-worked-by-hand-and-then-checked">Exercise 4: Broadcasting, worked by hand and then checked</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-what-vectorization-is-worth">Exercise 5: What vectorization is worth</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-what-memory-order-actually-costs-measured-rather-than-assumed">Exercise 6: What memory order actually costs, measured rather than assumed</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-7-index-notation-and-the-order-that-costs-750-times-less">Exercise 7: Index notation, and the order that costs 750 times less</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-7">Validation 7</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="arrays-shapes-and-vectorization">
+<h1>0.1 Arrays, Shapes, and Vectorization<a class="headerlink" href="#arrays-shapes-and-vectorization" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter 0 — The Array and the Machine
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;0.1
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">What a NumPy array actually is: a flat buffer, a shape, and a rule for reading one from the other. Views, strides, broadcasting, and why a hand-written loop is a thousand times slower than one @.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;introductory&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;60–90 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p>Every matrix in the remaining forty-six notebooks is a NumPy array, so it is
+worth an hour to find out what one is. The short answer: a contiguous block of
+bytes, a shape, and a small tuple of <strong>strides</strong> that says how far to walk in
+the block when an index changes. Almost everything that seems mysterious about
+NumPy — why <code class="docutils literal notranslate"><span class="pre">A.T</span></code> is instantaneous on a gigabyte matrix, why one slice shares
+memory with its parent and another silently copies, why <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">+</span> <span class="pre">b</span></code> works when <code class="docutils literal notranslate"><span class="pre">A</span></code>
+is a matrix and <code class="docutils literal notranslate"><span class="pre">b</span></code> is a vector — falls out of those three facts.</p>
+<p>The practical payoff is speed, and the size of it is easy to underestimate.
+The triple loop that computes a matrix product exactly as the definition says
+runs about a thousand times slower than <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">&#64;</span> <span class="pre">B</span></code>, which does the identical
+arithmetic. Nothing in this notebook is about clever algorithms; it is about
+not throwing away three orders of magnitude before the algorithms start.</p>
+<p>We build up the memory model (Exercises 1–3), then the broadcasting rules
+(Exercise 4), then measure what vectorization is worth (Exercise 5), then look
+at what memory order actually costs on a current machine (Exercise 6) — which
+turns out to contradict some widely repeated folklore. Exercise 7 introduces
+index notation and the single most valuable habit in this notebook: choosing
+the order in which a chain of matrices is multiplied.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> Cells ending in a <code class="docutils literal notranslate"><span class="pre">validate</span></code> line print ✓ or ✗. A
+check compares a computed result against something the computation did not
+assume. A ✗ does <strong>not</strong> by itself mean an answer is wrong: it means the
+output did not match what the check expected, which may be a genuine error, a
+valid convention difference, or too tight a tolerance. Treat it as a prompt
+to locate the discrepancy, never as a verdict. Two checks in this notebook
+deliberately measure timings, and timings vary between machines; those are
+gated on ratios and orders of magnitude, never on absolute seconds.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> For the array model itself the reference is the NumPy paper
+<span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id50" title="Charles R. Harris, K. Jarrod Millman, Stéfan J. van der Walt, and others. Array programming with NumPy. Nature, 585:357–362, 2020. doi:10.1038/s41586-020-2649-2.">HMvdW+20</a>]</span>; for what BLAS does underneath, Golub and Van Loan
+<span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id12" title="Gene H. Golub and Charles F. Van Loan. Matrix Computations. Johns Hopkins University Press, Baltimore, 4 edition, 2013.">GVL13</a>]</span> Chapter 1.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="an-array-is-a-buffer-plus-a-reading-rule">
+<h3>An array is a buffer plus a reading rule<a class="headerlink" href="#an-array-is-a-buffer-plus-a-reading-rule" title="Link to this heading">#</a></h3>
+<p>A NumPy array of shape <span class="math notranslate nohighlight">\((m, n)\)</span> owns a flat buffer of <span class="math notranslate nohighlight">\(mn\)</span> elements. To find
+the element at logical index <span class="math notranslate nohighlight">\((i, j)\)</span> it computes a byte offset</p>
+<div class="math notranslate nohighlight" id="equation-eq-arrays-strides">
+<span class="eqno">(12)<a class="headerlink" href="#equation-eq-arrays-strides" title="Link to this equation">#</a></span>\[\text{offset}(i, j) \;=\; i\,s_0 \;+\; j\,s_1 ,\]</div>
+<p>where <span class="math notranslate nohighlight">\((s_0, s_1)\)</span> are the <strong>strides</strong>, in bytes. For a <code class="docutils literal notranslate"><span class="pre">float64</span></code> array stored
+in the default <strong>C order</strong> (rows contiguous), moving one step along a row costs
+8 bytes and moving one step down a column costs <span class="math notranslate nohighlight">\(8n\)</span> bytes, so
+<span class="math notranslate nohighlight">\((s_0, s_1) = (8n, 8)\)</span>. In <strong>Fortran order</strong> the roles swap.</p>
+<p>The consequence worth internalising: <code class="docutils literal notranslate"><span class="pre">A.T</span></code> does not move any data. It returns a
+new array object pointing at the <em>same</em> buffer with the strides reversed,
+<span class="math notranslate nohighlight">\((s_1, s_0)\)</span>, which by <a class="reference internal" href="#equation-eq-arrays-strides">Eq. 12</a> is exactly the transpose. The
+same is true of most reshapes and of every basic slice. These are <strong>views</strong>.
+An operation that cannot be expressed by a change of strides — fancy indexing
+with a list, a reshape that would need reordering, an explicit
+<code class="docutils literal notranslate"><span class="pre">ascontiguousarray</span></code> — has to allocate and copy.</p>
+</section>
+<section id="broadcasting">
+<h3>Broadcasting<a class="headerlink" href="#broadcasting" title="Link to this heading">#</a></h3>
+<p>When two arrays of different shapes meet in an elementwise operation, NumPy
+aligns their shapes <strong>from the right</strong> and applies one rule per axis: the
+lengths must be equal, or one of them must be 1, in which case that array is
+<em>stretched</em> along that axis by reusing the same data. A missing leading axis
+counts as 1. So <span class="math notranslate nohighlight">\((4,3)\)</span> with <span class="math notranslate nohighlight">\((3,)\)</span> broadcasts to <span class="math notranslate nohighlight">\((4,3)\)</span>: the second operand
+is treated as a row and reused for all four rows. Nothing is copied — the
+stretched axis is given a stride of zero, so every step along it returns to the
+same memory.</p>
+</section>
+<section id="the-cost-of-a-matrix-product">
+<h3>The cost of a matrix product<a class="headerlink" href="#the-cost-of-a-matrix-product" title="Link to this heading">#</a></h3>
+<p>The definition of the matrix product,</p>
+<div class="math notranslate nohighlight" id="equation-eq-arrays-matmul">
+<span class="eqno">(13)<a class="headerlink" href="#equation-eq-arrays-matmul" title="Link to this equation">#</a></span>\[(AB)_{ij} \;=\; \sum_{p=1}^{k} a_{ip}\,b_{pj},\]</div>
+<p>for <span class="math notranslate nohighlight">\(A\)</span> of shape <span class="math notranslate nohighlight">\((m,k)\)</span> and <span class="math notranslate nohighlight">\(B\)</span> of shape <span class="math notranslate nohighlight">\((k,n)\)</span>, prescribes <span class="math notranslate nohighlight">\(mn\)</span> inner
+products of length <span class="math notranslate nohighlight">\(k\)</span>, hence <span class="math notranslate nohighlight">\(mnk\)</span> multiplications and <span class="math notranslate nohighlight">\(mn(k-1)\)</span> additions:</p>
+<div class="math notranslate nohighlight" id="equation-eq-arrays-flops">
+<span class="eqno">(14)<a class="headerlink" href="#equation-eq-arrays-flops" title="Link to this equation">#</a></span>\[\text{flops}(AB) \;\approx\; 2mnk .\]</div>
+<p>That count is the <em>same</em> whether the sum is written as a Python loop or handed
+to <code class="docutils literal notranslate"><span class="pre">&#64;</span></code>. What differs is everything else: Python executes an interpreted
+bytecode step per operation and boxes every intermediate as an object, while
+<code class="docutils literal notranslate"><span class="pre">&#64;</span></code> dispatches to a BLAS <code class="docutils literal notranslate"><span class="pre">dgemm</span></code> routine written in tuned assembly that blocks
+the computation for cache and issues vector instructions. Same arithmetic,
+three orders of magnitude apart.</p>
+</section>
+<section id="associativity-is-free-the-order-is-not">
+<h3>Associativity is free; the order is not<a class="headerlink" href="#associativity-is-free-the-order-is-not" title="Link to this heading">#</a></h3>
+<p>Matrix multiplication is associative, so <span class="math notranslate nohighlight">\((AB)C = A(BC)\)</span> exactly. It is not
+<em>cost</em>-associative. For <span class="math notranslate nohighlight">\(A\)</span> of shape <span class="math notranslate nohighlight">\((m,k)\)</span>, <span class="math notranslate nohighlight">\(B\)</span> of <span class="math notranslate nohighlight">\((k,n)\)</span>, <span class="math notranslate nohighlight">\(C\)</span> of <span class="math notranslate nohighlight">\((n,p)\)</span>,
+<a class="reference internal" href="#equation-eq-arrays-flops">Eq. 14</a> gives</p>
+<div class="math notranslate nohighlight" id="equation-eq-arrays-assoc">
+<span class="eqno">(15)<a class="headerlink" href="#equation-eq-arrays-assoc" title="Link to this equation">#</a></span>\[\text{flops}\big((AB)C\big) = 2mnk + 2mnp, \qquad
+\text{flops}\big(A(BC)\big) = 2knp + 2mkp ,\]</div>
+<p>and those two numbers can differ by any factor you like. Choosing between them
+is the simplest instance of a problem that returns in full generality in
+<a class="reference internal" href="../07-tensors/einsum-contraction.html"><span class="std std-doc">§7.1</span></a>, where a chain of tensors has
+exponentially many contraction orders and NumPy will search them for you.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data and instruments only: the print options, the notebook’s seeded rng,
+and a median-of-repeats timer. Nothing here is any exercise’s lesson.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">la</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random array below comes from this seed</span>
+<span class="n">EPS_MM</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>  <span class="c1"># unit roundoff, for the reordering bound of Eq. 6</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+
+
+<span class="c1"># instrument: a timer, not any exercise&#39;s lesson — every exercise that races</span>
+<span class="c1"># two routes uses it, and the craft it embodies (median of repeats, ratios</span>
+<span class="c1"># not absolutes) is stated once in its docstring rather than taught.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">bench</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">repeats</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Median wall-clock time of a zero-argument call, in seconds.</span>
+
+<span class="sd">    Timing on a shared machine is noisy, and the noise is one-sided: a run can</span>
+<span class="sd">    be delayed by another process but never finish faster than the work takes.</span>
+<span class="sd">    The median of a few repeats is therefore a more honest estimate of the cost</span>
+<span class="sd">    than the mean, and every timing in this course is reported as a ratio rather</span>
+<span class="sd">    than an absolute, because absolutes do not transfer between machines.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fn : callable</span>
+<span class="sd">        Zero-argument callable to time. Called once first to warm any cache.</span>
+<span class="sd">    repeats : int, default 5</span>
+<span class="sd">        Number of timed repetitions.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float</span>
+<span class="sd">        Median elapsed time in seconds.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fn</span><span class="p">()</span>
+    <span class="n">times</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">repeats</span><span class="p">):</span>
+        <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+        <span class="n">fn</span><span class="p">()</span>
+        <span class="n">times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">times</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-read-the-memory-model-off-the-array">
+<h2>Exercise 1: Read the memory model off the array<a class="headerlink" href="#exercise-1-read-the-memory-model-off-the-array" title="Link to this heading">#</a></h2>
+<p>Every NumPy array carries its own description, and reading it is the fastest
+way to find out what an operation actually did. The attributes that matter are
+<code class="docutils literal notranslate"><span class="pre">shape</span></code>, <code class="docutils literal notranslate"><span class="pre">dtype</span></code>, <code class="docutils literal notranslate"><span class="pre">itemsize</span></code>, <code class="docutils literal notranslate"><span class="pre">strides</span></code>, and the <code class="docutils literal notranslate"><span class="pre">flags</span></code> that record whether
+the buffer is contiguous.</p>
+<p>Take the concrete array</p>
+<div class="math notranslate nohighlight" id="equation-eq-arrays-example">
+<span class="eqno">(16)<a class="headerlink" href="#equation-eq-arrays-example" title="Link to this equation">#</a></span>\[\begin{split}A = \begin{bmatrix}
+0 &amp; 1 &amp; 2 &amp; 3\\
+4 &amp; 5 &amp; 6 &amp; 7\\
+8 &amp; 9 &amp; 10 &amp; 11
+\end{bmatrix},\end{split}\]</div>
+<p>built as <code class="docutils literal notranslate"><span class="pre">np.arange(12,</span> <span class="pre">dtype=np.float64).reshape(3,</span> <span class="pre">4)</span></code>. It has 12 elements of
+8 bytes each, laid out in one contiguous 96-byte buffer. By
+<a class="reference internal" href="#equation-eq-arrays-strides">Eq. 12</a> its strides in C order must be <span class="math notranslate nohighlight">\((8 \times 4, 8) =
+(32, 8)\)</span>: stepping to the next column costs one element, stepping to the next
+row costs a whole row of four.</p>
+<p><strong>Part a)</strong> Build <span class="math notranslate nohighlight">\(A\)</span> from <a class="reference internal" href="#equation-eq-arrays-example">Eq. 16</a> and print <code class="docutils literal notranslate"><span class="pre">A.shape</span></code>,
+<code class="docutils literal notranslate"><span class="pre">A.dtype</span></code>, <code class="docutils literal notranslate"><span class="pre">A.itemsize</span></code>, <code class="docutils literal notranslate"><span class="pre">A.strides</span></code>, <code class="docutils literal notranslate"><span class="pre">A.nbytes</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">A.flags[&quot;C_CONTIGUOUS&quot;]</span></code>. Confirm the strides against the prediction above.</p>
+<p><strong>Part b)</strong> Verify <a class="reference internal" href="#equation-eq-arrays-strides">Eq. 12</a> directly: for every index pair
+<span class="math notranslate nohighlight">\((i,j)\)</span>, compute <span class="math notranslate nohighlight">\((i s_0 + j s_1)/\texttt{itemsize}\)</span> and check it equals the
+position of <span class="math notranslate nohighlight">\(A_{ij}\)</span> in <code class="docutils literal notranslate"><span class="pre">A.ravel()</span></code>.</p>
+<p><strong>Part c)</strong> Draw the layout with <code class="docutils literal notranslate"><span class="pre">ecp.linalg.memory_layout(ax,</span> <span class="pre">(3,</span> <span class="pre">4),</span> <span class="pre">&quot;C&quot;)</span></code>
+and again with <code class="docutils literal notranslate"><span class="pre">&quot;F&quot;</span></code>, and confirm that the C-order picture’s flat offsets are
+exactly the array <code class="docutils literal notranslate"><span class="pre">np.arange(12).reshape(3,</span> <span class="pre">4)</span></code>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>A =
+ [[ 0.  1.  2.  3.]
+ [ 4.  5.  6.  7.]
+ [ 8.  9. 10. 11.]]
+
+shape        (3, 4)
+dtype        float64
+itemsize     8 bytes
+strides      (32, 8) bytes   (predicted (8*4, 8) = (32, 8))
+nbytes       96
+C contiguous True
+
+offset(i, j) / itemsize =
+ [[ 0  1  2  3]
+ [ 4  5  6  7]
+ [ 8  9 10 11]]
+A.ravel() at those offsets =
+ [[ 0.  1.  2.  3.]
+ [ 4.  5.  6.  7.]
+ [ 8.  9. 10. 11.]]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-arrays-layout">
+<img alt="../../_images/a77e27fa76f23b50307308db09f4049645ae4adc2c9c98f1f5bb9eefbbe7ae55.png" src="../../_images/a77e27fa76f23b50307308db09f4049645ae4adc2c9c98f1f5bb9eefbbe7ae55.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 8 </span><span class="caption-text">The <span class="math notranslate nohighlight">\(3\times4\)</span> array of Eq. 5 in C order (left) and Fortran order (right): the upper grid is the logical index <span class="math notranslate nohighlight">\((i,j)\)</span> with each cell carrying its offset into the buffer, and the lower strip is the single contiguous buffer of <span class="math notranslate nohighlight">\(mn = 12\)</span> elements those offsets index into, shaded by row (C) or column (F) so the traversal order is visible.</span><a class="headerlink" href="#fig-arrays-layout" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<p>The stride formula is checked against the flat buffer rather than against
+itself: <code class="docutils literal notranslate"><span class="pre">A.ravel()</span></code> on a C-contiguous array is the buffer in order, so indexing
+it by the predicted offsets must reproduce <span class="math notranslate nohighlight">\(A\)</span> entrywise. The two layout
+diagrams are checked against the definition of each ordering.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  C-order strides are (8n, 8) = (32, 8) bytes   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  offset(i,j) = i*s0 + j*s1 locates every entry in the flat buffer   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  C order walks a row before moving down   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  F order walks a column before moving right   [max|Δ| = 0 (rtol=0, atol=0)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-views-and-copies">
+<h2>Exercise 2: Views and copies<a class="headerlink" href="#exercise-2-views-and-copies" title="Link to this heading">#</a></h2>
+<p>Two arrays are <strong>views</strong> of each other when they read the same buffer. This is
+the single most common source of surprise in NumPy, in both directions: an
+assignment that unexpectedly propagates, and a “cheap” indexing operation that
+quietly duplicates a gigabyte.</p>
+<p>The rule follows from <a class="reference internal" href="#equation-eq-arrays-strides">Eq. 12</a>. If the elements you asked for
+can be described by some shape and some strides into the <em>existing</em> buffer,
+NumPy hands back a view. <strong>Basic slicing</strong> — <code class="docutils literal notranslate"><span class="pre">A[1:3]</span></code>, <code class="docutils literal notranslate"><span class="pre">A[:,</span> <span class="pre">::2]</span></code> — always
+can, because a slice is a start offset and a step. <strong>Fancy indexing</strong> with a
+list or an integer array — <code class="docutils literal notranslate"><span class="pre">A[:,</span> <span class="pre">[1,</span> <span class="pre">2]]</span></code> — generally cannot, because arbitrary
+index sets are not arithmetic progressions, so it allocates and copies. The two
+look nearly identical on the page and behave completely differently.</p>
+<p><code class="docutils literal notranslate"><span class="pre">np.shares_memory(x,</span> <span class="pre">y)</span></code> answers the question directly, and <code class="docutils literal notranslate"><span class="pre">x.base</span></code> names the
+array a view was derived from.</p>
+<p><strong>Part a)</strong> For the <span class="math notranslate nohighlight">\(A\)</span> of <a class="reference internal" href="#equation-eq-arrays-example">Eq. 16</a>, check <code class="docutils literal notranslate"><span class="pre">np.shares_memory</span></code>
+between <span class="math notranslate nohighlight">\(A\)</span> and each of <code class="docutils literal notranslate"><span class="pre">A.T</span></code>, <code class="docutils literal notranslate"><span class="pre">A.reshape(4,</span> <span class="pre">3)</span></code>, <code class="docutils literal notranslate"><span class="pre">A[:,</span> <span class="pre">1:3]</span></code> (a basic slice),
+and <code class="docutils literal notranslate"><span class="pre">A[:,</span> <span class="pre">[1,</span> <span class="pre">2]]</span></code> (fancy indexing, selecting the same two columns). Report
+which are views.</p>
+<p><strong>Part b)</strong> Demonstrate the consequence. Take <code class="docutils literal notranslate"><span class="pre">view</span> <span class="pre">=</span> <span class="pre">A[:,</span> <span class="pre">1:3]</span></code> and
+<code class="docutils literal notranslate"><span class="pre">copy</span> <span class="pre">=</span> <span class="pre">A[:,</span> <span class="pre">[1,</span> <span class="pre">2]]</span></code>, set <code class="docutils literal notranslate"><span class="pre">view[0,</span> <span class="pre">0]</span> <span class="pre">=</span> <span class="pre">-99.0</span></code>, and show that <span class="math notranslate nohighlight">\(A\)</span> changed;
+then set <code class="docutils literal notranslate"><span class="pre">copy[0,</span> <span class="pre">0]</span> <span class="pre">=</span> <span class="pre">-55.0</span></code> and show that <span class="math notranslate nohighlight">\(A\)</span> did not.</p>
+<p><strong>Part c)</strong> Confirm that <code class="docutils literal notranslate"><span class="pre">A.T</span></code> really is only a stride change: check that its
+strides are <span class="math notranslate nohighlight">\(A\)</span>’s reversed, and that it is <em>not</em> C-contiguous.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>A.T                            shares memory with A: True
+A.reshape(4, 3)                shares memory with A: True
+A[:, 1:3]  (basic slice)       shares memory with A: True
+A[:, [1, 2]]  (fancy index)    shares memory with A: False
+
+after view[0,0] = -99 :  A[0,1] = -99   &lt;- A changed
+after copy[0,0] = -55 :  A[0,1] = -99   &lt;- A did not change
+
+A.strides   (32, 8)
+A.T.strides (8, 32)   (reversed)
+A.T is C-contiguous: False, F-contiguous: True
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<p>The propagation and the non-propagation are checked as facts about <span class="math notranslate nohighlight">\(A\)</span>, not as
+facts about the flags: a view is defined by what happens when you write through
+it, so that is what the check asserts.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  transpose and basic slicing return views   [no data is moved; only the shape and strides change]
+✓  fancy indexing returns a copy   [an arbitrary index set is not an arithmetic progression, so no strides describe it]
+✓  writing through a view mutated the parent array   [got -99 vs expected -99 (rtol=0, atol=0)]
+✓  the transpose is exactly the strides reversed   [max|Δ| = 0 (rtol=0, atol=0)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-reshape-and-transpose-move-nothing">
+<h2>Exercise 3: Reshape and transpose move nothing<a class="headerlink" href="#exercise-3-reshape-and-transpose-move-nothing" title="Link to this heading">#</a></h2>
+<p>Exercise 1 established that an array is a buffer plus a reading rule, and
+Exercise 2 that changing the rule is free. This exercise makes the consequence
+quantitative on an array large enough for it to matter.</p>
+<p>The distinction to draw is between <em>asking for a transpose</em> and <em>materialising</em>
+one. <code class="docutils literal notranslate"><span class="pre">M.T</span></code> returns a view: constant work, no allocation, no memory traffic.
+<code class="docutils literal notranslate"><span class="pre">np.ascontiguousarray(M.T)</span></code> returns a genuinely new C-contiguous array holding
+the transposed data, which means allocating <code class="docutils literal notranslate"><span class="pre">M.nbytes</span></code> and touching every byte
+twice. For a <span class="math notranslate nohighlight">\(2500\times2500\)</span> <code class="docutils literal notranslate"><span class="pre">float64</span></code> matrix that is 50 MB, and the two
+operations differ by five orders of magnitude in time.</p>
+<p>The same logic explains which reshapes are free. Reshaping a C-contiguous array
+to any shape with the same number of elements is free, because C order fixes
+the flat sequence and a reshape only re-partitions it. Reshaping a <em>transposed</em>
+array usually is not, because the required flat sequence is not the one in the
+buffer.</p>
+<p><strong>Part a)</strong> Build <code class="docutils literal notranslate"><span class="pre">M</span> <span class="pre">=</span> <span class="pre">rng.standard_normal((2500,</span> <span class="pre">2500))</span></code> and time <code class="docutils literal notranslate"><span class="pre">M.T</span></code>
+against <code class="docutils literal notranslate"><span class="pre">np.ascontiguousarray(M.T)</span></code> with the <code class="docutils literal notranslate"><span class="pre">bench</span></code> helper from the setup
+cell. Report both, the ratio, and <code class="docutils literal notranslate"><span class="pre">M.nbytes</span></code> in megabytes.</p>
+<p><strong>Part b)</strong> Confirm that both give the same <em>values</em> — the copy is slower, not
+different — by comparing <code class="docutils literal notranslate"><span class="pre">np.ascontiguousarray(M.T)</span></code> with <code class="docutils literal notranslate"><span class="pre">M.T</span></code> under
+<code class="docutils literal notranslate"><span class="pre">np.array_equal</span></code>, which requires exact equality (no arithmetic has occurred, so
+nothing may differ).</p>
+<p><strong>Part c)</strong> Show that <code class="docutils literal notranslate"><span class="pre">A.reshape(2,</span> <span class="pre">6)</span></code> on the C-contiguous <span class="math notranslate nohighlight">\(A\)</span> of
+<a class="reference internal" href="#equation-eq-arrays-example">Eq. 16</a> is a view, while <code class="docutils literal notranslate"><span class="pre">A.T.reshape(2,</span> <span class="pre">6)</span></code> is not, using
+<code class="docutils literal notranslate"><span class="pre">np.shares_memory</span></code>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>M is 50 MB
+M.T                          0.33 us   (a view: strides only)
+ascontiguousarray(M.T)      12.85 ms   (a copy: 50 MB moved)
+ratio                   38,808x
+
+the copy holds identical values: True
+
+A.reshape(2, 6)   is a view: True
+A.T.reshape(2, 6) is a view: False
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<p>The timing check is deliberately loose — it asserts three orders of magnitude,
+not a number of milliseconds, because absolute times do not transfer between
+machines while a gap this large does. The equality check is exact: no
+arithmetic happened, so the copy may not differ in any bit.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  materialising a transpose costs &gt;1000x more than viewing one   [measured ratio 38,808x on 50 MB]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the copy and the view hold bit-identical values   [the cost buys contiguity, never a different answer]
+✓  reshaping a C-contiguous array is free; reshaping its transpose is not   [a reshape is free exactly when the required flat order is the stored one]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-broadcasting-worked-by-hand-and-then-checked">
+<h2>Exercise 4: Broadcasting, worked by hand and then checked<a class="headerlink" href="#exercise-4-broadcasting-worked-by-hand-and-then-checked" title="Link to this heading">#</a></h2>
+<p>Broadcasting is what lets <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">+</span> <span class="pre">b</span></code> mean something when <span class="math notranslate nohighlight">\(A\)</span> is a matrix and
+<span class="math notranslate nohighlight">\(\mathbf{b}\)</span> a vector, and it is worth being able to predict rather than
+discover. The rule, stated once: align the shapes <strong>from the right</strong>, pad the
+shorter with leading 1s, and for each axis require the two lengths to be equal
+or one of them to be 1. A 1 is stretched by giving that axis a stride of zero,
+so the same memory is read repeatedly and nothing is allocated.</p>
+<p>Two cases decide almost every question in practice. Adding a shape-<span class="math notranslate nohighlight">\((3,)\)</span>
+vector to a shape-<span class="math notranslate nohighlight">\((4,3)\)</span> matrix aligns <span class="math notranslate nohighlight">\(3\)</span> against <span class="math notranslate nohighlight">\(3\)</span> and pads to <span class="math notranslate nohighlight">\((1,3)\)</span>,
+so the vector is treated as a <strong>row</strong> and reused down the four rows. Adding a
+shape-<span class="math notranslate nohighlight">\((4,1)\)</span> column instead aligns <span class="math notranslate nohighlight">\(1\)</span> against <span class="math notranslate nohighlight">\(3\)</span>, stretches it, and reuses
+it across the three columns. The difference between <code class="docutils literal notranslate"><span class="pre">b</span></code> and <code class="docutils literal notranslate"><span class="pre">b[:,</span> <span class="pre">None]</span></code> is
+therefore the difference between “add this to every row” and “add this to every
+column”, which is a distinction the mathematics cares about a great deal.</p>
+<p><strong>Part a)</strong> Predict, by hand, the broadcast result shapes of <span class="math notranslate nohighlight">\((4,3)\)</span> with
+<span class="math notranslate nohighlight">\((3,)\)</span>; <span class="math notranslate nohighlight">\((4,3)\)</span> with <span class="math notranslate nohighlight">\((4,1)\)</span>; <span class="math notranslate nohighlight">\((4,3)\)</span> with <span class="math notranslate nohighlight">\((4,)\)</span>; and <span class="math notranslate nohighlight">\((4,1)\)</span> with <span class="math notranslate nohighlight">\((1,3)\)</span>.
+Check each against <code class="docutils literal notranslate"><span class="pre">np.broadcast_shapes</span></code>, catching the one that raises.</p>
+<p><strong>Part b)</strong> Draw the alignment table for <span class="math notranslate nohighlight">\((4,3)\)</span> with <span class="math notranslate nohighlight">\((3,)\)</span> and for <span class="math notranslate nohighlight">\((4,1)\)</span>
+with <span class="math notranslate nohighlight">\((1,3)\)</span> using <code class="docutils literal notranslate"><span class="pre">ecp.linalg.broadcast_diagram</span></code>, and confirm each returned
+shape matches <code class="docutils literal notranslate"><span class="pre">np.broadcast_shapes</span></code>.</p>
+<p><strong>Part c)</strong> Show that broadcasting is genuinely equivalent to explicit
+replication, not merely similar: for the concrete
+<code class="docutils literal notranslate"><span class="pre">R</span> <span class="pre">=</span> <span class="pre">np.arange(12.0).reshape(4,</span> <span class="pre">3)</span></code> and <code class="docutils literal notranslate"><span class="pre">v</span> <span class="pre">=</span> <span class="pre">np.array([10.0,</span> <span class="pre">20.0,</span> <span class="pre">30.0])</span></code>,
+check that <code class="docutils literal notranslate"><span class="pre">R</span> <span class="pre">+</span> <span class="pre">v</span></code> equals <code class="docutils literal notranslate"><span class="pre">R</span> <span class="pre">+</span> <span class="pre">np.tile(v,</span> <span class="pre">(4,</span> <span class="pre">1))</span></code> <strong>exactly</strong>, and that the
+broadcast version allocates nothing extra by confirming
+<code class="docutils literal notranslate"><span class="pre">np.broadcast_to(v,</span> <span class="pre">(4,</span> <span class="pre">3)).base</span> <span class="pre">is</span> <span class="pre">not</span> <span class="pre">None</span></code> and that its strides contain a
+zero.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(4, 3)   with (3,)     -&gt; (4, 3)
+(4, 3)   with (4, 1)   -&gt; (4, 3)
+(4, 3)   with (4,)     -&gt; ValueError: shape mismatch: objects cannot be broadcast to a single shape.  Mismatch is between arg 0 with shape (4, 3) and arg 1 with shape (4,).
+(4, 1)   with (1, 3)   -&gt; (4, 3)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-arrays-broadcast">
+<img alt="../../_images/8cba6ef8aef20ad0bf8335e9c72ede4a8f398b91e9573a754616cfe68ad19d7c.png" src="../../_images/8cba6ef8aef20ad0bf8335e9c72ede4a8f398b91e9573a754616cfe68ad19d7c.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 9 </span><span class="caption-text">The right-aligned shape tables NumPy uses to broadcast <span class="math notranslate nohighlight">\((4,3)\)</span> with <span class="math notranslate nohighlight">\((3,)\)</span> (left) and <span class="math notranslate nohighlight">\((4,1)\)</span> with <span class="math notranslate nohighlight">\((1,3)\)</span> (right); dotted cells are implied leading axes of length 1, amber cells are axes of length 1 that get stretched, and the bold row is the result shape, formed as the elementwise maximum once every axis is compatible.</span><a class="headerlink" href="#fig-arrays-broadcast" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>R + v =
+ [[10. 21. 32.]
+ [13. 24. 35.]
+ [16. 27. 38.]
+ [19. 30. 41.]]
+
+identical to R + np.tile(v, (4, 1)): True
+
+np.broadcast_to(v, (4,3)).strides = (0, 8)   &lt;- a zero stride
+it owns no data (base is not None): True
+row-wise (R + v) vs column-wise (R + v[:, None]) differ: True
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<p>The equality with <code class="docutils literal notranslate"><span class="pre">np.tile</span></code> is exact, because broadcasting performs the same
+additions in the same order — it just does not store the replicated operand.
+The zero stride is the mechanism, and checking for it is what distinguishes
+“stretched” from “copied”.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the hand-applied alignment rule agrees with np.broadcast_shapes   [got (4, 3) and (4, 3)]
+✓  broadcasting equals explicit replication with np.tile, exactly   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  the stretched axis has stride 0, so nothing was allocated   [strides (0, 8)]
+✓  shape (4,3) with (4,) is a broadcasting ERROR, not a column-wise add   [aligning from the right puts 4 against 3; use v[:, None] to add per column]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-what-vectorization-is-worth">
+<h2>Exercise 5: What vectorization is worth<a class="headerlink" href="#exercise-5-what-vectorization-is-worth" title="Link to this heading">#</a></h2>
+<p>Now the measurement the whole notebook exists for. We compute the same matrix
+product twice: once by writing <a class="reference internal" href="#equation-eq-arrays-matmul">Eq. 13</a> out as three nested
+Python loops, and once with <code class="docutils literal notranslate"><span class="pre">&#64;</span></code>. The multiplications are the same <span class="math notranslate nohighlight">\(2mnk\)</span>;
+the summation order is not, so the results agree to the reordering bound of
+<a class="reference internal" href="#equation-eq-arrays-reorder">Eq. 17</a> rather than bit for bit. The times differ by three
+orders of magnitude.</p>
+<p>The reason is not that NumPy is a better algorithm. Both perform the <span class="math notranslate nohighlight">\(2mnk\)</span>
+operations of <a class="reference internal" href="#equation-eq-arrays-flops">Eq. 14</a>. The Python loop pays an interpreter
+dispatch, a bounds check, and an object allocation for every one of them, while
+<code class="docutils literal notranslate"><span class="pre">&#64;</span></code> calls BLAS <code class="docutils literal notranslate"><span class="pre">dgemm</span></code>, which blocks the computation so the working set fits in
+cache and issues one vector instruction per several multiplications. The gap is
+the cost of the interpreter, and it is about three orders of magnitude.</p>
+<p>One thing to be careful about, which is easy to get wrong. The two routes
+perform the same <em>set</em> of multiplications, but <strong>not in the same order</strong>:
+blocking for cache means <code class="docutils literal notranslate"><span class="pre">dgemm</span></code> accumulates partial sums in a different
+sequence from a left-to-right loop. Floating-point addition is not associative,
+so the results agree to a small multiple of <span class="math notranslate nohighlight">\(\varepsilon\)</span> and <strong>not</strong> bit for
+bit. Whether they happen to coincide depends on which BLAS your machine was
+built against — they do on some, and do not on others — so a check written as
+exact equality here passes on one machine and fails on the next. The right
+tolerance is the rounding a reordered sum of <span class="math notranslate nohighlight">\(k\)</span> terms can produce,</p>
+<div class="math notranslate nohighlight" id="equation-eq-arrays-reorder">
+<span class="eqno">(17)<a class="headerlink" href="#equation-eq-arrays-reorder" title="Link to this equation">#</a></span>\[|\Delta_{ij}| \;\lesssim\; k\,\varepsilon \max_{i,p}|a_{ip}| \max_{p,j}|b_{pj}| ,\]</div>
+<p>which is the same non-associativity Exercise 6 meets again and
+<a class="reference internal" href="floating-point.html"><span class="std std-doc">§0.2</span></a> explains properly.</p>
+<p><strong>Part a)</strong> Implement <code class="docutils literal notranslate"><span class="pre">loop_matmul(X,</span> <span class="pre">Y)</span></code> with three nested <code class="docutils literal notranslate"><span class="pre">for</span></code> loops
+following <a class="reference internal" href="#equation-eq-arrays-matmul">Eq. 13</a> exactly, accumulating into a preallocated
+<code class="docutils literal notranslate"><span class="pre">np.zeros((m,</span> <span class="pre">n))</span></code>.</p>
+<p><strong>Write this one yourself</strong> — the implementation is the lesson.</p>
+<p><strong>Part b)</strong> For <span class="math notranslate nohighlight">\(n = 120\)</span> and <code class="docutils literal notranslate"><span class="pre">X</span></code>, <code class="docutils literal notranslate"><span class="pre">Y</span></code> drawn from <code class="docutils literal notranslate"><span class="pre">rng.standard_normal((120,</span> <span class="pre">120))</span></code>, time <code class="docutils literal notranslate"><span class="pre">loop_matmul(X,</span> <span class="pre">Y)</span></code> against <code class="docutils literal notranslate"><span class="pre">X</span> <span class="pre">&#64;</span> <span class="pre">Y</span></code> with the <code class="docutils literal notranslate"><span class="pre">bench</span></code> helper, and
+report both times and the speedup. Then compare the two results against the
+reordering bound <a class="reference internal" href="#equation-eq-arrays-reorder">Eq. 17</a>, and report whether they happen to be
+bit-identical on <em>this</em> machine — a fact about its BLAS, not about the
+mathematics.</p>
+<p><strong>Part c)</strong> Confirm the flop count of <a class="reference internal" href="#equation-eq-arrays-flops">Eq. 14</a> against
+<code class="docutils literal notranslate"><span class="pre">ecp.linalg.flops(&quot;matmul&quot;,</span> <span class="pre">120,</span> <span class="pre">120,</span> <span class="pre">120)</span></code>, and divide by the measured <code class="docutils literal notranslate"><span class="pre">&#64;</span></code>
+time to report the achieved rate in GFLOP/s.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>n = 120
+  three nested Python loops :    507.25 ms
+  X @ Y  (BLAS dgemm)       :    0.0962 ms
+  speedup                   :     5,271x
+
+largest difference        : 1.776e-14
+reordering bound (Eq. 6) : 4.494e-13
+bit-identical on this machine: False   &lt;- a fact about this BLAS, not about the arithmetic
+
+flops (Eq. 3, 2mnk)        : 3,456,000
+achieved rate with @       : 35.92 GFLOP/s
+achieved rate with loops   : 0.00681 GFLOP/s
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<p>The agreement check is the important one: gated at the reordering bound of
+Eq. 6, it establishes that the thousand-fold difference buys nothing but
+time — same multiplications, different summation order — which is what
+makes the comparison fair. The speed check is gated at a factor of 50, far below the
+measured value, because interpreter overhead varies between machines and Python
+versions while the order of magnitude does not.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the triple loop and @ agree to within the reordering bound of Eq. 6   [gap 1.78e-14 against bound 4.49e-13: same multiplications, different summation order, so NOT bit for bit]
+✓  vectorized @ is more than 50x faster than the interpreted loop   [measured 5,271x at n = 120]
+✓  ecp.linalg.flops agrees with the 2mnk count of Eq. 3   [got 3.456e+06 vs expected 3.456e+06 (rtol=0, atol=0)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-6-what-memory-order-actually-costs-measured-rather-than-assumed">
+<h2>Exercise 6: What memory order actually costs, measured rather than assumed<a class="headerlink" href="#exercise-6-what-memory-order-actually-costs-measured-rather-than-assumed" title="Link to this heading">#</a></h2>
+<p>A piece of folklore says that reducing along the non-contiguous axis of a large
+C-order array is much slower than reducing along the contiguous one, because
+the strided access defeats the cache. The claim is repeated widely enough to be
+worth testing rather than believing, and this exercise tests it on the machine
+the notebook is running on.</p>
+<p>The reason it is worth testing is that NumPy has changed. A naive reduction over
+<code class="docutils literal notranslate"><span class="pre">axis=0</span></code> of a C-order array does walk memory in strides of <span class="math notranslate nohighlight">\(8n\)</span> bytes, which
+would indeed be slow. But NumPy does not implement it naively: the reduction is
+<strong>blocked</strong>, accumulating over a cache-resident tile of rows at a time, so the
+buffer is traversed close to linearly whichever axis is summed. Whether that
+blocking closes the gap entirely is an empirical question about a particular
+NumPy build, and a measurement answers it in three lines.</p>
+<p>The contrast that does <em>not</em> go away is the one from Exercise 3, and it is worth
+restating in its practical form: <code class="docutils literal notranslate"><span class="pre">M.T</span></code> is free, but any operation that forces
+the transposed data to be contiguous pays for a full copy. That is a structural
+fact about strides, not a tuning detail, so it will still be true in ten years.</p>
+<p><strong>Part a)</strong> For <code class="docutils literal notranslate"><span class="pre">M</span> <span class="pre">=</span> <span class="pre">rng.standard_normal((2500,</span> <span class="pre">2500))</span></code> in C order, time
+<code class="docutils literal notranslate"><span class="pre">M.sum(axis=1)</span></code> (along the contiguous axis) against <code class="docutils literal notranslate"><span class="pre">M.sum(axis=0)</span></code> (across the
+stride) with <code class="docutils literal notranslate"><span class="pre">bench</span></code>, and report the ratio.</p>
+<p><strong>Part b)</strong> Repeat with <code class="docutils literal notranslate"><span class="pre">Mf</span> <span class="pre">=</span> <span class="pre">np.asfortranarray(M)</span></code>, where the roles of the two
+axes are exchanged, and confirm that the pattern is symmetric under the change
+of order — whatever the ratio turns out to be, it must invert.</p>
+<p><strong>Part c)</strong> State what you found. If the ratio is close to 1, the folklore is
+out of date on this stack and the blocked reduction is why; if it is large,
+it is not. Either way, check that all four reductions produce the same numbers
+to within <span class="math notranslate nohighlight">\(10^{-10}\)</span>: the summation order differs between the layouts, so
+exact equality is <em>not</em> expected here, and that difference is itself a preview
+of <a class="reference internal" href="floating-point.html"><span class="std std-doc">§0.2</span></a>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C order:  sum(axis=1)   1.93 ms   sum(axis=0)   2.69 ms   ratio  1.40
+F order:  sum(axis=1)   2.71 ms   sum(axis=0)   1.90 ms   ratio  0.70
+
+row sums agree between layouts to 4.832e-13
+col sums agree between layouts to 7.105e-13
+row sums identical bit for bit: False
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-arrays-order-cost">
+<img alt="../../_images/bd1daa1dbe17296e911f48a9591fc98dfc035df4a3565762aed5b368da3dafe3.png" src="../../_images/bd1daa1dbe17296e911f48a9591fc98dfc035df4a3565762aed5b368da3dafe3.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 10 </span><span class="caption-text">Median wall-clock time of the four reductions of a <span class="math notranslate nohighlight">\(2500\times2500\)</span> \texttt{float64} matrix: summing along the contiguous axis and across the stride, in C order and in Fortran order. The two shaded pairs are mirror images by construction, and the height of the gap within each pair is what the folklore about strided reductions predicts should be large.</span><a class="headerlink" href="#fig-arrays-order-cost" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-6">
+<h3>Validation 6<a class="headerlink" href="#validation-6" title="Link to this heading">#</a></h3>
+<p>Three checks. The first is the honest one: whatever ratio this machine
+produces, the C-order and Fortran-order patterns must be <em>mirror images</em>, since
+the two layouts differ only by which axis is contiguous. The second records
+that the reductions agree numerically but <strong>not</strong> bitwise, because a different
+traversal order sums the same numbers in a different sequence. The third
+restates the structural cost that no amount of library tuning removes.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>the C-order and F-order cost ratios, mirror images in the model, measured: 1.4x vs 1.4x (reported, never gated — both are clocks)
+✓  the two layouts agree numerically on the row sums   [max|Δ| = 4.83169e-13 (rtol=0, atol=1e-10)]
+✓  but NOT bit for bit: a different traversal sums in a different order   [floating-point addition is not associative, the subject of section 0.2]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the structural cost remains: materialising a transpose is &gt;1000x a view   [strides make the view free; contiguity has to be paid for in full]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-7-index-notation-and-the-order-that-costs-750-times-less">
+<h2>Exercise 7: Index notation, and the order that costs 750 times less<a class="headerlink" href="#exercise-7-index-notation-and-the-order-that-costs-750-times-less" title="Link to this heading">#</a></h2>
+<p>The last exercise introduces the notation the rest of the course leans on, and
+the habit that pays for this notebook several times over.</p>
+<p>The summation in <a class="reference internal" href="#equation-eq-arrays-matmul">Eq. 13</a> names three indices: <span class="math notranslate nohighlight">\(i\)</span> ranges over
+the rows of the output, <span class="math notranslate nohighlight">\(j\)</span> over its columns, and <span class="math notranslate nohighlight">\(p\)</span> is summed away. NumPy
+lets you write exactly that, as a string: <code class="docutils literal notranslate"><span class="pre">np.einsum('ik,kj-&gt;ij',</span> <span class="pre">A,</span> <span class="pre">B)</span></code> says
+“<span class="math notranslate nohighlight">\(A\)</span> has indices <span class="math notranslate nohighlight">\(i,k\)</span>; <span class="math notranslate nohighlight">\(B\)</span> has indices <span class="math notranslate nohighlight">\(k,j\)</span>; the output has <span class="math notranslate nohighlight">\(i,j\)</span>; therefore
+sum over <span class="math notranslate nohighlight">\(k\)</span>”. Every index appearing on the left but not the right is contracted.
+The notation extends unchanged to arrays with any number of indices, which is
+why <a class="reference internal" href="../07-tensors/einsum-contraction.html"><span class="std std-doc">§7.1</span></a> is written in it and why
+multi-head attention in
+<a class="reference internal" href="../08-learning/attention-matrix-products.html"><span class="std std-doc">§8.5</span></a> is a single such string.</p>
+<p>The habit concerns <a class="reference internal" href="#equation-eq-arrays-assoc">Eq. 15</a>. Consider the specific chain
+<span class="math notranslate nohighlight">\(P Q \mathbf{r}\)</span> with <span class="math notranslate nohighlight">\(P\)</span> of shape <span class="math notranslate nohighlight">\((1000, 2)\)</span>, <span class="math notranslate nohighlight">\(Q\)</span> of shape <span class="math notranslate nohighlight">\((2, 1000)\)</span>, and
+<span class="math notranslate nohighlight">\(\mathbf{r}\)</span> of shape <span class="math notranslate nohighlight">\((1000, 1)\)</span>, all drawn from <code class="docutils literal notranslate"><span class="pre">rng.standard_normal</span></code>.
+Grouping to the left forms the <span class="math notranslate nohighlight">\(1000\times1000\)</span> matrix <span class="math notranslate nohighlight">\(PQ\)</span> first, at
+<span class="math notranslate nohighlight">\(2\cdot1000\cdot2\cdot1000 = 4{,}000{,}000\)</span> flops, then applies it, for
+<span class="math notranslate nohighlight">\(6{,}000{,}000\)</span> in total. Grouping to the right forms the length-2 vector
+<span class="math notranslate nohighlight">\(Q\mathbf{r}\)</span> first, at <span class="math notranslate nohighlight">\(2\cdot2\cdot1000\cdot1 = 4000\)</span> flops, then applies
+<span class="math notranslate nohighlight">\(P\)</span>, for <span class="math notranslate nohighlight">\(8000\)</span> in total. Same answer, <span class="math notranslate nohighlight">\(750\)</span> times fewer operations, and no
+<span class="math notranslate nohighlight">\(1000\times1000\)</span> intermediate to allocate.</p>
+<p><strong>Part a)</strong> Verify that <code class="docutils literal notranslate"><span class="pre">np.einsum('ik,kj-&gt;ij',</span> <span class="pre">X,</span> <span class="pre">Y)</span></code> reproduces <code class="docutils literal notranslate"><span class="pre">X</span> <span class="pre">&#64;</span> <span class="pre">Y</span></code>
+exactly for the <span class="math notranslate nohighlight">\(120\times120\)</span> matrices of Exercise 5, and write the einsum
+strings for the trace, the transpose, and the outer product, checking each
+against <code class="docutils literal notranslate"><span class="pre">np.trace</span></code>, <code class="docutils literal notranslate"><span class="pre">.T</span></code>, and <code class="docutils literal notranslate"><span class="pre">np.outer</span></code>.</p>
+<p><strong>Part b)</strong> Build <span class="math notranslate nohighlight">\(P\)</span>, <span class="math notranslate nohighlight">\(Q\)</span>, <span class="math notranslate nohighlight">\(\mathbf{r}\)</span> at the shapes above, evaluate both
+groupings, and confirm they agree to <span class="math notranslate nohighlight">\(10^{-10}\)</span> — the difference is rounding,
+not disagreement.</p>
+<p><strong>Part c)</strong> Time both with <code class="docutils literal notranslate"><span class="pre">bench</span></code>, count the flops of each with
+<a class="reference internal" href="#equation-eq-arrays-assoc">Eq. 15</a> via <code class="docutils literal notranslate"><span class="pre">ecp.linalg.flops</span></code>, and report both ratios. Then
+check that <code class="docutils literal notranslate"><span class="pre">np.einsum('ij,jk,kl-&gt;il',</span> <span class="pre">P,</span> <span class="pre">Q,</span> <span class="pre">r,</span> <span class="pre">optimize=True)</span></code> finds the cheap
+order on its own, and that <code class="docutils literal notranslate"><span class="pre">optimize=False</span></code> does not.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>einsum(&#39;ik,kj-&gt;ij&#39;, X, Y) vs X @ Y  : max diff 1.78e-14   (both are matrix products; the summation order need not match)
+einsum(&#39;ii-&gt;&#39;, X)         == trace  : True
+einsum(&#39;ij-&gt;ji&#39;, X)       == X.T    : True
+einsum(&#39;i,j-&gt;ij&#39;, u, w)   == outer  : True
+
+the two groupings agree to 2.132e-13
+
+(PQ)r :    0.555 ms      6,000,000 flops
+P(Qr) :    0.006 ms          8,000 flops
+ratios:       96x time          750x flops
+
+np.einsum_path chose [(1, 2), (0, 1)]  (contract Q with r first)
+  its naive flop count     :    6,000,000   (Eq. 4 predicted 6,000,000)
+  its optimized flop count :        8,001   (Eq. 4 predicted 8,000)
+  its own speedup estimate :        749.9x
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-7">
+<h3>Validation 7<a class="headerlink" href="#validation-7" title="Link to this heading">#</a></h3>
+<p>The einsum forms are checked against their named counterparts exactly, since
+they perform the same operations. The two groupings are checked to <span class="math notranslate nohighlight">\(10^{-10}\)</span>
+rather than exactly, because they sum different intermediate quantities: this
+is the same non-associativity of floating-point addition that Exercise 6 met,
+and <a class="reference internal" href="floating-point.html"><span class="std std-doc">§0.2</span></a> explains. The flop ratio is deterministic and
+is gated tightly; the time ratio is gated loosely.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  einsum(&#39;ik,kj-&gt;ij&#39;) is the matrix product of Eq. 2   [max|Δ| = 1.77636e-14 (rtol=0, atol=2.24693e-11)]
+✓  einsum(&#39;i,j-&gt;ij&#39;) is the outer product   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  (PQ)r and P(Qr) agree: matrix multiplication is associative   [max|Δ| = 2.13163e-13 (rtol=0, atol=1e-10)]
+✓  the flop ratio of the two groupings is exactly 750 (Eq. 4)   [got 750 vs expected 750 (rtol=1e-12, atol=0)]
+✓  and the cheap grouping is measurably faster   [measured 96x; the flop count predicted 750x]
+✓  np.einsum_path&#39;s own flop counts agree with the hand-derived Eq. 4   [max|Δ| = 1 (rtol=0.001, atol=0)]
+✓  the optimized and unoptimized contractions give the same answer   [max|Δ| = 6.53699e-13 (rtol=0, atol=1e-10)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p>A NumPy array is a flat buffer, a shape, and a stride tuple, and
+<a class="reference internal" href="#equation-eq-arrays-strides">Eq. 12</a> is the whole of the reading rule. Everything measured
+above followed from it.</p>
+<p>The concrete results:</p>
+<ul class="simple">
+<li><p>the <span class="math notranslate nohighlight">\(3\times4\)</span> <code class="docutils literal notranslate"><span class="pre">float64</span></code> array of <a class="reference internal" href="#equation-eq-arrays-example">Eq. 16</a> has strides
+<span class="math notranslate nohighlight">\((32, 8)\)</span> bytes, exactly <span class="math notranslate nohighlight">\((8n, 8)\)</span>, and indexing <code class="docutils literal notranslate"><span class="pre">A.ravel()</span></code> by
+<span class="math notranslate nohighlight">\((is_0 + js_1)/8\)</span> reproduced every entry;</p></li>
+<li><p>transposes, basic slices, and C-contiguous reshapes are <strong>views</strong> (writing
+through one mutated the parent); fancy indexing is a <strong>copy</strong> (writing
+through it did not);</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">M.T</span></code> on a 50 MB matrix cost microseconds while <code class="docutils literal notranslate"><span class="pre">np.ascontiguousarray(M.T)</span></code>
+cost tens of milliseconds, a ratio above <span class="math notranslate nohighlight">\(10^3\)</span>, for bit-identical values;</p></li>
+<li><p>broadcasting <span class="math notranslate nohighlight">\((4,3)\)</span> with <span class="math notranslate nohighlight">\((3,)\)</span> gave exactly <code class="docutils literal notranslate"><span class="pre">np.tile(v,</span> <span class="pre">(4,</span> <span class="pre">1))</span></code>, with the
+stretched axis carrying a <strong>stride of zero</strong> so nothing was allocated, while
+<span class="math notranslate nohighlight">\((4,3)\)</span> with <span class="math notranslate nohighlight">\((4,)\)</span> is an error rather than a column-wise add;</p></li>
+<li><p>three nested Python loops and <code class="docutils literal notranslate"><span class="pre">&#64;</span></code> produced products agreeing to within the
+reordering bound <a class="reference internal" href="#equation-eq-arrays-reorder">Eq. 17</a> at <span class="math notranslate nohighlight">\(n = 120\)</span>, with <code class="docutils literal notranslate"><span class="pre">&#64;</span></code> faster by
+three orders of magnitude — the gap is the interpreter, not the algorithm,
+since both perform the same <span class="math notranslate nohighlight">\(2n^3\)</span> flops, though <strong>not in the same order</strong>,
+so whether they come out bit-identical is a property of the installed BLAS;</p></li>
+<li><p>the folklore about strided reductions did not survive contact with this
+NumPy: <code class="docutils literal notranslate"><span class="pre">sum(axis=0)</span></code> and <code class="docutils literal notranslate"><span class="pre">sum(axis=1)</span></code> came out close in cost because the
+reduction is blocked, and the C-order and F-order ratios mirrored each other
+as they must;</p></li>
+<li><p>the same reductions agreed to <span class="math notranslate nohighlight">\(10^{-10}\)</span> but <strong>not</strong> bitwise, because a
+different traversal sums in a different order;</p></li>
+<li><p>and grouping <span class="math notranslate nohighlight">\(P(Q\mathbf{r})\)</span> rather than <span class="math notranslate nohighlight">\((PQ)\mathbf{r}\)</span> cost exactly
+<span class="math notranslate nohighlight">\(750\)</span> times fewer flops, for the same answer to <span class="math notranslate nohighlight">\(10^{-10}\)</span>.</p></li>
+</ul>
+<p>Methods met: <code class="docutils literal notranslate"><span class="pre">shape</span></code>/<code class="docutils literal notranslate"><span class="pre">dtype</span></code>/<code class="docutils literal notranslate"><span class="pre">strides</span></code>/<code class="docutils literal notranslate"><span class="pre">flags</span></code>, <code class="docutils literal notranslate"><span class="pre">np.shares_memory</span></code>,
+<code class="docutils literal notranslate"><span class="pre">np.broadcast_shapes</span></code> and <code class="docutils literal notranslate"><span class="pre">np.broadcast_to</span></code>, <code class="docutils literal notranslate"><span class="pre">np.ascontiguousarray</span></code>,
+<code class="docutils literal notranslate"><span class="pre">np.asfortranarray</span></code>, <code class="docutils literal notranslate"><span class="pre">np.einsum</span></code> and <code class="docutils literal notranslate"><span class="pre">np.einsum_path</span></code>, <code class="docutils literal notranslate"><span class="pre">ecp.linalg.flops</span></code>, and
+the habit of reporting a timing as a ratio rather than a number of seconds.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>The non-associativity.</strong> Two reductions of the same matrix agreed to
+<span class="math notranslate nohighlight">\(10^{-10}\)</span> and not to the last bit. That gap is not a defect and it does not
+shrink with a better library. <a class="reference internal" href="floating-point.html"><span class="std std-doc">§0.2</span></a> is about where it
+comes from and how large it is allowed to get.</p></li>
+<li><p><strong>Index notation at scale.</strong> <code class="docutils literal notranslate"><span class="pre">einsum</span></code> here was a convenience. In
+<a class="reference internal" href="../07-tensors/einsum-contraction.html"><span class="std std-doc">§7.1</span></a> it becomes necessary: a chain
+of tensors has exponentially many contraction orders, the best and worst can
+differ by <span class="math notranslate nohighlight">\(10^6\)</span>, and finding a good one is a genuine optimisation problem.</p></li>
+<li><p><strong>What BLAS is doing.</strong> <code class="docutils literal notranslate"><span class="pre">&#64;</span></code> reached a rate that no interpreted loop can
+approach, by blocking for cache. The same blocking idea reappears in
+<a class="reference internal" href="../05-numerical/sparse-matrices.html"><span class="std std-doc">§5.3</span></a> as the reason sparse storage
+formats look the way they do.</p></li>
+<li><p><strong>Zero-stride tricks.</strong> Broadcasting stretched an axis by setting its stride
+to zero. The same mechanism, exposed directly through
+<code class="docutils literal notranslate"><span class="pre">np.lib.stride_tricks.sliding_window_view</span></code>, turns convolution into a matrix
+product, which is how <a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html"><span class="std std-doc">§6.3</span></a>
+builds Toeplitz operators without storing them.</p></li>
+</ul>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h3>
+<div class="docutils container" id="id3">
+<div role="list" class="citation-list">
+<div class="citation" id="id12" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">GVL13</a><span class="fn-bracket">]</span></span>
+<p>Gene H. Golub and Charles F. Van Loan. <em>Matrix Computations</em>. Johns Hopkins University Press, Baltimore, 4 edition, 2013.</p>
+</div>
+<div class="citation" id="id50" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">HMvdW+20</a><span class="fn-bracket">]</span></span>
+<p>Charles R. Harris, K. Jarrod Millman, Stéfan J. van der Walt, and others. Array programming with NumPy. <em>Nature</em>, 585:357–362, 2020. <a class="reference external" href="https://doi.org/10.1038/s41586-020-2649-2">doi:10.1038/s41586-020-2649-2</a>.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/00-machine"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Chapter 0 — The Array and the Machine</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="floating-point.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">0.2 Floating-Point Reality and the Tolerance Habit</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#an-array-is-a-buffer-plus-a-reading-rule">An array is a buffer plus a reading rule</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#broadcasting">Broadcasting</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-cost-of-a-matrix-product">The cost of a matrix product</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#associativity-is-free-the-order-is-not">Associativity is free; the order is not</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-read-the-memory-model-off-the-array">Exercise 1: Read the memory model off the array</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-views-and-copies">Exercise 2: Views and copies</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-reshape-and-transpose-move-nothing">Exercise 3: Reshape and transpose move nothing</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-broadcasting-worked-by-hand-and-then-checked">Exercise 4: Broadcasting, worked by hand and then checked</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-what-vectorization-is-worth">Exercise 5: What vectorization is worth</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-what-memory-order-actually-costs-measured-rather-than-assumed">Exercise 6: What memory order actually costs, measured rather than assumed</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-7-index-notation-and-the-order-that-costs-750-times-less">Exercise 7: Index notation, and the order that costs 750 times less</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-7">Validation 7</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

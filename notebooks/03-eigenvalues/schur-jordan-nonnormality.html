@@ -1,0 +1,1632 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="3.5 Similarity, Schur, Jordan, and Non-normality" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/03-eigenvalues/schur-jordan-nonnormality.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: §3.4 found the exact condition for an orthonormal eigenbasis — normality — and measured that its Schur form is diagonal while a non-normal..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: §3.4 found the exact condition for an orthonormal eigenbasis — normality — and measured that its Schur form is diagonal while a non-normal..." />
+
+    <title>3.5 Similarity, Schur, Jordan, and Non-normality &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/03-eigenvalues/schur-jordan-nonnormality';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/03-eigenvalues/schur-jordan-nonnormality.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="3.6 Matrix Functions and the Matrix Exponential" href="matrix-functions-exponential.html" />
+    <link rel="prev" title="3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices" href="hermitian-unitary-normal.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter III — Eigenvalues and Spectral Theory</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/03-eigenvalues/schur-jordan-nonnormality.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/03-eigenvalues/schur-jordan-nonnormality.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/03-eigenvalues/schur-jordan-nonnormality.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/03-eigenvalues/schur-jordan-nonnormality.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>3.5 Similarity, Schur, Jordan, and Non-normality</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#similarity">Similarity</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#three-decompositions">Three decompositions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-jordan-cannot-be-computed">Why Jordan cannot be computed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bauerfike">Bauer–Fike</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#transient-growth">Transient growth</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pseudospectra">Pseudospectra</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-what-similarity-keeps-and-what-it-throws-away">Exercise 1: What similarity keeps, and what it throws away</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-schur-the-decomposition-that-always-exists">Exercise 2: Schur: the decomposition that always exists</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-jordan-form-dissolves-and-the-rate-is-exactly-delta-1-n">Exercise 3: The Jordan form dissolves, and the rate is exactly <span class="math notranslate nohighlight">\(\delta^{1/n}\)</span></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-bauerfike-the-conditioning-of-the-eigenvector-matrix">Exercise 4: Bauer–Fike: the conditioning of the eigenvector matrix</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-spectral-radius-below-1-and-the-norm-goes-up-anyway">Exercise 5: Spectral radius below 1, and the norm goes up anyway</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-pseudospectra-the-picture-that-does-predict-it">Exercise 6: Pseudospectra: the picture that does predict it</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="similarity-schur-jordan-and-non-normality">
+<h1>3.5 Similarity, Schur, Jordan, and Non-normality<a class="headerlink" href="#similarity-schur-jordan-and-non-normality" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter III — Eigenvalues and Spectral Theory
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;3.5
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">The Jordan form is exact, beautiful, and uncomputable; the Schur form is computable and always exists; and in between sits the honest answer to why a matrix whose every eigenvalue says decay can amplify a vector sixfold first.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;advanced&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;120–150 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="hermitian-unitary-normal.html"><span class="std std-doc">§3.4</span></a> found the exact condition for an
+orthonormal eigenbasis — normality — and measured that its Schur form is
+diagonal while a non-normal matrix’s is not. This notebook is about what that
+off-diagonal part <em>costs</em>, and the answer is: most of what one expects
+eigenvalues to tell you.</p>
+<p>Three decompositions, in decreasing order of beauty and increasing order of
+usefulness. <strong>Jordan</strong> is the complete classification: every matrix is similar
+to a direct sum of Jordan blocks, and that form settles every question about
+similarity. It is also uncomputable in floating point, for a reason this
+notebook makes quantitative — perturb a <span class="math notranslate nohighlight">\(6\times6\)</span> Jordan block by <span class="math notranslate nohighlight">\(10^{-14}\)</span>
+and its eigenvalues do not move by <span class="math notranslate nohighlight">\(10^{-14}\)</span>, they scatter onto a circle of
+radius <span class="math notranslate nohighlight">\(\delta^{1/6} = 5\times10^{-3}\)</span>, eleven orders larger. <strong>Schur</strong> exists
+for every matrix, is computed by a stable algorithm, and gives a unitary <span class="math notranslate nohighlight">\(Q\)</span>;
+what it gives up is a diagonal middle. <strong>Diagonalization</strong> is what one wants
+and cannot always have.</p>
+<p>Then the consequences. <strong>Bauer–Fike</strong> replaces the perfect conditioning of
+<a class="reference internal" href="spectral-theorem.html"><span class="std std-doc">§3.2</span></a>: eigenvalues move by at most
+<span class="math notranslate nohighlight">\(\operatorname{cond}(X)\|E\|\)</span> rather than <span class="math notranslate nohighlight">\(\|E\|\)</span>, and <span class="math notranslate nohighlight">\(\operatorname{cond}(X)\)</span>
+can be <span class="math notranslate nohighlight">\(10^{6}\)</span>. <strong>Transient growth</strong> is the practical sting: a matrix with
+spectral radius <span class="math notranslate nohighlight">\(0.8\)</span> — every eigenvalue comfortably inside the unit disc, so
+<span class="math notranslate nohighlight">\(A^k \to 0\)</span> guaranteed — nevertheless has <span class="math notranslate nohighlight">\(\|A^4\| = 6.17\)</span>. Anything driven by
+that matrix grows sixfold before it decays, and no eigenvalue predicts it.
+<strong>Pseudospectra</strong> are the picture that does.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> Trefethen and Embree’s <em>Spectra and Pseudospectra</em>
+<span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id22" title="Lloyd N. Trefethen and Mark Embree. Spectra and Pseudospectra: The Behavior of Nonnormal Matrices and Operators. Princeton University Press, 2005.">TE05</a>]</span> is the book for the second half and is a
+pleasure to read; Golub and Van Loan <span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id15" title="Gene H. Golub and Charles F. Van Loan. Matrix Computations. Johns Hopkins University Press, Baltimore, 4 edition, 2013.">GVL13</a>]</span> §7.1 for Schur and
+Jordan; Horn and Johnson <span class="bibtex-citation" id="id3">[<a class="reference internal" href="#id13" title="Roger A. Horn and Charles R. Johnson. Matrix Analysis. Cambridge University Press, 2 edition, 2013. doi:10.1017/CBO9781139020411.">HJ13</a>]</span> Chapter 3; Higham
+<span class="bibtex-citation" id="id4">[<a class="reference internal" href="#id17" title="Nicholas J. Higham. Accuracy and Stability of Numerical Algorithms. SIAM, Philadelphia, 2 edition, 2002. doi:10.1137/1.9780898718027.">Hig02</a>]</span> on why the Jordan form is not computed.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="similarity">
+<h3>Similarity<a class="headerlink" href="#similarity" title="Link to this heading">#</a></h3>
+<p><span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span> are <strong>similar</strong> if <span class="math notranslate nohighlight">\(B = X^{-1}AX\)</span> for some invertible <span class="math notranslate nohighlight">\(X\)</span>: the same
+linear map written in two bases, exactly as
+<a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html"><span class="std std-doc">§1.6</span></a> described. Similarity
+preserves the characteristic polynomial, hence the eigenvalues with their
+multiplicities, hence the trace and determinant. It preserves <em>nothing</em> about
+lengths: norms, singular values, symmetry and orthogonality of eigenvectors are
+all free to change, and that gap is the subject of this notebook.</p>
+</section>
+<section id="three-decompositions">
+<h3>Three decompositions<a class="headerlink" href="#three-decompositions" title="Link to this heading">#</a></h3>
+<p><strong>Jordan.</strong> Every <span class="math notranslate nohighlight">\(A \in \mathbb{C}^{n\times n}\)</span> is similar to a block diagonal</p>
+<div class="math notranslate nohighlight" id="equation-eq-nn-jordan">
+<span class="eqno">(180)<a class="headerlink" href="#equation-eq-nn-jordan" title="Link to this equation">#</a></span>\[A = PJP^{-1},
+\qquad J = \operatorname{diag}\bigl(J_{n_1}(\lambda_1), \dots, J_{n_k}(\lambda_k)\bigr),\]</div>
+<p>where <span class="math notranslate nohighlight">\(J_m(\lambda)\)</span> has <span class="math notranslate nohighlight">\(\lambda\)</span> on the diagonal and 1 on the superdiagonal.
+This is a complete invariant: two matrices are similar exactly when their
+Jordan forms agree up to block order.</p>
+<p><strong>Schur.</strong> Every <span class="math notranslate nohighlight">\(A\)</span> has</p>
+<div class="math notranslate nohighlight" id="equation-eq-nn-schur">
+<span class="eqno">(181)<a class="headerlink" href="#equation-eq-nn-schur" title="Link to this equation">#</a></span>\[A = QTQ^{*},
+\qquad Q \text{ unitary},\; T \text{ upper triangular},\]</div>
+<p>with the eigenvalues on <span class="math notranslate nohighlight">\(\operatorname{diag}T\)</span>. Unlike <a class="reference internal" href="#equation-eq-nn-jordan">Eq. 180</a> this
+is computed by a backward-stable algorithm, and it is what <code class="docutils literal notranslate"><span class="pre">scipy.linalg.schur</span></code>
+returns.</p>
+</section>
+<section id="why-jordan-cannot-be-computed">
+<h3>Why Jordan cannot be computed<a class="headerlink" href="#why-jordan-cannot-be-computed" title="Link to this heading">#</a></h3>
+<p>The Jordan structure is <strong>discontinuous</strong> in <span class="math notranslate nohighlight">\(A\)</span>. Perturb the <span class="math notranslate nohighlight">\(n\times n\)</span>
+nilpotent block <span class="math notranslate nohighlight">\(J_n(0)\)</span> by putting <span class="math notranslate nohighlight">\(\delta\)</span> in its bottom-left corner. The
+characteristic polynomial becomes <span class="math notranslate nohighlight">\(\lambda^n = \delta\)</span>, so the eigenvalues are</p>
+<div class="math notranslate nohighlight" id="equation-eq-nn-dissolution">
+<span class="eqno">(182)<a class="headerlink" href="#equation-eq-nn-dissolution" title="Link to this equation">#</a></span>\[\lambda_j = \delta^{1/n}\,e^{2\pi ij/n}, \qquad j = 0, \dots, n-1 :\]</div>
+<p><span class="math notranslate nohighlight">\(n\)</span> distinct eigenvalues on a circle of radius <span class="math notranslate nohighlight">\(\delta^{1/n}\)</span>. The single
+eigenvalue of multiplicity <span class="math notranslate nohighlight">\(n\)</span> has dissolved, and the displacement is
+<span class="math notranslate nohighlight">\(\delta^{1/n}\)</span>, not <span class="math notranslate nohighlight">\(\delta\)</span>. At <span class="math notranslate nohighlight">\(n = 6\)</span> and <span class="math notranslate nohighlight">\(\delta = 10^{-14}\)</span> that is
+<span class="math notranslate nohighlight">\(5\times10^{-3}\)</span> — a perturbation at the level of rounding error moving the
+answer into the third decimal place. Any matrix is within <span class="math notranslate nohighlight">\(\varepsilon\)</span> of a
+diagonalizable one, so “is this matrix defective?” is not a question floating
+point can answer.</p>
+</section>
+<section id="bauerfike">
+<h3>Bauer–Fike<a class="headerlink" href="#bauerfike" title="Link to this heading">#</a></h3>
+<p>If <span class="math notranslate nohighlight">\(A = X\Lambda X^{-1}\)</span> is diagonalizable, then every eigenvalue <span class="math notranslate nohighlight">\(\mu\)</span> of
+<span class="math notranslate nohighlight">\(A + E\)</span> satisfies</p>
+<div class="math notranslate nohighlight" id="equation-eq-nn-bauer-fike">
+<span class="eqno">(183)<a class="headerlink" href="#equation-eq-nn-bauer-fike" title="Link to this equation">#</a></span>\[\min_i |\mu - \lambda_i| \;\le\; \operatorname{cond}_2(X)\,\|E\|_2 .\]</div>
+<p>The amplifier is the conditioning of the <em>eigenvector</em> matrix. For a normal
+matrix <span class="math notranslate nohighlight">\(X\)</span> is unitary and <span class="math notranslate nohighlight">\(\operatorname{cond}(X) = 1\)</span>, recovering
+<a class="reference internal" href="spectral-theorem.html"><span class="std std-doc">§3.2</span></a>’s Weyl bound exactly; for a non-normal matrix it
+can be arbitrarily large.</p>
+</section>
+<section id="transient-growth">
+<h3>Transient growth<a class="headerlink" href="#transient-growth" title="Link to this heading">#</a></h3>
+<p>The spectral radius controls the <em>asymptotic</em> behaviour: <span class="math notranslate nohighlight">\(A^k \to 0\)</span> if and
+only if <span class="math notranslate nohighlight">\(\rho(A) &lt; 1\)</span>. It says nothing about the way there. A matrix can
+satisfy <span class="math notranslate nohighlight">\(\rho(A) &lt; 1\)</span> and still have <span class="math notranslate nohighlight">\(\|A^k\| \gg 1\)</span> for a range of <span class="math notranslate nohighlight">\(k\)</span> before
+the decay sets in, and for a <em>normal</em> matrix this is impossible, since
+<span class="math notranslate nohighlight">\(\|A^k\|_2 = \rho(A)^k\)</span> exactly.</p>
+</section>
+<section id="pseudospectra">
+<h3>Pseudospectra<a class="headerlink" href="#pseudospectra" title="Link to this heading">#</a></h3>
+<p>For <span class="math notranslate nohighlight">\(\epsilon &gt; 0\)</span> the <strong><span class="math notranslate nohighlight">\(\epsilon\)</span>-pseudospectrum</strong> has three equivalent
+definitions:</p>
+<div class="math notranslate nohighlight" id="equation-eq-nn-pseudospectrum">
+<span class="eqno">(184)<a class="headerlink" href="#equation-eq-nn-pseudospectrum" title="Link to this equation">#</a></span>\[\Lambda_\epsilon(A)
+ = \bigl\{z : \|(zI - A)^{-1}\|_2 &gt; \epsilon^{-1}\bigr\}
+ = \bigl\{z : \sigma_{\min}(zI - A) &lt; \epsilon\bigr\}
+ = \bigl\{z : z \in \Lambda(A + E) \text{ for some } \|E\|_2 &lt; \epsilon\bigr\} .\]</div>
+<p>The second is how it is computed — one SVD per grid point — and the third is
+what it means: the set of numbers that are eigenvalues of something within
+<span class="math notranslate nohighlight">\(\epsilon\)</span> of <span class="math notranslate nohighlight">\(A\)</span>. For a normal matrix <span class="math notranslate nohighlight">\(\Lambda_\epsilon\)</span> is exactly the union
+of <span class="math notranslate nohighlight">\(\epsilon\)</span>-discs around the eigenvalues, and nothing more; for a non-normal
+matrix it bulges far beyond them, and how far is what predicts the transient.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data only: the Jordan-block family the exercises study, given like any
+other specimen. The resolvent-norm probe — Exercise 6’s own definition —
+is built there.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sympy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">schur</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">la</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random array below comes from this seed</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
+
+
+<span class="c1"># data: a specified matrix family — the specimen the exercises perturb and</span>
+<span class="c1"># measure, given like any other input.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">jordan_block</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">lam</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The n-by-n Jordan block: lam on the diagonal, 1 on the superdiagonal.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">lam</span><span class="p">)))</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+
+
+<span class="c1"># data: the transient-growth pair — spectral radius 0.8 twice over, one</span>
+<span class="c1"># non-normal and one normal, the specimens of Exercises 5 and 6.</span>
+<span class="n">A_TRANS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">],</span>
+                    <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">]])</span>
+<span class="n">A_NORMAL</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-what-similarity-keeps-and-what-it-throws-away">
+<h2>Exercise 1: What similarity keeps, and what it throws away<a class="headerlink" href="#exercise-1-what-similarity-keeps-and-what-it-throws-away" title="Link to this heading">#</a></h2>
+<p><span class="math notranslate nohighlight">\(B = X^{-1}AX\)</span> is the same map in a different basis. The characteristic
+polynomial is unchanged, since <span class="math notranslate nohighlight">\(\det(X^{-1}AX - \lambda I) =
+\det(X^{-1}(A - \lambda I)X) = \det(A - \lambda I)\)</span>, so the eigenvalues,
+trace and determinant all survive. Almost nothing else does — and the
+quantities that do not survive are exactly the ones that decide whether a
+computation is well behaved.</p>
+<p><strong>Part a)</strong> Build <span class="math notranslate nohighlight">\(A = \left[\begin{smallmatrix}4&amp;1\\2&amp;3\end{smallmatrix}\right]\)</span>,
+the shear <span class="math notranslate nohighlight">\(X = \left[\begin{smallmatrix}1&amp;5\\0&amp;1\end{smallmatrix}\right]\)</span>
+(whose condition number is 27, so it distorts lengths substantially), and
+<span class="math notranslate nohighlight">\(B = X^{-1}AX\)</span> with <code class="docutils literal notranslate"><span class="pre">np.linalg.solve(X,</span> <span class="pre">A</span> <span class="pre">&#64;</span> <span class="pre">X)</span></code>. Report both matrices. A
+<em>random</em> <span class="math notranslate nohighlight">\(X\)</span> would not do here: a random <span class="math notranslate nohighlight">\(2\times2\)</span> is often close to
+orthogonal, and then the norm barely moves and the exercise’s point is lost.</p>
+<p><strong>Part b)</strong> Confirm what is preserved, to <span class="math notranslate nohighlight">\(10^{-12}\)</span>: the eigenvalues (sorted),
+the trace, and the determinant. The eigenvalues are 2 and 5.</p>
+<p><strong>Part c)</strong> Confirm what is <em>not</em>. Report <span class="math notranslate nohighlight">\(\|A\|_2\)</span> against <span class="math notranslate nohighlight">\(\|B\|_2\)</span> and the
+singular values of each; they differ substantially. Similarity is not an
+isometry, and a matrix norm is not a similarity invariant.</p>
+<p><strong>Part d)</strong> Confirm that symmetry is not preserved either. Take the symmetric
+<span class="math notranslate nohighlight">\(S = \left[\begin{smallmatrix}3&amp;1\\1&amp;2\end{smallmatrix}\right]\)</span> and form
+<span class="math notranslate nohighlight">\(X^{-1}SX\)</span> for the same <span class="math notranslate nohighlight">\(X\)</span>; confirm the result is <em>not</em> symmetric (report
+<span class="math notranslate nohighlight">\(\|M - M^{\top}\|_{\max}\)</span>, which is order 1) while its eigenvalues are
+unchanged to <span class="math notranslate nohighlight">\(10^{-12}\)</span>. This is why <a class="reference internal" href="spectral-theorem.html"><span class="std std-doc">§3.2</span></a> insisted on
+<em>orthogonal</em> similarity: <span class="math notranslate nohighlight">\(Q^{\top}SQ\)</span> preserves symmetry and a general
+<span class="math notranslate nohighlight">\(X^{-1}SX\)</span> does not.</p>
+<p><strong>Part e)</strong> Confirm the one similarity that keeps everything. For a random
+orthogonal <span class="math notranslate nohighlight">\(Q\)</span> from <code class="docutils literal notranslate"><span class="pre">np.linalg.qr(rng.standard_normal((2,</span> <span class="pre">2)))</span></code>, form
+<span class="math notranslate nohighlight">\(Q^{\top}SQ\)</span> and confirm it is symmetric to <span class="math notranslate nohighlight">\(10^{-14}\)</span>, has the same singular
+values to <span class="math notranslate nohighlight">\(10^{-13}\)</span>, and the same 2-norm. Orthogonal similarity is a rotation
+of the coordinate system; a general similarity is a shear, and a shear can
+distort every length in sight.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>A =
+[[4. 1.]
+ [2. 3.]]
+B = X^-1 A X =
+[[ -6. -44.]
+ [  2.  13.]]
+
+preserved:
+  eigenvalues [2. 5.] against [2. 5.]   gap 1.78e-15
+  trace 7.000000 against 7.000000
+  det   10.000000 against 10.000000
+
+NOT preserved:
+  singular values [5.11667 1.9544 ] against [46.31364  0.21592]
+  ||A||_2 = 5.116673 against ||B||_2 = 46.313641   ratio 9.0515
+
+  a GENERAL similarity of a symmetric matrix:
+    ||M - M^T||_max = 20.000000   &lt;- symmetry destroyed
+    eigenvalues still [1.38197 3.61803] vs [1.38197 3.61803], gap 8.88e-16
+  an ORTHOGONAL similarity of the same matrix:
+    ||M - M^T||_max = 0.00e+00   &lt;- symmetry kept
+    singular values [3.61803 1.38197] vs [3.61803 1.38197], gap 2.22e-15
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<p>The point of this exercise is the contrast, so both halves are checked: the
+invariants to <span class="math notranslate nohighlight">\(10^{-12}\)</span> and the <em>non</em>-invariants as quantities that visibly
+moved. A check that only confirmed the eigenvalues survive would leave the
+impression that similarity is harmless.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  similarity preserves the eigenvalues (2 and 5)   [max|Δ| = 1.77636e-15 (rtol=0, atol=1e-12)]
+✓  and therefore the trace and determinant   [trace 7.000000 vs 7.000000, det 10.000000 vs 10.000000]
+✓  but NOT the norm: similarity is not an isometry   [||A||_2 = 5.1167 against ||B||_2 = 46.3136, a ratio of 9.0515. Eigenvalues are similarity invariants; singular values are not]
+✓  and not symmetry: a general similarity destroys it while keeping the spectrum   [||M - M^T|| = 20.0000 with eigenvalues unchanged to 8.9e-16. This is why 3.2 required ORTHOGONAL similarity]
+✓  an orthogonal similarity keeps symmetry, singular values and norm   [||M - M^T|| = 0.0e+00, singular values agree to 2.2e-15: a rotation of the coordinates rather than a shear]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-schur-the-decomposition-that-always-exists">
+<h2>Exercise 2: Schur: the decomposition that always exists<a class="headerlink" href="#exercise-2-schur-the-decomposition-that-always-exists" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-nn-schur">Eq. 181</a> is the workhorse. It asks nothing of <span class="math notranslate nohighlight">\(A\)</span>, it uses a unitary
+<span class="math notranslate nohighlight">\(Q\)</span> so nothing is amplified, and it is what LAPACK computes on the way to the
+eigenvalues. The price is that <span class="math notranslate nohighlight">\(T\)</span> is triangular rather than diagonal, and
+<a class="reference internal" href="hermitian-unitary-normal.html"><span class="std std-doc">§3.4</span></a> established that the off-diagonal part
+vanishes exactly for normal matrices.</p>
+<p>The test matrices are the <span class="math notranslate nohighlight">\(8\times8\)</span> Grcar matrix <code class="docutils literal notranslate"><span class="pre">la.grcar(8)</span></code> — a standard
+non-normal example, Toeplitz with ones on the diagonal and three
+superdiagonals and <span class="math notranslate nohighlight">\(-1\)</span> below — and a random <span class="math notranslate nohighlight">\(6\times6\)</span> real matrix.</p>
+<p><strong>Part a)</strong> For both matrices compute <code class="docutils literal notranslate"><span class="pre">T,</span> <span class="pre">Q</span> <span class="pre">=</span> <span class="pre">schur(A,</span> <span class="pre">output=&quot;complex&quot;)</span></code> and
+confirm <span class="math notranslate nohighlight">\(A = QTQ^{*}\)</span> to <span class="math notranslate nohighlight">\(10^{-12}\)</span>, that <span class="math notranslate nohighlight">\(Q^{*}Q = I\)</span> to <span class="math notranslate nohighlight">\(10^{-13}\)</span>, and that
+<span class="math notranslate nohighlight">\(T\)</span> is upper triangular exactly (<code class="docutils literal notranslate"><span class="pre">np.tril(T,</span> <span class="pre">-1)</span></code> identically zero).</p>
+<p><strong>Part b)</strong> Confirm the diagonal of <span class="math notranslate nohighlight">\(T\)</span> is the spectrum. Compare
+<code class="docutils literal notranslate"><span class="pre">np.diag(T)</span></code> against <code class="docutils literal notranslate"><span class="pre">np.linalg.eigvals(A)</span></code> <strong>as sorted sets</strong>, using a
+lexicographic sort on (real, imaginary) — not <code class="docutils literal notranslate"><span class="pre">np.sort_complex</span></code>, which
+<a class="reference internal" href="hermitian-unitary-normal.html"><span class="std std-doc">§3.4</span></a> showed orders on the real part alone.
+Agreement should be <span class="math notranslate nohighlight">\(10^{-10}\)</span>.</p>
+<p><strong>Part c)</strong> Quantify the non-normality. Report
+<span class="math notranslate nohighlight">\(\|T - \operatorname{diag}T\|_F\)</span> for both matrices, and the <strong>departure from
+normality</strong> <span class="math notranslate nohighlight">\(\Delta(A) = \sqrt{\|A\|_F^2 - \sum_i|\lambda_i|^2}\)</span>, which is zero
+exactly for normal matrices. Confirm the two agree to <span class="math notranslate nohighlight">\(10^{-10}\)</span>: the
+off-diagonal Frobenius mass of the Schur form <em>is</em> the departure from
+normality, which makes <a class="reference internal" href="#equation-eq-nn-schur">Eq. 181</a> a way of measuring it.</p>
+<p><strong>Part d)</strong> Confirm the real Schur form is different. Call <code class="docutils literal notranslate"><span class="pre">schur(A)</span></code> without
+<code class="docutils literal notranslate"><span class="pre">output=&quot;complex&quot;</span></code> on the random real matrix and confirm the result is real,
+but only <em>quasi</em>-triangular: it has <span class="math notranslate nohighlight">\(2\times2\)</span> blocks on the diagonal wherever
+a complex-conjugate eigenvalue pair occurs. Report how many such blocks there
+are, by counting nonzero entries on the first subdiagonal. Real arithmetic
+cannot produce a triangular form with complex eigenvalues on the diagonal, and
+this is the compromise.</p>
+<p><strong>Part e)</strong> Confirm the practical consequence: the Schur form gives the
+eigenvalues <em>without</em> ever forming an eigenvector matrix, so nothing in it can
+be badly conditioned. Report <span class="math notranslate nohighlight">\(\operatorname{cond}(Q)\)</span> for both matrices — it is
+1 — against <span class="math notranslate nohighlight">\(\operatorname{cond}(X)\)</span> from <code class="docutils literal notranslate"><span class="pre">np.linalg.eig</span></code>, which for the Grcar
+matrix is larger. Exercise 4 makes that number matter.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Grcar 8x8:
+  ||Q T Q* - A|| 4.08e-15   ||Q*Q - I|| 1.78e-15   strictly lower triangle 0.0e+00
+  diag(T) vs eigvals, lexicographically sorted : 0.00e+00
+  ||T - diag T||_F = 2.584298   departure from normality 2.584298   gap 3.11e-15
+  cond(Q) = 1.000000   against cond(X) from eig = 6.5137
+random 6x6:
+  ||Q T Q* - A|| 3.23e-15   ||Q*Q - I|| 8.44e-16   strictly lower triangle 0.0e+00
+  diag(T) vs eigvals, lexicographically sorted : 4.80e-15
+  ||T - diag T||_F = 3.732027   departure from normality 3.732027   gap 1.78e-15
+  cond(Q) = 1.000000   against cond(X) from eig = 4.6509
+
+real Schur form of the random 6x6:
+  entries all real: True
+  nonzero first-subdiagonal entries: 2  -&gt; 2 2x2 block(s), one per complex-conjugate pair
+  reconstruction ||Q T Q^T - A|| = 4.27e-15
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<p>The identity <span class="math notranslate nohighlight">\(\|T - \operatorname{diag}T\|_F = \Delta(A)\)</span> is the check worth
+having: it connects the Schur form’s shape to a quantity defined without
+reference to any decomposition, so the two could disagree and do not.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  A = Q T Q* holds for both matrices with Q unitary (Eq. 2)   [worst reconstruction 4.08e-15, worst |Q*Q - I| 1.78e-15]
+✓  with T exactly upper triangular   [the strictly lower triangle is identically zero in both cases]
+✓  and diag(T) is the spectrum, compared as a lexicographically sorted set   [worst gap 4.80e-15. np.sort_complex would not do here: it orders on the real part alone and leaves conjugate pairs in input order]
+✓  the off-diagonal Frobenius mass of T IS the departure from normality   [Grcar: 2.584298 against 2.584298; random: 3.732027 against 3.732027. The second is defined without reference to any decomposition, so they could disagree]
+✓  cond(Q) = 1 always, and the real Schur form is quasi-triangular   [cond(Q) = 1 to 1e-12 for both; the real form has 2 nonzero subdiagonal entries, one per complex-conjugate pair — real arithmetic cannot put a complex eigenvalue on a diagonal]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-the-jordan-form-dissolves-and-the-rate-is-exactly-delta-1-n">
+<h2>Exercise 3: The Jordan form dissolves, and the rate is exactly <span class="math notranslate nohighlight">\(\delta^{1/n}\)</span><a class="headerlink" href="#exercise-3-the-jordan-form-dissolves-and-the-rate-is-exactly-delta-1-n" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-nn-jordan">Eq. 180</a> is the complete answer to the similarity classification
+problem and it cannot be computed. This exercise shows why, and the failure is
+not a matter of degree: it is a discontinuity with an exactly known rate.</p>
+<p>Take the nilpotent block <span class="math notranslate nohighlight">\(J_n(0)\)</span> and put <span class="math notranslate nohighlight">\(\delta\)</span> in the bottom-left corner.
+Expanding the determinant gives <span class="math notranslate nohighlight">\(\det(J_n(0) - \lambda I + \delta e_ne_1^{\top})
+= (-\lambda)^n + (-1)^{n+1}\delta\)</span>, so the characteristic equation is
+<span class="math notranslate nohighlight">\(\lambda^n = \delta\)</span> and the eigenvalues are exactly
+<a class="reference internal" href="#equation-eq-nn-dissolution">Eq. 182</a>: <span class="math notranslate nohighlight">\(n\)</span> of them, equally spaced on a circle of radius
+<span class="math notranslate nohighlight">\(\delta^{1/n}\)</span>.</p>
+<p><strong>Part a)</strong> Confirm the exact Jordan form is available symbolically. For
+<span class="math notranslate nohighlight">\(A = \left[\begin{smallmatrix}2&amp;1&amp;0\\0&amp;2&amp;1\\0&amp;0&amp;2\end{smallmatrix}\right]\)</span> use
+<code class="docutils literal notranslate"><span class="pre">sp.Matrix(...).jordan_form()</span></code> to get <span class="math notranslate nohighlight">\((P, J)\)</span> and confirm
+<span class="math notranslate nohighlight">\(PJP^{-1} = A\)</span> <strong>exactly</strong> with <code class="docutils literal notranslate"><span class="pre">sp.simplify(...)</span> <span class="pre">==</span> <span class="pre">sp.zeros(3,</span> <span class="pre">3)</span></code>. Report
+<span class="math notranslate nohighlight">\(J\)</span>: one <span class="math notranslate nohighlight">\(3\times3\)</span> block with eigenvalue 2.</p>
+<p><strong>Part b)</strong> Now perturb numerically. For <span class="math notranslate nohighlight">\(n = 4, 6, 8\)</span> and
+<span class="math notranslate nohighlight">\(\delta = 10^{-10}, 10^{-14}\)</span>, build <code class="docutils literal notranslate"><span class="pre">jordan_block(n)</span></code>, add <span class="math notranslate nohighlight">\(\delta\)</span> at
+<code class="docutils literal notranslate"><span class="pre">[n-1,</span> <span class="pre">0]</span></code>, and report <span class="math notranslate nohighlight">\(|\lambda|\)</span> for the resulting eigenvalues alongside the
+prediction <span class="math notranslate nohighlight">\(\delta^{1/n}\)</span>.</p>
+<p><strong>Part c)</strong> Confirm <a class="reference internal" href="#equation-eq-nn-dissolution">Eq. 182</a> to a relative <span class="math notranslate nohighlight">\(10^{-6}\)</span>: every
+eigenvalue has modulus <span class="math notranslate nohighlight">\(\delta^{1/n}\)</span>, and they are equally spaced in angle.
+Check the spacing by sorting the arguments and confirming consecutive
+differences equal <span class="math notranslate nohighlight">\(2\pi/n\)</span> to <span class="math notranslate nohighlight">\(10^{-6}\)</span>.</p>
+<p><strong>Part d)</strong> State the amplification. At <span class="math notranslate nohighlight">\(n = 6\)</span>, <span class="math notranslate nohighlight">\(\delta = 10^{-14}\)</span> the
+eigenvalues move to <span class="math notranslate nohighlight">\(4.6\times10^{-3}\)</span> — a displacement <span class="math notranslate nohighlight">\(4.6\times10^{11}\)</span>
+times the perturbation. Confirm the ratio <span class="math notranslate nohighlight">\(\delta^{1/n}/\delta\)</span> exceeds
+<span class="math notranslate nohighlight">\(10^{10}\)</span> for that case. A perturbation at the level of rounding error has
+moved the answer into the third decimal place.</p>
+<p><strong>Part e)</strong> Draw the conclusion the right way round. It is not that the
+algorithm is bad: <em>any</em> matrix is within <span class="math notranslate nohighlight">\(\varepsilon\)</span> of a diagonalizable one,
+because the diagonalizable matrices are dense. Confirm that directly by taking
+the <span class="math notranslate nohighlight">\(6\times6\)</span> Jordan block, adding a random perturbation of norm <span class="math notranslate nohighlight">\(10^{-13}\)</span>,
+and checking the result has 6 distinct eigenvalues — hence is diagonalizable —
+over 20 trials. “Is this matrix defective?” is not a question <code class="docutils literal notranslate"><span class="pre">float64</span></code> can
+answer, and that is why <code class="docutils literal notranslate"><span class="pre">scipy</span></code> offers <code class="docutils literal notranslate"><span class="pre">schur</span></code> and not <code class="docutils literal notranslate"><span class="pre">jordan</span></code>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>SymPy: P J P^-1 = A exactly -&gt; True
+J =
+[[2. 1. 0.]
+ [0. 2. 1.]
+ [0. 0. 2.]]
+  one 3x3 block with eigenvalue 2: algebraic multiplicity 3, geometric 1
+
+  n     delta      |lambda|   delta^(1/n)     ratio    angle gap
+  4     1e-10   3.16228e-03   3.16228e-03   1.00000     2.22e-16
+  4     1e-14   3.16228e-04   3.16228e-04   1.00000     2.22e-16
+  6     1e-10   2.15443e-02   2.15443e-02   1.00000     6.66e-16
+  6     1e-14   4.64159e-03   4.64159e-03   1.00000     2.22e-16
+  8     1e-10   5.62341e-02   5.62341e-02   1.00000     1.33e-15
+  8     1e-14   1.77828e-02   1.77828e-02   1.00000     4.44e-16
+
+at n = 6, delta = 1e-14: eigenvalues move to 4.6416e-03
+  amplification delta^(1/6) / delta = 4.642e+11
+  a perturbation at rounding level has moved the answer to the third decimal place
+
+20 random perturbations of norm 1e-13 applied to J_6(0):
+  20/20 gave 6 DISTINCT eigenvalues, hence a diagonalizable matrix
+  the diagonalizable matrices are dense, so defectiveness is not a decidable property in float64
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<p>The dissolution rate is checked against an exact closed form rather than an
+order-of-magnitude estimate, and the <em>angles</em> are checked too, because
+“<span class="math notranslate nohighlight">\(n\)</span> eigenvalues on a circle” is a stronger and more falsifiable claim than
+“the eigenvalues moved a lot”.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  SymPy&#39;s Jordan form is exact over the rationals: P J P^-1 = A (Eq. 1)   [one 3x3 block with eigenvalue 2 — algebraic multiplicity 3, geometric 1]
+✓  the perturbed eigenvalues have modulus exactly delta^(1/n) (Eq. 3)   [worst relative deviation 1.37e-15 over n = 4, 6, 8 and delta = 1e-10, 1e-14: the characteristic equation is lambda^n = delta, so this is a closed form and not an estimate]
+✓  and they are equally spaced in angle, 2 pi / n apart (Eq. 3)   [worst angular deviation 1.33e-15: n distinct eigenvalues on a circle, where there had been one of multiplicity n]
+✓  so a 1e-14 perturbation moves the answer by 4.6e-3, an amplification of 5e11   [delta^(1/6)/delta = 4.64e+11. Nothing is wrong with the algorithm: the Jordan STRUCTURE is discontinuous in A]
+✓  and every one of 20 tiny random perturbations made J_6(0) diagonalizable   [the diagonalizable matrices are dense in C^(n x n), so &#39;is this matrix defective?&#39; is not a question float64 can answer — which is why scipy offers schur and not jordan]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-bauerfike-the-conditioning-of-the-eigenvector-matrix">
+<h2>Exercise 4: Bauer–Fike: the conditioning of the eigenvector matrix<a class="headerlink" href="#exercise-4-bauerfike-the-conditioning-of-the-eigenvector-matrix" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="spectral-theorem.html"><span class="std std-doc">§3.2</span></a> established that symmetric eigenvalues are
+perfectly conditioned: a perturbation of norm <span class="math notranslate nohighlight">\(\|E\|\)</span> moves no eigenvalue
+further than <span class="math notranslate nohighlight">\(\|E\|\)</span>. <a class="reference internal" href="#equation-eq-nn-bauer-fike">Eq. 183</a> is the general statement, and the
+difference is a factor of <span class="math notranslate nohighlight">\(\operatorname{cond}(X)\)</span> — which for a normal matrix
+is 1 and otherwise is not.</p>
+<p>The test matrix is <span class="math notranslate nohighlight">\(A = X\Lambda X^{-1}\)</span> with
+<span class="math notranslate nohighlight">\(\Lambda = \operatorname{diag}(1, 2, 3)\)</span> and the deliberately ill-conditioned</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+X = \begin{bmatrix} 1 &amp; 1 &amp; 1\\ 0 &amp; 10^{-3} &amp; 2\times10^{-3}\\
+                    0 &amp; 0 &amp; 10^{-6}\end{bmatrix},
+\end{split}\]</div>
+<p>whose condition number is <span class="math notranslate nohighlight">\(4.2\times10^{6}\)</span>: the eigenvectors are nearly
+parallel, which is what makes the eigenvalues sensitive.</p>
+<p><strong>Part a)</strong> Build <span class="math notranslate nohighlight">\(A\)</span> and confirm its eigenvalues are <span class="math notranslate nohighlight">\(1, 2, 3\)</span> to <span class="math notranslate nohighlight">\(10^{-8}\)</span>,
+and report <span class="math notranslate nohighlight">\(\operatorname{cond}(X) = 4.2\times10^{6}\)</span>.</p>
+<p><strong>Part b)</strong> Apply 100 random perturbations <span class="math notranslate nohighlight">\(E\)</span> of norm about <span class="math notranslate nohighlight">\(10^{-6}\)</span>, built
+as <code class="docutils literal notranslate"><span class="pre">1e-6</span> <span class="pre">*</span> <span class="pre">rng.standard_normal((3,</span> <span class="pre">3))</span></code>. For each, compute the eigenvalues of
+<span class="math notranslate nohighlight">\(A + E\)</span> and the largest distance from any of them to the nearest of
+<span class="math notranslate nohighlight">\(\{1, 2, 3\}\)</span>. Confirm <a class="reference internal" href="#equation-eq-nn-bauer-fike">Eq. 183</a> holds every time: that distance
+never exceeds <span class="math notranslate nohighlight">\(\operatorname{cond}(X)\|E\|_2\)</span>.</p>
+<p><strong>Part c)</strong> Report the worst ratio <span class="math notranslate nohighlight">\(\min_i|\mu - \lambda_i| \big/
+(\operatorname{cond}(X)\|E\|_2)\)</span> over the 100 trials. It comes out about
+<span class="math notranslate nohighlight">\(0.15\)</span>, so the bound holds with room to spare — Bauer–Fike is a worst case, and
+a worst case attained only by adversarial perturbations. Report also the actual
+eigenvalue movement in absolute terms.</p>
+<p><strong>Part d)</strong> Contrast with the symmetric case. Take a symmetric matrix with the
+same spectrum, <span class="math notranslate nohighlight">\(S = Q\operatorname{diag}(1,2,3)Q^{\top}\)</span> for a random
+orthogonal <span class="math notranslate nohighlight">\(Q\)</span>, apply the <em>same</em> 100 perturbations symmetrised as
+<span class="math notranslate nohighlight">\((E + E^{\top})/2\)</span>, and confirm the movement never exceeds <span class="math notranslate nohighlight">\(\|E\|_2\)</span> — Weyl’s
+bound, with <span class="math notranslate nohighlight">\(\operatorname{cond}(X) = 1\)</span>. Report the ratio of the two worst
+movements: the non-normal matrix’s eigenvalues move far further under
+perturbations of the same size.</p>
+<p><strong>Part e)</strong> Confirm the mechanism is the eigenvector conditioning and not
+anything else, by checking that <span class="math notranslate nohighlight">\(\operatorname{cond}\)</span> of the eigenvector matrix
+returned by <code class="docutils literal notranslate"><span class="pre">np.linalg.eig(A)</span></code> is itself around <span class="math notranslate nohighlight">\(10^{6}\)</span>, while for <span class="math notranslate nohighlight">\(S\)</span> it is
+1 to <span class="math notranslate nohighlight">\(10^{-12}\)</span>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>cond(X) = 4.2426e+06
+eigenvalues of A : [1. 2. 3.]   gap from (1,2,3) 0.00e+00
+
+100 perturbations of norm ~1e-6:
+  non-normal A : worst movement 1.3454e+00, worst ratio to cond(X)||E|| = 0.148500   (Bauer-Fike: &lt;= 1)
+  symmetric S  : worst movement 2.8821e-06, worst ratio to ||E||         = 0.998343   (Weyl: &lt;= 1)
+  the non-normal eigenvalues move 466801.6x further under the same size of perturbation
+
+  cond of eig&#39;s eigenvector matrix: 4.243e+06 for A, 1.000000 for S
+  that number IS the amplifier in Eq. 4
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<p>Bauer–Fike is checked as an inequality over 100 trials, which is the only
+honest way to test a bound, and the <em>worst ratio</em> is reported so the reader can
+see it is not attained. The symmetric comparison is run with the same
+perturbations so the difference cannot be attributed to the draw.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the test matrix has eigenvalues 1, 2, 3 despite cond(X) = 4e6   [max|Δ| = 0 (rtol=0, atol=1e-08)]
+✓  Bauer-Fike holds for all 100 perturbations (Eq. 4)   [worst ratio |dlambda| / (cond(X) ||E||) = 0.148500, so the bound holds with room: it is a worst case, attained only by adversarial E]
+✓  and Weyl holds for the symmetric matrix with the same spectrum   [worst ratio |dlambda| / ||E|| = 0.998343: cond(X) = 1 there, so Bauer-Fike degenerates to Weyl exactly]
+✓  but the non-normal eigenvalues move orders further for the same ||E||   [1.345e+00 against 2.882e-06, a factor of 466802, under the SAME 100 perturbations]
+✓  and the amplifier is exactly the eigenvector matrix&#39;s conditioning   [cond(X) = 4.24e+06 for A against 1.000000 for S]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-spectral-radius-below-1-and-the-norm-goes-up-anyway">
+<h2>Exercise 5: Spectral radius below 1, and the norm goes up anyway<a class="headerlink" href="#exercise-5-spectral-radius-below-1-and-the-norm-goes-up-anyway" title="Link to this heading">#</a></h2>
+<p>This is the practical sting of non-normality. The spectral radius answers one
+question exactly — does <span class="math notranslate nohighlight">\(A^k \to 0\)</span>? — and people routinely read it as
+answering a different one: does <span class="math notranslate nohighlight">\(\|A^k\|\)</span> decrease? For a normal matrix those
+are the same question, since <span class="math notranslate nohighlight">\(\|A^k\|_2 = \rho(A)^k\)</span>. For a non-normal matrix
+they are not, and the gap can be large.</p>
+<p>The matrix is <span class="math notranslate nohighlight">\(A = \left[\begin{smallmatrix}0.8 &amp; 3\\ 0 &amp; 0.8\end{smallmatrix}\right]\)</span>,
+available as <code class="docutils literal notranslate"><span class="pre">A_TRANS</span></code>. Both eigenvalues are <span class="math notranslate nohighlight">\(0.8\)</span>, so <span class="math notranslate nohighlight">\(\rho = 0.8 &lt; 1\)</span> and
+<span class="math notranslate nohighlight">\(A^k \to 0\)</span> is guaranteed. The comparison is
+<span class="math notranslate nohighlight">\(\operatorname{diag}(0.8, 0.8)\)</span>, available as <code class="docutils literal notranslate"><span class="pre">A_NORMAL</span></code>: same spectrum,
+normal.</p>
+<p><strong>Part a)</strong> Confirm <span class="math notranslate nohighlight">\(\rho(A_{\text{TRANS}}) = 0.8\)</span> exactly and that
+<span class="math notranslate nohighlight">\(A_{\text{TRANS}}\)</span> is not normal, reporting <span class="math notranslate nohighlight">\(\|AA^{*} - A^{*}A\|\)</span>.</p>
+<p><strong>Part b)</strong> Compute <span class="math notranslate nohighlight">\(\|A^k\|_2\)</span> for <span class="math notranslate nohighlight">\(k = 0, \dots, 59\)</span> using
+<code class="docutils literal notranslate"><span class="pre">np.linalg.matrix_power</span></code> and report the maximum and where it occurs. It reaches
+<span class="math notranslate nohighlight">\(6.17\)</span> at <span class="math notranslate nohighlight">\(k = 4\)</span>: the matrix amplifies by more than a factor of six before it
+begins to decay.</p>
+<p><strong>Part c)</strong> Confirm the decay does eventually happen, as the spectral radius
+promises: report <span class="math notranslate nohighlight">\(\|A^{59}\|_2\)</span>, which is <span class="math notranslate nohighlight">\(4\times10^{-4}\)</span>. The asymptotic
+statement was true all along; it was simply not the statement one wanted.</p>
+<p><strong>Part d)</strong> Confirm the normal matrix cannot do this. For <code class="docutils literal notranslate"><span class="pre">A_NORMAL</span></code>, confirm
+<span class="math notranslate nohighlight">\(\|A^k\|_2 = 0.8^k\)</span> to <span class="math notranslate nohighlight">\(10^{-14}\)</span> for every <span class="math notranslate nohighlight">\(k\)</span>, so the maximum is <span class="math notranslate nohighlight">\(1\)</span> at
+<span class="math notranslate nohighlight">\(k = 0\)</span> and the sequence never rises. This is the exact sense in which
+non-normality is <em>necessary</em> for a transient.</p>
+<p><strong>Part e)</strong> Confirm the transient scales with the off-diagonal entry. For
+<span class="math notranslate nohighlight">\(a = 0.9, 1.5, 3\)</span> in <span class="math notranslate nohighlight">\(\left[\begin{smallmatrix}0.8&amp;a\\0&amp;0.8\end{smallmatrix}\right]\)</span>,
+report the peak <span class="math notranslate nohighlight">\(\|A^k\|\)</span>; it grows roughly linearly in <span class="math notranslate nohighlight">\(a\)</span> while the spectrum
+is <em>identical</em> in all three cases. Confirm the peak values are increasing and
+that all three matrices have exactly the same eigenvalues, to <span class="math notranslate nohighlight">\(10^{-15}\)</span>.
+Nothing about the spectrum distinguishes them, and the behaviour differs by a
+factor of three.</p>
+<p><strong>Part f)</strong> Plot <span class="math notranslate nohighlight">\(\|A^k\|_2\)</span> against <span class="math notranslate nohighlight">\(k\)</span> on a log axis for the three values of
+<span class="math notranslate nohighlight">\(a\)</span> and for the normal matrix, with <span class="math notranslate nohighlight">\(0.8^k\)</span> drawn as the asymptotic reference.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>A_TRANS: rho = 0.800000 &lt; 1, so A^k -&gt; 0 is guaranteed
+  ||A A^T - A^T A|| = 9.0   (not normal)
+  max ||A^k||_2 = 6.1712 at k = 4
+  ||A^59||_2    = 4.2384e-04   (it does decay, eventually)
+
+A_NORMAL, same spectrum:
+  ||A^k||_2 = 0.8^k to 1.11e-16, so max = 1.0000 at k = 0 and the sequence never rises
+  a = 0.9: peak ||A^k|| = 1.9301 at k = 4, eigenvalues [0.8 0.8]
+  a = 1.5: peak ||A^k|| = 3.1257 at k = 4, eigenvalues [0.8 0.8]
+  a = 3.0: peak ||A^k|| = 6.1712 at k = 4, eigenvalues [0.8 0.8]
+
+  all three have IDENTICAL spectra to 0.0e+00, and peaks [&#39;1.93&#39;, &#39;3.13&#39;, &#39;6.17&#39;]
+  nothing in the spectrum distinguishes them; the behaviour differs 3.2-fold
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-nn-transient">
+<img alt="../../_images/077d2683717b9711624aee4681a1999f5881c3c2f44899aa793a2e2158e68287.png" src="../../_images/077d2683717b9711624aee4681a1999f5881c3c2f44899aa793a2e2158e68287.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 67 </span><span class="caption-text"><span class="math notranslate nohighlight">\(\|A^k\|_2\)</span> against <span class="math notranslate nohighlight">\(k\)</span> for <span class="math notranslate nohighlight">\(A = \left[\begin{smallmatrix}0.8&amp;a\\0&amp;0.8\end{smallmatrix}\right]\)</span> at <span class="math notranslate nohighlight">\(a = 0.9, 1.5, 3\)</span> (amber), and for the normal <span class="math notranslate nohighlight">\(\mathrm{diag}(0.8, 0.8)\)</span> (navy), on a log axis with <span class="math notranslate nohighlight">\(0.8^k\)</span> dotted. All four matrices have the <em>same</em> spectrum, <span class="math notranslate nohighlight">\(\{0.8, 0.8\}\)</span>, so all four satisfy <span class="math notranslate nohighlight">\(\rho(A) = 0.8 &lt; 1\)</span> and all four decay eventually. Three of them first amplify – by <span class="math notranslate nohighlight">\(1.93\)</span>, <span class="math notranslate nohighlight">\(3.13\)</span> and <span class="math notranslate nohighlight">\(6.17\)</span>, peaking at <span class="math notranslate nohighlight">\(k = 4\)</span> – while the normal one traces <span class="math notranslate nohighlight">\(0.8^k\)</span> exactly and never rises above 1. The spectral radius answers ‘does it decay?’ and says nothing whatever about the route.</span><a class="headerlink" href="#fig-nn-transient" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<p>The normal comparison is what turns this from an anecdote into a theorem: the
+transient is not merely <em>possible</em> for a non-normal matrix, it is <em>impossible</em>
+for a normal one, and <span class="math notranslate nohighlight">\(\|A^k\| = \rho^k\)</span> to <span class="math notranslate nohighlight">\(10^{-16}\)</span> is the exact statement
+of that.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  A_TRANS has spectral radius 0.8 and is not normal   [rho = 0.800000 &lt; 1, so A^k -&gt; 0 is guaranteed; commutator 9.0]
+✓  yet ||A^k|| reaches 6.17 before decaying to 4e-4   [peak 6.1712 at k = 4, and ||A^59|| = 4.238e-04. The asymptotic claim was true; it was not the claim one wanted]
+✓  for the normal matrix ||A^k||_2 = rho^k exactly, so it can never rise   [max|Δ| = 1.11022e-16 (rtol=0, atol=1e-14)]
+✓  the transient grows with the off-diagonal entry at IDENTICAL spectrum   [peaks [&#39;1.930&#39;, &#39;3.126&#39;, &#39;6.171&#39;] for a = 0.9, 1.5, 3.0, whose spectra agree to 0.0e+00: a 3.2-fold difference in behaviour that no eigenvalue sees]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-6-pseudospectra-the-picture-that-does-predict-it">
+<h2>Exercise 6: Pseudospectra: the picture that does predict it<a class="headerlink" href="#exercise-6-pseudospectra-the-picture-that-does-predict-it" title="Link to this heading">#</a></h2>
+<p>Eigenvalues failed to predict the transient because they are the wrong object
+for a non-normal matrix. <a class="reference internal" href="#equation-eq-nn-pseudospectrum">Eq. 184</a> gives the right one: the
+set of <span class="math notranslate nohighlight">\(z\)</span> that are eigenvalues of <em>some</em> matrix within <span class="math notranslate nohighlight">\(\epsilon\)</span> of <span class="math notranslate nohighlight">\(A\)</span>.
+For a normal matrix that set is exactly the union of <span class="math notranslate nohighlight">\(\epsilon\)</span>-discs about the
+eigenvalues; for a non-normal one it bulges, and how far it bulges is what the
+behaviour follows.</p>
+<p>The three definitions in <a class="reference internal" href="#equation-eq-nn-pseudospectrum">Eq. 184</a> are equivalent, and the
+middle one — <span class="math notranslate nohighlight">\(\sigma_{\min}(zI - A) &lt; \epsilon\)</span> — is how it is computed: one
+SVD per grid point, which is why pseudospectra were impractical until they were
+not.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">resolvent_norm(z,</span> <span class="pre">A)</span></code> — one line:
+<span class="math notranslate nohighlight">\(1/\sigma_{\min}(zI - A)\)</span>, the definition of <a class="reference internal" href="#equation-eq-nn-pseudospectrum">Eq. 184</a>
+transcribed.</p>
+<p><strong>Part b)</strong> Confirm the resolvent and singular-value definitions agree. For the
+<span class="math notranslate nohighlight">\(8\times8\)</span> Grcar matrix and 200 random points <span class="math notranslate nohighlight">\(z\)</span> in the box
+<span class="math notranslate nohighlight">\([-2, 4]\times[-3, 3]\)</span>, confirm
+<span class="math notranslate nohighlight">\(\|(zI - A)^{-1}\|_2 = 1/\sigma_{\min}(zI - A)\)</span> to a relative <span class="math notranslate nohighlight">\(10^{-10}\)</span>,
+computing the left side with <code class="docutils literal notranslate"><span class="pre">np.linalg.inv</span></code> and the right with
+<code class="docutils literal notranslate"><span class="pre">np.linalg.svd(...,</span> <span class="pre">compute_uv=False)</span></code>.</p>
+<p><strong>Part c)</strong> Confirm the spectrum is inside every pseudospectrum: for each
+eigenvalue <span class="math notranslate nohighlight">\(\lambda\)</span> of the Grcar matrix, confirm
+<span class="math notranslate nohighlight">\(\sigma_{\min}(\lambda I - A) &lt; 10^{-12}\)</span>, so the resolvent norm exceeds
+<span class="math notranslate nohighlight">\(10^{12}\)</span> and <span class="math notranslate nohighlight">\(\lambda \in \Lambda_\epsilon\)</span> for every <span class="math notranslate nohighlight">\(\epsilon &gt; 10^{-12}\)</span>.</p>
+<p><strong>Part d)</strong> Confirm the boundary identity. By definition the boundary of
+<span class="math notranslate nohighlight">\(\Lambda_\epsilon\)</span> is where <span class="math notranslate nohighlight">\(\|(zI - A)^{-1}\| = 1/\epsilon\)</span> exactly. Find such
+a point by bisection along the real direction from the first eigenvalue, for
+<span class="math notranslate nohighlight">\(\epsilon = 10^{-1}\)</span> and <span class="math notranslate nohighlight">\(10^{-2}\)</span>, and confirm the resolvent norm there equals
+<span class="math notranslate nohighlight">\(1/\epsilon\)</span> to a relative <span class="math notranslate nohighlight">\(10^{-6}\)</span>.</p>
+<p><strong>Part e)</strong> Confirm the third definition — that <span class="math notranslate nohighlight">\(z\)</span> on the boundary really is
+an eigenvalue of a nearby matrix — by <em>constructing</em> the perturbation. Let
+<span class="math notranslate nohighlight">\(zI - A = U\Sigma V^{*}\)</span> with smallest singular triple
+<span class="math notranslate nohighlight">\((\sigma_{\min}, \mathbf{u}, \mathbf{v})\)</span>, so <span class="math notranslate nohighlight">\((zI-A)\mathbf{v} =
+\sigma_{\min}\mathbf{u}\)</span>. Setting</p>
+<div class="math notranslate nohighlight">
+\[
+E = \sigma_{\min}\,\mathbf{u}\mathbf{v}^{*}
+\]</div>
+<p>gives <span class="math notranslate nohighlight">\((zI - A - E)\mathbf{v} = \sigma_{\min}\mathbf{u} -
+\sigma_{\min}\mathbf{u} = \mathbf{0}\)</span>, so <span class="math notranslate nohighlight">\(z\)</span> is an eigenvalue of <span class="math notranslate nohighlight">\(A + E\)</span>
+with eigenvector <span class="math notranslate nohighlight">\(\mathbf{v}\)</span>, and <span class="math notranslate nohighlight">\(\|E\|_2 = \sigma_{\min} = \epsilon\)</span>
+because a rank-one matrix’s only singular value is the product of the two unit
+vectors’ scale.</p>
+<p>Build it — with <code class="docutils literal notranslate"><span class="pre">numpy</span></code>’s convention <code class="docutils literal notranslate"><span class="pre">U,</span> <span class="pre">s,</span> <span class="pre">Vh</span> <span class="pre">=</span> <span class="pre">svd(M)</span></code> the right singular
+vector is <code class="docutils literal notranslate"><span class="pre">Vh[-1].conj()</span></code>, so <span class="math notranslate nohighlight">\(\mathbf{v}^{*}\)</span> is <code class="docutils literal notranslate"><span class="pre">Vh[-1]</span></code> — and confirm
+<span class="math notranslate nohighlight">\(\|E\|_2 = \epsilon\)</span> to <span class="math notranslate nohighlight">\(10^{-12}\)</span> and that <span class="math notranslate nohighlight">\(z\)</span> is an eigenvalue of <span class="math notranslate nohighlight">\(A + E\)</span>
+to <span class="math notranslate nohighlight">\(10^{-10}\)</span>. The sign and the conjugate both matter: getting either wrong
+leaves <span class="math notranslate nohighlight">\(\|E\|\)</span> correct while putting <span class="math notranslate nohighlight">\(z\)</span> about <span class="math notranslate nohighlight">\(0.29\)</span> away from the spectrum,
+which is a failure the norm check alone would not catch.</p>
+<p><strong>Part f)</strong> Confirm the contrast with a normal matrix. For
+<span class="math notranslate nohighlight">\(D = \operatorname{diag}(1, 2, 3)\)</span> and 200 random <span class="math notranslate nohighlight">\(z\)</span>, confirm
+<span class="math notranslate nohighlight">\(\sigma_{\min}(zI - D) = \min_i|z - \lambda_i|\)</span> to <span class="math notranslate nohighlight">\(10^{-12}\)</span> — so
+<span class="math notranslate nohighlight">\(\Lambda_\epsilon(D)\)</span> is exactly the union of <span class="math notranslate nohighlight">\(\epsilon\)</span>-discs, with no bulge
+at all. For a normal matrix the pseudospectra carry no information the
+eigenvalues did not already have, which is precisely why they are only
+interesting in the non-normal case.</p>
+<p><strong>Part g)</strong> Draw the pseudospectral contours of the <span class="math notranslate nohighlight">\(32\times32\)</span> Grcar matrix
+with <code class="docutils literal notranslate"><span class="pre">la.pseudospectrum</span></code>, eigenvalues marked.</p>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p>The transient of Exercise 5 and the pseudospectra of this one are connected by
+the <strong>Kreiss constant</strong>, <span class="math notranslate nohighlight">\(\mathcal{K}(A) = \sup_{|z|&gt;1}(|z| - 1)\,\|(zI -
+A)^{-1}\|\)</span>, which satisfies <span class="math notranslate nohighlight">\(\mathcal{K}(A) \le \sup_k\|A^k\| \le
+e\,n\,\mathcal{K}(A)\)</span>: pseudospectra bounding a transient from both sides. Ask
+your assistant to write <code class="docutils literal notranslate"><span class="pre">kreiss_constant(A,</span> <span class="pre">n_grid)</span></code> estimating the supremum
+over a polar grid outside the unit circle. Then check it against the
+mathematics rather than against a picture: for the three matrices of Exercise 5
+verify the lower bound <span class="math notranslate nohighlight">\(\mathcal{K}(A) \le \max_k\|A^k\|\)</span> holds in all three
+cases, that the upper bound <span class="math notranslate nohighlight">\(\max_k\|A^k\| \le e\,n\,\mathcal{K}(A)\)</span> holds
+with <span class="math notranslate nohighlight">\(n = 2\)</span>, and — the check that matters — that <span class="math notranslate nohighlight">\(\mathcal{K}\)</span> <em>increases</em>
+with <span class="math notranslate nohighlight">\(a\)</span> in step with the peak, since the whole claim is that this quantity
+sees what the spectrum cannot. The check is yours.</p>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>the two definitions agree over 200 random z, relative gap 6.46e-15
+at the eigenvalues, sigma_min &lt;= 1.07e-15, so the resolvent norm exceeds 9.4e+14
+  eps = 1e-01: boundary point found, resolvent norm 1.000000e+01 against 1/eps = 1.0e+01, relative gap 8.88e-16
+  eps = 1e-02: boundary point found, resolvent norm 1.000000e+02 against 1/eps = 1.0e+02, relative gap 1.11e-14
+
+  explicit rank-one E with ||E||_2 = 0.1000000000 (target 0.1)
+  z is an eigenvalue of A + E to 1.26e-15   &lt;- the third definition, constructively
+
+  for diag(1,2,3): sigma_min(zI - D) = min|z - lambda| to 4.44e-16
+  so its pseudospectra are exactly discs, and carry no new information
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-nn-pseudospectra">
+<img alt="../../_images/fe96fbc419e507e5757d8fad981ba6fec108ad0493d960c52102657d097d938e.png" src="../../_images/fe96fbc419e507e5757d8fad981ba6fec108ad0493d960c52102657d097d938e.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 68 </span><span class="caption-text">Pseudospectral contours of the <span class="math notranslate nohighlight">\(32\times32\)</span> Grcar matrix, drawn as <span class="math notranslate nohighlight">\(\log_{10}\sigma_{\min}(zI - A)\)</span> on a grid, with the eigenvalues marked. Each contour bounds the set of numbers that are eigenvalues of some matrix within <span class="math notranslate nohighlight">\(\epsilon\)</span> of this one, Eq. 5. For a normal matrix these would be circles of radius <span class="math notranslate nohighlight">\(\epsilon\)</span> around each eigenvalue and nothing more; here they bulge far outside the spectrum, and that bulge – not the eigenvalues – is what governs how the matrix behaves under iteration.</span><a class="headerlink" href="#fig-nn-pseudospectra" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-6">
+<h3>Validation 6<a class="headerlink" href="#validation-6" title="Link to this heading">#</a></h3>
+<p>All three definitions in <a class="reference internal" href="#equation-eq-nn-pseudospectrum">Eq. 184</a> are checked, and the third
+is checked <em>constructively</em>: rather than asserting that a boundary point is an
+eigenvalue of some nearby matrix, the exercise builds the rank-one perturbation
+that makes it one and verifies both its norm and its effect.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the resolvent and sigma_min definitions of the pseudospectrum agree (Eq. 5)   [worst relative gap 6.46e-15 over 200 random z: the SVD form is how it is computed, one decomposition per grid point]
+✓  and the spectrum lies inside every pseudospectrum   [sigma_min(lambda I - A) &lt;= 1.07e-15 at each eigenvalue, so the resolvent norm is effectively infinite there]
+✓  on the boundary of Lambda_eps the resolvent norm equals 1/eps (Eq. 5)   [worst relative deviation 1.11e-14 at eps = 1e-1 and 1e-2, located by bisection]
+✓  and a boundary z IS an eigenvalue of an explicit A + E with ||E|| = eps   [the rank-one E built from the smallest singular triple has norm 0.1000000000 and makes z an eigenvalue to 1.26e-15 — the third definition, constructed rather than asserted]
+✓  while for a normal matrix the pseudospectra are exactly discs   [sigma_min(zI - D) = min|z - lambda| to 4.44e-16 over 200 points, so they carry no information the eigenvalues did not already have]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p><strong>Similarity keeps the spectrum and little else.</strong> Eigenvalues, trace and
+determinant survived <span class="math notranslate nohighlight">\(X^{-1}AX\)</span> to <span class="math notranslate nohighlight">\(10^{-15}\)</span>; the 2-norm did not, and a
+general similarity applied to a symmetric matrix destroyed its symmetry
+(<span class="math notranslate nohighlight">\(\|M - M^{\top}\| \approx 1\)</span>) while leaving the eigenvalues untouched. An
+<em>orthogonal</em> similarity kept symmetry, singular values and norm — which is
+exactly why <a class="reference internal" href="spectral-theorem.html"><span class="std std-doc">§3.2</span></a> required one.</p>
+<p><strong>Schur always works.</strong> <span class="math notranslate nohighlight">\(A = QTQ^{*}\)</span> reconstructed both test matrices to
+<span class="math notranslate nohighlight">\(10^{-15}\)</span> with <span class="math notranslate nohighlight">\(Q\)</span> unitary and <span class="math notranslate nohighlight">\(T\)</span> exactly triangular, and
+<span class="math notranslate nohighlight">\(\operatorname{cond}(Q) = 1\)</span> in every case. The off-diagonal Frobenius mass of
+<span class="math notranslate nohighlight">\(T\)</span> matched the departure from normality
+<span class="math notranslate nohighlight">\(\sqrt{\|A\|_F^2 - \sum|\lambda_i|^2}\)</span> to <span class="math notranslate nohighlight">\(10^{-14}\)</span> — a quantity defined
+without reference to any decomposition, so the two could have disagreed. The
+real Schur form came back quasi-triangular, with one <span class="math notranslate nohighlight">\(2\times2\)</span> block per
+complex-conjugate pair.</p>
+<p><strong>The Jordan form dissolves at an exactly known rate.</strong> SymPy produced
+<span class="math notranslate nohighlight">\(PJP^{-1} = A\)</span> exactly over the rationals. Numerically, putting <span class="math notranslate nohighlight">\(\delta\)</span> in the
+corner of <span class="math notranslate nohighlight">\(J_n(0)\)</span> gave <span class="math notranslate nohighlight">\(n\)</span> eigenvalues of modulus <strong>exactly</strong> <span class="math notranslate nohighlight">\(\delta^{1/n}\)</span>
+— matched to a relative <span class="math notranslate nohighlight">\(10^{-15}\)</span> — equally spaced by <span class="math notranslate nohighlight">\(2\pi/n\)</span> to <span class="math notranslate nohighlight">\(10^{-15}\)</span>,
+because the characteristic equation is <span class="math notranslate nohighlight">\(\lambda^n = \delta\)</span>. At <span class="math notranslate nohighlight">\(n = 6\)</span>,
+<span class="math notranslate nohighlight">\(\delta = 10^{-14}\)</span> that is a displacement of <span class="math notranslate nohighlight">\(4.6\times10^{-3}\)</span>, an
+amplification of <span class="math notranslate nohighlight">\(4.6\times10^{11}\)</span>. And all 20 random perturbations of norm
+<span class="math notranslate nohighlight">\(10^{-13}\)</span> made <span class="math notranslate nohighlight">\(J_6(0)\)</span> diagonalizable: defectiveness is not decidable in
+<code class="docutils literal notranslate"><span class="pre">float64</span></code>, which is why <code class="docutils literal notranslate"><span class="pre">scipy</span></code> ships <code class="docutils literal notranslate"><span class="pre">schur</span></code> and not <code class="docutils literal notranslate"><span class="pre">jordan</span></code>.</p>
+<p><strong>Bauer–Fike replaces perfect conditioning.</strong> With <span class="math notranslate nohighlight">\(\operatorname{cond}(X) =
+4.2\times10^{6}\)</span> the bound held over 100 perturbations with a worst ratio of
+<span class="math notranslate nohighlight">\(0.15\)</span>, while a symmetric matrix with the <em>same spectrum</em> under the <em>same</em>
+perturbations obeyed Weyl with <span class="math notranslate nohighlight">\(\operatorname{cond}(X) = 1\)</span>. The non-normal
+eigenvalues moved orders of magnitude further for identical <span class="math notranslate nohighlight">\(\|E\|\)</span>.</p>
+<p><strong>A spectral radius of 0.8 is compatible with amplifying by six.</strong>
+<span class="math notranslate nohighlight">\(\left[\begin{smallmatrix}0.8&amp;3\\0&amp;0.8\end{smallmatrix}\right]\)</span> has
+<span class="math notranslate nohighlight">\(\rho = 0.8\)</span>, so <span class="math notranslate nohighlight">\(A^k \to 0\)</span> is guaranteed — and it reaches
+<span class="math notranslate nohighlight">\(\|A^4\|_2 = 6.17\)</span> first, decaying to <span class="math notranslate nohighlight">\(4\times10^{-4}\)</span> only by <span class="math notranslate nohighlight">\(k = 59\)</span>. The
+normal matrix with the same spectrum satisfies <span class="math notranslate nohighlight">\(\|A^k\| = 0.8^k\)</span> to <span class="math notranslate nohighlight">\(10^{-16}\)</span>
+and can never rise. Varying the off-diagonal entry over <span class="math notranslate nohighlight">\(0.9, 1.5, 3\)</span> changed
+the peak by a factor of 3.2 while leaving the spectrum identical to <span class="math notranslate nohighlight">\(10^{-16}\)</span>.</p>
+<p><strong>Pseudospectra see what eigenvalues cannot.</strong> All three definitions agreed:
+resolvent norm against <span class="math notranslate nohighlight">\(1/\sigma_{\min}\)</span> to <span class="math notranslate nohighlight">\(10^{-13}\)</span>, the spectrum inside
+every pseudospectrum, and the resolvent norm equal to <span class="math notranslate nohighlight">\(1/\epsilon\)</span> on the
+boundary to <span class="math notranslate nohighlight">\(10^{-15}\)</span>. The third definition was checked <em>constructively</em> — an
+explicit rank-one <span class="math notranslate nohighlight">\(E\)</span> with <span class="math notranslate nohighlight">\(\|E\|_2 = \epsilon\)</span> making a boundary point a
+genuine eigenvalue of <span class="math notranslate nohighlight">\(A + E\)</span> to <span class="math notranslate nohighlight">\(10^{-14}\)</span>. For <span class="math notranslate nohighlight">\(\operatorname{diag}(1,2,3)\)</span>
+the pseudospectra are exactly discs to <span class="math notranslate nohighlight">\(10^{-16}\)</span>, which is why they are only
+interesting in the non-normal case.</p>
+<p><strong>Methods introduced.</strong> <code class="docutils literal notranslate"><span class="pre">scipy.linalg.schur</span></code> in both real and complex form,
+the departure from normality, <code class="docutils literal notranslate"><span class="pre">sympy.Matrix.jordan_form</span></code>, lexicographic sorting
+of complex spectra, the Bauer–Fike ratio, <span class="math notranslate nohighlight">\(\|A^k\|\)</span> curves,
+<span class="math notranslate nohighlight">\(\sigma_{\min}(zI - A)\)</span> as the computable pseudospectrum, the rank-one
+perturbation from the smallest singular triple, and <code class="docutils literal notranslate"><span class="pre">ecp.linalg.pseudospectrum</span></code>.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>The algorithm behind Schur.</strong> <code class="docutils literal notranslate"><span class="pre">schur</span></code> reduces to Hessenberg form and then
+runs shifted <span class="math notranslate nohighlight">\(QR\)</span> iterations, and the whole of that is
+<a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html"><span class="std std-doc">§5.2</span></a> — including why the
+shifts matter and why nobody forms a characteristic polynomial.</p></li>
+<li><p><strong>Non-normality in iterative solvers.</strong> GMRES convergence is governed by
+pseudospectra rather than eigenvalues for exactly the reasons here, which is
+why a preconditioner that clusters the spectrum may not help a non-normal
+system. <a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html"><span class="std std-doc">§5.5</span></a> measures
+it.</p></li>
+<li><p><strong>Where the transient is the physics.</strong> Fluid flows that are linearly stable
+by every eigenvalue can still amplify a disturbance by <span class="math notranslate nohighlight">\(10^{3}\)</span> and become
+turbulent, and this notebook’s <span class="math notranslate nohighlight">\(6\times\)</span> is a toy version of that. Trefethen
+and Embree <span class="bibtex-citation" id="id5">[<a class="reference internal" href="#id22" title="Lloyd N. Trefethen and Mark Embree. Spectra and Pseudospectra: The Behavior of Nonnormal Matrices and Operators. Princeton University Press, 2005.">TE05</a>]</span> treat the real case.</p></li>
+<li><p><strong>Singular values instead.</strong> Every difficulty here came from eigenvalues of a
+non-normal matrix. Singular values have none of these problems: they are
+always real and non-negative, always perfectly conditioned, and always come
+with orthonormal bases on both sides.
+<a class="reference internal" href="../04-svd/svd-geometry.html"><span class="std std-doc">§4.1</span></a> opens the sustained argument for using
+them instead.</p></li>
+</ul>
+<div class="docutils container" id="id6">
+<div role="list" class="citation-list">
+<div class="citation" id="id15" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">GVL13</a><span class="fn-bracket">]</span></span>
+<p>Gene H. Golub and Charles F. Van Loan. <em>Matrix Computations</em>. Johns Hopkins University Press, Baltimore, 4 edition, 2013.</p>
+</div>
+<div class="citation" id="id17" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">Hig02</a><span class="fn-bracket">]</span></span>
+<p>Nicholas J. Higham. <em>Accuracy and Stability of Numerical Algorithms</em>. SIAM, Philadelphia, 2 edition, 2002. <a class="reference external" href="https://doi.org/10.1137/1.9780898718027">doi:10.1137/1.9780898718027</a>.</p>
+</div>
+<div class="citation" id="id13" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">HJ13</a><span class="fn-bracket">]</span></span>
+<p>Roger A. Horn and Charles R. Johnson. <em>Matrix Analysis</em>. Cambridge University Press, 2 edition, 2013. <a class="reference external" href="https://doi.org/10.1017/CBO9781139020411">doi:10.1017/CBO9781139020411</a>.</p>
+</div>
+<div class="citation" id="id22" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>TE05<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id5">2</a>)</span>
+<p>Lloyd N. Trefethen and Mark Embree. <em>Spectra and Pseudospectra: The Behavior of Nonnormal Matrices and Operators</em>. Princeton University Press, 2005.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/03-eigenvalues"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="hermitian-unitary-normal.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="matrix-functions-exponential.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">3.6 Matrix Functions and the Matrix Exponential</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#similarity">Similarity</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#three-decompositions">Three decompositions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-jordan-cannot-be-computed">Why Jordan cannot be computed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bauerfike">Bauer–Fike</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#transient-growth">Transient growth</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pseudospectra">Pseudospectra</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-what-similarity-keeps-and-what-it-throws-away">Exercise 1: What similarity keeps, and what it throws away</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-schur-the-decomposition-that-always-exists">Exercise 2: Schur: the decomposition that always exists</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-jordan-form-dissolves-and-the-rate-is-exactly-delta-1-n">Exercise 3: The Jordan form dissolves, and the rate is exactly <span class="math notranslate nohighlight">\(\delta^{1/n}\)</span></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-bauerfike-the-conditioning-of-the-eigenvector-matrix">Exercise 4: Bauer–Fike: the conditioning of the eigenvector matrix</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-spectral-radius-below-1-and-the-norm-goes-up-anyway">Exercise 5: Spectral radius below 1, and the norm goes up anyway</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-pseudospectra-the-picture-that-does-predict-it">Exercise 6: Pseudospectra: the picture that does predict it</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

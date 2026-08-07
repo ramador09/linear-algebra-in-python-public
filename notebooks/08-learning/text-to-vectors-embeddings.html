@@ -1,0 +1,1307 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/08-learning/text-to-vectors-embeddings.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: Before a transformer can multiply matrices, text must become numbers, and every step of that conversion is this course’s material. A byte-..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: Before a transformer can multiply matrices, text must become numbers, and every step of that conversion is this course’s material. A byte-..." />
+
+    <title>8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/08-learning/text-to-vectors-embeddings';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/08-learning/text-to-vectors-embeddings.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="8.5 Attention Is a Product of Matrices" href="attention-matrix-products.html" />
+    <link rel="prev" title="8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation" href="linear-layer-backpropagation.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter VIII — The Linear Algebra of Learning</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/08-learning/text-to-vectors-embeddings.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/08-learning/text-to-vectors-embeddings.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/08-learning/text-to-vectors-embeddings.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/08-learning/text-to-vectors-embeddings.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tokens-one-hots-and-the-lookup-identity">Tokens, one-hots, and the lookup identity</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#counts-reweighted-and-factored">Counts, reweighted and factored</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-cosine-works-in-high-dimension">Why cosine works in high dimension</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-byte-pair-encoding-written-and-round-tripped">Exercise 1: Byte-pair encoding, written and round-tripped</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-lookup-is-a-matrix-product-that-nobody-performs">Exercise 2: The lookup IS a matrix product (that nobody performs)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-termdocument-matrix-reweighted">Exercise 3: The term–document matrix, reweighted</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-lsa-the-svd-reads-the-topics">Exercise 4: LSA: the SVD reads the topics</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-ppmi-and-the-analogy-that-actually-computes">Exercise 5: PPMI, and the analogy that actually computes</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-cosine-invariant-by-algebra-meaningful-by-dimension">Exercise 6: Cosine: invariant by algebra, meaningful by dimension</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="from-text-to-vectors-tokens-one-hot-and-embeddings">
+<h1>8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings<a class="headerlink" href="#from-text-to-vectors-tokens-one-hot-and-embeddings" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter VIII — The Linear Algebra of Learning
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;8.4
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">Language enters linear algebra through three doors: a tokenizer chops strings into integers, an embedding matrix turns integers into vectors — a matrix product nobody actually performs — and factored count matrices give the vectors their geometry, where king minus man plus woman lands nearest queen, gated like everything else.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;advanced&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;135–165 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p>Before a transformer can multiply matrices, text must become numbers,
+and every step of that conversion is this course’s material. A
+<strong>byte-pair-encoding</strong> merge loop <span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id51" title="Rico Sennrich, Barry Haddow, and Alexandra Birch. Neural machine translation of rare words with subword units. In Proceedings of the 54th Annual Meeting of the Association for Computational Linguistics, 1715–1725. 2016. doi:10.18653/v1/P16-1162.">SHB16</a>]</span> — written by
+hand, with a stated tie-break so the merges are deterministic — builds
+a subword vocabulary whose decoding reproduces the input <em>exactly</em>
+(gated as string equality, the format rule of
+<a class="reference internal" href="../05-numerical/sparse-matrices.html"><span class="std std-doc">§5.3</span></a> applied to text). Token
+IDs become <strong>one-hot vectors</strong> — the standard basis wearing
+linguistics — and the embedding lookup is gated as the matrix product
+it secretly is: <span class="math notranslate nohighlight">\(e_i^{\top}E\)</span> equals row <span class="math notranslate nohighlight">\(E_i\)</span> <em>exactly</em>, because a
+one-hot product sums nothing but exact zeros and one exact copy; the
+ledger (2Vd flops for the product, d copied numbers for the lookup —
+a counted <span class="math notranslate nohighlight">\(2V\times\)</span> asymmetry, stopwatch reported per the course’s
+rules) is why no framework ever forms the one-hot.</p>
+<p>Geometry arrives through counts. The <strong>term–document matrix</strong> of a
+twelve-document, three-topic corpus gets the TF-IDF reweighting
+(gated against its closed form), and <strong>LSA</strong> <span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id33" title="Scott Deerwester, Susan T. Dumais, George W. Furnas, Thomas K. Landauer, and Richard Harshman. Indexing by latent semantic analysis. Journal of the American Society for Information Science, 41(6):391–407, 1990. doi:10.1002/(SICI)1097-4571(199009)41:6&lt;391::AID-ASI1&gt;3.0.CO;2-9.">DDF+90</a>]</span> —
+a truncated SVD, <a class="reference internal" href="../04-svd/pca-covariance-whitening.html"><span class="std std-doc">§4.3</span></a>’s
+machinery verbatim — recovers the planted topics <em>exactly</em> by
+nearest-centroid in two dimensions. <strong>PPMI factorization</strong>
+<span class="bibtex-citation" id="id3">[<a class="reference internal" href="#id52" title="Omer Levy and Yoav Goldberg. Neural word embedding as implicit matrix factorization. In Advances in Neural Information Processing Systems 27, 2177–2185. 2014.">LG14</a>]</span> — the linear algebra word2vec implicitly performs —
+builds an eight-word royal-family micro-world where the analogy
+<span class="math notranslate nohighlight">\(\textit{king} - \textit{man} + \textit{woman}\)</span> lands nearest
+<em>queen</em> (gated, query words excluded, margin 0.13 over the
+runner-up), drawn as the parallelogram it algebraically is. The
+closing measurement is the one that governs all of retrieval: random
+high-dimensional cosines concentrate near zero at the <span class="math notranslate nohighlight">\(1/\sqrt{d}\)</span>
+rate — measured at three dimensions on a dedicated stream — which is
+<em>why</em> similarity search works at all in embedding spaces.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> Sennrich et al. <span class="bibtex-citation" id="id4">[<a class="reference internal" href="#id51" title="Rico Sennrich, Barry Haddow, and Alexandra Birch. Neural machine translation of rare words with subword units. In Proceedings of the 54th Annual Meeting of the Association for Computational Linguistics, 1715–1725. 2016. doi:10.18653/v1/P16-1162.">SHB16</a>]</span> for BPE;
+Deerwester et al. <span class="bibtex-citation" id="id5">[<a class="reference internal" href="#id33" title="Scott Deerwester, Susan T. Dumais, George W. Furnas, Thomas K. Landauer, and Richard Harshman. Indexing by latent semantic analysis. Journal of the American Society for Information Science, 41(6):391–407, 1990. doi:10.1002/(SICI)1097-4571(199009)41:6&lt;391::AID-ASI1&gt;3.0.CO;2-9.">DDF+90</a>]</span> for LSA; Levy and Goldberg
+<span class="bibtex-citation" id="id6">[<a class="reference internal" href="#id52" title="Omer Levy and Yoav Goldberg. Neural word embedding as implicit matrix factorization. In Advances in Neural Information Processing Systems 27, 2177–2185. 2014.">LG14</a>]</span> for the PPMI–word2vec equivalence. The SVD is
+Chapter IV’s; nothing here needs a GPU or a download.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="tokens-one-hots-and-the-lookup-identity">
+<h3>Tokens, one-hots, and the lookup identity<a class="headerlink" href="#tokens-one-hots-and-the-lookup-identity" title="Link to this heading">#</a></h3>
+<p>BPE starts from characters and greedily merges the most frequent
+adjacent pair, <span class="math notranslate nohighlight">\(k\)</span> times; the merges <em>are</em> the vocabulary. A token ID
+<span class="math notranslate nohighlight">\(i\)</span> is the standard basis vector <span class="math notranslate nohighlight">\(e_i \in \mathbb{R}^{V}\)</span>, and the
+embedding of a token is</p>
+<div class="math notranslate nohighlight" id="equation-eq-tv-lookup">
+<span class="eqno">(286)<a class="headerlink" href="#equation-eq-tv-lookup" title="Link to this equation">#</a></span>\[\operatorname{embed}(i) \;=\; e_i^{\top}E \;=\; E_{i,:} ,\]</div>
+<p>a matrix product whose result is a <em>row copy</em> — the identity every
+framework exploits by never forming <span class="math notranslate nohighlight">\(e_i\)</span>: the product costs <span class="math notranslate nohighlight">\(2Vd\)</span>
+operations to select what indexing copies in <span class="math notranslate nohighlight">\(d\)</span>.</p>
+</section>
+<section id="counts-reweighted-and-factored">
+<h3>Counts, reweighted and factored<a class="headerlink" href="#counts-reweighted-and-factored" title="Link to this heading">#</a></h3>
+<p>The term–document matrix <span class="math notranslate nohighlight">\(C_{wj}\)</span> counts word <span class="math notranslate nohighlight">\(w\)</span> in document <span class="math notranslate nohighlight">\(j\)</span>;
+TF-IDF reweights it,</p>
+<div class="math notranslate nohighlight" id="equation-eq-tv-tfidf">
+<span class="eqno">(287)<a class="headerlink" href="#equation-eq-tv-tfidf" title="Link to this equation">#</a></span>\[X_{wj} \;=\; \frac{C_{wj}}{\sum_w C_{wj}}\;
+\log\frac{N}{\lvert\{j : C_{wj} &gt; 0\}\rvert} ,\]</div>
+<p>damping ubiquitous words. LSA is its truncated SVD: documents in the
+top singular directions, topics as the directions themselves.
+<strong>PPMI</strong> does the same for word–context co-occurrence,</p>
+<div class="math notranslate nohighlight" id="equation-eq-tv-ppmi">
+<span class="eqno">(288)<a class="headerlink" href="#equation-eq-tv-ppmi" title="Link to this equation">#</a></span>\[\mathrm{PPMI}_{wc} \;=\; \max\!\Bigl(0,\;
+\log\frac{P(w,c)}{P(w)P(c)}\Bigr),\]</div>
+<p>and its truncated SVD produces word vectors equivalent (Levy–Goldberg)
+to what skip-gram training approximates — analogies as
+parallelograms, similarity as cosine.</p>
+</section>
+<section id="why-cosine-works-in-high-dimension">
+<h3>Why cosine works in high dimension<a class="headerlink" href="#why-cosine-works-in-high-dimension" title="Link to this heading">#</a></h3>
+<p>Independent random vectors in <span class="math notranslate nohighlight">\(\mathbb{R}^d\)</span> have
+<span class="math notranslate nohighlight">\(\mathbb{E}\lvert\cos\theta\rvert \approx \sqrt{2/(\pi d)}\)</span>:
+unrelated directions crowd toward orthogonality as <span class="math notranslate nohighlight">\(d\)</span> grows, so a
+cosine of 0.5 that would be unremarkable at <span class="math notranslate nohighlight">\(d = 10\)</span> is a screaming
+signal at <span class="math notranslate nohighlight">\(d = 1000\)</span> — the concentration that makes embedding
+retrieval meaningful, measured below.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data and instruments only: the seeded rng and the cosine readout. BPE,
+the embeddings and the matrices they fill are all built in the exercises.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random array below comes from this seed</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+
+
+<span class="c1"># instrument: the two-line cosine readout — Exercise 6 interrogates its</span>
+<span class="c1"># invariances; the quotient itself is plumbing.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">cosine</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">a</span> <span class="o">@</span> <span class="n">b</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">b</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-byte-pair-encoding-written-and-round-tripped">
+<h2>Exercise 1: Byte-pair encoding, written and round-tripped<a class="headerlink" href="#exercise-1-byte-pair-encoding-written-and-round-tripped" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">bpe_train(text,</span> <span class="pre">n_merges)</span></code>: split into words with a
+word-end marker, count adjacent symbol pairs, merge the most frequent
+— <strong>ties broken lexicographically</strong>, stated so the merge sequence is
+deterministic and the gate below is honest — and repeat.</p>
+<p><strong>Write this one yourself</strong> — the loop is eight lines, and it is the
+tokenizer of every model you have used this year, minus engineering.</p>
+<p><strong>Part b)</strong> Train 12 merges on a toy corpus and gate two facts:
+re-running produces the <em>identical</em> merge list (determinism as
+equality of lists), and joining the tokens and stripping markers
+reproduces the input string <strong>exactly</strong> — tokenization is a
+reversible encoding, <a class="reference internal" href="../05-numerical/sparse-matrices.html"><span class="std std-doc">§5.3</span></a>’s
+format rule wearing letters.</p>
+<p><strong>Part c)</strong> Report the compression: token count before and after the
+merges, and the learned vocabulary — <code class="docutils literal notranslate"><span class="pre">at</span></code>, <code class="docutils literal notranslate"><span class="pre">the</span></code>, <code class="docutils literal notranslate"><span class="pre">cat</span></code> emerging from
+characters, frequency doing the linguistics.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tie-break honoured: True; decode == input: True
+tokens: 66 characters -&gt; 18 subwords; first merges: [(&#39;a&#39;, &#39;t&#39;), (&#39;at&#39;, &#39;&lt;/w&gt;&#39;), (&#39;e&#39;, &#39;&lt;/w&gt;&#39;), (&#39;t&#39;, &#39;h&#39;), (&#39;th&#39;, &#39;e&lt;/w&gt;&#39;), (&#39;c&#39;, &#39;at&lt;/w&gt;&#39;)]
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the first merges are exactly the hand-derivable ones — the stated tie-break honoured   [lexicographic tie-breaking makes the trained vocabulary a pure function of the corpus, so its opening merges are checkable against the corpus&#39;s own pair counts]
+✓  and decoding reproduces the input string exactly   [tokenization is a reversible encoding — 5.3&#39;s format rule, wearing letters]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-the-lookup-is-a-matrix-product-that-nobody-performs">
+<h2>Exercise 2: The lookup IS a matrix product (that nobody performs)<a class="headerlink" href="#exercise-2-the-lookup-is-a-matrix-product-that-nobody-performs" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> Build a <span class="math notranslate nohighlight">\(V = 500\)</span>, <span class="math notranslate nohighlight">\(d = 64\)</span> embedding matrix and gate
+<a class="reference internal" href="#equation-eq-tv-lookup">Eq. 286</a> <strong>exactly</strong>: <code class="docutils literal notranslate"><span class="pre">one_hot</span> <span class="pre">&#64;</span> <span class="pre">E</span> <span class="pre">==</span> <span class="pre">E[i]</span></code> for twenty
+random IDs, by <code class="docutils literal notranslate"><span class="pre">np.array_equal</span></code> — legitimate for once, because the
+product’s every term is an exact zero or an exact copy, and sums of
+zeros commute with anything (the
+<a class="reference internal" href="../00-machine/floating-point.html"><span class="std std-doc">exact-representability rule</span></a>, in
+its cleanest habitat).</p>
+<p><strong>Part b)</strong> The ledger, counted then timed: the product moves
+<span class="math notranslate nohighlight">\(2Vd = 64{,}000\)</span> floating operations to select what indexing copies
+in <span class="math notranslate nohighlight">\(d = 64\)</span> — a <span class="math notranslate nohighlight">\(1000\times\)</span> counted asymmetry (gated as arithmetic).
+The stopwatch (reported, never gated) agrees loudly.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>one-hot product equals row lookup exactly, 20 IDs: True
+counted: 64,000 flops vs 64 copies (1,000x); stopwatch: 4.19 ms vs 0.862 ms (reported)
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  e_i&#39; E equals row E_i bitwise (Eq. 1)   [every term of the product is an exact zero or an exact copy, so the sum is order-independent — the rare matmul the exactness rule permits]
+✓  and the counted ledger is why nobody forms the one-hot   [64,000 operations to select what 64 copies deliver — gated as counting; the stopwatch testified above]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-the-termdocument-matrix-reweighted">
+<h2>Exercise 3: The term–document matrix, reweighted<a class="headerlink" href="#exercise-3-the-termdocument-matrix-reweighted" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> Build the corpus: twelve documents, four each from three
+planted topics (astronomy, baking, sailing), each drawing 20 topic
+words and 6 stop words on the notebook’s stream — plus one copy of
+<em>every</em> stop word appended deterministically, so ubiquity holds by
+construction rather than by luck (a random draw misses a stop word in
+some document about half the time, and Part b’s exact-zero gate would
+then be gating a coin flip). Assemble the term–document count
+matrix.</p>
+<p><strong>Part b)</strong> Apply <a class="reference internal" href="#equation-eq-tv-tfidf">Eq. 287</a> step by step and gate it against a
+one-line closed-form recomputation at <span class="math notranslate nohighlight">\(10^{-12}\)</span> — and gate the
+mechanism: the stop words <code class="docutils literal notranslate"><span class="pre">the/and/of</span></code> appear in all 12 documents (by
+Part a’s construction), so their IDF is <span class="math notranslate nohighlight">\(\log(12/12) = 0\)</span> <em>exactly</em>
+and TF-IDF erases them (gated as exact zeros — a logarithm of one,
+not a rounding accident).</p>
+<p><strong>Part c)</strong> Draw the count matrix and the TF-IDF matrix as heatmaps:
+the block structure of topics, visible before, sharpened after — the
+stop-word rows going blank is <a class="reference internal" href="#equation-eq-tv-tfidf">Eq. 287</a> working.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>TF-IDF vs closed form: 0.0e+00; stop-word rows exactly zero: True (log(12/12) = 0, not an accident)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-tv-tfidf">
+<img alt="../../_images/74195d73ce14bda402329cfeef496861c02e7272bf318f2eb1c6d28848b89ad6.png" src="../../_images/74195d73ce14bda402329cfeef496861c02e7272bf318f2eb1c6d28848b89ad6.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 149 </span><span class="caption-text">The term-document matrix of the twelve-document corpus before (left) and after (right) TF-IDF, rows sorted by topic then stop words at the bottom. The three topic blocks are visible in the raw counts but so are the stop words – present everywhere, saying nothing. TF-IDF’s IDF factor is <span class="math notranslate nohighlight">\(\log(12/\mathrm{df})\)</span>, which is exactly zero for a word in every document: the bottom rows go blank not approximately but identically, and the topic blocks carry all the remaining weight – Eq. 2 as an image.</span><a class="headerlink" href="#fig-tv-tfidf" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  TF-IDF matches its closed-form definition (Eq. 2)   [the stepwise pipeline against the one-liner — bookkeeping, certified [0 &lt; 1e-12]]
+✓  and ubiquitous words are erased exactly, not approximately   [df = N makes the IDF log(1) = 0.0 — an exact zero from exact counting, so the gate is equality]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-lsa-the-svd-reads-the-topics">
+<h2>Exercise 4: LSA: the SVD reads the topics<a class="headerlink" href="#exercise-4-lsa-the-svd-reads-the-topics" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> Truncated SVD of the TF-IDF matrix
+(<a class="reference internal" href="../04-svd/pca-covariance-whitening.html"><span class="std std-doc">§4.3</span></a>’s machinery): keep
+two right-singular directions as document coordinates. Report the
+singular values — three large (one per topic, minus one for the
+overall mean direction), then a cliff.</p>
+<p><strong>Part b)</strong> Gate the recovery <em>exactly</em>: nearest-centroid
+classification of the 12 documents in the 2-D LSA space reproduces
+the planted labels 12/12 — with the margin printed (the smallest
+ratio of between- to within-topic distance), because an exact gate
+owes the reader its safety margin
+(<a class="reference internal" href="../06-structure/kernels-gram-matrix.html"><span class="std std-doc">§6.5</span></a>’s rule).</p>
+<p><strong>Part c)</strong> Draw the documents in LSA-2 coloured by topic, beside the
+singular-value log plot: three tight clusters, one spectral cliff.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>topic recovery 12/12: True; safety margin between/within = 15.1x
+singular values: [0.664 0.657 0.647 0.261 0.254 0.191]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-tv-lsa">
+<img alt="../../_images/ef33acdbeedc779908ffdaab971fe088aa2cffd885053f629bdf2c2cd705eb8b.png" src="../../_images/ef33acdbeedc779908ffdaab971fe088aa2cffd885053f629bdf2c2cd705eb8b.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 150 </span><span class="caption-text">Latent semantic analysis on the twelve documents. Left: the TF-IDF matrix’s singular values – three carrying the topic structure, then a cliff onto the sampling-noise shelf, 4.2’s scree logic on text. Right: every document in the first two right-singular directions, coloured by its planted topic: three clusters recovered 12/12 by nearest centroid, with the between-to-within distance ratio printed as the exact gate’s safety margin. The SVD was never told there were topics; the counts told it.</span><a class="headerlink" href="#fig-tv-lsa" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  LSA recovers the planted topics 12/12, with margin stated   [nearest-centroid in two singular directions; between/within = 15.1x — the exact gate licensed the 6.5 way, by its printed margin]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-ppmi-and-the-analogy-that-actually-computes">
+<h2>Exercise 5: PPMI, and the analogy that actually computes<a class="headerlink" href="#exercise-5-ppmi-and-the-analogy-that-actually-computes" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> Build the royal micro-world: eight words
+(<em>king, queen, man, woman, prince, princess, boy, girl</em>) with
+co-occurrence counts over six contexts (<em>crown, throne, beard, dress,
+palace, toy</em>) constructed from three binary attributes (royal, male,
+adult) plus a floor of 2. Compute PPMI <a class="reference internal" href="#equation-eq-tv-ppmi">Eq. 288</a> and gate
+nonnegativity <strong>by construction</strong> (<code class="docutils literal notranslate"><span class="pre">max</span></code> with zero — exact).</p>
+<p><strong>Part b)</strong> Factor: rank-3 truncated SVD gives word vectors
+<span class="math notranslate nohighlight">\(E = U_3\Sigma_3\)</span>. Gate the reconstruction honestly: relative
+Frobenius error below 30% — measured <strong>21%</strong>, not near zero, because
+PPMI’s log-and-clamp is <em>nonlinear</em>: three attributes generated the
+counts, but the transform spreads their signature across more
+directions than three. The structure test that matters is Part c’s
+analogy, not matrix reproduction.</p>
+<p><strong>Part c)</strong> Gate the analogy: the nearest neighbour of
+<span class="math notranslate nohighlight">\(v_{\text{king}} - v_{\text{man}} + v_{\text{woman}}\)</span> — query words
+excluded, as every published evaluation does — is <strong>queen</strong>, cosine
+0.69 against the runner-up’s 0.56. Draw the vocabulary’s cosine
+heatmap and the analogy parallelogram in the top-2 directions.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>PPMI nonnegative by construction: True
+rank-3 PPMI reconstruction: 21.3% relative error (three attributes built the world)
+king - man + woman -&gt; queen (cos 0.686, margin 0.127 over girl)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-tv-analogy">
+<img alt="../../_images/25532850b7647b4c750605af2dca78b42a9e76b28296e027d18c670123011afd.png" src="../../_images/25532850b7647b4c750605af2dca78b42a9e76b28296e027d18c670123011afd.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 151 </span><span class="caption-text">The royal micro-world, factored. Left: pairwise cosine similarity of the eight PPMI-SVD word vectors – the block structure follows the planted attributes (royals with royals, children with children), which is Eq. 3’s factorization reading the construction back out. Right: the four analogy words projected onto the plane spanned by the mean gender displacement (horizontal) and the royalty direction orthogonalized against it (vertical) – the plane chosen to DISPLAY the structure, since a generic top-2 SVD projection shears the parallelogram out of shape. In this plane, at equal axis scales, the two gender arrows are near-parallel – with a real residual tilt of a few degrees, honestly visible: the micro-world’s gender displacement is not identical for royal and common pairs, and the analogy works anyway because the nearest-neighbour gate tolerates imperfect parallelograms. king - man + woman lands on queen, gated (query words excluded, margin 0.13) rather than admired.</span><a class="headerlink" href="#fig-tv-analogy" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  PPMI is nonnegative by construction, and rank 3 captures its structure (Eq. 3)   [max(0, .) is exact; 21.3% residual from three directions — NOT near zero, because the log-and-clamp is nonlinear and three generating attributes do not mean rank three; the analogy below is the honest structure test]
+✓  and king - man + woman lands nearest queen, with margin   [cosine margin 0.13 over the runner-up, query words excluded — the famous parallelogram, gated instead of admired]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-6-cosine-invariant-by-algebra-meaningful-by-dimension">
+<h2>Exercise 6: Cosine: invariant by algebra, meaningful by dimension<a class="headerlink" href="#exercise-6-cosine-invariant-by-algebra-meaningful-by-dimension" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> Gate scale invariance: <span class="math notranslate nohighlight">\(\cos(\alpha a, \beta b) =
+\cos(a, b)\)</span> for random vectors and random positive scales, to
+<span class="math notranslate nohighlight">\(10^{-14}\)</span> — the normalization is the point of the definition.</p>
+<p><strong>Part b)</strong> The concentration measurement, on a dedicated stream: 500
+random pairs at <span class="math notranslate nohighlight">\(d = 10, 100, 1000\)</span>; mean <span class="math notranslate nohighlight">\(\lvert\cos\rvert\)</span> falls as
+<span class="math notranslate nohighlight">\(\sqrt{2/(\pi d)}\)</span> — gate each measured mean within 15% of the
+formula, and the decade-to-decade ratios within <span class="math notranslate nohighlight">\([2.5, 4.0]\)</span> of the
+predicted <span class="math notranslate nohighlight">\(\sqrt{10} \approx 3.16\)</span>. A cosine of 0.3 is noise at
+<span class="math notranslate nohighlight">\(d = 10\)</span> and a five-sigma event at <span class="math notranslate nohighlight">\(d = 1000\)</span>: retrieval thresholds
+are dimension-dependent, which every embedding-database default
+quietly encodes.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>scale invariance over ten trials: worst 2.8e-17
+d =   10: mean |cos| 0.2647 (sqrt(2/pi d) = 0.2523)
+d =  100: mean |cos| 0.0841 (sqrt(2/pi d) = 0.0798)
+d = 1000: mean |cos| 0.0255 (sqrt(2/pi d) = 0.0252)
+decade ratios: 3.15, 3.29 (sqrt(10) = 3.16)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p>The analogy worked in a designed micro-world; real corpora are
+noisier. Ask your assistant for <code class="docutils literal notranslate"><span class="pre">analogy_eval(E,</span> <span class="pre">vocab,</span> <span class="pre">triples)</span></code>
+scoring a list of analogies by the excluded-query nearest-neighbour
+rule, then check it against the mathematics rather than a demo:
+(i) on this notebook’s eight-word world it scores 4/4 on the
+royal/gender/age triples you can form; (ii) shuffling the embedding
+rows breaks it to chance — the geometry, not the code, carries the
+answers; (iii) adding isotropic noise of growing scale degrades
+accuracy monotonically, and the noise level where it breaks is a
+<em>measurement</em> of the margin Exercise 5 printed. The check is yours.</p>
+</div>
+<section id="validation-6">
+<h3>Validation 6<a class="headerlink" href="#validation-6" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  cosine ignores positive rescaling of either argument   [the normalization is the definition — gated at rounding on ten random pairs]
+✓  and random cosines concentrate at the 1/sqrt(d) rate (measured)   [means within 15% of sqrt(2/pi d) at three dimensions, decade ratios 3.15 and 3.29 about sqrt(10) — dedicated-stream Monte Carlo, and the reason embedding retrieval works at all]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p><strong>Text became numbers reversibly.</strong> The hand-written BPE loop trained
+a deterministic merge sequence (tie-break stated and gated) whose
+decoding reproduced the corpus exactly; the one-hot embedding lookup
+was gated <em>bitwise</em> against the matrix product it abbreviates — the
+rare exact matmul, since every term is an exact zero or copy — with
+the <span class="math notranslate nohighlight">\(1000\times\)</span> counted ledger explaining why the product is never
+performed.</p>
+<p><strong>Counts carried the semantics.</strong> TF-IDF matched its closed form at
+<span class="math notranslate nohighlight">\(10^{-16}\)</span> and erased the stop words <em>exactly</em> (<span class="math notranslate nohighlight">\(\log 1 = 0\)</span>); LSA’s
+two singular directions recovered the planted topics 12/12 with a
+printed <span class="math notranslate nohighlight">\(15\times\)</span> safety margin; and the PPMI micro-world factored
+back into its three planted attributes, with
+<em>king − man + woman</em> landing nearest <em>queen</em> with a clear cosine margin
+— the parallelogram gated, query words excluded, folklore made
+measurement (and the rank-3 residual honestly 21%: PPMI’s log is
+nonlinear, so planted attributes shape the geometry without bounding
+the rank).</p>
+<p><strong>And dimension is why any of it works.</strong> Random cosines concentrated
+at <span class="math notranslate nohighlight">\(\sqrt{2/(\pi d)}\)</span> across two decades of <span class="math notranslate nohighlight">\(d\)</span> on a dedicated
+stream — the geometry that turns “cosine 0.3” from noise into signal
+as embeddings widen, and the quiet assumption under every retrieval
+system.</p>
+<p><strong>Methods introduced.</strong> <code class="docutils literal notranslate"><span class="pre">bpe_train</span></code> with deterministic tie-breaks,
+the lookup identity and its counted ledger, term–document assembly,
+TF-IDF with exact stop-word erasure, LSA topic recovery with margin
+reporting, PPMI construction and factorization, gated analogies, and
+cosine-concentration measurement.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Attention next.</strong> <a class="reference internal" href="attention-matrix-products.html"><span class="std std-doc">§8.5</span></a> puts
+these embeddings to work: queries, keys and values are three linear
+maps of them, and the similarity that routes information is exactly
+this notebook’s scaled dot product.</p></li>
+<li><p><strong>From counts to gradients.</strong> word2vec trains what PPMI computes
+<span class="bibtex-citation" id="id7">[<a class="reference internal" href="#id52" title="Omer Levy and Yoav Goldberg. Neural word embedding as implicit matrix factorization. In Advances in Neural Information Processing Systems 27, 2177–2185. 2014.">LG14</a>]</span>; modern embeddings train end-to-end through
+<a class="reference internal" href="linear-layer-backpropagation.html"><span class="std std-doc">§8.3</span></a>’s machinery — but the
+geometry they land in still answers to cosine and SVD.</p></li>
+<li><p><strong>Anisotropy in the wild.</strong> Real embedding spaces are not isotropic
+— frequent words crowd a narrow cone, and the concentration
+baseline of Exercise 6 is how that pathology is <em>detected</em>.</p></li>
+<li><p><strong>Retrieval at scale.</strong> Nearest-neighbour search over millions of
+embeddings runs on the structures of Chapter VI — product
+quantization is <a class="reference internal" href="../06-structure/kronecker-vec-separable.html"><span class="std std-doc">§6.4</span></a>’s
+Kronecker idea, and graph-based search is <a class="reference internal" href="../06-structure/graphs-laplacian.html"><span class="std std-doc">§6.1</span></a>’s
+neighbourhoods, both applied to this notebook’s vectors.</p></li>
+</ul>
+<div class="docutils container" id="id8">
+<div role="list" class="citation-list">
+<div class="citation" id="id33" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>DDF+90<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id2">1</a>,<a role="doc-backlink" href="#id5">2</a>)</span>
+<p>Scott Deerwester, Susan T. Dumais, George W. Furnas, Thomas K. Landauer, and Richard Harshman. Indexing by latent semantic analysis. <em>Journal of the American Society for Information Science</em>, 41(6):391–407, 1990. <a class="reference external" href="https://doi.org/10.1002/(SICI)1097-4571(199009)41:6&lt;391::AID-ASI1&gt;3.0.CO;2-9">doi:10.1002/(SICI)1097-4571(199009)41:6&lt;391::AID-ASI1&gt;3.0.CO;2-9</a>.</p>
+</div>
+<div class="citation" id="id52" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>LG14<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id3">1</a>,<a role="doc-backlink" href="#id6">2</a>,<a role="doc-backlink" href="#id7">3</a>)</span>
+<p>Omer Levy and Yoav Goldberg. Neural word embedding as implicit matrix factorization. In <em>Advances in Neural Information Processing Systems 27</em>, 2177–2185. 2014.</p>
+</div>
+<div class="citation" id="id51" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>SHB16<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id4">2</a>)</span>
+<p>Rico Sennrich, Barry Haddow, and Alexandra Birch. Neural machine translation of rare words with subword units. In <em>Proceedings of the 54th Annual Meeting of the Association for Computational Linguistics</em>, 1715–1725. 2016. <a class="reference external" href="https://doi.org/10.18653/v1/P16-1162">doi:10.18653/v1/P16-1162</a>.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/08-learning"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="linear-layer-backpropagation.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="attention-matrix-products.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">8.5 Attention Is a Product of Matrices</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tokens-one-hots-and-the-lookup-identity">Tokens, one-hots, and the lookup identity</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#counts-reweighted-and-factored">Counts, reweighted and factored</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-cosine-works-in-high-dimension">Why cosine works in high dimension</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-byte-pair-encoding-written-and-round-tripped">Exercise 1: Byte-pair encoding, written and round-tripped</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-lookup-is-a-matrix-product-that-nobody-performs">Exercise 2: The lookup IS a matrix product (that nobody performs)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-termdocument-matrix-reweighted">Exercise 3: The term–document matrix, reweighted</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-lsa-the-svd-reads-the-topics">Exercise 4: LSA: the SVD reads the topics</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-ppmi-and-the-analogy-that-actually-computes">Exercise 5: PPMI, and the analogy that actually computes</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-cosine-invariant-by-algebra-meaningful-by-dimension">Exercise 6: Cosine: invariant by algebra, meaningful by dimension</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

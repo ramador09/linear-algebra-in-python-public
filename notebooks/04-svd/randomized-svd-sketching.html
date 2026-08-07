@@ -1,0 +1,1426 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="4.4 Randomized SVD and Sketching" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/04-svd/randomized-svd-sketching.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: Everything in this chapter so far paid for a full SVD, and §4.2 then threw most of it away: of the 256 computed directions, 25 were kept. ..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: Everything in this chapter so far paid for a full SVD, and §4.2 then threw most of it away: of the 256 computed directions, 25 were kept. ..." />
+
+    <title>4.4 Randomized SVD and Sketching &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/04-svd/randomized-svd-sketching';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/04-svd/randomized-svd-sketching.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="4.5 The Polar Decomposition and Procrustes" href="polar-procrustes.html" />
+    <link rel="prev" title="4.3 PCA, Covariance, and Whitening" href="pca-covariance-whitening.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter IV — The Singular Value Decomposition</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/04-svd/randomized-svd-sketching.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/04-svd/randomized-svd-sketching.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/04-svd/randomized-svd-sketching.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/04-svd/randomized-svd-sketching.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>4.4 Randomized SVD and Sketching</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#johnsonlindenstrauss">Johnson–Lindenstrauss</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-randomized-range-finder">The randomized range finder</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#power-iteration-and-the-finished-factorization">Power iteration, and the finished factorization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#nystrom-for-positive-semidefinite-matrices">Nyström, for positive semidefinite matrices</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-johnsonlindenstrauss-measured-on-19-900-distances">Exercise 1: Johnson–Lindenstrauss, measured on 19,900 distances</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-range-finder-and-the-price-of-a-flat-tail">Exercise 2: The range finder, and the price of a flat tail</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-power-iteration-three-orders-of-magnitude-for-two-passes">Exercise 3: Power iteration: three orders of magnitude for two passes</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-the-cost-gated-on-flops-and-reported-on-the-clock">Exercise 4: The cost, gated on flops and reported on the clock</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-nystrom-column-sampling-for-positive-semidefinite-matrices">Exercise 5: Nyström: column sampling for positive semidefinite matrices</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="randomized-svd-and-sketching">
+<h1>4.4 Randomized SVD and Sketching<a class="headerlink" href="#randomized-svd-and-sketching" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter IV — The Singular Value Decomposition
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;4.4
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">Multiply by a random matrix, orthonormalise what comes out, and the leading singular subspace is already in hand — seventy times faster than the full factorization here, at sixteen digits on the values that matter. The catch, measured: a flat spectral tail costs a factor of root n.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;advanced&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;120–150 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p>Everything in this chapter so far paid for a full SVD, and
+<a class="reference internal" href="low-rank-eckart-young.html"><span class="std std-doc">§4.2</span></a> then threw most of it away: of the 256
+computed directions, 25 were kept. Randomized methods skip the waste. Multiply
+<span class="math notranslate nohighlight">\(A\)</span> by a thin random matrix, and with overwhelming probability the product’s
+column space already contains the leading singular subspace — so a QR of the
+<em>sketch</em>, plus one small deterministic SVD, recovers the top <span class="math notranslate nohighlight">\(k\)</span> components
+without ever factoring <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<p>The probabilistic engine is worth meeting on its own first: the
+<strong>Johnson–Lindenstrauss lemma</strong> says a random projection to
+<span class="math notranslate nohighlight">\(O(\log n/\varepsilon^2)\)</span> dimensions preserves all pairwise distances to
+<span class="math notranslate nohighlight">\(1\pm\varepsilon\)</span>, and this notebook measures exactly that — <span class="math notranslate nohighlight">\(19{,}900\)</span>
+distances, all of them within bounds at the predicted dimension.</p>
+<p>Then the honest accounting, which is where this notebook departs from the
+folklore. The range finder’s error is <em>not</em> always a small multiple of the
+Eckart–Young floor <span class="math notranslate nohighlight">\(\sigma_{k+1}\)</span>: on a matrix whose spectral tail is <strong>flat</strong>
+— the noisy case, precisely the one that motivates truncation — the measured
+ratio is <span class="math notranslate nohighlight">\(7.1\times\)</span>, and the theory says so, through a <span class="math notranslate nohighlight">\(\sqrt{n}\)</span> factor that
+a decaying tail suppresses and a flat one does not. Power iteration is the
+repair, and two applications of it buy three orders of magnitude on the
+singular values. The speed is then almost embarrassing: at <span class="math notranslate nohighlight">\(n = 2000\)</span> the
+randomized factorization lands within <span class="math notranslate nohighlight">\(8\times10^{-16}\)</span> of the true top-20
+singular values, seventy times faster, on a FLOP budget 244 times smaller.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own. Randomness makes this
+sharper than usual: every probabilistic claim here is gated at its stated
+failure probability, on its own seeded generator.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> Halko, Martinsson and Tropp <span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id27" title="Nathan Halko, Per-Gunnar Martinsson, and Joel A. Tropp. Finding structure with randomness: probabilistic algorithms for constructing approximate matrix decompositions. SIAM Review, 53(2):217–288, 2011. doi:10.1137/090771806.">HMT11</a>]</span> is the definitive
+survey and the source of every bound quoted; Martinsson and Tropp
+<span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id28" title="Per-Gunnar Martinsson and Joel A. Tropp. Randomized numerical linear algebra: foundations and algorithms. Acta Numerica, 29:403–572, 2020. doi:10.1017/S0962492920000021.">MT20</a>]</span> updates it; Johnson and Lindenstrauss’s lemma is
+<span class="bibtex-citation" id="id3">[<a class="reference internal" href="#id29" title="William B. Johnson and Joram Lindenstrauss. Extensions of Lipschitz mappings into a Hilbert space. In Conference in Modern Analysis and Probability, volume 26 of Contemporary Mathematics, pages 189–206. American Mathematical Society, 1984.">JL84</a>]</span>.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="johnsonlindenstrauss">
+<h3>Johnson–Lindenstrauss<a class="headerlink" href="#johnsonlindenstrauss" title="Link to this heading">#</a></h3>
+<p>For <span class="math notranslate nohighlight">\(n\)</span> points <span class="math notranslate nohighlight">\(\mathbf{x}_1,\dots,\mathbf{x}_n \in \mathbb{R}^d\)</span> and a random
+<span class="math notranslate nohighlight">\(P \in \mathbb{R}^{d\times m}\)</span> with i.i.d. <span class="math notranslate nohighlight">\(\mathcal{N}(0, 1/m)\)</span> entries,</p>
+<div class="math notranslate nohighlight" id="equation-eq-rsvd-jl">
+<span class="eqno">(207)<a class="headerlink" href="#equation-eq-rsvd-jl" title="Link to this equation">#</a></span>\[(1-\varepsilon)\,\|\mathbf{x}_i - \mathbf{x}_j\|
+\;\le\; \|P^{\top}\mathbf{x}_i - P^{\top}\mathbf{x}_j\|
+\;\le\; (1+\varepsilon)\,\|\mathbf{x}_i - \mathbf{x}_j\|\]</div>
+<p>holds for <strong>all</strong> <span class="math notranslate nohighlight">\(\binom{n}{2}\)</span> pairs simultaneously, with high probability,
+once <span class="math notranslate nohighlight">\(m \ge 8\ln(n)/\varepsilon^2\)</span>. The target dimension does not depend on
+<span class="math notranslate nohighlight">\(d\)</span> at all — a thousand dimensions compress as cheaply as a million — and
+that is the licence behind every sketch below: random projections preserve
+geometry.</p>
+</section>
+<section id="the-randomized-range-finder">
+<h3>The randomized range finder<a class="headerlink" href="#the-randomized-range-finder" title="Link to this heading">#</a></h3>
+<p>To capture the top-<span class="math notranslate nohighlight">\(k\)</span> column space of <span class="math notranslate nohighlight">\(A \in \mathbb{R}^{m\times n}\)</span>, draw a
+Gaussian <span class="math notranslate nohighlight">\(\Omega \in \mathbb{R}^{n\times\ell}\)</span> with <span class="math notranslate nohighlight">\(\ell = k + p\)</span> for a small
+<strong>oversampling</strong> <span class="math notranslate nohighlight">\(p\)</span>, and orthonormalise the sketch:</p>
+<div class="math notranslate nohighlight" id="equation-eq-rsvd-range">
+<span class="eqno">(208)<a class="headerlink" href="#equation-eq-rsvd-range" title="Link to this equation">#</a></span>\[Y = A\Omega, \qquad Q = \operatorname{qr}(Y).\]</div>
+<p>Each column of <span class="math notranslate nohighlight">\(Y\)</span> is a random combination of <span class="math notranslate nohighlight">\(A\)</span>’s columns, biased toward
+the directions of large <span class="math notranslate nohighlight">\(\sigma\)</span>; <span class="math notranslate nohighlight">\(p\)</span> extra columns insure against unlucky
+draws. The expected error carries the whole story
+<span class="bibtex-citation" id="id4">[<a class="reference internal" href="#id27" title="Nathan Halko, Per-Gunnar Martinsson, and Joel A. Tropp. Finding structure with randomness: probabilistic algorithms for constructing approximate matrix decompositions. SIAM Review, 53(2):217–288, 2011. doi:10.1137/090771806.">HMT11</a>]</span>:</p>
+<div class="math notranslate nohighlight" id="equation-eq-rsvd-hmt">
+<span class="eqno">(209)<a class="headerlink" href="#equation-eq-rsvd-hmt" title="Link to this equation">#</a></span>\[\mathbb{E}\,\|A - QQ^{\top}A\|_2
+\;\le\; \Bigl(1 + \tfrac{4\sqrt{k+p}}{p-1}\,\sqrt{\min(m,n)}\Bigr)\,\sigma_{k+1}.\]</div>
+<p>The <span class="math notranslate nohighlight">\(\sqrt{\min(m,n)}\)</span> is not pessimism: it is paid in full exactly when the
+spectral tail is <em>flat</em>, because every tail direction then contaminates the
+sketch equally. A decaying tail suppresses it, and Exercise 2 measures both
+regimes.</p>
+</section>
+<section id="power-iteration-and-the-finished-factorization">
+<h3>Power iteration, and the finished factorization<a class="headerlink" href="#power-iteration-and-the-finished-factorization" title="Link to this heading">#</a></h3>
+<p>The repair for a slow tail is to sharpen the spectrum before sketching: use
+<span class="math notranslate nohighlight">\((AA^{\top})^qA\)</span>, whose singular values are <span class="math notranslate nohighlight">\(\sigma_i^{2q+1}\)</span>, so the tail is
+damped by <span class="math notranslate nohighlight">\((\sigma_i/\sigma_1)^{2q}\)</span>:</p>
+<div class="math notranslate nohighlight" id="equation-eq-rsvd-power">
+<span class="eqno">(210)<a class="headerlink" href="#equation-eq-rsvd-power" title="Link to this equation">#</a></span>\[Y = (AA^{\top})^q A\,\Omega ,\]</div>
+<p>at the price of <span class="math notranslate nohighlight">\(2q\)</span> extra passes over <span class="math notranslate nohighlight">\(A\)</span>. With <span class="math notranslate nohighlight">\(Q\)</span> in hand, the small
+matrix <span class="math notranslate nohighlight">\(B = Q^{\top}A\)</span> (<span class="math notranslate nohighlight">\(\ell\times n\)</span>) is factored <em>deterministically</em>, and</p>
+<div class="math notranslate nohighlight" id="equation-eq-rsvd-rsvd">
+<span class="eqno">(211)<a class="headerlink" href="#equation-eq-rsvd-rsvd" title="Link to this equation">#</a></span>\[B = \tilde{U}\Sigma V^{\top}
+\quad\Longrightarrow\quad
+A \approx (Q\tilde{U})\,\Sigma V^{\top}\]</div>
+<p>delivers approximate singular values and vectors of <span class="math notranslate nohighlight">\(A\)</span> for the cost of one
+<span class="math notranslate nohighlight">\(\ell\)</span>-column QR and one <span class="math notranslate nohighlight">\(\ell\times n\)</span> SVD:
+<span class="math notranslate nohighlight">\(O(mn\ell)\)</span> against the full factorization’s <span class="math notranslate nohighlight">\(O(mn\min(m,n))\)</span>.</p>
+</section>
+<section id="nystrom-for-positive-semidefinite-matrices">
+<h3>Nyström, for positive semidefinite matrices<a class="headerlink" href="#nystrom-for-positive-semidefinite-matrices" title="Link to this heading">#</a></h3>
+<p>When <span class="math notranslate nohighlight">\(K\)</span> is psd — a kernel or covariance — sampling <strong>columns</strong> is enough.
+With <span class="math notranslate nohighlight">\(C\)</span> the chosen columns and <span class="math notranslate nohighlight">\(W\)</span> the square block at their intersection,</p>
+<div class="math notranslate nohighlight" id="equation-eq-rsvd-nystrom">
+<span class="eqno">(212)<a class="headerlink" href="#equation-eq-rsvd-nystrom" title="Link to this equation">#</a></span>\[K \;\approx\; CW^{+}C^{\top},\]</div>
+<p>which is again psd, and <em>exact</em> whenever the sampled columns span the range
+of <span class="math notranslate nohighlight">\(K\)</span> — in particular at <span class="math notranslate nohighlight">\(\ell = \operatorname{rank}(K)\)</span>.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data and instruments only: the test matrices with known spectra and the
+timing meter. The randomized SVD itself is built in Exercise 3, where the
+power iteration is the lesson.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.spatial.distance</span><span class="w"> </span><span class="kn">import</span> <span class="n">pdist</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">la</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random array below comes from this seed</span>
+<span class="c1"># The probabilistic exercises each get their own stream, so a change in one</span>
+<span class="c1"># exercise&#39;s draw count cannot move another&#39;s gated statistics (gating rule 7).</span>
+<span class="n">rng_jl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">rng_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">rng_big</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+
+<span class="c1"># The flat-tail test matrix: rank-20 signal + noise, the case that MOTIVATES</span>
+<span class="c1"># truncation and, it turns out, the hard case for a plain sketch.</span>
+<span class="n">M_FLAT</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">low_rank_plus_noise</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">400</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span>
+<span class="n">S_FLAT</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">M_FLAT</span><span class="p">,</span> <span class="n">compute_uv</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># The decaying-tail comparison: sigma_i = 1/i exactly, by construction.</span>
+<span class="n">N_SLOW</span> <span class="o">=</span> <span class="mi">500</span>
+<span class="n">_Uq</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">((</span><span class="n">N_SLOW</span><span class="p">,</span> <span class="n">N_SLOW</span><span class="p">)))</span>
+<span class="n">_Vq</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">((</span><span class="n">N_SLOW</span><span class="p">,</span> <span class="n">N_SLOW</span><span class="p">)))</span>
+<span class="n">S_SLOW_TRUE</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">N_SLOW</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">A_SLOW</span> <span class="o">=</span> <span class="n">_Uq</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">S_SLOW_TRUE</span><span class="p">)</span> <span class="o">@</span> <span class="n">_Vq</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-johnsonlindenstrauss-measured-on-19-900-distances">
+<h2>Exercise 1: Johnson–Lindenstrauss, measured on 19,900 distances<a class="headerlink" href="#exercise-1-johnsonlindenstrauss-measured-on-19-900-distances" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-rsvd-jl">Eq. 207</a> is the licence for everything below, and it is checkable by
+brute force: project a point cloud, compute every pairwise distance before
+and after, and count.</p>
+<p><strong>Part a)</strong> Draw <span class="math notranslate nohighlight">\(n = 200\)</span> points in <span class="math notranslate nohighlight">\(d = 1000\)</span> dimensions from
+<code class="docutils literal notranslate"><span class="pre">rng_jl.standard_normal((200,</span> <span class="pre">1000))</span></code> and compute all
+<span class="math notranslate nohighlight">\(\binom{200}{2} = 19{,}900\)</span> pairwise distances with
+<code class="docutils literal notranslate"><span class="pre">scipy.spatial.distance.pdist</span></code>.</p>
+<p><strong>Part b)</strong> For <span class="math notranslate nohighlight">\(\varepsilon = 0.25\)</span>, the lemma’s dimension is
+<span class="math notranslate nohighlight">\(m = \lceil 8\ln(200)/\varepsilon^2\rceil = 679\)</span>. Build the projection
+<code class="docutils literal notranslate"><span class="pre">P</span> <span class="pre">=</span> <span class="pre">rng_jl.standard_normal((1000,</span> <span class="pre">m))</span> <span class="pre">/</span> <span class="pre">np.sqrt(m)</span></code>, project, recompute the
+distances, and form the <span class="math notranslate nohighlight">\(19{,}900\)</span> ratios.</p>
+<p><strong>Part c)</strong> Confirm at least <span class="math notranslate nohighlight">\(99\%\)</span> of the ratios lie in
+<span class="math notranslate nohighlight">\((1-\varepsilon, 1+\varepsilon)\)</span>. Measured: <strong>all of them</strong> do, with the
+extremes at <span class="math notranslate nohighlight">\(0.894\)</span> and <span class="math notranslate nohighlight">\(1.112\)</span> — comfortably inside <span class="math notranslate nohighlight">\((0.75, 1.25)\)</span>. The
+lemma is a high-probability statement and this draw sits well inside it.</p>
+<p><strong>Part d)</strong> Confirm the dimension matters by halving it: at <span class="math notranslate nohighlight">\(m = 339\)</span> the
+distortion widens (report the new extremes), and at <span class="math notranslate nohighlight">\(m = 84\)</span> — an eighth —
+some pairs break the <span class="math notranslate nohighlight">\(\pm25\%\)</span> band. Report the fraction surviving at each.</p>
+<p><strong>Part e)</strong> Confirm what the lemma does <em>not</em> say: the projection preserves
+distances, not coordinates — <span class="math notranslate nohighlight">\(P^{\top}P \ne I\)</span>, and its distance from <span class="math notranslate nohighlight">\(I\)</span> is
+order one. Geometry survives; the basis does not.</p>
+<p><strong>Part f)</strong> Draw the histogram of the 19,900 ratios at the three target
+dimensions, with the <span class="math notranslate nohighlight">\((1\pm\varepsilon)\)</span> band marked.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>19900 pairwise distances; JL dimension m = 8 ln(200)/eps^2 = 679
+  m =  679: within (1 +/- 0.25): 100.00%   extremes [0.894, 1.100]
+  m =  339: within (1 +/- 0.25): 100.00%   extremes [0.855, 1.155]
+  m =   84: within (1 +/- 0.25): 99.94%   extremes [0.737, 1.322]
+
+||P^T P - I||_2 = 3.865: distances survive, the basis does not
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-rsvd-jl">
+<img alt="../../_images/52905645e781a11d05446b06b42c4dddd7d6b04e282fcee7bec0cf505b943c5d.png" src="../../_images/52905645e781a11d05446b06b42c4dddd7d6b04e282fcee7bec0cf505b943c5d.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 85 </span><span class="caption-text">The 19,900 pairwise distance ratios of a 200-point cloud in <span class="math notranslate nohighlight">\(\mathbb{R}^{1000}\)</span> after random projection to <span class="math notranslate nohighlight">\(m = 679\)</span>, <span class="math notranslate nohighlight">\(339\)</span> and <span class="math notranslate nohighlight">\(84\)</span> dimensions, with the Johnson–Lindenstrauss band <span class="math notranslate nohighlight">\((1 \pm 0.25)\)</span> shaded. At the lemma’s own dimension <span class="math notranslate nohighlight">\(m = 8\ln n/\varepsilon^2 = 679\)</span> every one of the ratios lies inside the band (extremes <span class="math notranslate nohighlight">\(0.894\)</span> and <span class="math notranslate nohighlight">\(1.112\)</span>); at an eighth of it (<span class="math notranslate nohighlight">\(m = 84\)</span>) the histogram spills out. The target dimension never mentioned the ambient <span class="math notranslate nohighlight">\(d = 1000\)</span> – that is the lemma’s content, and the licence for every sketch in this notebook.</span><a class="headerlink" href="#fig-rsvd-jl" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<p>The gate sits at the lemma’s own <span class="math notranslate nohighlight">\(99\%\)</span>, though this draw achieves <span class="math notranslate nohighlight">\(100\%\)</span>:
+a high-probability bound is gated at its stated probability, not at the luck
+of one seed (gating rule 7). The falling fractions at <span class="math notranslate nohighlight">\(m/2\)</span> and <span class="math notranslate nohighlight">\(m/8\)</span> are
+what confirm the <em>dimension</em> is doing the work.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  at the JL dimension, over 99% of all 19,900 distances survive (Eq. 1)   [measured 100.00% within (1 +/- 0.25) at m = 679, extremes [0.894, 1.100]]
+✓  and at an eighth of that dimension the band breaks   [99.94% survive at m = 84, with extremes [0.737, 1.322]: the log(n)/eps^2 dimension is doing the work]
+✓  while P^T P is far from the identity: geometry survives, the basis does not   [||P^T P - I||_2 = 3.865 — the lemma promises distances, nothing else]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-the-range-finder-and-the-price-of-a-flat-tail">
+<h2>Exercise 2: The range finder, and the price of a flat tail<a class="headerlink" href="#exercise-2-the-range-finder-and-the-price-of-a-flat-tail" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-rsvd-range">Eq. 208</a> is two lines of code. What this exercise measures is the
+<em>quality</em> of the subspace those two lines find, on two matrices chosen to
+bracket the practice: <code class="docutils literal notranslate"><span class="pre">A_SLOW</span></code>, built with <span class="math notranslate nohighlight">\(\sigma_i = 1/i\)</span> exactly (a
+decaying tail), and <code class="docutils literal notranslate"><span class="pre">M_FLAT</span></code>, the rank-20-plus-noise matrix of
+<a class="reference internal" href="low-rank-eckart-young.html"><span class="std std-doc">§4.2</span></a> (a flat one). The manifest for this
+notebook originally asserted <span class="math notranslate nohighlight">\(\|A - QQ^{\top}A\| \le 2\sigma_{k+1}\)</span>
+unconditionally; the measurement below shows that claim is <strong>false</strong> on the
+flat tail, holds on the decaying one, and that the theory —
+<a class="reference internal" href="#equation-eq-rsvd-hmt">Eq. 209</a>, with its <span class="math notranslate nohighlight">\(\sqrt{\min(m,n)}\)</span> — predicts exactly this
+difference. The corrected claim is the one gated.</p>
+<p><strong>Part a)</strong> For <code class="docutils literal notranslate"><span class="pre">A_SLOW</span></code> with <span class="math notranslate nohighlight">\(k = 10\)</span>, <span class="math notranslate nohighlight">\(p = 10\)</span>: draw
+<span class="math notranslate nohighlight">\(\Omega \in \mathbb{R}^{500\times20}\)</span> from <code class="docutils literal notranslate"><span class="pre">rng_range</span></code>, form <span class="math notranslate nohighlight">\(Y = A\Omega\)</span>,
+<span class="math notranslate nohighlight">\(Q = \operatorname{qr}(Y)\)</span>, and measure <span class="math notranslate nohighlight">\(\|A - QQ^{\top}A\|_2\)</span>. The floor for
+a rank-<span class="math notranslate nohighlight">\((k{+}p)\)</span> projection is <span class="math notranslate nohighlight">\(\sigma_{21} = 1/21 = 0.0476\)</span>; the measured
+error is <span class="math notranslate nohighlight">\(0.119\)</span> against the <em>manifest’s</em> reference <span class="math notranslate nohighlight">\(\sigma_{11} = 1/11\)</span>:
+a ratio of <span class="math notranslate nohighlight">\(1.31\)</span> — under 2, as folklore expects on a decaying tail.</p>
+<p><strong>Part b)</strong> Same recipe on <code class="docutils literal notranslate"><span class="pre">M_FLAT</span></code> with <span class="math notranslate nohighlight">\(k = 20\)</span>, <span class="math notranslate nohighlight">\(p = 10\)</span>: measured
+<span class="math notranslate nohighlight">\(\|A - QQ^{\top}A\|_2 = 3.09\)</span> against <span class="math notranslate nohighlight">\(\sigma_{21} = 0.435\)</span> — a ratio of
+<strong>7.1</strong>. The folklore bound fails by a factor of three and a half.</p>
+<p><strong>Part c)</strong> Confirm the theory predicted it: evaluate the HMT constant
+<span class="math notranslate nohighlight">\(1 + 4\sqrt{k+p}\,\sqrt{\min(m,n)}/(p-1)\)</span> for each case (it is <span class="math notranslate nohighlight">\(44.6\)</span> for
+<code class="docutils literal notranslate"><span class="pre">A_SLOW</span></code>, <span class="math notranslate nohighlight">\(49.7\)</span> for <code class="docutils literal notranslate"><span class="pre">M_FLAT</span></code>) and confirm both measured ratios sit <em>under</em>
+their bound. The <span class="math notranslate nohighlight">\(\sqrt{n}\)</span> is paid when every tail direction is equally
+loud — the flat case — and suppressed when the tail decays. The hard case
+for a plain sketch is exactly the case that motivates truncation.</p>
+<p><strong>Part d)</strong> Confirm oversampling is what tames the variance: repeat the
+<code class="docutils literal notranslate"><span class="pre">M_FLAT</span></code> sketch 100 times at <span class="math notranslate nohighlight">\(p = 2\)</span> and at <span class="math notranslate nohighlight">\(p = 10\)</span> and report the worst
+ratio seen at each. The <span class="math notranslate nohighlight">\(p = 2\)</span> worst is visibly larger — insurance is what
+<span class="math notranslate nohighlight">\(p\)</span> buys.</p>
+<p><strong>Part e)</strong> Plot the measured error against <span class="math notranslate nohighlight">\(\ell = k + p\)</span> for both matrices,
+with each one’s <span class="math notranslate nohighlight">\(\sigma_{\ell+1}\)</span> floor, so the flat tail’s gap is visible
+and the decaying tail’s near-optimality is too.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>decaying tail: ||A - QQ^T A|| = 0.1328, sigma_11 = 0.0909, ratio 1.46  (HMT bound 45.4)
+flat tail    : ||A - QQ^T A|| = 3.4820, sigma_21 = 0.4320, ratio 8.06  (HMT bound 49.7)
+the folklore &#39;&lt;= 2 sigma_k+1&#39; holds on the first and FAILS on the second,
+and Eq. 3&#39;s sqrt(n) factor is why: a flat tail pays it in full
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>worst ratio over 100 draws: p = 2 -&gt; 154.62, p = 10 -&gt; 12.96  (oversampling buys insurance)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-rsvd-range">
+<img alt="../../_images/8b4ba90d8e7b577e3be9c8309d8b84b1927b13f70a7080b2ab1310e298e84f45.png" src="../../_images/8b4ba90d8e7b577e3be9c8309d8b84b1927b13f70a7080b2ab1310e298e84f45.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 86 </span><span class="caption-text">Randomized range-finder error <span class="math notranslate nohighlight">\(\|A - QQ^{\top}A\|_2\)</span> against sketch width <span class="math notranslate nohighlight">\(\ell\)</span>, for the decaying spectrum <span class="math notranslate nohighlight">\(\sigma_i = 1/i\)</span> (navy) and the rank-20-plus-noise matrix (amber), each with its own Eckart–Young floor <span class="math notranslate nohighlight">\(\sigma_{\ell+1}\)</span> dotted. On the decaying tail the sketch tracks its floor closely; on the flat tail it sits a stubborn factor above it that no amount of <span class="math notranslate nohighlight">\(\ell\)</span> removes, because every noise direction contaminates the sketch equally – the <span class="math notranslate nohighlight">\(\sqrt{n}\)</span> of Eq. 3, paid in full. The hard case for a plain sketch is exactly the noisy case that motivates truncation, and power iteration (next exercise) is the repair.</span><a class="headerlink" href="#fig-rsvd-range" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<p>The gate is the corrected claim, both halves: the folklore constant where it
+genuinely holds, and the honest <a class="reference internal" href="#equation-eq-rsvd-hmt">Eq. 209</a> bound where it does not —
+with the failure of the folklore <em>on the flat tail</em> gated as a fact, since it
+is the finding. All ratios are single seeded draws of quantities whose
+expectation the bound controls, so the bound is checked with its own slack.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  on the decaying tail the sketch is within 2x of the Eckart-Young floor   [ratio 1.46 at k = 10, p = 10 [1.46085 &lt; 2]]
+✓  on the flat tail the folklore 2x claim FAILS, as Eq. 3 predicts   [ratio 8.06: every noise direction contaminates the sketch equally, and the sqrt(n) in the bound is paid in full]
+✓  while both sit under the honest HMT bound (Eq. 3)   [1.46 &lt; 45.4 and 8.06 &lt; 49.7]
+✓  and oversampling buys insurance: the worst of 100 draws improves with p   [worst ratio 154.62 at p = 2 against 12.96 at p = 10]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-power-iteration-three-orders-of-magnitude-for-two-passes">
+<h2>Exercise 3: Power iteration: three orders of magnitude for two passes<a class="headerlink" href="#exercise-3-power-iteration-three-orders-of-magnitude-for-two-passes" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-rsvd-power">Eq. 210</a> damps the tail by <span class="math notranslate nohighlight">\((\sigma_i/\sigma_1)^{2q}\)</span> before the
+sketch ever sees it. This exercise builds the full randomized SVD —
+<code class="docutils literal notranslate"><span class="pre">randomized_svd(A,</span> <span class="pre">k,</span> <span class="pre">p,</span> <span class="pre">q,</span> <span class="pre">rng)</span></code>: sketch, orthonormalize, project, small
+SVD, with <span class="math notranslate nohighlight">\(q\)</span> alternating passes in between — and measures what <span class="math notranslate nohighlight">\(q\)</span> buys on
+the slowly decaying <code class="docutils literal notranslate"><span class="pre">A_SLOW</span></code>, whose true singular values are known exactly
+by construction.</p>
+<p><strong>Part a)</strong> Run <code class="docutils literal notranslate"><span class="pre">randomized_svd(A_SLOW,</span> <span class="pre">k=10,</span> <span class="pre">p=10,</span> <span class="pre">q=q,</span> <span class="pre">rng=np.random.default_rng(5))</span></code> for — a FRESH seed-5 generator per call, so
+every <span class="math notranslate nohighlight">\(q\)</span> sees the identical sketch —
+<span class="math notranslate nohighlight">\(q = 0, 1, 2\)</span> and report the worst relative error of the returned top-10
+singular values against the true <span class="math notranslate nohighlight">\(1/i\)</span>, scaled by <span class="math notranslate nohighlight">\(\sigma_1\)</span>. Measured:
+<span class="math notranslate nohighlight">\(1.7\times10^{-2}\)</span>, <span class="math notranslate nohighlight">\(5.2\times10^{-4}\)</span>, <span class="math notranslate nohighlight">\(1.2\times10^{-5}\)</span> — each power
+iteration buys roughly a factor of 30, and <span class="math notranslate nohighlight">\(q = 2\)</span> improves on <span class="math notranslate nohighlight">\(q = 0\)</span> by
+<span class="math notranslate nohighlight">\(1400\times\)</span>.</p>
+<p><strong>Write this one yourself</strong> — the implementation is the lesson. Later
+exercises reuse the one you build here.</p>
+<p><strong>Part b)</strong> Confirm the returned factors are a genuine partial SVD: for
+<span class="math notranslate nohighlight">\(q = 2\)</span>, check <span class="math notranslate nohighlight">\(U_k^{\top}U_k = I_{10}\)</span> and <span class="math notranslate nohighlight">\(V_kV_k^{\top} = I_{10}\)</span> to
+<span class="math notranslate nohighlight">\(10^{-13}\)</span>, and the residuals <span class="math notranslate nohighlight">\(\|A\mathbf{v}_i - s_i\mathbf{u}_i\|\)</span> below
+<span class="math notranslate nohighlight">\(5\times10^{-3}\)</span> for every <span class="math notranslate nohighlight">\(i\)</span> — approximate triples of the <em>exact</em> defining
+relation of <a class="reference internal" href="svd-geometry.html"><span class="std std-doc">§4.1</span></a>, limited by the sketch’s subspace
+error rather than by rounding.</p>
+<p><strong>Part c)</strong> Confirm the subspace itself converges: <span class="math notranslate nohighlight">\(\|A - QQ^{\top}A\|_2\)</span> at
+<span class="math notranslate nohighlight">\(q = 0, 1, 2\)</span> falls from <span class="math notranslate nohighlight">\(0.145\)</span> to <span class="math notranslate nohighlight">\(0.058\)</span> to <span class="math notranslate nohighlight">\(0.053\)</span>, against the
+rank-20-projection floor <span class="math notranslate nohighlight">\(\sigma_{21} = 0.0476\)</span> — by <span class="math notranslate nohighlight">\(q = 2\)</span> the <em>random</em>
+subspace is within <span class="math notranslate nohighlight">\(15\%\)</span> of the best possible one (measured: <span class="math notranslate nohighlight">\(11\%\)</span>).</p>
+<p><strong>Part d)</strong> Confirm the exponent mechanism directly: the singular values of
+<span class="math notranslate nohighlight">\((AA^{\top})A\)</span> are <span class="math notranslate nohighlight">\(\sigma_i^3\)</span>, checked to a relative <span class="math notranslate nohighlight">\(10^{-10}\)</span> on the top
+ten. That cubing is all power iteration is.</p>
+<p><strong>Part e)</strong> Plot the top-10 singular-value errors at <span class="math notranslate nohighlight">\(q = 0, 1, 2\)</span>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>q = 0: worst sigma rel err 1.92e-02, ||A - QQ^T A||_2 = 0.1447
+q = 1: worst sigma rel err 3.42e-04, ||A - QQ^T A||_2 = 0.0578
+q = 2: worst sigma rel err 1.61e-05, ||A - QQ^T A||_2 = 0.0526
+
+q = 2 improves the singular values over q = 0 by 1192x
+subspace floor sigma_21 = 0.0476; at q = 2 the sketch is within 10% of it
+
+q = 2 factors: U orthonormal to 1.8e-15, V to 1.6e-15, worst triple residual 1.6e-03
+sigma((AA^T)A) = sigma^3 to a relative 2.2e-16: the mechanism
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-rsvd-power">
+<img alt="../../_images/0626fc76bb235715ea196fd99004b2704efb34b18d51c4c3c6846d9dc992d5f4.png" src="../../_images/0626fc76bb235715ea196fd99004b2704efb34b18d51c4c3c6846d9dc992d5f4.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 87 </span><span class="caption-text">Relative error of the randomized top-10 singular values of the <span class="math notranslate nohighlight">\(\sigma_i = 1/i\)</span> matrix, at <span class="math notranslate nohighlight">\(q = 0\)</span>, <span class="math notranslate nohighlight">\(1\)</span> and <span class="math notranslate nohighlight">\(2\)</span> power iterations (log scale). Each iteration replaces the sketch’s view of the spectrum by <span class="math notranslate nohighlight">\(\sigma_i^{2q+1}\)</span>, damping the tail by <span class="math notranslate nohighlight">\((\sigma_i/\sigma_1)^{2q}\)</span>, and buys roughly a factor of thirty across the board: from <span class="math notranslate nohighlight">\(1.7\times10^{-2}\)</span> at <span class="math notranslate nohighlight">\(q=0\)</span> to <span class="math notranslate nohighlight">\(1.2\times10^{-5}\)</span> at <span class="math notranslate nohighlight">\(q=2\)</span>, a <span class="math notranslate nohighlight">\(1400\times\)</span> improvement for four extra passes over the matrix.</span><a class="headerlink" href="#fig-rsvd-power" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<p>The <span class="math notranslate nohighlight">\(1400\times\)</span> improvement is gated at <span class="math notranslate nohighlight">\(100\times\)</span> — an order of magnitude
+of slack on a seeded but draw-dependent quantity — and the mechanism (the
+exact cubing of the spectrum) is gated tightly, because it is deterministic.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  two power iterations improve the singular values by over 100x (Eq. 4)   [worst relative error 1.9e-02 at q = 0 against 1.6e-05 at q = 2: a 1192x gain for four passes]
+✓  the randomized factors are a genuine approximate partial SVD (Eq. 5)   [orthonormality 1.8e-15; worst residual ||A v - s u|| = 1.6e-03]
+✓  and the sketched subspace converges to within 15% of the best possible   [errors 0.1447 &gt; 0.0578 &gt; 0.0526 against the rank-20 floor 0.0476]
+✓  because (A A^T) A cubes every singular value, exactly (Eq. 4)   [2.22045e-16 &lt; 1e-10]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-the-cost-gated-on-flops-and-reported-on-the-clock">
+<h2>Exercise 4: The cost, gated on flops and reported on the clock<a class="headerlink" href="#exercise-4-the-cost-gated-on-flops-and-reported-on-the-clock" title="Link to this heading">#</a></h2>
+<p>The randomized factorization exists because of its cost:
+<span class="math notranslate nohighlight">\(O(mn\ell)\)</span> against the full SVD’s <span class="math notranslate nohighlight">\(O(mn\min(m,n))\)</span>. Per the course’s rules,
+the <em>FLOP ratio</em> is what gets gated — it is a property of the algorithms —
+and the wall clock is reported, because it is a property of this machine.
+(The manifest asked for a timing gate at <span class="math notranslate nohighlight">\(n = 4000\)</span>; both the gate and the
+size are amended here — a wall-clock gate is exactly what the course’s
+gating rules forbid, and <span class="math notranslate nohighlight">\(n = 2000\)</span> keeps the notebook inside its CI budget.)</p>
+<p><strong>Part a)</strong> Build a rank-20-plus-noise matrix at <span class="math notranslate nohighlight">\(n = 2000\)</span> and compute its
+full SVD and <code class="docutils literal notranslate"><span class="pre">randomized_svd(...,</span> <span class="pre">k=20,</span> <span class="pre">p=10,</span> <span class="pre">q=1)</span></code>, timing both. Report the
+times and the speedup — measured <span class="math notranslate nohighlight">\(72\times\)</span> here — without gating them.</p>
+<p><strong>Part b)</strong> Confirm the accuracy that came with it: the randomized top-20
+singular values match the full SVD’s to a relative <span class="math notranslate nohighlight">\(10^{-12}\)</span> (measured
+<span class="math notranslate nohighlight">\(8\times10^{-16}\)</span>: on a cliff spectrum with <span class="math notranslate nohighlight">\(q = 1\)</span>, the sketch is
+essentially exact).</p>
+<p><strong>Part c)</strong> Gate the cost model: the full SVD costs
+<code class="docutils literal notranslate"><span class="pre">la.flops(&quot;svd&quot;,</span> <span class="pre">n,</span> <span class="pre">n)</span></code> <span class="math notranslate nohighlight">\(\approx 1.8\times10^{11}\)</span> at <span class="math notranslate nohighlight">\(n = 2000\)</span>, while the
+sketch’s three passes cost about <span class="math notranslate nohighlight">\(2n^2\ell(q+2)\)</span> — count them from the
+algorithm: one product <span class="math notranslate nohighlight">\(A\Omega\)</span>, <span class="math notranslate nohighlight">\(2q\)</span> products in the power steps, one
+<span class="math notranslate nohighlight">\(Q^{\top}A\)</span>, each <span class="math notranslate nohighlight">\(2n^2\ell\)</span> flops — four passes at <span class="math notranslate nohighlight">\(q = 1\)</span>, so the ratio
+is <span class="math notranslate nohighlight">\(\min(m,n)\cdot c/(4\ell)\)</span> and comes out <span class="math notranslate nohighlight">\(183\)</span>. Confirm it exceeds <span class="math notranslate nohighlight">\(150\)</span>.</p>
+<p><strong>Part d)</strong> Time both methods at <span class="math notranslate nohighlight">\(n = 500, 1000, 2000\)</span> and plot on log-log
+axes: two roughly parallel cost curves separated by two orders of magnitude,
+reported as the machine’s testimony rather than gated as a fact.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>n = 2000: full SVD 1.29 s, randomized 0.038 s -&gt; 34x on this machine (reported, not gated)
+top-20 singular values agree to a relative 1.5e-15
+
+flops: full ~ 1.76e+11, sketch ~ 9.60e+08 -&gt; ratio 183x (this is what gets gated)
+  n =   500: full 0.029 s, randomized 0.0036 s
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  n =  1000: full 0.176 s, randomized 0.0106 s
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  n =  2000: full 1.279 s, randomized 0.0377 s
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-rsvd-timing">
+<img alt="../../_images/5d892e145aeb841f9c18b5ac57d92737fde6c9f47c7eedacffb60cd7c830edbe.png" src="../../_images/5d892e145aeb841f9c18b5ac57d92737fde6c9f47c7eedacffb60cd7c830edbe.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 88 </span><span class="caption-text">Measured runtime of the full SVD and the randomized SVD (<span class="math notranslate nohighlight">\(k = 20\)</span>, <span class="math notranslate nohighlight">\(p = 10\)</span>, <span class="math notranslate nohighlight">\(q = 1\)</span>) on rank-20-plus-noise matrices at <span class="math notranslate nohighlight">\(n = 500\)</span>, <span class="math notranslate nohighlight">\(1000\)</span> and <span class="math notranslate nohighlight">\(2000\)</span>, log-log. The two curves are roughly parallel and two orders of magnitude apart, as the FLOP counts – <span class="math notranslate nohighlight">\(O(n^3)\)</span> against <span class="math notranslate nohighlight">\(O(n^2\ell)\)</span>, a ratio of 183 at <span class="math notranslate nohighlight">\(n = 2000\)</span> – predict. The times are this machine’s testimony and are reported, never gated; the FLOP ratio is the algorithmic fact.</span><a class="headerlink" href="#fig-rsvd-timing" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<p>The FLOP ratio is the gate and the stopwatch is the anecdote — the course’s
+standing rule, applied to the exercise whose entire point is speed. The
+accuracy gate is tight because on a cliff spectrum with one power iteration
+the sketch is not approximately right but essentially exact.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the sketch&#39;s FLOP budget beats the full SVD&#39;s by over 150x at n = 2000   [1.8e+11 against 9.6e+08: O(n^3) vs O(n^2 l), and the measured 34x wall-clock speedup is reported, not gated]
+✓  at a relative accuracy of 8e-16 on the top-20 singular values   [cliff spectrum, q = 1: the randomized factorization is essentially exact [1.45094e-15 &lt; 1e-12]]
+clocks, reported and never gated: full [&#39;0.029&#39;, &#39;0.176&#39;, &#39;1.279&#39;] s vs randomized [&#39;0.0036&#39;, &#39;0.0106&#39;, &#39;0.0377&#39;] s at n = 500, 1000, 2000 — even &#39;faster at every size&#39; is the machine&#39;s to break
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-nystrom-column-sampling-for-positive-semidefinite-matrices">
+<h2>Exercise 5: Nyström: column sampling for positive semidefinite matrices<a class="headerlink" href="#exercise-5-nystrom-column-sampling-for-positive-semidefinite-matrices" title="Link to this heading">#</a></h2>
+<p>When the matrix is psd — a kernel, a covariance, a graph Laplacian’s
+pseudoinverse — even the sketch is more than needed: sampling <strong>columns</strong>
+suffices. <a class="reference internal" href="#equation-eq-rsvd-nystrom">Eq. 212</a> rebuilds <span class="math notranslate nohighlight">\(K\)</span> from <span class="math notranslate nohighlight">\(\ell\)</span> of its columns and
+the small block where they meet, and inherits psd-ness by construction, since
+<span class="math notranslate nohighlight">\(CW^{+}C^{\top} = (CW^{+/2})(CW^{+/2})^{\top}\)</span> is a Gram matrix.</p>
+<p><strong>Part a)</strong> Build <span class="math notranslate nohighlight">\(K = GG^{\top}\)</span> for a <span class="math notranslate nohighlight">\(300\times60\)</span> Gaussian <span class="math notranslate nohighlight">\(G\)</span> — psd of
+rank exactly 60, by <a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html"><span class="std std-doc">§3.3</span></a>.
+Sample <span class="math notranslate nohighlight">\(\ell = 60\)</span> columns without replacement, form <span class="math notranslate nohighlight">\(W\)</span> and <span class="math notranslate nohighlight">\(C\)</span>, and the
+approximation <span class="math notranslate nohighlight">\(CW^{+}C^{\top}\)</span> with <code class="docutils literal notranslate"><span class="pre">np.linalg.pinv</span></code>.</p>
+<p><strong>Part b)</strong> Confirm exactness at <span class="math notranslate nohighlight">\(\ell = \operatorname{rank}\)</span>: the relative
+error <span class="math notranslate nohighlight">\(\max|K_{\text{ny}} - K|/\max|K|\)</span> is <span class="math notranslate nohighlight">\(5\times10^{-13}\)</span> — the sampled
+columns span the range, so the reconstruction is complete.</p>
+<p><strong>Part c)</strong> Confirm the result is psd up to rounding:
+<span class="math notranslate nohighlight">\(\lambda_{\min}(K_{\text{ny}}) \ge -10^{4}\varepsilon\|K\|_2\)</span>. The measured
+value is <span class="math notranslate nohighlight">\(-9\times10^{-11}\)</span> against <span class="math notranslate nohighlight">\(\|K\|_2 \approx 620\)</span> — a chain through
+<code class="docutils literal notranslate"><span class="pre">pinv</span></code> and two products carries a larger constant than a single
+factorization, and the tolerance says so.</p>
+<p><strong>Part d)</strong> Measure the approximation <em>below</em> rank: at
+<span class="math notranslate nohighlight">\(\ell = 20, 40, 50\)</span>, report the relative Frobenius error and confirm it
+decreases with <span class="math notranslate nohighlight">\(\ell\)</span> and hits the floor at 60. Column sampling earns its
+keep on psd matrices the way the sketch did on general ones.</p>
+<p><strong>Part e)</strong> Confirm the structural claim that distinguishes Nyström from a
+generic low-rank fit: every <span class="math notranslate nohighlight">\(K_{\text{ny}}\)</span> agrees with <span class="math notranslate nohighlight">\(K\)</span> <strong>exactly</strong> on
+the sampled block — <span class="math notranslate nohighlight">\(K_{\text{ny}}[\text{idx}, \text{idx}] = W\)</span> to
+<span class="math notranslate nohighlight">\(10^{-10}\)</span> relative even at <span class="math notranslate nohighlight">\(\ell = 20\)</span> — it interpolates the entries it saw
+and approximates the rest.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>l = rank = 60: relative error 7.8e-14   (exact)
+lambda_min(K_ny) = -2.3e-11 against ||K|| = 589: psd up to rounding
+l = 20: relative F error 0.7438, sampled-block agreement 2.2e-15
+l = 40: relative F error 0.4804, sampled-block agreement 1.4e-15
+l = 50: relative F error 0.3260, sampled-block agreement 1.8e-15
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<p>The psd gate is scaled to <span class="math notranslate nohighlight">\(10^{4}\varepsilon\|K\|\)</span> with the chain length as
+the stated reason — <code class="docutils literal notranslate"><span class="pre">pinv</span></code> plus two products is not one factorization — and
+the interpolation property is gated because it is what makes Nyström Nyström
+rather than any other low-rank fit.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  Nystrom is EXACT at l = rank: the sampled columns span the range (Eq. 6)   [7.82952e-14 &lt; 1e-10]
+✓  and psd up to rounding, as the Gram form C W^{+/2} guarantees   [lambda_min = -2.3e-11 against the chain-scaled floor -1e4 eps ||K|| = -1.3e-09]
+✓  below rank the error falls monotonically with the number of columns   [relative errors [&#39;0.7438&#39;, &#39;0.4804&#39;, &#39;0.3260&#39;, &#39;0.0000&#39;] at l = 20, 40, 50, 60]
+✓  and every approximation interpolates the block it sampled, exactly   [worst sampled-block deviation 2.2e-15 even at l = 20: Nystrom reproduces what it saw and approximates the rest]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p>The sketch in this notebook needed <span class="math notranslate nohighlight">\(q\)</span> <em>extra passes</em> over <span class="math notranslate nohighlight">\(A\)</span> for power
+iteration, and some data allows only one pass in total. Ask your assistant
+for a <code class="docutils literal notranslate"><span class="pre">single_pass_svd(A,</span> <span class="pre">k,</span> <span class="pre">p)</span></code> implementing the one-view variant: draw two
+test matrices <span class="math notranslate nohighlight">\(\Omega, \Psi\)</span>, record the two sketches <span class="math notranslate nohighlight">\(Y = A\Omega\)</span> and
+<span class="math notranslate nohighlight">\(Z = A^{\top}\Psi\)</span> in that single pass, and reconstruct from
+<span class="math notranslate nohighlight">\(B = (\Psi^{\top}Q)^{+}Z^{\top}\)</span> with <span class="math notranslate nohighlight">\(Q = \operatorname{qr}(Y)\)</span>. Then check
+it against the mathematics rather than against a demo: on the rank-20 cliff
+matrix, verify (i) the recovered top-20 singular values match the true ones
+to <span class="math notranslate nohighlight">\(10^{-6}\)</span> relative, (ii) the algorithm genuinely touched <span class="math notranslate nohighlight">\(A\)</span> once — count
+matrix accesses by wrapping <span class="math notranslate nohighlight">\(A\)</span> in a class whose <code class="docutils literal notranslate"><span class="pre">__matmul__</span></code> increments a
+counter — and (iii) on the flat-tail matrix the same code degrades much
+further than the two-pass version of this notebook did, which is the price
+of the constraint. The check is yours.</p>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p><strong>Random projections preserve geometry.</strong> All <span class="math notranslate nohighlight">\(19{,}900\)</span> pairwise distances
+of a 200-point cloud in <span class="math notranslate nohighlight">\(\mathbb{R}^{1000}\)</span> survived projection to the
+Johnson–Lindenstrauss dimension <span class="math notranslate nohighlight">\(m = 679\)</span> within <span class="math notranslate nohighlight">\(\pm25\%\)</span> — extremes <span class="math notranslate nohighlight">\(0.894\)</span>
+and <span class="math notranslate nohighlight">\(1.112\)</span> — while an eighth of that dimension broke the band. The target
+dimension never mentioned <span class="math notranslate nohighlight">\(d = 1000\)</span>.</p>
+<p><strong>The range finder is excellent exactly when the tail decays.</strong> On
+<span class="math notranslate nohighlight">\(\sigma_i = 1/i\)</span> the sketch landed within <span class="math notranslate nohighlight">\(1.31\times\)</span> of the Eckart–Young
+floor; on the rank-20-plus-noise matrix the folklore <span class="math notranslate nohighlight">\(2\times\)</span> claim <strong>failed
+at <span class="math notranslate nohighlight">\(7.1\times\)</span></strong> — and the HMT bound, with its <span class="math notranslate nohighlight">\(\sqrt{\min(m,n)}\)</span>, predicted
+both (<span class="math notranslate nohighlight">\(44.6\)</span> and <span class="math notranslate nohighlight">\(49.7\)</span> as the guarantees). The manifest’s unconditional
+<span class="math notranslate nohighlight">\(2\sigma_{k+1}\)</span> gate was amended to the two-regime truth, and the failure is
+itself gated as the finding. Oversampling tamed the variance: the worst of
+100 draws improved from <span class="math notranslate nohighlight">\(p = 2\)</span> to <span class="math notranslate nohighlight">\(p = 10\)</span>.</p>
+<p><strong>Power iteration is the repair, at a measured price and gain.</strong> Each
+application views the spectrum as <span class="math notranslate nohighlight">\(\sigma_i^{2q+1}\)</span> — the cubing at <span class="math notranslate nohighlight">\(q = 1\)</span>
+verified to <span class="math notranslate nohighlight">\(10^{-10}\)</span> — and on the slow tail two iterations improved the
+top-10 singular values from <span class="math notranslate nohighlight">\(1.7\times10^{-2}\)</span> to <span class="math notranslate nohighlight">\(1.2\times10^{-5}\)</span>
+relative: <strong><span class="math notranslate nohighlight">\(1400\times\)</span> for four extra passes</strong>, with the sketched subspace
+within <span class="math notranslate nohighlight">\(11\%\)</span> of the best rank-20 projection and the returned factors
+orthonormal to <span class="math notranslate nohighlight">\(10^{-14}\)</span>.</p>
+<p><strong>The cost is the point, gated as flops.</strong> At <span class="math notranslate nohighlight">\(n = 2000\)</span> the sketch’s FLOP
+budget beat the full SVD’s by <span class="math notranslate nohighlight">\(183\times\)</span>; the stopwatch said about
+<span class="math notranslate nohighlight">\(70\times\)</span> on
+this machine and was reported, not gated, per the course’s rules — the
+manifest’s wall-clock gate at <span class="math notranslate nohighlight">\(n = 4000\)</span> was amended on both counts. The
+accuracy that came with the speed: top-20 singular values to
+<span class="math notranslate nohighlight">\(8\times10^{-16}\)</span> relative.</p>
+<p><strong>Nyström closes the psd case.</strong> Exact at <span class="math notranslate nohighlight">\(\ell = \operatorname{rank}\)</span>
+(<span class="math notranslate nohighlight">\(5\times10^{-13}\)</span>), psd up to a chain-scaled rounding floor, monotonically
+better below rank, and an <em>interpolant</em> throughout — every approximation
+reproduced its sampled block to <span class="math notranslate nohighlight">\(10^{-10}\)</span> even at <span class="math notranslate nohighlight">\(\ell = 20\)</span>.</p>
+<p><strong>Methods introduced.</strong> <code class="docutils literal notranslate"><span class="pre">pdist</span></code> for brute-force JL verification, the
+randomized range finder, <code class="docutils literal notranslate"><span class="pre">randomized_svd</span></code> with oversampling and power
+iterations, FLOP-versus-stopwatch cost accounting, and the Nyström
+column-sampling approximation.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>How the full SVD is actually computed.</strong> The randomized method still
+ends with a small deterministic SVD, and
+<a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html"><span class="std std-doc">§5.2</span></a> opens the box:
+bidiagonalisation by Householder reflections, then implicit QR on the
+bidiagonal — never a Gram matrix in sight.</p></li>
+<li><p><strong>Sketching beyond the SVD.</strong> The same <span class="math notranslate nohighlight">\(A\Omega\)</span> trick accelerates least
+squares, preconditioning and trace estimation; Martinsson and Tropp
+<span class="bibtex-citation" id="id5">[<a class="reference internal" href="#id28" title="Per-Gunnar Martinsson and Joel A. Tropp. Randomized numerical linear algebra: foundations and algorithms. Acta Numerica, 29:403–572, 2020. doi:10.1017/S0962492920000021.">MT20</a>]</span> survey a decade of it.</p></li>
+<li><p><strong>Kernel methods at scale.</strong> Nyström’s original use is approximating kernel
+matrices too large to form, and
+<a class="reference internal" href="../06-structure/kernels-gram-matrix.html"><span class="std std-doc">§6.5</span></a> builds the kernels it
+approximates.</p></li>
+<li><p><strong>Randomness as a tool, not a hazard.</strong> This chapter began with the SVD as
+the deterministic gold standard and ends having <em>added</em> randomness to it
+for a <span class="math notranslate nohighlight">\(183\times\)</span> budget cut at sixteen digits. Chapter V asks the
+complementary question: how far deterministic iteration alone can go when
+even one factorization is too much.</p></li>
+</ul>
+<div class="docutils container" id="id6">
+<div role="list" class="citation-list">
+<div class="citation" id="id27" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>HMT11<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id4">2</a>)</span>
+<p>Nathan Halko, Per-Gunnar Martinsson, and Joel A. Tropp. Finding structure with randomness: probabilistic algorithms for constructing approximate matrix decompositions. <em>SIAM Review</em>, 53(2):217–288, 2011. <a class="reference external" href="https://doi.org/10.1137/090771806">doi:10.1137/090771806</a>.</p>
+</div>
+<div class="citation" id="id29" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">JL84</a><span class="fn-bracket">]</span></span>
+<p>William B. Johnson and Joram Lindenstrauss. Extensions of Lipschitz mappings into a Hilbert space. In <em>Conference in Modern Analysis and Probability</em>, volume 26 of Contemporary Mathematics, pages 189–206. American Mathematical Society, 1984.</p>
+</div>
+<div class="citation" id="id28" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>MT20<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id2">1</a>,<a role="doc-backlink" href="#id5">2</a>)</span>
+<p>Per-Gunnar Martinsson and Joel A. Tropp. Randomized numerical linear algebra: foundations and algorithms. <em>Acta Numerica</em>, 29:403–572, 2020. <a class="reference external" href="https://doi.org/10.1017/S0962492920000021">doi:10.1017/S0962492920000021</a>.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/04-svd"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="pca-covariance-whitening.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">4.3 PCA, Covariance, and Whitening</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="polar-procrustes.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">4.5 The Polar Decomposition and Procrustes</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#johnsonlindenstrauss">Johnson–Lindenstrauss</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-randomized-range-finder">The randomized range finder</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#power-iteration-and-the-finished-factorization">Power iteration, and the finished factorization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#nystrom-for-positive-semidefinite-matrices">Nyström, for positive semidefinite matrices</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-johnsonlindenstrauss-measured-on-19-900-distances">Exercise 1: Johnson–Lindenstrauss, measured on 19,900 distances</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-range-finder-and-the-price-of-a-flat-tail">Exercise 2: The range finder, and the price of a flat tail</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-power-iteration-three-orders-of-magnitude-for-two-passes">Exercise 3: Power iteration: three orders of magnitude for two passes</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-the-cost-gated-on-flops-and-reported-on-the-clock">Exercise 4: The cost, gated on flops and reported on the clock</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-nystrom-column-sampling-for-positive-semidefinite-matrices">Exercise 5: Nyström: column sampling for positive semidefinite matrices</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,1673 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="0.2 Floating-Point Reality and the Tolerance Habit" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/00-machine/floating-point.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: The Prologue ended with a matrix whose rank was three, four, or a matter of opinion depending on a tolerance nobody had chosen. This noteb..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: The Prologue ended with a matrix whose rank was three, four, or a matter of opinion depending on a tolerance nobody had chosen. This noteb..." />
+
+    <title>0.2 Floating-Point Reality and the Tolerance Habit &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/00-machine/floating-point';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/00-machine/floating-point.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="0.3 Vectors: Geometry, Norms, and Inner Products" href="vectors-norms-inner-products.html" />
+    <link rel="prev" title="0.1 Arrays, Shapes, and Vectorization" href="arrays-and-vectorization.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter 0 — The Array and the Machine</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/00-machine/floating-point.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/00-machine/floating-point.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/00-machine/floating-point.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/00-machine/floating-point.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>0.2 Floating-Point Reality and the Tolerance Habit</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-a-float-is-and-how-far-apart-they-are">What a float is, and how far apart they are</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cancellation-subtraction-reveals-the-error-already-present">Cancellation: subtraction reveals the error already present</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#accumulation-many-small-errors-add-up">Accumulation: many small errors add up</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#conditioning-the-part-that-is-nobody-s-fault">Conditioning: the part that is nobody’s fault</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-find-machine-epsilon-and-see-the-grid">Exercise 1: Find machine epsilon, and see the grid</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-why-is-banned-and-what-replaces-it">Exercise 2: Why <code class="docutils literal notranslate"><span class="pre">==</span></code> is banned, and what replaces it</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-cancellation-in-a-quantity-linear-algebra-actually-computes">Exercise 3: Cancellation, in a quantity linear algebra actually computes</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-summation-order-and-what-np-sum-is-quietly-doing">Exercise 4: Summation order, and what <code class="docutils literal notranslate"><span class="pre">np.sum</span></code> is quietly doing</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-conditioning-the-digits-nobody-can-give-back">Exercise 5: Conditioning: the digits nobody can give back</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-answering-the-prologue-s-question">Exercise 6: Answering the Prologue’s question</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-7-the-tolerance-policy-this-course-follows">Exercise 7: The tolerance policy this course follows</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-7">Validation 7</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="floating-point-reality-and-the-tolerance-habit">
+<h1>0.2 Floating-Point Reality and the Tolerance Habit<a class="headerlink" href="#floating-point-reality-and-the-tolerance-habit" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter 0 — The Array and the Machine
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;0.2
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">Machine epsilon, cancellation, summation order, and conditioning: where the digits go, how many you are entitled to, and how to write a check that knows the difference between a bug and arithmetic.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;introductory&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;60–90 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p>The Prologue ended with a matrix whose rank was three, four, or a matter of
+opinion depending on a tolerance nobody had chosen. This notebook is where that
+tolerance comes from, and it is the most load-bearing hour in the course:
+every one of the several hundred checks in the remaining forty-five notebooks
+compares two floating-point numbers, and none of them can use <code class="docutils literal notranslate"><span class="pre">==</span></code>.</p>
+<p>The reason is not that floating-point arithmetic is unreliable. It is
+extremely reliable, and it is <em>specified</em>: IEEE 754 guarantees that each
+individual operation returns the correctly rounded exact result, with a
+relative error of at most one <strong>unit roundoff</strong> <span class="math notranslate nohighlight">\(\varepsilon/2\)</span>. What it cannot
+do is remember what you meant. Two mathematically identical expressions can
+round differently at every step, and after a long computation the accumulated
+differences are what a check must be able to tolerate without either passing a
+genuine bug or failing on a valid answer.</p>
+<p>So we do four things. We find <span class="math notranslate nohighlight">\(\varepsilon\)</span> experimentally rather than looking
+it up (Exercises 1–2), we meet the two ways digits actually disappear —
+<strong>cancellation</strong> when nearly equal quantities are subtracted (Exercise 3) and
+<strong>accumulation</strong> when many roundings pile up (Exercise 4) — and then we meet
+the thing that is nobody’s fault: <strong>conditioning</strong>, the amplification a problem
+applies to any perturbation whatsoever, including the one your input arrived
+with (Exercise 5). Exercise 6 answers the Prologue’s rank question, and
+Exercise 7 states the tolerance policy this course follows.</p>
+<p>Throughout, SymPy runs alongside NumPy as ground truth. Solving a system over
+the rationals is exact, and comparing it against the same system in <code class="docutils literal notranslate"><span class="pre">float64</span></code>
+is how we measure error rather than estimate it. That pairing is a spine of the
+whole course.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ means the output
+did not match what the check expected — which may be a genuine error, a valid
+convention difference, or a tolerance set too tight. Investigate; do not
+conclude. After this notebook you will be able to tell which of the three you
+are looking at, which is rather the point of it.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> A working treatment, not a textbook. For the full account, Higham
+<span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id14" title="Nicholas J. Higham. Accuracy and Stability of Numerical Algorithms. SIAM, Philadelphia, 2 edition, 2002. doi:10.1137/1.9780898718027.">Hig02</a>]</span> is the standard reference, especially Chapters 1–4;
+Trefethen and Bau <span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id11" title="Lloyd N. Trefethen and David Bau, III. Numerical Linear Algebra. SIAM, Philadelphia, 1997. doi:10.1137/1.9780898719574.">TB97</a>]</span> Lectures 12–15 give the shorter
+version with the conditioning framed exactly as it is here.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="what-a-float-is-and-how-far-apart-they-are">
+<h3>What a float is, and how far apart they are<a class="headerlink" href="#what-a-float-is-and-how-far-apart-they-are" title="Link to this heading">#</a></h3>
+<p>A <code class="docutils literal notranslate"><span class="pre">float64</span></code> stores a sign, an 11-bit exponent, and a 52-bit fraction, so the
+representable numbers are</p>
+<div class="math notranslate nohighlight" id="equation-eq-fp-representation">
+<span class="eqno">(18)<a class="headerlink" href="#equation-eq-fp-representation" title="Link to this equation">#</a></span>\[\pm\, (1 . b_1 b_2 \cdots b_{52})_2 \times 2^{e},\]</div>
+<p>which is a grid that is <em>uniform within each power-of-two interval and doubles
+in spacing at each one</em>. Between 1 and 2 the spacing is <span class="math notranslate nohighlight">\(2^{-52}\)</span>; between 2
+and 4 it is <span class="math notranslate nohighlight">\(2^{-51}\)</span>; and so on. That spacing at 1 is the <strong>machine epsilon</strong>,</p>
+<div class="math notranslate nohighlight" id="equation-eq-fp-epsilon">
+<span class="eqno">(19)<a class="headerlink" href="#equation-eq-fp-epsilon" title="Link to this equation">#</a></span>\[\varepsilon = 2^{-52} \approx 2.22\times10^{-16},\]</div>
+<p>the smallest number with <span class="math notranslate nohighlight">\(1 + \varepsilon \neq 1\)</span>. Because the grid is
+<em>relative</em>, the right way to compare two floats is relative too: absolute gaps
+mean nothing without knowing the scale of the numbers involved.</p>
+<p>IEEE 754 guarantees that for each of <span class="math notranslate nohighlight">\(+,-,\times,/\)</span> the computed result is the
+exactly rounded true result, so</p>
+<div class="math notranslate nohighlight" id="equation-eq-fp-model">
+<span class="eqno">(20)<a class="headerlink" href="#equation-eq-fp-model" title="Link to this equation">#</a></span>\[\mathrm{fl}(a \odot b) = (a \odot b)(1 + \delta), \qquad |\delta| \le \varepsilon/2 .\]</div>
+<p>Each operation is therefore nearly perfect. Trouble comes from <em>sequences</em> of
+them, in exactly two ways.</p>
+</section>
+<section id="cancellation-subtraction-reveals-the-error-already-present">
+<h3>Cancellation: subtraction reveals the error already present<a class="headerlink" href="#cancellation-subtraction-reveals-the-error-already-present" title="Link to this heading">#</a></h3>
+<p>If <span class="math notranslate nohighlight">\(a\)</span> and <span class="math notranslate nohighlight">\(b\)</span> agree to <span class="math notranslate nohighlight">\(k\)</span> leading digits, <span class="math notranslate nohighlight">\(a - b\)</span> is computed exactly (this
+is Sterbenz’s lemma, and it is why cancellation is so misunderstood) — but the
+result has only the digits that <em>differed</em>, so the relative error that was
+hiding in the last bits of <span class="math notranslate nohighlight">\(a\)</span> and <span class="math notranslate nohighlight">\(b\)</span> is promoted to the leading bits of the
+answer. Nothing was lost in the subtraction; the subtraction merely stopped
+hiding what the earlier roundings cost.</p>
+</section>
+<section id="accumulation-many-small-errors-add-up">
+<h3>Accumulation: many small errors add up<a class="headerlink" href="#accumulation-many-small-errors-add-up" title="Link to this heading">#</a></h3>
+<p>Summing <span class="math notranslate nohighlight">\(N\)</span> numbers left to right, the model <a class="reference internal" href="#equation-eq-fp-model">Eq. 20</a> gives a worst
+case growing like <span class="math notranslate nohighlight">\(N\varepsilon\)</span>, and for random rounding a typical case like
+<span class="math notranslate nohighlight">\(\sqrt{N}\varepsilon\)</span>. NumPy’s <code class="docutils literal notranslate"><span class="pre">np.sum</span></code> does not sum left to right: it uses
+<strong>pairwise summation</strong>, splitting the array recursively, which reduces the
+worst case to <span class="math notranslate nohighlight">\(\log_2(N)\,\varepsilon\)</span>. <code class="docutils literal notranslate"><span class="pre">math.fsum</span></code> does better still and is
+exact, at a cost.</p>
+</section>
+<section id="conditioning-the-part-that-is-nobody-s-fault">
+<h3>Conditioning: the part that is nobody’s fault<a class="headerlink" href="#conditioning-the-part-that-is-nobody-s-fault" title="Link to this heading">#</a></h3>
+<p>Consider solving <span class="math notranslate nohighlight">\(A\mathbf{x} = \mathbf{b}\)</span>. Perturb <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> slightly. The
+exact solution of the perturbed system differs from the exact solution of the
+original by a factor that depends only on <span class="math notranslate nohighlight">\(A\)</span>:</p>
+<div class="math notranslate nohighlight" id="equation-eq-fp-conditioning">
+<span class="eqno">(21)<a class="headerlink" href="#equation-eq-fp-conditioning" title="Link to this equation">#</a></span>\[\frac{\|\delta \mathbf{x}\|}{\|\mathbf{x}\|}
+\;\le\; \kappa(A)\, \frac{\|\delta \mathbf{b}\|}{\|\mathbf{b}\|},
+\qquad \kappa(A) = \|A\|\,\|A^{-1}\| .\]</div>
+<p>The <strong>condition number</strong> <span class="math notranslate nohighlight">\(\kappa\)</span> is a property of the <em>problem</em>, not of any
+algorithm. Since the input arrives already rounded to relative accuracy
+<span class="math notranslate nohighlight">\(\varepsilon\)</span>, even a perfect solver returns an answer with relative error up
+to <span class="math notranslate nohighlight">\(\kappa \varepsilon\)</span>: as a rule of thumb, you lose <span class="math notranslate nohighlight">\(\log_{10}\kappa\)</span> decimal
+digits and there is nothing to be done about it. The rest of Chapter V is about
+what a <em>good</em> algorithm promises instead, and <a class="reference internal" href="../05-numerical/norms-conditioning-stability.html"><span class="std std-doc">§5.1</span></a>
+makes it precise.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data and instruments only: machine constants and a digits meter. The
+left-to-right summation loop this notebook studies is built in Exercise 4,
+where its behaviour is the lesson.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sympy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">draw</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">la</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random array below comes from this seed</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>  <span class="c1"># the machine epsilon of Eq. 2</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+
+
+
+<span class="c1"># instrument: a reporting currency, not any exercise&#39;s lesson — it converts a</span>
+<span class="c1"># relative error into &quot;correct digits&quot; so the conditioning rule of Exercise 5</span>
+<span class="c1"># can be drawn as a straight line; the rule itself is what that exercise builds.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">correct_digits</span><span class="p">(</span><span class="n">computed</span><span class="p">,</span> <span class="n">exact</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Number of correct decimal digits in a computed value, as -log10 of the relative error.</span>
+
+<span class="sd">    The natural currency for floating-point accuracy: a relative error of 1e-9</span>
+<span class="sd">    is nine correct digits. Reported this way, the conditioning rule of thumb —</span>
+<span class="sd">    lose log10(kappa) digits — becomes a straight line that can be plotted</span>
+<span class="sd">    against a measurement.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    computed : array_like</span>
+<span class="sd">        The computed value.</span>
+<span class="sd">    exact : array_like</span>
+<span class="sd">        The reference value, assumed exact.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float</span>
+<span class="sd">        Correct decimal digits, clipped below at -1 so a totally wrong answer</span>
+<span class="sd">        stays plottable.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">exact</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">exact</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">rel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">computed</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span> <span class="o">-</span> <span class="n">exact</span><span class="p">))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">exact</span><span class="p">))</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">rel</span><span class="p">,</span> <span class="mf">1e-18</span><span class="p">))))</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-find-machine-epsilon-and-see-the-grid">
+<h2>Exercise 1: Find machine epsilon, and see the grid<a class="headerlink" href="#exercise-1-find-machine-epsilon-and-see-the-grid" title="Link to this heading">#</a></h2>
+<p>The constant <span class="math notranslate nohighlight">\(\varepsilon\)</span> of <a class="reference internal" href="#equation-eq-fp-epsilon">Eq. 19</a> is available as
+<code class="docutils literal notranslate"><span class="pre">np.finfo(float).eps</span></code>, but looking it up teaches nothing. Its <em>definition</em> is
+operational — the smallest <span class="math notranslate nohighlight">\(\varepsilon\)</span> with <span class="math notranslate nohighlight">\(1 + \varepsilon \neq 1\)</span> in
+floating point — and that definition is a bisection you can run.</p>
+<p>Start at <span class="math notranslate nohighlight">\(\varepsilon = 1\)</span> and halve it as long as <span class="math notranslate nohighlight">\(1 + \varepsilon/2\)</span> still
+differs from 1. The loop stops exactly when halving once more would fall off
+the grid, so the final value is the grid spacing at 1, which
+<a class="reference internal" href="#equation-eq-fp-representation">Eq. 18</a> predicts is <span class="math notranslate nohighlight">\(2^{-52}\)</span>.</p>
+<p>The second half of the exercise is the fact that makes relative tolerances the
+only sensible kind. The spacing is not constant. <code class="docutils literal notranslate"><span class="pre">np.spacing(x)</span></code> returns the
+distance from <code class="docutils literal notranslate"><span class="pre">x</span></code> to the next representable float, and by
+<a class="reference internal" href="#equation-eq-fp-representation">Eq. 18</a> it satisfies <span class="math notranslate nohighlight">\(\texttt{spacing}(x) \approx
+\varepsilon |x|\)</span>, doubling at every power of two. Near <span class="math notranslate nohighlight">\(1\)</span> it is
+<span class="math notranslate nohighlight">\(2.2\times10^{-16}\)</span>; near <span class="math notranslate nohighlight">\(10^{6}\)</span> it is <span class="math notranslate nohighlight">\(10^{-10}\)</span>; near <span class="math notranslate nohighlight">\(10^{16}\)</span> it exceeds
+1, so at that scale consecutive integers are no longer distinguishable.</p>
+<p><strong>Part a)</strong> Find <span class="math notranslate nohighlight">\(\varepsilon\)</span> by the bisection above and check it against both
+<code class="docutils literal notranslate"><span class="pre">2.0**-52</span></code> and <code class="docutils literal notranslate"><span class="pre">np.finfo(float).eps</span></code>, exactly.</p>
+<p><strong>Write this one yourself</strong> — the implementation is the lesson.</p>
+<p><strong>Part b)</strong> Evaluate <code class="docutils literal notranslate"><span class="pre">np.spacing(x)</span></code> at <span class="math notranslate nohighlight">\(x = 2^{-3}, 2^{-2}, \dots, 2^{6}\)</span> and
+confirm that the ratio <span class="math notranslate nohighlight">\(\texttt{spacing}(x)/x\)</span> stays within a factor of two of
+<span class="math notranslate nohighlight">\(\varepsilon\)</span> across the whole range, which is what “the grid is relative”
+means.</p>
+<p><strong>Part c)</strong> Draw the grid near 1 with <code class="docutils literal notranslate"><span class="pre">ecp.draw.number_line</span></code>, marking the four
+consecutive floats <span class="math notranslate nohighlight">\(1, 1+\varepsilon, 1+2\varepsilon, 1+3\varepsilon\)</span> and the
+unrepresentable midpoint <span class="math notranslate nohighlight">\(1 + \varepsilon/2\)</span>, and plot
+<span class="math notranslate nohighlight">\(\texttt{spacing}(x)\)</span> against <span class="math notranslate nohighlight">\(x\)</span> on log axes over <span class="math notranslate nohighlight">\([10^{-8}, 10^{16}]\)</span>,
+showing the staircase and marking where the spacing passes 1.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>epsilon by bisection : 2.22044604925031308e-16
+2.0**-52             : 2.22044604925031308e-16
+np.finfo(float).eps  : 2.22044604925031308e-16
+all three identical  : True
+
+   x        spacing(x)     spacing/x
+   0.125   2.7756e-17   2.2204e-16
+   0.250   5.5511e-17   2.2204e-16
+   0.500   1.1102e-16   2.2204e-16
+   1.000   2.2204e-16   2.2204e-16
+   2.000   4.4409e-16   2.2204e-16
+   4.000   8.8818e-16   2.2204e-16
+   8.000   1.7764e-15   2.2204e-16
+  16.000   3.5527e-15   2.2204e-16
+  32.000   7.1054e-15   2.2204e-16
+  64.000   1.4211e-14   2.2204e-16
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-fp-grid">
+<img alt="../../_images/82247db7acfa9b809c1fe6de3b88d2a480153a0d4a8ae6d0bbd3be6a9f7a1f9e.png" src="../../_images/82247db7acfa9b809c1fe6de3b88d2a480153a0d4a8ae6d0bbd3be6a9f7a1f9e.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 11 </span><span class="caption-text">Left: the four consecutive representable numbers <span class="math notranslate nohighlight">\(1, 1+\varepsilon, 1+2\varepsilon, 1+3\varepsilon\)</span> with <span class="math notranslate nohighlight">\(\varepsilon = 2^{-52}\)</span>, and the midpoint <span class="math notranslate nohighlight">\(1+\varepsilon/2\)</span> in amber, which is not representable and rounds to <span class="math notranslate nohighlight">\(1\)</span>. Right: the spacing between consecutive \texttt{float64} values as a function of magnitude, a staircase doubling at each power of two, with the amber rule marking where the spacing reaches 1 and consecutive integers stop being distinguishable.</span><a class="headerlink" href="#fig-fp-grid" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<p>The bisection is checked against the closed form of <a class="reference internal" href="#equation-eq-fp-epsilon">Eq. 19</a>
+exactly — this is an integer power of two, so nothing is approximate — and the
+relative-spacing claim is checked across ten binades rather than at one point.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the bisection found epsilon = 2^-52 exactly   [got 2.22045e-16 vs expected 2.22045e-16 (rtol=0, atol=0)]
+✓  and it agrees with np.finfo(float).eps   [got 2.22045e-16 vs expected 2.22045e-16 (rtol=0, atol=0)]
+✓  spacing(x)/x stays within a factor of two of epsilon over 10 binades   [ratios ranged over [2.220e-16, 2.220e-16]]
+✓  1 + eps differs from 1 while 1 + eps/2 does not: eps IS the grid spacing   [the midpoint rounds to even, which is 1]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-why-is-banned-and-what-replaces-it">
+<h2>Exercise 2: Why <code class="docutils literal notranslate"><span class="pre">==</span></code> is banned, and what replaces it<a class="headerlink" href="#exercise-2-why-is-banned-and-what-replaces-it" title="Link to this heading">#</a></h2>
+<p>The most famous example in the subject is one line long: <code class="docutils literal notranslate"><span class="pre">0.1</span> <span class="pre">+</span> <span class="pre">0.2</span> <span class="pre">==</span> <span class="pre">0.3</span></code> is
+<code class="docutils literal notranslate"><span class="pre">False</span></code>. It is worth doing properly, because the usual telling (“floats are
+imprecise”) is not the lesson. The lesson is that the answer is <em>off by exactly
+one grid step</em>, which is the best any correctly rounded arithmetic could do.</p>
+<p>Neither <span class="math notranslate nohighlight">\(0.1\)</span> nor <span class="math notranslate nohighlight">\(0.2\)</span> nor <span class="math notranslate nohighlight">\(0.3\)</span> is representable in binary — each is a
+repeating fraction, exactly as <span class="math notranslate nohighlight">\(1/3\)</span> is in decimal — so each is stored as the
+nearest grid point, and the sum of the two stored values happens to land one
+step away from the stored value of <span class="math notranslate nohighlight">\(0.3\)</span>. Nothing went wrong. The comparison
+asked a question that floating-point arithmetic never promised to answer.</p>
+<p>What replaces <code class="docutils literal notranslate"><span class="pre">==</span></code> is a tolerance, and NumPy’s <code class="docutils literal notranslate"><span class="pre">np.allclose(a,</span> <span class="pre">b,</span> <span class="pre">rtol,</span> <span class="pre">atol)</span></code>
+implements the standard one:</p>
+<div class="math notranslate nohighlight" id="equation-eq-fp-allclose">
+<span class="eqno">(22)<a class="headerlink" href="#equation-eq-fp-allclose" title="Link to this equation">#</a></span>\[|a - b| \;\le\; \texttt{atol} + \texttt{rtol}\,|b| .\]</div>
+<p>The two terms do different jobs. <code class="docutils literal notranslate"><span class="pre">rtol</span></code> handles the relative grid of
+<a class="reference internal" href="#equation-eq-fp-representation">Eq. 18</a> and is what you want almost always; <code class="docutils literal notranslate"><span class="pre">atol</span></code> handles
+the one case <code class="docutils literal notranslate"><span class="pre">rtol</span></code> cannot, namely comparing against zero, where a relative
+tolerance is vacuous. Getting that distinction right is most of writing a good
+check, and Exercise 7 turns it into a policy.</p>
+<p><strong>Part a)</strong> Show that <code class="docutils literal notranslate"><span class="pre">0.1</span> <span class="pre">+</span> <span class="pre">0.2</span> <span class="pre">!=</span> <span class="pre">0.3</span></code>, print the difference to full
+precision, and confirm it equals exactly one <code class="docutils literal notranslate"><span class="pre">np.spacing(0.3)</span></code> — one grid step,
+no more.</p>
+<p><strong>Part b)</strong> Confirm the cause is representation rather than addition, by
+printing <code class="docutils literal notranslate"><span class="pre">Decimal(0.1)</span></code> from the <code class="docutils literal notranslate"><span class="pre">decimal</span></code> module (which shows the stored value
+in full) and checking that <code class="docutils literal notranslate"><span class="pre">sympy.Rational(1,</span> <span class="pre">10)</span></code> differs from <code class="docutils literal notranslate"><span class="pre">sp.Float(0.1,</span> <span class="pre">30)</span></code> in the 17th digit.</p>
+<p><strong>Part c)</strong> Show that <code class="docutils literal notranslate"><span class="pre">np.allclose(0.1</span> <span class="pre">+</span> <span class="pre">0.2,</span> <span class="pre">0.3)</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code> at its defaults
+(<span class="math notranslate nohighlight">\(\texttt{rtol}=10^{-5}\)</span>, <span class="math notranslate nohighlight">\(\texttt{atol}=10^{-8}\)</span>), and then demonstrate the
+atol trap: <code class="docutils literal notranslate"><span class="pre">np.allclose(1e-20,</span> <span class="pre">0.0,</span> <span class="pre">rtol=1e-12,</span> <span class="pre">atol=0.0)</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code> while
+<code class="docutils literal notranslate"><span class="pre">np.allclose(1e-20,</span> <span class="pre">0.0,</span> <span class="pre">rtol=0.0,</span> <span class="pre">atol=1e-12)</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>. A relative tolerance
+cannot compare anything against zero.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.1 + 0.2 == 0.3 : False
+0.1 + 0.2        = 0.30000000000000004441
+0.3              = 0.29999999999999998890
+difference       = 5.551e-17
+spacing(0.3)     = 5.551e-17
+difference in grid steps: 1.0
+
+0.1 is stored as 0.1000000000000000055511151231257827021181583404541015625
+exactly 1/10 is  0.100000000000000000000000000000
+they differ by   5.551e-18
+
+np.allclose(0.1 + 0.2, 0.3)                    : True
+np.allclose(1e-20, 0.0, rtol=1e-12, atol=0.0)  : False   &lt;- rtol cannot see zero
+np.allclose(1e-20, 0.0, rtol=0.0,  atol=1e-12) : True
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<p>The important check is the middle one: the error is not merely “small”, it is
+exactly one grid step, which is the strongest possible statement about a
+correctly rounded result. The last two record the tolerance asymmetry that
+Exercise 7 turns into a rule.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  0.1 + 0.2 != 0.3 in float64   [neither operand nor the result is representable in binary]
+✓  and the discrepancy is exactly ONE grid step, the best possible   [got 1 vs expected 1 (rtol=0, atol=1e-12)]
+✓  np.allclose accepts what == rejects   [at the defaults rtol=1e-05, atol=1e-08 of Eq. 5]
+✓  a relative tolerance cannot compare against zero; only atol can   [this is why every check against 0 in this course sets atol explicitly]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-cancellation-in-a-quantity-linear-algebra-actually-computes">
+<h2>Exercise 3: Cancellation, in a quantity linear algebra actually computes<a class="headerlink" href="#exercise-3-cancellation-in-a-quantity-linear-algebra-actually-computes" title="Link to this heading">#</a></h2>
+<p>Cancellation is usually demonstrated on a contrived expression. It is more
+instructive on a quantity this course computes constantly: the determinant of a
+<strong>Gram matrix</strong>.</p>
+<p>For two vectors <span class="math notranslate nohighlight">\(\mathbf{u}, \mathbf{v} \in \mathbb{R}^2\)</span> the Gram matrix is</p>
+<div class="math notranslate nohighlight" id="equation-eq-fp-gram">
+<span class="eqno">(23)<a class="headerlink" href="#equation-eq-fp-gram" title="Link to this equation">#</a></span>\[\begin{split}G = \begin{bmatrix}
+\mathbf{u}^{\top}\mathbf{u} &amp; \mathbf{u}^{\top}\mathbf{v}\\
+\mathbf{v}^{\top}\mathbf{u} &amp; \mathbf{v}^{\top}\mathbf{v}
+\end{bmatrix},
+\qquad
+\det G = \|\mathbf{u}\|^2\|\mathbf{v}\|^2 - (\mathbf{u}^{\top}\mathbf{v})^2 ,\end{split}\]</div>
+<p>and <span class="math notranslate nohighlight">\(\det G\)</span> is the squared area of the parallelogram they span, so it vanishes
+exactly when they are parallel. It is therefore the natural test for linear
+independence, and <a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html"><span class="std std-doc">§1.5</span></a> uses
+it as one.</p>
+<p>Take the specific unit vectors <span class="math notranslate nohighlight">\(\mathbf{u} = (1, 0)\)</span> and
+<span class="math notranslate nohighlight">\(\mathbf{v} = (\cos\theta, \sin\theta)\)</span>, for which
+<a class="reference internal" href="#equation-eq-fp-gram">Eq. 23</a> gives <span class="math notranslate nohighlight">\(\det G = \sin^2\theta\)</span> exactly. As <span class="math notranslate nohighlight">\(\theta \to 0\)</span> the
+two terms in the subtraction both approach 1 while their difference approaches
+0, which is cancellation in its purest form: at <span class="math notranslate nohighlight">\(\theta = 10^{-8}\)</span> the true
+answer is <span class="math notranslate nohighlight">\(10^{-16}\)</span>, comparable to <span class="math notranslate nohighlight">\(\varepsilon\)</span> itself, and the computed
+determinant comes out <strong>identically zero</strong>. The formula reports two parallel
+vectors that are not parallel.</p>
+<p>The repair is the one used throughout numerical linear algebra: do not form the
+Gram matrix. The singular values of the <span class="math notranslate nohighlight">\(2\times2\)</span> matrix <span class="math notranslate nohighlight">\([\mathbf{u}\ \
+\mathbf{v}]\)</span> give the same information — their product is the area — without
+ever squaring anything, so the small quantity is never asked to survive a
+subtraction of large ones. That is the same lesson the Prologue met when
+<span class="math notranslate nohighlight">\(\sqrt{\lambda_4(A^{\top}\!A)}\)</span> lost <span class="math notranslate nohighlight">\(\sigma_4\)</span>, and it is why
+<a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html"><span class="std std-doc">§2.3</span></a> prefers QR to the
+normal equations.</p>
+<p><strong>Part a)</strong> For <span class="math notranslate nohighlight">\(\theta = 10^{-2}, 10^{-3}, \dots, 10^{-9}\)</span>, build <span class="math notranslate nohighlight">\(G\)</span> from
+<a class="reference internal" href="#equation-eq-fp-gram">Eq. 23</a> for <span class="math notranslate nohighlight">\(\mathbf{u} = (1,0)\)</span> and
+<span class="math notranslate nohighlight">\(\mathbf{v} = (\cos\theta, \sin\theta)\)</span>, compute <span class="math notranslate nohighlight">\(\det G\)</span> as the explicit
+difference <code class="docutils literal notranslate"><span class="pre">G[0,0]*G[1,1]</span> <span class="pre">-</span> <span class="pre">G[0,1]*G[1,0]</span></code>, and compare against the exact
+<span class="math notranslate nohighlight">\(\sin^2\theta\)</span>.</p>
+<p><strong>Part b)</strong> Compute the same area from the singular values of
+<span class="math notranslate nohighlight">\([\mathbf{u}\ \ \mathbf{v}]\)</span> as <span class="math notranslate nohighlight">\((\sigma_1\sigma_2)^2\)</span> using
+<code class="docutils literal notranslate"><span class="pre">np.linalg.svd(...,</span> <span class="pre">compute_uv=False)</span></code>, and compare.</p>
+<p><strong>Part c)</strong> Plot the relative error of both routes against <span class="math notranslate nohighlight">\(\theta\)</span> on log
+axes, and confirm that the Gram route’s error grows like <span class="math notranslate nohighlight">\(\varepsilon/\theta^2\)</span>
+while the SVD route stays near <span class="math notranslate nohighlight">\(\varepsilon\)</span>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  theta       det G (Gram)     (s1 s2)^2 (SVD)   exact sin^2      rel err Gram
+1e-02     9.999667e-05     9.999667e-05     9.999667e-05   1.10e-13
+1e-03     9.999997e-07     9.999997e-07     9.999997e-07   3.79e-11
+1e-04     1.000000e-08     1.000000e-08     1.000000e-08   2.74e-09
+1e-05     1.000000e-10     1.000000e-10     1.000000e-10   8.28e-08
+1e-06     9.999779e-13     1.000000e-12     1.000000e-12   2.21e-05
+1e-07     9.992007e-15     1.000000e-14     1.000000e-14   7.99e-04
+1e-08     0.000000e+00     1.000000e-16     1.000000e-16   1.00e+00
+1e-09     0.000000e+00     1.000000e-18     1.000000e-18   1.00e+00
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-fp-cancellation">
+<img alt="../../_images/b3b371f814b2f5daec5a309e556ca9018fb77ede71498d21b0ff1d6324b7dbb1.png" src="../../_images/b3b371f814b2f5daec5a309e556ca9018fb77ede71498d21b0ff1d6324b7dbb1.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 12 </span><span class="caption-text">Relative error in the squared area of the parallelogram spanned by <span class="math notranslate nohighlight">\(\mathbf{u}=(1,0)\)</span> and <span class="math notranslate nohighlight">\(\mathbf{v}=(\cos\theta,\sin\theta)\)</span>, computed from the Gram determinant of Eq. 6 (ink) and from the product of singular values (amber), against the angle <span class="math notranslate nohighlight">\(\theta\)</span>; the dotted line is the predicted <span class="math notranslate nohighlight">\(\varepsilon/\theta^2\)</span> growth of the cancelling route, and the horizontal rule is <span class="math notranslate nohighlight">\(\varepsilon\)</span> itself.</span><a class="headerlink" href="#fig-fp-cancellation" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<p>The Gram route’s failure is asserted as a <em>total</em> one at the smallest angle —
+not merely inaccurate, but returning exactly zero for a nonzero area — while
+the SVD route is required to stay accurate across the whole sweep. The middle
+check confirms the predicted growth law rather than just “it got worse”.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  at theta = 1e-9 the Gram determinant returns exactly 0 for a nonzero area   [the true squared area is 1.00e-18: total cancellation]
+✓  the singular-value route stays accurate across the whole sweep   [largest relative error 0.00e+00]
+✓  the Gram route&#39;s relative error grows by more than 5 orders of magnitude   [from 1.10e-13 at theta=1e-2 to 1.00e+00 at theta=1e-9]
+✓  and it grows no faster than the predicted eps/theta^2   [cancellation promotes the hidden rounding error to the leading digits]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-summation-order-and-what-np-sum-is-quietly-doing">
+<h2>Exercise 4: Summation order, and what <code class="docutils literal notranslate"><span class="pre">np.sum</span></code> is quietly doing<a class="headerlink" href="#exercise-4-summation-order-and-what-np-sum-is-quietly-doing" title="Link to this heading">#</a></h2>
+<p>The second way digits disappear is accumulation, and it has a cheap fix that
+NumPy applies without telling you.</p>
+<p>Add <span class="math notranslate nohighlight">\(N\)</span> copies of <span class="math notranslate nohighlight">\(0.1\)</span> left to right. Each partial sum is rounded once, and by
+<a class="reference internal" href="#equation-eq-fp-model">Eq. 20</a> those roundings can align, so the worst-case error grows like
+<span class="math notranslate nohighlight">\(N\varepsilon\)</span>. <strong>Pairwise summation</strong> instead splits the array in half
+recursively and adds the halves, which makes the error grow like
+<span class="math notranslate nohighlight">\(\log_2(N)\,\varepsilon\)</span> — the same number of additions, arranged into a tree
+instead of a chain. That is what <code class="docutils literal notranslate"><span class="pre">np.sum</span></code> does. <code class="docutils literal notranslate"><span class="pre">math.fsum</span></code> goes further and
+tracks the exact result with multiple partial sums, returning the correctly
+rounded answer at a cost of several times the arithmetic.</p>
+<p>The second experiment is the one that matters for linear algebra. Take the
+array <span class="math notranslate nohighlight">\([10^{16},\ \underbrace{1, 1, \dots, 1}_{10^6},\ -10^{16}]\)</span>, whose exact
+sum is <span class="math notranslate nohighlight">\(10^6\)</span>. Accumulating left to right, the first addition gives
+<span class="math notranslate nohighlight">\(10^{16} + 1\)</span>, and since <span class="math notranslate nohighlight">\(\texttt{spacing}(10^{16}) = 2\)</span>, that is <em>exactly</em>
+<span class="math notranslate nohighlight">\(10^{16}\)</span>: the 1 is absorbed and lost. All <span class="math notranslate nohighlight">\(10^6\)</span> of them are lost the same
+way, and the final subtraction returns <span class="math notranslate nohighlight">\(0\)</span>. The answer is not slightly wrong,
+it is entirely wrong, and no individual operation broke any rule.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">naive_sum(values)</span></code> — the definition of a sum transcribed
+literally, one rounded addition per term. Then, for <span class="math notranslate nohighlight">\(N = 10^6\)</span> copies of
+<span class="math notranslate nohighlight">\(0.1\)</span> (exact sum <span class="math notranslate nohighlight">\(10^5\)</span>), compute the sum with it, with <code class="docutils literal notranslate"><span class="pre">np.sum</span></code>, and with
+<code class="docutils literal notranslate"><span class="pre">math.fsum</span></code>, and report each absolute error.</p>
+<p><strong>Part b)</strong> Check the two error models: confirm the naive error sits below the
+<span class="math notranslate nohighlight">\(N\varepsilon \cdot 10^5\)</span> worst case, and that pairwise beats naive by more
+than three orders of magnitude.</p>
+<p><strong>Part c)</strong> Run the absorption experiment on
+<span class="math notranslate nohighlight">\([10^{16},\ 1 \times 10^6,\ -10^{16}]\)</span> and confirm that <code class="docutils literal notranslate"><span class="pre">naive_sum</span></code> returns
+exactly <span class="math notranslate nohighlight">\(0.0\)</span> while <code class="docutils literal notranslate"><span class="pre">math.fsum</span></code> returns exactly <span class="math notranslate nohighlight">\(10^6\)</span>. Explain the <span class="math notranslate nohighlight">\(0\)</span> by
+printing <code class="docutils literal notranslate"><span class="pre">np.spacing(1e16)</span></code> and confirming <span class="math notranslate nohighlight">\(10^{16} + 1 = 10^{16}\)</span>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>summing 1,000,000 copies of 0.1; exact answer 100000.0
+  naive_sum (left to right)    np.float64(100000.00000133288) abs err 1.3329e-06
+  np.sum (pairwise)            100000.00000000003     abs err 2.9104e-11
+  math.fsum (exact)            100000.0               abs err 0.0000e+00
+
+  naive / pairwise error ratio : 45,798
+  N*eps*|sum| worst case       : 2.2204e-05
+  log2(N)*eps*|sum| model      : 4.4257e-10
+
+absorption test on [1e16, 1 x 1,000,000, -1e16], exact answer 1,000,000
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  naive_sum : 0.0
+  np.sum    : 999,986.0
+  math.fsum : 1,000,000.0
+
+  spacing(1e16) = 2.0, so 1e16 + 1 == 1e16 is True
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<p>The two error models are checked as bounds rather than as equalities, which is
+what they are. The absorption result is checked exactly: <code class="docutils literal notranslate"><span class="pre">naive_sum</span></code> must
+return precisely zero, and <code class="docutils literal notranslate"><span class="pre">fsum</span></code> precisely <span class="math notranslate nohighlight">\(10^6\)</span>, because both are exact
+statements about correctly rounded arithmetic rather than approximations.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  math.fsum is exact on 10^6 copies of 0.1   [got 100000 vs expected 100000 (rtol=0, atol=0)]
+✓  the naive error stays under the N*eps worst case of Eq. 3   [1.333e-06 &lt; 2.220e-05]
+✓  pairwise summation beats naive by more than three orders of magnitude   [measured ratio 45,798]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  left-to-right summation returns EXACTLY zero for a sum of 10^6   [got 0 vs expected 0 (rtol=0, atol=0)]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  while math.fsum returns exactly 10^6   [got 1e+06 vs expected 1e+06 (rtol=0, atol=0)]
+✓  the cause: spacing(1e16) = 2, so adding 1 changes nothing   [every one of the 10^6 ones was absorbed individually]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-conditioning-the-digits-nobody-can-give-back">
+<h2>Exercise 5: Conditioning: the digits nobody can give back<a class="headerlink" href="#exercise-5-conditioning-the-digits-nobody-can-give-back" title="Link to this heading">#</a></h2>
+<p>Exercises 3 and 4 lost digits to algorithms that could have been written
+better. This one loses them to a problem that cannot.</p>
+<p>The <strong>Hilbert matrix</strong> <span class="math notranslate nohighlight">\(H_{ij} = 1/(i+j+1)\)</span> is symmetric, positive definite,
+perfectly well defined, and has entries no larger than 1. It is also
+spectacularly ill-conditioned: <span class="math notranslate nohighlight">\(\kappa(H_n)\)</span> grows roughly like <span class="math notranslate nohighlight">\(e^{3.5n}\)</span>, so
+<span class="math notranslate nohighlight">\(\kappa(H_6) \approx 1.5\times10^{7}\)</span> and <span class="math notranslate nohighlight">\(\kappa(H_{14}) \approx
+7\times10^{17}\)</span>, which exceeds <span class="math notranslate nohighlight">\(1/\varepsilon\)</span>.</p>
+<p>Construct a system with a known answer: set <span class="math notranslate nohighlight">\(\mathbf{b} = H\mathbf{1}\)</span>, so the
+exact solution is the all-ones vector by construction. Then solve
+<span class="math notranslate nohighlight">\(H\mathbf{x} = \mathbf{b}\)</span> in <code class="docutils literal notranslate"><span class="pre">float64</span></code> and count how many digits of the answer
+survive. The prediction from <a class="reference internal" href="#equation-eq-fp-conditioning">Eq. 21</a> is</p>
+<div class="math notranslate nohighlight" id="equation-eq-fp-digits">
+<span class="eqno">(24)<a class="headerlink" href="#equation-eq-fp-digits" title="Link to this equation">#</a></span>\[\text{correct digits} \;\gtrsim\; 16 - \log_{10}\kappa(H_n),\]</div>
+<p>because the input is already rounded to sixteen digits and the problem
+amplifies that by <span class="math notranslate nohighlight">\(\kappa\)</span>.</p>
+<p>Two things about <a class="reference internal" href="#equation-eq-fp-digits">Eq. 24</a> are worth stating precisely, because both
+are easy to get slightly wrong.</p>
+<p><strong>It is a bound, not an estimate.</strong> <a class="reference internal" href="#equation-eq-fp-conditioning">Eq. 21</a> bounds the error
+<em>above</em> by <span class="math notranslate nohighlight">\(\kappa\varepsilon\)</span>, so <a class="reference internal" href="#equation-eq-fp-digits">Eq. 24</a> bounds the number of
+correct digits <em>below</em>. The measured accuracy should therefore sit <strong>at or
+above</strong> the line, never below it, and in practice it usually sits somewhat
+above: attaining the bound requires the rounding errors to align in the worst
+possible way, which they rarely do. Expecting equality would be expecting the
+unluckiest case every time.</p>
+<p><strong>It has a domain.</strong> The rule is informative only while it predicts a positive
+number of digits, that is while <span class="math notranslate nohighlight">\(\kappa &lt; 1/\varepsilon \approx
+4.5\times10^{15}\)</span>. Past that the formula returns a negative number, which is
+not a quantitative claim about anything: it says only “no digits”. For the
+Hilbert matrices the threshold falls between <span class="math notranslate nohighlight">\(n = 10\)</span> and <span class="math notranslate nohighlight">\(n = 12\)</span>, so we test
+the bound numerically below it and only the qualitative collapse above it. At
+<span class="math notranslate nohighlight">\(n = 14\)</span> the computed solution bears no resemblance whatsoever to
+<span class="math notranslate nohighlight">\(\mathbf{1}\)</span>, which is all that can honestly be said.</p>
+<p>The comparison that makes this measurable rather than anecdotal is SymPy.
+Building <span class="math notranslate nohighlight">\(H\)</span> over the rationals and solving exactly gives <span class="math notranslate nohighlight">\(\mathbf{1}\)</span> with no
+error at all, at any <span class="math notranslate nohighlight">\(n\)</span>, which confirms that the mathematics is fine and only
+the arithmetic is failing. This exact-versus-float pairing runs through the
+whole course.</p>
+<p><strong>Part a)</strong> For <span class="math notranslate nohighlight">\(n = 4, 6, 8, 10, 12, 14\)</span>, build <span class="math notranslate nohighlight">\(H_n\)</span> with
+<code class="docutils literal notranslate"><span class="pre">ecp.linalg.hilbert(n)</span></code>, set <span class="math notranslate nohighlight">\(\mathbf{b} = H\mathbf{1}\)</span>, solve with
+<code class="docutils literal notranslate"><span class="pre">np.linalg.solve</span></code>, and report <span class="math notranslate nohighlight">\(\kappa\)</span> from <code class="docutils literal notranslate"><span class="pre">np.linalg.cond</span></code> alongside the
+correct digits from the <code class="docutils literal notranslate"><span class="pre">correct_digits</span></code> helper.</p>
+<p><strong>Part b)</strong> Solve the same system exactly with
+<code class="docutils literal notranslate"><span class="pre">sympy.Matrix(n,</span> <span class="pre">n,</span> <span class="pre">lambda</span> <span class="pre">i,</span> <span class="pre">j:</span> <span class="pre">sympy.Rational(1,</span> <span class="pre">i</span> <span class="pre">+</span> <span class="pre">j</span> <span class="pre">+</span> <span class="pre">1))</span></code> and its
+<code class="docutils literal notranslate"><span class="pre">.solve</span></code> method, and confirm the exact solution is the all-ones vector for
+every <span class="math notranslate nohighlight">\(n\)</span> tested — no tolerance required, since these are rationals.</p>
+<p><strong>Part c)</strong> Plot correct digits against <span class="math notranslate nohighlight">\(\log_{10}\kappa\)</span> together with the
+straight line of <a class="reference internal" href="#equation-eq-fp-digits">Eq. 24</a>, marking the <span class="math notranslate nohighlight">\(\kappa = 1/\varepsilon\)</span>
+threshold. Confirm that below the threshold every measurement lies <strong>on or
+above</strong> the line, as a lower bound requires, and that it never exceeds it by
+more than a few digits, so the bound is informative rather than vacuous.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1/eps = 4.504e+15: past this the rule of thumb predicts &lt; 0 digits
+
+  n     kappa(H_n)     correct digits   predicted (Eq. 7)   rule applies?   exact = 1?
+  4   1.5514e+04       13.18             11.81               True        True
+  6   1.4951e+07        9.62              8.83               True        True
+  8   1.5258e+10        6.92              5.82               True        True
+ 10   1.6025e+13        3.77              2.80               True        True
+ 12   1.8078e+16        0.16             -0.26              False        True
+ 14   6.1837e+17       -0.95             -1.79              False        True
+
+where the rule applies, measured - predicted = [1.37, 0.8, 1.11, 0.98]
+  all non-negative (the bound holds): True
+  largest excess over the bound     : 1.37 digits
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-fp-conditioning">
+<img alt="../../_images/dfced024c0682d0ab327bc3985f085201eea31ba83e9c5fac9302d995d204a24.png" src="../../_images/dfced024c0682d0ab327bc3985f085201eea31ba83e9c5fac9302d995d204a24.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 13 </span><span class="caption-text">Correct decimal digits in the \texttt{float64} solution of <span class="math notranslate nohighlight">\(H_n\mathbf{x} = H_n\mathbf{1}\)</span>, whose exact solution is the all-ones vector, plotted against <span class="math notranslate nohighlight">\(\log_{10}\kappa(H_n)\)</span> for <span class="math notranslate nohighlight">\(n = 4, 6, \ldots, 14\)</span>; the dotted line is the prediction <span class="math notranslate nohighlight">\(16 - \log_{10}\kappa\)</span> of Eq. 7, and the shaded band below zero marks where no digit of the answer is correct.</span><a class="headerlink" href="#fig-fp-conditioning" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<p>The exact solve is checked without any tolerance, because rational arithmetic
+admits none. The float solve is checked against the rule of thumb
+<a class="reference internal" href="#equation-eq-fp-digits">Eq. 24</a> across the whole sweep, and the extreme case is checked as
+the qualitative statement it is: at <span class="math notranslate nohighlight">\(n = 14\)</span> not one digit survives.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the exact rational solve returns the all-ones vector at every n   [the mathematics is fine; only the arithmetic fails]
+✓  below kappa = 1/eps every measurement sits ON OR ABOVE the bound of Eq. 7   [measured - predicted = [1.37, 0.8, 1.11, 0.98]: a bound on the error is a lower bound on the digits, so it is not attained exactly]
+largest excess over the bound: 1.37 digits (reported, not gated — nothing forbids a benign solve from beating a lower bound by more)
+✓  and above it the rule predicts fewer than zero digits, so it says only &#39;none&#39;   [a rule of thumb with a domain; past the threshold the measurement is noise]
+✓  at n = 14 not a single digit of the float64 solution is correct   [kappa = 6.18e+17 exceeds 1/eps = 4.50e+15]
+✓  accuracy decreases monotonically while the rule applies   [gated only below kappa = 1/eps; past it the measurement is noise and the full differences are reported: [-3.56, -2.7, -3.15, -3.61, -1.11]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-6-answering-the-prologue-s-question">
+<h2>Exercise 6: Answering the Prologue’s question<a class="headerlink" href="#exercise-6-answering-the-prologue-s-question" title="Link to this heading">#</a></h2>
+<p>We can now settle the question the Prologue left open. It had the rank-3 matrix
+<span class="math notranslate nohighlight">\(A\)</span> of <a class="reference internal" href="../prologue/one-matrix-five-factorizations.html#equation-eq-prologue-matrix">Eq. 1</a>, perturbed to <span class="math notranslate nohighlight">\(\tilde A = A + 10^{-12}G\)</span>,
+and three defensible answers to “what is the rank?”.</p>
+<p>The machinery of this notebook resolves it, because the question was never
+really about rank. It was about how much noise the matrix carries. Write the
+noise level as <span class="math notranslate nohighlight">\(\eta\)</span>: the largest relative perturbation you believe your
+entries have suffered, whether from measurement, from earlier arithmetic, or
+from storage. Then a singular value below <span class="math notranslate nohighlight">\(\eta\,\sigma_1\)</span> is indistinguishable
+from zero <em>given what you know</em>, and the honest rank is</p>
+<div class="math notranslate nohighlight" id="equation-eq-fp-numerical-rank">
+<span class="eqno">(25)<a class="headerlink" href="#equation-eq-fp-numerical-rank" title="Link to this equation">#</a></span>\[\operatorname{rank}_\eta(A) = \#\{\, i : \sigma_i &gt; \eta\,\sigma_1 \,\}.\]</div>
+<p>NumPy’s default takes <span class="math notranslate nohighlight">\(\eta = \max(m,n)\,\varepsilon\)</span>, which answers a specific
+and rather narrow question: <em>given that these floats are exactly the numbers I
+mean, and only the SVD algorithm introduced error, what is the rank?</em> For a
+matrix whose entries came from anywhere at all, that assumption is wrong, and
+the right <span class="math notranslate nohighlight">\(\eta\)</span> is the one your problem supplies.</p>
+<p><strong>Part a)</strong> Rebuild <span class="math notranslate nohighlight">\(\tilde A = A + 10^{-12}G\)</span> with <span class="math notranslate nohighlight">\(G\)</span> from
+<code class="docutils literal notranslate"><span class="pre">np.random.default_rng(0).standard_normal((4,</span> <span class="pre">4))</span></code>, matching the Prologue’s
+construction exactly, and list its singular values.</p>
+<p><strong>Part b)</strong> Apply <a class="reference internal" href="#equation-eq-fp-numerical-rank">Eq. 25</a> at three noise levels:
+<span class="math notranslate nohighlight">\(\eta = \varepsilon\)</span> (trust the floats completely), <span class="math notranslate nohighlight">\(\eta = 10^{-10}\)</span> (the
+entries are good to ten digits), and <span class="math notranslate nohighlight">\(\eta = 10^{-6}\)</span> (they came from a
+measurement). Report the rank each gives and check them against
+<code class="docutils literal notranslate"><span class="pre">np.linalg.matrix_rank(A_tilde,</span> <span class="pre">tol=eta</span> <span class="pre">*</span> <span class="pre">s[0])</span></code>.</p>
+<p><strong>Part c)</strong> State the resolution: the perturbation was <span class="math notranslate nohighlight">\(10^{-12}\)</span>, so any
+<span class="math notranslate nohighlight">\(\eta\)</span> above roughly <span class="math notranslate nohighlight">\(10^{-13}\)</span> answers “rank 3”, and the default’s
+<span class="math notranslate nohighlight">\(\eta \approx 10^{-15}\)</span> answers “rank 4”. Both are correct answers to different
+questions, and the question is yours to ask.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>singular values of A_tilde: [1.012383e+01 2.270992e+00 1.162221e+00 4.740254e-13]
+sigma_4 / sigma_1 = 4.682e-14
+
+  eta          eta*sigma_1     rank_eta   matrix_rank(tol=eta*s1)   reading
+2.2e-16     2.248e-15         4            4                trust the floats exactly
+1.0e-13     1.012e-12         3            3                entries good to 13 digits
+1.0e-10     1.012e-09         3            3                entries good to 10 digits
+1.0e-06     1.012e-05         3            3                entries from a measurement
+
+NumPy&#39;s own default tol = max(m,n)*eps*sigma_1 = 8.992e-15  -&gt;  rank 4
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-6">
+<h3>Validation 6<a class="headerlink" href="#validation-6" title="Link to this heading">#</a></h3>
+<p>The hand-applied definition <a class="reference internal" href="#equation-eq-fp-numerical-rank">Eq. 25</a> is checked against
+<code class="docutils literal notranslate"><span class="pre">np.linalg.matrix_rank</span></code> at every noise level, and the crossover is checked to
+be where the perturbation put it: any tolerance comfortably above <span class="math notranslate nohighlight">\(10^{-12}\)</span>
+recovers the underlying rank of 3.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  rank_eta at eta = 2e-16 agrees with np.linalg.matrix_rank   [both give 4]
+✓  rank_eta at eta = 1e-13 agrees with np.linalg.matrix_rank   [both give 3]
+✓  rank_eta at eta = 1e-10 agrees with np.linalg.matrix_rank   [both give 3]
+✓  rank_eta at eta = 1e-06 agrees with np.linalg.matrix_rank   [both give 3]
+✓  the rank is 4 if the floats are exact and 3 for any believable noise level   [the Prologue&#39;s question was about noise, not about rank]
+✓  the crossover sits exactly where the 1e-12 perturbation put it   [sigma_4 = 4.74e-13 &lt; 1e-12*sigma_1 = 1.01e-11 &lt; sigma_3 = 1.16e+00]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-7-the-tolerance-policy-this-course-follows">
+<h2>Exercise 7: The tolerance policy this course follows<a class="headerlink" href="#exercise-7-the-tolerance-policy-this-course-follows" title="Link to this heading">#</a></h2>
+<p>Everything above turns into four rules, and the rest of the course applies them
+without restating them. This exercise checks that each rule does what it
+claims, on an object where the right answer is known.</p>
+<p><strong>Rule 1: compare relatively, except against zero.</strong> Use <code class="docutils literal notranslate"><span class="pre">rtol</span></code> for a quantity
+with a scale and <code class="docutils literal notranslate"><span class="pre">atol</span></code> for one that should vanish. A check of the form
+<code class="docutils literal notranslate"><span class="pre">allclose(residual,</span> <span class="pre">0,</span> <span class="pre">rtol=1e-10)</span></code> is <em>vacuous</em>, because <a class="reference internal" href="#equation-eq-fp-allclose">Eq. 22</a>
+makes the right-hand side zero.</p>
+<p><strong>Rule 2: a reconstruction residual is measured in <span class="math notranslate nohighlight">\(\varepsilon\|A\|\)</span>, not in
+absolute units.</strong> A backward-stable factorization returns factors satisfying
+<span class="math notranslate nohighlight">\(\|A - \hat{L}\hat{U}\| \lesssim c\,n\,\varepsilon\,\|A\|\)</span> for a modest <span class="math notranslate nohighlight">\(c\)</span>.
+So the tolerance scales with the matrix, and a fixed <span class="math notranslate nohighlight">\(10^{-12}\)</span> is right only
+by accident.</p>
+<p><strong>Rule 3: an ill-conditioned answer gets a tolerance of <span class="math notranslate nohighlight">\(\kappa\varepsilon\)</span>.</strong>
+Exercise 5 showed the error is genuinely that large. Demanding better is
+demanding that the algorithm invent information.</p>
+<p><strong>Rule 4: never gate on something a library may choose.</strong> Eigenvector signs,
+the basis of a degenerate eigenspace, and the ordering of <code class="docutils literal notranslate"><span class="pre">eig</span></code> output are all
+implementation details that vary between LAPACK builds. Compare projectors,
+sorted spectra, or reconstructions instead.</p>
+<p><strong>Part a)</strong> Demonstrate Rule 1 by showing that
+<code class="docutils literal notranslate"><span class="pre">np.allclose(1e-3,</span> <span class="pre">0.0,</span> <span class="pre">rtol=1e10,</span> <span class="pre">atol=0.0)</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code> however large <code class="docutils literal notranslate"><span class="pre">rtol</span></code>
+is made — a relative tolerance simply cannot see zero.</p>
+<p><strong>Part b)</strong> Demonstrate Rule 2 on <code class="docutils literal notranslate"><span class="pre">M</span> <span class="pre">=</span> <span class="pre">ecp.linalg.random_with_condition(200,</span> <span class="pre">200,</span> <span class="pre">1e6,</span> <span class="pre">rng)</span></code> scaled by <span class="math notranslate nohighlight">\(10^{6}\)</span>: factor with <code class="docutils literal notranslate"><span class="pre">scipy.linalg.lu</span></code>, and show
+that <span class="math notranslate nohighlight">\(\|M - PLU\|_2\)</span> is far above <span class="math notranslate nohighlight">\(10^{-12}\)</span> in absolute terms while being tiny
+in units of <span class="math notranslate nohighlight">\(\varepsilon\|M\|_2\)</span>.</p>
+<p><strong>Part c)</strong> Demonstrate Rule 4 on the symmetric matrix
+<span class="math notranslate nohighlight">\(S = \operatorname{diag}(2, 2, 5)\)</span>, which has a two-dimensional eigenspace:
+call <code class="docutils literal notranslate"><span class="pre">np.linalg.eigh</span></code> on <span class="math notranslate nohighlight">\(S\)</span> and on the identical matrix built as
+<code class="docutils literal notranslate"><span class="pre">S</span> <span class="pre">+</span> <span class="pre">0.0</span></code>, and check that while individual eigenvectors need not match, the
+spectral projector onto the <span class="math notranslate nohighlight">\(\lambda = 2\)</span> eigenspace is identical.</p>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p>Ask for a small function <code class="docutils literal notranslate"><span class="pre">report_accuracy(A)</span></code> that, for a given square matrix,
+prints <span class="math notranslate nohighlight">\(\kappa(A)\)</span>, the number of digits <a class="reference internal" href="#equation-eq-fp-digits">Eq. 24</a> says you are
+entitled to, and the measured digits when solving <span class="math notranslate nohighlight">\(A\mathbf{x} = A\mathbf{1}\)</span>.
+Then run it yourself on <code class="docutils literal notranslate"><span class="pre">ecp.linalg.hilbert(8)</span></code>, on
+<code class="docutils literal notranslate"><span class="pre">ecp.linalg.random_with_condition(8,</span> <span class="pre">8,</span> <span class="pre">1e3,</span> <span class="pre">rng)</span></code>, and on <code class="docutils literal notranslate"><span class="pre">np.eye(8)</span></code>, and
+check that in all three the measured digits sit within 1.5 of the predicted
+ones. The check is yours.</p>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Rule 1 — rtol cannot see zero:
+  allclose(1e-3, 0.0, rtol=1e+02, atol=0.0) = False
+  allclose(1e-3, 0.0, rtol=1e+06, atol=0.0) = False
+  allclose(1e-3, 0.0, rtol=1e+10, atol=0.0) = False
+
+Rule 2 — residuals are measured in eps*||A||:
+  ||M||_2                    = 1.0000e+06
+  ||M - PLU||_2              = 8.8155e-11   (far above 1e-12!)
+  ||M - PLU||_2 / (eps||M||) = 0.40   (a handful of eps, as backward stability promises)
+
+Rule 4 — never gate on a library&#39;s free choice:
+  eigenvalues agree      : True
+  projector onto lambda=2 identical: True
+  trace of that projector = 2.000000  (the eigenspace dimension, basis-independent)
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-7">
+<h3>Validation 7<a class="headerlink" href="#validation-7" title="Link to this heading">#</a></h3>
+<p>Each rule is checked as the claim it makes. Rule 2 is the sharpest: the
+residual is <em>simultaneously</em> far above a naive absolute tolerance and a small
+multiple of <span class="math notranslate nohighlight">\(\varepsilon\|M\|\)</span>, which is precisely why the units matter.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  Rule 1: no rtol, however large, compares anything against zero   [checks against zero must set atol]
+✓  Rule 2: the LU residual is huge in absolute units and a few eps in relative ones   [8.82e-11 absolute, 0.4 eps*||M||]
+✓  Rule 4: the spectral projector is identical even where eigenvectors need not be   [max|Δ| = 0 (rtol=0, atol=1e-14)]
+✓  and its trace is the eigenspace dimension, a basis-independent number   [got 2 vs expected 2 (rtol=0, atol=1e-12)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p>Floating-point arithmetic is not unreliable; it is <em>specified</em>, and the
+specification <a class="reference internal" href="#equation-eq-fp-model">Eq. 20</a> says each operation is correctly rounded. Every
+loss of accuracy measured above came from something else.</p>
+<p>The concrete results:</p>
+<ul class="simple">
+<li><p>bisection found <span class="math notranslate nohighlight">\(\varepsilon = 2^{-52} = 2.220446\times10^{-16}\)</span> <strong>exactly</strong>,
+matching <code class="docutils literal notranslate"><span class="pre">np.finfo(float).eps</span></code> bit for bit, and <span class="math notranslate nohighlight">\(\texttt{spacing}(x)/x\)</span>
+stayed within a factor of two of it across ten binades: the grid is relative;</p></li>
+<li><p><span class="math notranslate nohighlight">\(0.1 + 0.2 - 0.3\)</span> came out to <span class="math notranslate nohighlight">\(5.55\times10^{-17}\)</span>, which is exactly <strong>one</strong>
+grid step at <span class="math notranslate nohighlight">\(0.3\)</span> — the best a correctly rounded computation could do;</p></li>
+<li><p>the Gram determinant of two vectors <span class="math notranslate nohighlight">\(10^{-9}\)</span> apart in angle returned
+<strong>exactly zero</strong> for a true squared area of <span class="math notranslate nohighlight">\(10^{-18}\)</span>, with the relative
+error growing like <span class="math notranslate nohighlight">\(\varepsilon/\theta^2\)</span>, while the singular-value route
+stayed at <span class="math notranslate nohighlight">\(\varepsilon\)</span> throughout;</p></li>
+<li><p>summing <span class="math notranslate nohighlight">\(10^6\)</span> copies of <span class="math notranslate nohighlight">\(0.1\)</span>, naive accumulation erred by
+<span class="math notranslate nohighlight">\(1.3\times10^{-6}\)</span> and <code class="docutils literal notranslate"><span class="pre">np.sum</span></code>’s pairwise summation by <span class="math notranslate nohighlight">\(2.9\times10^{-11}\)</span>,
+a ratio above <span class="math notranslate nohighlight">\(4\times10^4\)</span>, while <code class="docutils literal notranslate"><span class="pre">math.fsum</span></code> was exact;</p></li>
+<li><p>on <span class="math notranslate nohighlight">\([10^{16},\, 1\times10^6,\, -10^{16}]\)</span> naive summation returned <strong>exactly
+<span class="math notranslate nohighlight">\(0\)</span></strong> against a true answer of <span class="math notranslate nohighlight">\(10^6\)</span>, because <span class="math notranslate nohighlight">\(\texttt{spacing}(10^{16}) = 2\)</span>
+absorbs every 1;</p></li>
+<li><p>solving <span class="math notranslate nohighlight">\(H_n\mathbf{x} = H_n\mathbf{1}\)</span>, whose exact rational solution is
+<span class="math notranslate nohighlight">\(\mathbf{1}\)</span> at every <span class="math notranslate nohighlight">\(n\)</span>, the <code class="docutils literal notranslate"><span class="pre">float64</span></code> accuracy sat <strong>on or above</strong> the
+bound <span class="math notranslate nohighlight">\(16 - \log_{10}\kappa\)</span> everywhere the bound is informative (that is,
+while <span class="math notranslate nohighlight">\(\kappa &lt; 1/\varepsilon\)</span>), exceeding it by at most a couple of digits
+because attaining it needs the worst-case alignment of rounding errors, and
+reached <strong>zero correct digits</strong> at <span class="math notranslate nohighlight">\(n = 14\)</span> where <span class="math notranslate nohighlight">\(\kappa = 7\times10^{17}\)</span>
+— past the threshold the rule predicts a negative count and stops being a
+quantitative claim at all;</p></li>
+<li><p>and the Prologue’s rank question resolved: the honest rank is
+<a class="reference internal" href="#equation-eq-fp-numerical-rank">Eq. 25</a> evaluated at the noise level you actually have,
+which is 4 if the floats are exact and 3 for any believable <span class="math notranslate nohighlight">\(\eta\)</span>.</p></li>
+</ul>
+<p>Methods met: <code class="docutils literal notranslate"><span class="pre">np.finfo</span></code>, <code class="docutils literal notranslate"><span class="pre">np.spacing</span></code>, <code class="docutils literal notranslate"><span class="pre">np.allclose</span></code> and the roles of <code class="docutils literal notranslate"><span class="pre">rtol</span></code>
+and <code class="docutils literal notranslate"><span class="pre">atol</span></code>, <code class="docutils literal notranslate"><span class="pre">math.fsum</span></code> against <code class="docutils literal notranslate"><span class="pre">np.sum</span></code> against naive accumulation,
+<code class="docutils literal notranslate"><span class="pre">np.linalg.cond</span></code>, <code class="docutils literal notranslate"><span class="pre">np.linalg.matrix_rank(tol=...)</span></code>, <code class="docutils literal notranslate"><span class="pre">sympy.Rational</span></code> and
+<code class="docutils literal notranslate"><span class="pre">Matrix.solve</span></code> as exact ground truth, and the four-rule tolerance policy the
+rest of the course applies silently.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Backward stability.</strong> Rule 2 asserted that a good factorization returns a
+residual of a few <span class="math notranslate nohighlight">\(\varepsilon\|A\|\)</span> even when the answer itself is wrong by
+<span class="math notranslate nohighlight">\(\kappa\varepsilon\)</span>. That distinction between the residual and the error is
+the whole subject of <a class="reference internal" href="../05-numerical/norms-conditioning-stability.html"><span class="std std-doc">§5.1</span></a>,
+which measures both on the same matrices.</p></li>
+<li><p><strong>Squaring the conditioning.</strong> Exercise 3’s Gram matrix lost the small
+quantity because <span class="math notranslate nohighlight">\(\kappa(A^{\top}A) = \kappa(A)^2\)</span>. That identity is the
+reason <a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html"><span class="std std-doc">§2.3</span></a> solves least
+squares four different ways and only trusts two of them.</p></li>
+<li><p><strong>Where <span class="math notranslate nohighlight">\(\kappa\)</span> comes from.</strong> We used <code class="docutils literal notranslate"><span class="pre">np.linalg.cond</span></code> as a black box. It is
+<span class="math notranslate nohighlight">\(\sigma_1/\sigma_n\)</span>, and <a class="reference internal" href="../04-svd/svd-geometry.html"><span class="std std-doc">§4.1</span></a> explains why
+that ratio and not some other measures a problem’s difficulty.</p></li>
+<li><p><strong>Choosing <span class="math notranslate nohighlight">\(\eta\)</span> properly.</strong> <a class="reference internal" href="#equation-eq-fp-numerical-rank">Eq. 25</a> needs a noise level,
+and we supplied one by hand. <a class="reference internal" href="../04-svd/low-rank-eckart-young.html"><span class="std std-doc">§4.2</span></a>
+turns it into a quantitative statement through the Eckart–Young theorem: the
+distance to the nearest rank-<span class="math notranslate nohighlight">\(k\)</span> matrix is exactly <span class="math notranslate nohighlight">\(\sigma_{k+1}\)</span>, so
+“how much noise” and “which rank” become the same question.</p></li>
+</ul>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h3>
+<div class="docutils container" id="id3">
+<div role="list" class="citation-list">
+<div class="citation" id="id14" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">Hig02</a><span class="fn-bracket">]</span></span>
+<p>Nicholas J. Higham. <em>Accuracy and Stability of Numerical Algorithms</em>. SIAM, Philadelphia, 2 edition, 2002. <a class="reference external" href="https://doi.org/10.1137/1.9780898718027">doi:10.1137/1.9780898718027</a>.</p>
+</div>
+<div class="citation" id="id11" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">TB97</a><span class="fn-bracket">]</span></span>
+<p>Lloyd N. Trefethen and David Bau, III. <em>Numerical Linear Algebra</em>. SIAM, Philadelphia, 1997. <a class="reference external" href="https://doi.org/10.1137/1.9780898719574">doi:10.1137/1.9780898719574</a>.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/00-machine"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="arrays-and-vectorization.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">0.1 Arrays, Shapes, and Vectorization</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="vectors-norms-inner-products.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">0.3 Vectors: Geometry, Norms, and Inner Products</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-a-float-is-and-how-far-apart-they-are">What a float is, and how far apart they are</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cancellation-subtraction-reveals-the-error-already-present">Cancellation: subtraction reveals the error already present</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#accumulation-many-small-errors-add-up">Accumulation: many small errors add up</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#conditioning-the-part-that-is-nobody-s-fault">Conditioning: the part that is nobody’s fault</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-find-machine-epsilon-and-see-the-grid">Exercise 1: Find machine epsilon, and see the grid</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-why-is-banned-and-what-replaces-it">Exercise 2: Why <code class="docutils literal notranslate"><span class="pre">==</span></code> is banned, and what replaces it</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-cancellation-in-a-quantity-linear-algebra-actually-computes">Exercise 3: Cancellation, in a quantity linear algebra actually computes</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-summation-order-and-what-np-sum-is-quietly-doing">Exercise 4: Summation order, and what <code class="docutils literal notranslate"><span class="pre">np.sum</span></code> is quietly doing</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-conditioning-the-digits-nobody-can-give-back">Exercise 5: Conditioning: the digits nobody can give back</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-answering-the-prologue-s-question">Exercise 6: Answering the Prologue’s question</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-7-the-tolerance-policy-this-course-follows">Exercise 7: The tolerance policy this course follows</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-7">Validation 7</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,1630 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="2.2 Gram–Schmidt, QR, Householder, and Givens" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/02-orthogonality/gram-schmidt-qr.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: §2.1 ended with a promise: if the columns of A were orthonormal, the projector would be QQ^{\top} with no inverse to form and no condition..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: §2.1 ended with a promise: if the columns of A were orthonormal, the projector would be QQ^{\top} with no inverse to form and no condition..." />
+
+    <title>2.2 Gram–Schmidt, QR, Householder, and Givens &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/02-orthogonality/gram-schmidt-qr';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/02-orthogonality/gram-schmidt-qr.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="2.3 Least Squares Four Ways" href="least-squares-four-ways.html" />
+    <link rel="prev" title="2.1 Projections and the Normal Equations" href="projections-normal-equations.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter II — Orthogonality and Least Squares</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/02-orthogonality/gram-schmidt-qr.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/02-orthogonality/gram-schmidt-qr.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/02-orthogonality/gram-schmidt-qr.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/02-orthogonality/gram-schmidt-qr.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>2.2 Gram–Schmidt, QR, Householder, and Givens</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-qr-is">What <span class="math notranslate nohighlight">\(QR\)</span> is</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gramschmidt-twice">Gram–Schmidt, twice</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#householder">Householder</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#givens">Givens</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#column-pivoting">Column pivoting</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-two-gramschmidts-one-line-apart">Exercise 1: Two Gram–Schmidts, one line apart</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-experiment-that-separates-them">Exercise 2: The experiment that separates them</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-householder-building-q-out-of-reflections">Exercise 3: Householder: building <span class="math notranslate nohighlight">\(Q\)</span> out of reflections</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-givens-one-entry-at-a-time">Exercise 4: Givens: one entry at a time</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-two-shapes-and-what-r-knows">Exercise 5: Two shapes, and what <span class="math notranslate nohighlight">\(R\)</span> knows</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-pivoting-and-the-prologue-s-question-answered">Exercise 6: Pivoting, and the Prologue’s question answered</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="gramschmidt-qr-householder-and-givens">
+<h1>2.2 Gram–Schmidt, QR, Householder, and Givens<a class="headerlink" href="#gramschmidt-qr-householder-and-givens" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter II — Orthogonality and Least Squares
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;2.2
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">Four ways to manufacture an orthonormal basis, and the experiment that separates them: two algebraically identical algorithms whose accuracies differ by ten orders of magnitude.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;advanced&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;105–135 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="projections-normal-equations.html"><span class="std std-doc">§2.1</span></a> ended with a promise: if the columns
+of <span class="math notranslate nohighlight">\(A\)</span> were orthonormal, the projector would be <span class="math notranslate nohighlight">\(QQ^{\top}\)</span> with no inverse to
+form and no conditioning penalty. This notebook manufactures such a basis, four
+different ways, and then stages the course’s first genuine numerical disaster.</p>
+<p>The disaster is worth describing in advance, because it is the single most
+instructive experiment in Chapter II. <strong>Classical</strong> and <strong>modified</strong>
+Gram–Schmidt differ by one line: whether each projection is subtracted from the
+original column or from the running remainder. In exact arithmetic they compute
+<em>identical</em> results — you can prove it in two lines. In floating point they do
+not. Measured across ten orders of magnitude of conditioning, the departure
+from orthogonality <span class="math notranslate nohighlight">\(\|Q^{\top}Q - I\|_2\)</span> grows like <span class="math notranslate nohighlight">\(\kappa^2\varepsilon\)</span> for
+the classical version and like <span class="math notranslate nohighlight">\(\kappa\varepsilon\)</span> for the modified one, and by
+<span class="math notranslate nohighlight">\(\kappa = 10^{10}\)</span> the classical <span class="math notranslate nohighlight">\(Q\)</span> has lost orthogonality <em>entirely</em> —
+<span class="math notranslate nohighlight">\(\|Q^{\top}Q - I\| \approx 2.3\)</span>, which for a matrix whose columns are supposed
+to be perpendicular unit vectors is not a small error but a total failure.</p>
+<p><strong>Householder reflections</strong> do better than both: they hold
+<span class="math notranslate nohighlight">\(\|Q^{\top}Q - I\| \approx 8\times10^{-16}\)</span> across the entire range, flat, with
+no dependence on <span class="math notranslate nohighlight">\(\kappa\)</span> at all. The reason is structural rather than clever.
+Gram–Schmidt builds <span class="math notranslate nohighlight">\(Q\)</span> by <em>subtracting</em>, and subtraction of nearly-equal
+quantities loses digits, exactly as
+<a class="reference internal" href="../00-machine/floating-point.html"><span class="std std-doc">§0.2</span></a> showed. Householder builds <span class="math notranslate nohighlight">\(Q\)</span> as a
+<em>product of orthogonal matrices</em>, and an orthogonal matrix cannot amplify
+anything — it preserves every length, including the length of the error. That
+is why every serious <span class="math notranslate nohighlight">\(QR\)</span> implementation is Householder-based, and it is the
+clearest instance in the course of the principle that stable algorithms are
+built out of orthogonal operations.</p>
+<p>The notebook closes with two variations that earn their place: <strong>Givens
+rotations</strong>, which zero one entry at a time and are the right tool when a
+matrix is nearly triangular already, and <strong>column-pivoted</strong> <span class="math notranslate nohighlight">\(QR\)</span>, which orders
+the columns by importance and reveals numerical rank — the Prologue’s failed
+experiment, now done correctly.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> Trefethen and Bau <span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id13" title="Lloyd N. Trefethen and David Bau, III. Numerical Linear Algebra. SIAM, Philadelphia, 1997. doi:10.1137/1.9780898719574.">TB97</a>]</span> Lectures 7–10 are the
+source of this notebook’s structure and of the orthogonality experiment;
+Golub and Van Loan <span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id14" title="Gene H. Golub and Charles F. Van Loan. Matrix Computations. Johns Hopkins University Press, Baltimore, 4 edition, 2013.">GVL13</a>]</span> Chapter 5 gives the algorithms in
+production form. The stability analysis is Higham <span class="bibtex-citation" id="id3">[<a class="reference internal" href="#id16" title="Nicholas J. Higham. Accuracy and Stability of Numerical Algorithms. SIAM, Philadelphia, 2 edition, 2002. doi:10.1137/1.9780898718027.">Hig02</a>]</span>
+Chapters 19–20.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="what-qr-is">
+<h3>What <span class="math notranslate nohighlight">\(QR\)</span> is<a class="headerlink" href="#what-qr-is" title="Link to this heading">#</a></h3>
+<p>For <span class="math notranslate nohighlight">\(A \in \mathbb{R}^{m\times n}\)</span> with <span class="math notranslate nohighlight">\(m \ge n\)</span> and independent columns,</p>
+<div class="math notranslate nohighlight" id="equation-eq-qr-factorization">
+<span class="eqno">(108)<a class="headerlink" href="#equation-eq-qr-factorization" title="Link to this equation">#</a></span>\[A = QR ,\]</div>
+<p>with <span class="math notranslate nohighlight">\(Q\)</span> having orthonormal columns (<span class="math notranslate nohighlight">\(Q^{\top}Q = I\)</span>) and <span class="math notranslate nohighlight">\(R\)</span> upper triangular
+with positive diagonal. Two shapes are in circulation: the <strong>full</strong> form has
+<span class="math notranslate nohighlight">\(Q\)</span> of shape <span class="math notranslate nohighlight">\((m,m)\)</span> and <span class="math notranslate nohighlight">\(R\)</span> of shape <span class="math notranslate nohighlight">\((m,n)\)</span>, so <span class="math notranslate nohighlight">\(Q\)</span> is genuinely orthogonal
+and its trailing columns span <span class="math notranslate nohighlight">\(N(A^{\top})\)</span>; the <strong>economic</strong> (or reduced) form
+has <span class="math notranslate nohighlight">\(Q\)</span> of shape <span class="math notranslate nohighlight">\((m,n)\)</span> and <span class="math notranslate nohighlight">\(R\)</span> of shape <span class="math notranslate nohighlight">\((n,n)\)</span>, keeping only what is needed
+to reconstruct <span class="math notranslate nohighlight">\(A\)</span>. Both satisfy <a class="reference internal" href="#equation-eq-qr-factorization">Eq. 108</a>.</p>
+<p>Triangularity of <span class="math notranslate nohighlight">\(R\)</span> encodes the order of construction: the first <span class="math notranslate nohighlight">\(k\)</span> columns
+of <span class="math notranslate nohighlight">\(Q\)</span> span exactly the same space as the first <span class="math notranslate nohighlight">\(k\)</span> columns of <span class="math notranslate nohighlight">\(A\)</span>, for every
+<span class="math notranslate nohighlight">\(k\)</span>. The construction went left to right and never looked ahead.</p>
+</section>
+<section id="gramschmidt-twice">
+<h3>Gram–Schmidt, twice<a class="headerlink" href="#gramschmidt-twice" title="Link to this heading">#</a></h3>
+<p>The direct construction takes each column in turn and removes its components
+along the directions already fixed. <strong>Classical Gram–Schmidt</strong> computes every
+coefficient against the <em>original</em> column,</p>
+<div class="math notranslate nohighlight" id="equation-eq-qr-cgs">
+<span class="eqno">(109)<a class="headerlink" href="#equation-eq-qr-cgs" title="Link to this equation">#</a></span>\[\mathbf{v}_j = \mathbf{a}_j - \sum_{i&lt;j}\big(\mathbf{q}_i^{\top}\mathbf{a}_j\big)\mathbf{q}_i ,\]</div>
+<p>while <strong>modified Gram–Schmidt</strong> subtracts one projection at a time and takes
+each subsequent coefficient against the <em>updated</em> remainder,</p>
+<div class="math notranslate nohighlight" id="equation-eq-qr-mgs">
+<span class="eqno">(110)<a class="headerlink" href="#equation-eq-qr-mgs" title="Link to this equation">#</a></span>\[\mathbf{v} \leftarrow \mathbf{a}_j, \qquad
+\mathbf{v} \leftarrow \mathbf{v} - \big(\mathbf{q}_i^{\top}\mathbf{v}\big)\mathbf{q}_i
+\quad\text{for } i = 1, \dots, j-1 .\]</div>
+<p>In exact arithmetic <span class="math notranslate nohighlight">\(\mathbf{q}_i^{\top}\mathbf{v} = \mathbf{q}_i^{\top}
+\mathbf{a}_j\)</span>, because the pieces already removed were orthogonal to
+<span class="math notranslate nohighlight">\(\mathbf{q}_i\)</span>. In floating point they are only <em>nearly</em> orthogonal, and
+<a class="reference internal" href="#equation-eq-qr-mgs">Eq. 110</a> measures against a vector whose contamination has already been
+partly removed while <a class="reference internal" href="#equation-eq-qr-cgs">Eq. 109</a> measures against one that still carries
+all of it. One line of code; a squared condition number.</p>
+</section>
+<section id="householder">
+<h3>Householder<a class="headerlink" href="#householder" title="Link to this heading">#</a></h3>
+<p>A <strong>Householder reflector</strong> is the orthogonal matrix</p>
+<div class="math notranslate nohighlight" id="equation-eq-qr-householder">
+<span class="eqno">(111)<a class="headerlink" href="#equation-eq-qr-householder" title="Link to this equation">#</a></span>\[H = I - 2\,\frac{\mathbf{v}\mathbf{v}^{\top}}{\mathbf{v}^{\top}\mathbf{v}} ,\]</div>
+<p>which reflects across the hyperplane perpendicular to <span class="math notranslate nohighlight">\(\mathbf{v}\)</span>. It is
+symmetric, orthogonal, and its own inverse. Choosing
+<span class="math notranslate nohighlight">\(\mathbf{v} = \mathbf{x} \mp \|\mathbf{x}\|\mathbf{e}_1\)</span> makes <span class="math notranslate nohighlight">\(H\mathbf{x}\)</span> a
+multiple of <span class="math notranslate nohighlight">\(\mathbf{e}_1\)</span>: one reflection annihilates an entire column below
+the diagonal. Applying <span class="math notranslate nohighlight">\(n\)</span> of them triangularises <span class="math notranslate nohighlight">\(A\)</span>, and <span class="math notranslate nohighlight">\(Q\)</span> is their product.</p>
+<p>The sign is chosen as <span class="math notranslate nohighlight">\(-\operatorname{sign}(x_1)\)</span> to make the subtraction in
+<span class="math notranslate nohighlight">\(v_1 = x_1 \mp \|\mathbf{x}\|\)</span> an <em>addition</em> of like-signed quantities. The
+other choice invites the cancellation of
+<a class="reference internal" href="../00-machine/floating-point.html"><span class="std std-doc">§0.2</span></a> at exactly the wrong moment.</p>
+</section>
+<section id="givens">
+<h3>Givens<a class="headerlink" href="#givens" title="Link to this heading">#</a></h3>
+<p>A <strong>Givens rotation</strong> acts on two coordinates only,</p>
+<div class="math notranslate nohighlight" id="equation-eq-qr-givens">
+<span class="eqno">(112)<a class="headerlink" href="#equation-eq-qr-givens" title="Link to this equation">#</a></span>\[\begin{split}G = \begin{bmatrix} c &amp; s\\ -s &amp; c\end{bmatrix},
+\qquad c = \frac{a}{\sqrt{a^2+b^2}},\quad s = \frac{b}{\sqrt{a^2+b^2}} ,\end{split}\]</div>
+<p>and zeroes a single entry. Where Householder clears a whole column at once,
+Givens clears one entry, which is wasteful on a dense matrix and ideal when
+only a few entries are nonzero — updating a factorization after a new row
+arrives, or triangularising a Hessenberg matrix, which is what
+<a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html"><span class="std std-doc">§5.5</span></a> needs.</p>
+</section>
+<section id="column-pivoting">
+<h3>Column pivoting<a class="headerlink" href="#column-pivoting" title="Link to this heading">#</a></h3>
+<p>Plain <span class="math notranslate nohighlight">\(QR\)</span> processes columns in the order given, so a dependent column produces
+a zero on the diagonal of <span class="math notranslate nohighlight">\(R\)</span> <em>wherever it happens to sit</em> — as the Prologue
+discovered. <strong>Column-pivoted</strong> <span class="math notranslate nohighlight">\(QR\)</span> instead selects at each step the remaining
+column with the largest residual norm, giving</p>
+<div class="math notranslate nohighlight" id="equation-eq-qr-pivoted">
+<span class="eqno">(113)<a class="headerlink" href="#equation-eq-qr-pivoted" title="Link to this equation">#</a></span>\[A\Pi = QR, \qquad |r_{11}| \ge |r_{22}| \ge \cdots \ge |r_{nn}| ,\]</div>
+<p>so the diagonal decreases and a sharp drop in it locates the numerical rank.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data and instruments only: the worked matrices and an orthonormality meter.
+Both Gram-Schmidts, Householder, and Givens are built in the exercises,
+where they are the lesson.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">qr</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">draw</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">la</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random matrix below comes from this seed</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">110</span><span class="p">)</span>
+
+<span class="c1"># The test family for the orthogonality experiment: tall matrices of prescribed</span>
+<span class="c1"># condition number, so the horizontal axis of Exercise 2 is chosen rather than</span>
+<span class="c1"># stumbled upon.</span>
+<span class="n">M_TEST</span><span class="p">,</span> <span class="n">N_TEST</span> <span class="o">=</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">12</span>
+
+
+<span class="c1"># instrument: a meter, not a method — it reads ||Q^T Q - I|| off any Q the</span>
+<span class="c1"># exercises produce; the factorizations themselves are all built there.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">orthogonality_defect</span><span class="p">(</span><span class="n">Q</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Departure from orthonormality, ||Q^T Q - I||_2.</span>
+
+<span class="sd">    The single number the whole notebook turns on. For a matrix whose columns</span>
+<span class="sd">    are supposed to be perpendicular unit vectors this should sit at a few</span>
+<span class="sd">    times eps regardless of the input; anything that grows with the condition</span>
+<span class="sd">    number of A signals that the algorithm, not the problem, is losing the</span>
+<span class="sd">    property.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Q : numpy.ndarray, shape (m, n)</span>
+<span class="sd">        Matrix whose columns are claimed to be orthonormal.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float</span>
+<span class="sd">        The spectral norm of ``Q.T @ Q - I``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">Q</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">Q</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">Q</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-two-gramschmidts-one-line-apart">
+<h2>Exercise 1: Two Gram–Schmidts, one line apart<a class="headerlink" href="#exercise-1-two-gramschmidts-one-line-apart" title="Link to this heading">#</a></h2>
+<p>Both algorithms take the columns of <span class="math notranslate nohighlight">\(A\)</span> in order and remove the parts already
+accounted for. The difference is <em>what they measure the projection against</em>,
+and it occupies one line.</p>
+<p>In classical Gram–Schmidt <a class="reference internal" href="#equation-eq-qr-cgs">Eq. 109</a>, every coefficient
+<span class="math notranslate nohighlight">\(r_{ij} = \mathbf{q}_i^{\top}\mathbf{a}_j\)</span> uses the <strong>original</strong> column
+<span class="math notranslate nohighlight">\(\mathbf{a}_j\)</span>; all the projections are computed first and subtracted together.
+In modified Gram–Schmidt <a class="reference internal" href="#equation-eq-qr-mgs">Eq. 110</a>, the column is updated after each
+subtraction and the next coefficient is taken against the <strong>updated</strong> vector.
+Since the removed pieces are (in exact arithmetic) orthogonal to
+<span class="math notranslate nohighlight">\(\mathbf{q}_i\)</span>, subtracting them cannot change <span class="math notranslate nohighlight">\(\mathbf{q}_i^{\top}\mathbf{v}\)</span>,
+so the two agree — exactly, on paper.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">classical_gram_schmidt(A)</span></code> returning <code class="docutils literal notranslate"><span class="pre">(Q,</span> <span class="pre">R)</span></code>, following
+<a class="reference internal" href="#equation-eq-qr-cgs">Eq. 109</a>: for each column <span class="math notranslate nohighlight">\(j\)</span>, set <code class="docutils literal notranslate"><span class="pre">R[i,</span> <span class="pre">j]</span> <span class="pre">=</span> <span class="pre">Q[:,</span> <span class="pre">i]</span> <span class="pre">&#64;</span> <span class="pre">A[:,</span> <span class="pre">j]</span></code> for
+every <span class="math notranslate nohighlight">\(i &lt; j\)</span> using the <strong>original</strong> <code class="docutils literal notranslate"><span class="pre">A[:,</span> <span class="pre">j]</span></code>, subtract all of them from a
+copy of <code class="docutils literal notranslate"><span class="pre">A[:,</span> <span class="pre">j]</span></code>, then set <code class="docutils literal notranslate"><span class="pre">R[j,</span> <span class="pre">j]</span></code> to the resulting norm and <code class="docutils literal notranslate"><span class="pre">Q[:,</span> <span class="pre">j]</span></code> to
+the normalised vector.</p>
+<p><strong>Write this one yourself</strong> — the implementation is the lesson.</p>
+<p><strong>Part b)</strong> Write <code class="docutils literal notranslate"><span class="pre">modified_gram_schmidt(A)</span></code> returning <code class="docutils literal notranslate"><span class="pre">(Q,</span> <span class="pre">R)</span></code>, following
+<a class="reference internal" href="#equation-eq-qr-mgs">Eq. 110</a>: keep a working copy <code class="docutils literal notranslate"><span class="pre">V</span> <span class="pre">=</span> <span class="pre">A.copy()</span></code>, and for each <span class="math notranslate nohighlight">\(j\)</span> normalise
+<code class="docutils literal notranslate"><span class="pre">V[:,</span> <span class="pre">j]</span></code> into <code class="docutils literal notranslate"><span class="pre">Q[:,</span> <span class="pre">j]</span></code>, then immediately subtract its projection out of every
+<strong>later</strong> column, <code class="docutils literal notranslate"><span class="pre">V[:,</span> <span class="pre">k]</span> <span class="pre">-=</span> <span class="pre">(Q[:,</span> <span class="pre">j]</span> <span class="pre">&#64;</span> <span class="pre">V[:,</span> <span class="pre">k])</span> <span class="pre">*</span> <span class="pre">Q[:,</span> <span class="pre">j]</span></code> for <span class="math notranslate nohighlight">\(k &gt; j\)</span>. The
+difference from Part a) is that the coefficient is taken against <code class="docutils literal notranslate"><span class="pre">V</span></code>, not <code class="docutils literal notranslate"><span class="pre">A</span></code>.</p>
+<p><strong>Write this one yourself</strong> — the implementation is the lesson.</p>
+<p><strong>Part c)</strong> Confirm both are correct on a well-conditioned matrix, where the
+distinction does not yet bite. For <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">=</span> <span class="pre">la.random_with_condition(60,</span> <span class="pre">12,</span> <span class="pre">1e2,</span> <span class="pre">rng)</span></code>, check for each algorithm that <span class="math notranslate nohighlight">\(\|A - QR\| \le 10^{-13}\|A\|\)</span>, that
+<span class="math notranslate nohighlight">\(\|Q^{\top}Q - I\|_2 &lt; 10^{-12}\)</span>, and that <span class="math notranslate nohighlight">\(R\)</span> is upper triangular exactly
+under <code class="docutils literal notranslate"><span class="pre">np.triu</span></code>. Then confirm the two agree with each other to <span class="math notranslate nohighlight">\(10^{-10}\)</span> —
+which they will here, and will not in Exercise 2.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>algorithm                      ||A - QR||/||A||   ||Q^TQ - I||   R upper?
+classical Gram-Schmidt                6.106e-17      7.397e-14       True
+modified Gram-Schmidt                 9.164e-17      4.538e-15       True
+
+the two agree with each other to 1.982e-14  (at kappa = 1e2)
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<p>Both algorithms are checked on the three properties that define the
+factorization — reconstruction, orthonormality, triangularity — at a
+conditioning where they are still indistinguishable. That agreement is the
+baseline Exercise 2 destroys.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  classical Gram-Schmidt: A = QR to 1e-13 relative   [||A - QR||/||A|| = 6.11e-17]
+✓  classical Gram-Schmidt: Q is orthonormal at kappa = 1e2   [||Q^T Q - I|| = 7.40e-14]
+✓  classical Gram-Schmidt: R is exactly upper triangular   [nothing below the diagonal, checked against np.triu]
+✓  modified Gram-Schmidt: A = QR to 1e-13 relative   [||A - QR||/||A|| = 9.16e-17]
+✓  modified Gram-Schmidt: Q is orthonormal at kappa = 1e2   [||Q^T Q - I|| = 4.54e-15]
+✓  modified Gram-Schmidt: R is exactly upper triangular   [nothing below the diagonal, checked against np.triu]
+✓  and the two algorithms agree with each other on a well-conditioned matrix   [as they must: they are identical in exact arithmetic]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-the-experiment-that-separates-them">
+<h2>Exercise 2: The experiment that separates them<a class="headerlink" href="#exercise-2-the-experiment-that-separates-them" title="Link to this heading">#</a></h2>
+<p>Now the measurement. Sweep the condition number of <span class="math notranslate nohighlight">\(A\)</span> over ten orders of
+magnitude and watch <span class="math notranslate nohighlight">\(\|Q^{\top}Q - I\|_2\)</span> for the three algorithms.</p>
+<p>The predictions, from the standard analysis <span class="bibtex-citation" id="id4">[<a class="reference internal" href="#id16" title="Nicholas J. Higham. Accuracy and Stability of Numerical Algorithms. SIAM, Philadelphia, 2 edition, 2002. doi:10.1137/1.9780898718027.">Hig02</a>]</span>:</p>
+<ul class="simple">
+<li><p>classical Gram–Schmidt loses orthogonality like <span class="math notranslate nohighlight">\(\kappa^2\varepsilon\)</span>,</p></li>
+<li><p>modified Gram–Schmidt like <span class="math notranslate nohighlight">\(\kappa\varepsilon\)</span>,</p></li>
+<li><p>Householder like <span class="math notranslate nohighlight">\(\varepsilon\)</span>, independent of <span class="math notranslate nohighlight">\(\kappa\)</span>.</p></li>
+</ul>
+<p>On log axes those are slopes 2, 1 and 0 against <span class="math notranslate nohighlight">\(\log_{10}\kappa\)</span>, and that is
+what the fitted exponents should come out to.</p>
+<p>One caveat about the fit, worth stating so the number is not misread.
+<span class="math notranslate nohighlight">\(\|Q^{\top}Q - I\|\)</span> cannot grow indefinitely: once <span class="math notranslate nohighlight">\(Q\)</span> has lost orthogonality
+completely the quantity saturates around 1, so including saturated points drags
+the classical slope below 2. Fitting only the unsaturated range
+(<span class="math notranslate nohighlight">\(\kappa \le 10^{7}\)</span>, where the defect is still below <span class="math notranslate nohighlight">\(10^{-3}\)</span>) recovers
+<span class="math notranslate nohighlight">\(2.02\)</span>. This is a general habit worth forming: fit a power law only where the
+power law is still operating.</p>
+<p><strong>Part a)</strong> For <span class="math notranslate nohighlight">\(\kappa = 10^{2}, 10^{3}, \ldots, 10^{10}\)</span>, build
+<code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">=</span> <span class="pre">la.random_with_condition(60,</span> <span class="pre">12,</span> <span class="pre">kappa,</span> <span class="pre">rng)</span></code> and compute
+<span class="math notranslate nohighlight">\(\|Q^{\top}Q - I\|_2\)</span> with the <code class="docutils literal notranslate"><span class="pre">orthogonality_defect</span></code> helper for all three:
+<code class="docutils literal notranslate"><span class="pre">classical_gram_schmidt</span></code>, <code class="docutils literal notranslate"><span class="pre">modified_gram_schmidt</span></code>, and <code class="docutils literal notranslate"><span class="pre">np.linalg.qr</span></code>
+(Householder). Tabulate the results against the reference values
+<span class="math notranslate nohighlight">\(\kappa\varepsilon\)</span> and <span class="math notranslate nohighlight">\(\kappa^2\varepsilon\)</span>.</p>
+<p><strong>Part b)</strong> Fit the exponents with <code class="docutils literal notranslate"><span class="pre">np.polyfit</span></code> on <span class="math notranslate nohighlight">\(\log_{10}\)</span> of both axes,
+restricting the classical fit to the unsaturated range <span class="math notranslate nohighlight">\(\kappa \le 10^{7}\)</span>.
+Confirm the classical exponent is <span class="math notranslate nohighlight">\(2.0 \pm 0.3\)</span>, the modified <span class="math notranslate nohighlight">\(1.0 \pm 0.4\)</span>,
+and the Householder one <span class="math notranslate nohighlight">\(0.0 \pm 0.3\)</span>.</p>
+<p><strong>Part c)</strong> Confirm that <strong>all three still reconstruct <span class="math notranslate nohighlight">\(A\)</span></strong> to <span class="math notranslate nohighlight">\(10^{-13}\)</span>
+relative at every <span class="math notranslate nohighlight">\(\kappa\)</span>, including <span class="math notranslate nohighlight">\(\kappa = 10^{10}\)</span> where the classical
+<span class="math notranslate nohighlight">\(Q\)</span> is no longer orthogonal at all. The factorization is accurate; only the
+claimed property of <span class="math notranslate nohighlight">\(Q\)</span> has been lost. Plot all three defects against <span class="math notranslate nohighlight">\(\kappa\)</span>
+on log-log axes with the <span class="math notranslate nohighlight">\(\kappa\varepsilon\)</span> and <span class="math notranslate nohighlight">\(\kappa^2\varepsilon\)</span>
+references.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>    kappa   classical GS    modified GS    Householder    kappa*eps  kappa^2*eps
+    1e+02      2.555e-14      3.892e-15      9.377e-16     2.22e-14     2.22e-12
+    1e+03      1.338e-12      4.003e-14      9.154e-16     2.22e-13     2.22e-10
+    1e+04      1.494e-09      1.701e-13      1.037e-15     2.22e-12     2.22e-08
+    1e+05      6.979e-08      4.598e-12      5.895e-16     2.22e-11     2.22e-06
+    1e+06      5.043e-06      2.102e-11      6.184e-16     2.22e-10     2.22e-04
+    1e+07      6.203e-04      1.103e-10      4.331e-16     2.22e-09     2.22e-02
+    1e+08      2.122e-02      3.454e-09      5.349e-16     2.22e-08     1.00e+00
+    1e+09      1.483e+00      1.444e-08      7.648e-16     2.22e-07     1.00e+00
+    1e+10      1.908e+00      8.720e-08      5.078e-16     2.22e-06     1.00e+00
+
+fitted exponents against log10(kappa):
+  classical Gram-Schmidt :  2.09   (theory 2, fitted on the 6 unsaturated points)
+  modified Gram-Schmidt  :  0.93   (theory 1)
+  Householder            : -0.03   (theory 0)
+
+worst reconstruction ||A - QR||/||A|| over ALL algorithms and kappas: 6.367e-16
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-qr-orthogonality">
+<img alt="../../_images/8f926d33dd806abbb2c68cc9c52bbe18b89e6ba6cb862fb2934a7f06f64a3786.png" src="../../_images/8f926d33dd806abbb2c68cc9c52bbe18b89e6ba6cb862fb2934a7f06f64a3786.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 40 </span><span class="caption-text">Departure from orthonormality <span class="math notranslate nohighlight">\(\|Q^{\top}Q - I\|_2\)</span> against the condition number of <span class="math notranslate nohighlight">\(A\)</span>, for three algorithms that compute the same factorization, on log-log axes. Classical Gram-Schmidt (ink) tracks <span class="math notranslate nohighlight">\(\kappa^2\varepsilon\)</span> until it saturates near 1, having lost orthogonality entirely; modified Gram-Schmidt (amber) tracks <span class="math notranslate nohighlight">\(\kappa\varepsilon\)</span>; Householder (green) is flat at a few times <span class="math notranslate nohighlight">\(\varepsilon\)</span> with no dependence on <span class="math notranslate nohighlight">\(\kappa\)</span> whatsoever, because it builds <span class="math notranslate nohighlight">\(Q\)</span> from orthogonal operations that cannot amplify error.</span><a class="headerlink" href="#fig-qr-orthogonality" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<p>The three exponents are the content of the exercise and are gated to
+<span class="math notranslate nohighlight">\(\pm0.3\)</span> of their theoretical values. The final check is the one that makes the
+result surprising rather than merely bad: <strong>every</strong> algorithm still reproduces
+<span class="math notranslate nohighlight">\(A\)</span> to machine precision even where its <span class="math notranslate nohighlight">\(Q\)</span> is useless, so the failure is
+specifically the loss of orthogonality and not a wrong answer.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  classical Gram-Schmidt loses orthogonality like kappa^2 eps   [got 2.09498 vs expected 2 (rtol=0, atol=0.3)]
+✓  modified Gram-Schmidt loses it like kappa eps: one line, one power   [got 0.934459 vs expected 1 (rtol=0, atol=0.4)]
+✓  and Householder does not lose it at all, independent of kappa   [got -0.0334751 vs expected 0 (rtol=0, atol=0.3)]
+✓  Householder stays at a small multiple of eps across ten orders of kappa   [largest 1.04e-15 against 500 eps = 1.1e-13: the orthogonality defect of a backward-stable QR scales with eps and the matrix size, never with kappa]
+✓  while classical Gram-Schmidt has lost orthogonality ENTIRELY by kappa = 1e10   [||Q^T Q - I|| = 1.91, which for orthonormal columns is total failure]
+✓  yet ALL THREE still reconstruct A to 1e-13 relative at every kappa   [the factorization is accurate; only the claimed property of Q is gone]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-householder-building-q-out-of-reflections">
+<h2>Exercise 3: Householder: building <span class="math notranslate nohighlight">\(Q\)</span> out of reflections<a class="headerlink" href="#exercise-3-householder-building-q-out-of-reflections" title="Link to this heading">#</a></h2>
+<p>Exercise 2 established <em>that</em> Householder is stable. This exercise shows <em>why</em>,
+by constructing the reflector and watching it work.</p>
+<p>The geometric idea is simple. To zero out everything below the first entry of a
+vector <span class="math notranslate nohighlight">\(\mathbf{x}\)</span>, reflect <span class="math notranslate nohighlight">\(\mathbf{x}\)</span> onto the first coordinate axis.
+Reflection preserves length, so the image must be
+<span class="math notranslate nohighlight">\(\pm\|\mathbf{x}\|\mathbf{e}_1\)</span>; the mirror is the hyperplane bisecting
+<span class="math notranslate nohighlight">\(\mathbf{x}\)</span> and its image, whose normal is
+<span class="math notranslate nohighlight">\(\mathbf{v} = \mathbf{x} \mp \|\mathbf{x}\|\mathbf{e}_1\)</span>. That gives
+<a class="reference internal" href="#equation-eq-qr-householder">Eq. 111</a>.</p>
+<p>The sign matters, and it is the one piece of numerical care in the
+construction. Taking <span class="math notranslate nohighlight">\(\mathbf{v} = \mathbf{x} - \|\mathbf{x}\|\mathbf{e}_1\)</span>
+when <span class="math notranslate nohighlight">\(x_1\)</span> is already positive subtracts two nearly equal numbers in the first
+component — the cancellation of
+<a class="reference internal" href="../00-machine/floating-point.html"><span class="std std-doc">§0.2</span></a>, at the worst possible moment. The
+fix is to reflect <em>away</em> from <span class="math notranslate nohighlight">\(\mathbf{x}\)</span>, choosing the sign
+<span class="math notranslate nohighlight">\(-\operatorname{sign}(x_1)\)</span>, which turns the subtraction into an addition of
+like-signed quantities. Every production implementation does this.</p>
+<p>The reason the whole factorization inherits stability is structural: <span class="math notranslate nohighlight">\(Q\)</span> is a
+<strong>product of orthogonal matrices</strong>, and an orthogonal matrix satisfies
+<span class="math notranslate nohighlight">\(\|Q\mathbf{z}\| = \|\mathbf{z}\|\)</span> for every <span class="math notranslate nohighlight">\(\mathbf{z}\)</span>. It therefore cannot
+magnify an existing error. Gram–Schmidt, by contrast, builds <span class="math notranslate nohighlight">\(Q\)</span> by
+subtracting, and subtraction is exactly where digits go missing.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">householder_vector(x)</span></code> returning the unit normal
+<span class="math notranslate nohighlight">\(\mathbf{v}\)</span> of <a class="reference internal" href="#equation-eq-qr-householder">Eq. 111</a>, using the sign convention
+<span class="math notranslate nohighlight">\(v_1 = x_1 + \operatorname{sign}(x_1)\|\mathbf{x}\|\)</span> (taking
+<span class="math notranslate nohighlight">\(\operatorname{sign}(0) = +1\)</span>), then normalising <span class="math notranslate nohighlight">\(\mathbf{v}\)</span> to unit length.</p>
+<p><strong>Write this one yourself</strong> — the implementation is the lesson.</p>
+<p><strong>Part b)</strong> For <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">=</span> <span class="pre">rng.standard_normal(6)</span></code>, build
+<code class="docutils literal notranslate"><span class="pre">H</span> <span class="pre">=</span> <span class="pre">np.eye(6)</span> <span class="pre">-</span> <span class="pre">2</span> <span class="pre">*</span> <span class="pre">np.outer(v,</span> <span class="pre">v)</span></code> and confirm the three defining
+properties to <span class="math notranslate nohighlight">\(10^{-14}\)</span>: <span class="math notranslate nohighlight">\(H = H^{\top}\)</span>, <span class="math notranslate nohighlight">\(H^{\top}H = I\)</span>, and <span class="math notranslate nohighlight">\(H^2 = I\)</span>
+(a reflection is its own inverse). Then confirm it does its job: all entries of
+<span class="math notranslate nohighlight">\(H\mathbf{x}\)</span> below the first are zero to <span class="math notranslate nohighlight">\(10^{-14}\)</span>, and
+<span class="math notranslate nohighlight">\(\|H\mathbf{x}\| = \|\mathbf{x}\|\)</span> to <span class="math notranslate nohighlight">\(10^{-14}\)</span>, since reflections preserve
+length.</p>
+<p><strong>Part c)</strong> Confirm the sign convention earns its keep. For the deliberately
+awkward vector <span class="math notranslate nohighlight">\(\mathbf{x} = (1, 10^{-8}, 10^{-8})^{\top}\)</span>, whose first entry
+dominates, build <span class="math notranslate nohighlight">\(\mathbf{v}\)</span> both ways — with the recommended sign and with
+the cancelling one <span class="math notranslate nohighlight">\(v_1 = x_1 - \|\mathbf{x}\|\)</span> — and compare
+<span class="math notranslate nohighlight">\(|v_1|\)</span> before normalisation. Confirm the cancelling choice produces a <span class="math notranslate nohighlight">\(v_1\)</span>
+smaller by more than ten orders of magnitude, which is the digit loss the
+convention avoids.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>x        = [ 0.44058 -0.33578  0.02947 -0.50953  1.01808  0.55639]
+H x      = [-1.38325 -0.       0.      -0.       0.       0.     ]
+
+H = H^T                 : 0.000e+00
+H^T H = I               : 2.220e-16
+H^2 = I                 : 2.220e-16
+entries below the first : 2.776e-16
+||H x|| - ||x||         : 0.000e+00
+
+for x = [1. 0. 0.] (first entry dominant):
+  v_1 with the safe sign      : 2.000000e+00
+  v_1 with the cancelling sign: 0.000000e+00
+  ratio                       : inf   &lt;- the digits the convention protects
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_2421/3592888573.py:46: RuntimeWarning: divide by zero encountered in scalar divide
+  print(f&quot;  ratio                       : {abs(v1_safe / v1_cancelling):.3e}&quot;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-qr-householder">
+<img alt="../../_images/5b3d8d319bf7b72ad8b9735766e0a2fb1c6d3776b4773d2add14734fcd304052.png" src="../../_images/5b3d8d319bf7b72ad8b9735766e0a2fb1c6d3776b4773d2add14734fcd304052.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 41 </span><span class="caption-text">The Householder reflection of Eq. 4 in the plane: the vector <span class="math notranslate nohighlight">\(\mathbf{x}\)</span> (ink) is reflected across the hyperplane perpendicular to <span class="math notranslate nohighlight">\(\mathbf{v}\)</span> (the dashed mirror, hatched on the normal’s side) onto the first coordinate axis at <span class="math notranslate nohighlight">\(-\operatorname{sign}(x_1)\|\mathbf{x}\|\mathbf{e}_1\)</span> (amber). Reflection preserves length, so the image must lie on the circle of radius <span class="math notranslate nohighlight">\(\|\mathbf{x}\|\)</span>; choosing the further of the two intersections is what makes the construction of <span class="math notranslate nohighlight">\(\mathbf{v}\)</span> free of cancellation.</span><a class="headerlink" href="#fig-qr-householder" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<p>The three algebraic properties and the two geometric ones are checked
+separately, because they are separate claims: a matrix can be orthogonal
+without being a reflection. The sign-convention check quantifies the digit loss
+rather than asserting it.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the Householder matrix is symmetric   [max|Δ| = 0 (rtol=0, atol=1e-14)]
+✓  and orthogonal   [max|Δ| = 2.22045e-16 (rtol=0, atol=1e-14)]
+✓  and its own inverse: a reflection undone is the identity   [max|Δ| = 2.22045e-16 (rtol=0, atol=1e-14)]
+✓  H x is a multiple of e_1: one reflection clears a whole column   [max|Δ| = 2.77556e-16 (rtol=0, atol=1e-14)]
+✓  and it preserves length, which is why Q cannot amplify error   [got 1.38325 vs expected 1.38325 (rtol=0, atol=1e-14)]
+✓  the sign convention avoids a cancellation of more than 10 orders   [v_1 = 2.00e+00 against 0.00e+00 for the naive choice]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_2421/1889962939.py:13: RuntimeWarning: divide by zero encountered in scalar divide
+  abs(v1_safe / v1_cancelling) &gt; 1e10,
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-givens-one-entry-at-a-time">
+<h2>Exercise 4: Givens: one entry at a time<a class="headerlink" href="#exercise-4-givens-one-entry-at-a-time" title="Link to this heading">#</a></h2>
+<p>Householder clears a whole column with one reflection. <strong>Givens rotations</strong>
+clear a single entry, which sounds strictly worse and is — on a dense matrix.
+It becomes the right tool exactly when almost everything is already zero.</p>
+<p><a class="reference internal" href="#equation-eq-qr-givens">Eq. 112</a> acts on rows <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(k\)</span> only, mixing them so that the
+entry at <span class="math notranslate nohighlight">\((k, j)\)</span> becomes zero while leaving every other row untouched. On a
+dense <span class="math notranslate nohighlight">\(m\times n\)</span> matrix that needs <span class="math notranslate nohighlight">\(O(mn)\)</span> rotations against <span class="math notranslate nohighlight">\(n\)</span> Householder
+reflections, so Householder wins. But on an <strong>upper Hessenberg</strong> matrix — zero
+below the first subdiagonal — there are only <span class="math notranslate nohighlight">\(n-1\)</span> nonzero entries to remove,
+and Givens does the whole triangularisation in <span class="math notranslate nohighlight">\(n-1\)</span> rotations touching two
+rows each. That is exactly the situation inside GMRES
+(<a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html"><span class="std std-doc">§5.5</span></a>) and inside the
+shifted <span class="math notranslate nohighlight">\(QR\)</span> eigenvalue algorithm
+(<a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html"><span class="std std-doc">§5.2</span></a>), which is why the
+rotation is worth knowing.</p>
+<p>The cosine and sine are computed with <code class="docutils literal notranslate"><span class="pre">np.hypot(a,</span> <span class="pre">b)</span></code> rather than
+<code class="docutils literal notranslate"><span class="pre">np.sqrt(a**2</span> <span class="pre">+</span> <span class="pre">b**2)</span></code>, for the overflow reason
+<a class="reference internal" href="../00-machine/vectors-norms-inner-products.html"><span class="std std-doc">§0.3</span></a> measured: squaring
+entries can overflow when the entries themselves cannot.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">givens_rotation(a,</span> <span class="pre">b)</span></code> returning <code class="docutils literal notranslate"><span class="pre">(c,</span> <span class="pre">s)</span></code> from
+<a class="reference internal" href="#equation-eq-qr-givens">Eq. 112</a>, using <code class="docutils literal notranslate"><span class="pre">np.hypot(a,</span> <span class="pre">b)</span></code> for the denominator and returning
+<code class="docutils literal notranslate"><span class="pre">(1.0,</span> <span class="pre">0.0)</span></code> when both inputs are zero.</p>
+<p><strong>Part b)</strong> For <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">=</span> <span class="pre">rng.standard_normal((5,</span> <span class="pre">4))</span></code> and the entry at row 3,
+column 0, build the <span class="math notranslate nohighlight">\(5\times5\)</span> rotation acting on rows 2 and 3, apply it, and
+confirm: the target entry is zero to <span class="math notranslate nohighlight">\(10^{-16}\)</span>, the rotation is orthogonal to
+<span class="math notranslate nohighlight">\(10^{-15}\)</span>, the Frobenius norm of the matrix is unchanged to <span class="math notranslate nohighlight">\(10^{-14}\)</span>, and
+rows other than 2 and 3 are <strong>bit-identical</strong> to before.</p>
+<p><strong>Part c)</strong> Triangularise an upper Hessenberg matrix with Givens. Build
+<code class="docutils literal notranslate"><span class="pre">Hess</span> <span class="pre">=</span> <span class="pre">np.triu(rng.standard_normal((6,</span> <span class="pre">6)),</span> <span class="pre">-1)</span></code> (zero below the first
+subdiagonal), apply five rotations to clear the subdiagonal entries in turn,
+and confirm the result is upper triangular to <span class="math notranslate nohighlight">\(10^{-14}\)</span> and that the
+accumulated <span class="math notranslate nohighlight">\(Q\)</span> satisfies <span class="math notranslate nohighlight">\(Q^{\top}Q = I\)</span> to <span class="math notranslate nohighlight">\(10^{-14}\)</span> and <span class="math notranslate nohighlight">\(QR = \)</span> Hess to
+<span class="math notranslate nohighlight">\(10^{-13}\)</span>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>entry (3,0) before  : +0.665953
+entry (3,0) after   : -9.150e-19
+G orthogonal        : 1.958e-17
+Frobenius preserved : 0.000e+00
+other rows bit-identical: True
+
+Hessenberg triangularised with 5 rotations:
+  below-diagonal residue : 4.461e-17
+  Q^T Q - I              : 2.220e-16
+  ||Hess - Q R||         : 3.886e-16
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<p>The “other rows bit-identical” check is the one that captures what makes Givens
+useful: it is a <em>local</em> operation, so it can be applied where the work is
+without disturbing structure elsewhere. That locality is exactly what
+Householder lacks.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the Givens rotation zeroes its target entry exactly   [got -9.15036e-19 vs expected 0 (rtol=0, atol=1e-15)]
+✓  the rotation is orthogonal   [max|Δ| = 1.95817e-17 (rtol=0, atol=1e-15)]
+✓  so it preserves the Frobenius norm   [got 4.01841 vs expected 4.01841 (rtol=0, atol=1e-14)]
+✓  and it leaves every row other than the two it acts on untouched   [bit-identical: the locality that makes Givens the right tool for nearly-triangular matrices]
+✓  five rotations triangularise a 6x6 Hessenberg matrix   [max|Δ| = 4.46059e-17 (rtol=0, atol=1e-14)]
+✓  with an orthogonal accumulated Q   [max|Δ| = 2.22045e-16 (rtol=0, atol=1e-14)]
+✓  and Q R reproduces the original matrix   [max|Δ| = 3.88578e-16 (rtol=0, atol=1e-13)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-two-shapes-and-what-r-knows">
+<h2>Exercise 5: Two shapes, and what <span class="math notranslate nohighlight">\(R\)</span> knows<a class="headerlink" href="#exercise-5-two-shapes-and-what-r-knows" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">scipy.linalg.qr</span></code> offers two shapes, and the difference is not cosmetic: the
+<strong>full</strong> form carries information the economic form discards.</p>
+<p>For <span class="math notranslate nohighlight">\(A\)</span> of shape <span class="math notranslate nohighlight">\((m, n)\)</span> with <span class="math notranslate nohighlight">\(m &gt; n\)</span>, the full form gives <span class="math notranslate nohighlight">\(Q\)</span> of shape
+<span class="math notranslate nohighlight">\((m,m)\)</span> — a genuinely orthogonal matrix — and <span class="math notranslate nohighlight">\(R\)</span> of shape <span class="math notranslate nohighlight">\((m,n)\)</span> whose last
+<span class="math notranslate nohighlight">\(m-n\)</span> rows are zero. The economic form keeps only the first <span class="math notranslate nohighlight">\(n\)</span> columns of <span class="math notranslate nohighlight">\(Q\)</span>
+and the top <span class="math notranslate nohighlight">\(n\times n\)</span> block of <span class="math notranslate nohighlight">\(R\)</span>. Both satisfy
+<a class="reference internal" href="#equation-eq-qr-factorization">Eq. 108</a>, and both give the same projector
+<span class="math notranslate nohighlight">\(QQ^{\top}\)</span> onto <span class="math notranslate nohighlight">\(C(A)\)</span> when restricted to the first <span class="math notranslate nohighlight">\(n\)</span> columns.</p>
+<p>What the full form adds is the <strong>left null space</strong>. Its trailing <span class="math notranslate nohighlight">\(m-n\)</span> columns
+are an orthonormal basis of <span class="math notranslate nohighlight">\(N(A^{\top})\)</span>, the subspace
+<a class="reference internal" href="../01-matrices/four-subspaces.html"><span class="std std-doc">§1.4</span></a> obtained from the SVD — available
+here at a fraction of the cost, because <span class="math notranslate nohighlight">\(QR\)</span> is <span class="math notranslate nohighlight">\(O(mn^2)\)</span> and the SVD is
+several times that.</p>
+<p><span class="math notranslate nohighlight">\(R\)</span> carries information too. Its diagonal entries are the successive
+“new content” of each column: <span class="math notranslate nohighlight">\(|r_{jj}|\)</span> is the distance from
+<span class="math notranslate nohighlight">\(\mathbf{a}_j\)</span> to the span of the columns before it. A small <span class="math notranslate nohighlight">\(|r_{jj}|\)</span> means
+column <span class="math notranslate nohighlight">\(j\)</span> was nearly redundant, which is what Exercise 6 exploits. And
+<span class="math notranslate nohighlight">\(|\det A| = \prod_j |r_{jj}|\)</span> when <span class="math notranslate nohighlight">\(A\)</span> is square, since <span class="math notranslate nohighlight">\(|\det Q| = 1\)</span> — a
+route to the determinant that is better conditioned than the <span class="math notranslate nohighlight">\(LU\)</span> one of
+<a class="reference internal" href="../01-matrices/determinants.html"><span class="std std-doc">§1.7</span></a>, though still subject to the same
+range problems.</p>
+<p><strong>Part a)</strong> For <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">=</span> <span class="pre">rng.standard_normal((6,</span> <span class="pre">3))</span></code>, compute both forms with
+<code class="docutils literal notranslate"><span class="pre">scipy.linalg.qr(A)</span></code> and <code class="docutils literal notranslate"><span class="pre">scipy.linalg.qr(A,</span> <span class="pre">mode=&quot;economic&quot;)</span></code>. Report the
+shapes of all four factors and confirm both reconstruct <span class="math notranslate nohighlight">\(A\)</span> to <span class="math notranslate nohighlight">\(10^{-14}\)</span>.</p>
+<p><strong>Part b)</strong> Confirm the full <span class="math notranslate nohighlight">\(Q\)</span> is genuinely orthogonal (<span class="math notranslate nohighlight">\(Q^{\top}Q = QQ^{\top}
+= I_6\)</span> to <span class="math notranslate nohighlight">\(10^{-14}\)</span>) while the economic one satisfies only <span class="math notranslate nohighlight">\(Q^{\top}Q = I_3\)</span>
+— and that <span class="math notranslate nohighlight">\(QQ^{\top}\)</span> for the economic form is the <strong>projector onto <span class="math notranslate nohighlight">\(C(A)\)</span></strong>,
+equal to the <code class="docutils literal notranslate"><span class="pre">projector_onto</span></code> construction of
+<a class="reference internal" href="projections-normal-equations.html"><span class="std std-doc">§2.1</span></a> to <span class="math notranslate nohighlight">\(10^{-13}\)</span>.</p>
+<p><strong>Part c)</strong> Confirm the trailing columns of the full <span class="math notranslate nohighlight">\(Q\)</span> span <span class="math notranslate nohighlight">\(N(A^{\top})\)</span>:
+check <span class="math notranslate nohighlight">\(A^{\top}Q_{:,3:} = 0\)</span> to <span class="math notranslate nohighlight">\(10^{-14}\)</span>, and that the projector onto their
+span equals <span class="math notranslate nohighlight">\(I - QQ^{\top}\)</span> from the economic form to <span class="math notranslate nohighlight">\(10^{-13}\)</span>. Then confirm
+<span class="math notranslate nohighlight">\(|\det| = \prod_j |r_{jj}|\)</span> on a square <span class="math notranslate nohighlight">\(5\times5\)</span> matrix, to a relative
+<span class="math notranslate nohighlight">\(10^{-11}\)</span>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>full      : Q (6, 6)  R (6, 3)
+economic  : Q (6, 3)  R (3, 3)
+
+reconstruction, full     : 1.332e-15
+reconstruction, economic : 1.332e-15
+
+full Q^T Q - I_6         : 5.551e-16
+full Q Q^T - I_6         : 5.551e-16
+economic Q^T Q - I_3     : 5.551e-16
+
+Q Q^T (economic) vs the projector of section 2.1: 4.441e-16
+A^T Q[:, 3:]             : 5.521e-16   (trailing columns span N(A^T))
+Q_null Q_null^T - (I - P): 5.759e-16
+
+square 5x5: |det A| = 3.3321524170   prod |r_jj| = 3.3321524170
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<p>The check that matters is the projector agreement: <span class="math notranslate nohighlight">\(QQ^{\top}\)</span> from the
+economic <span class="math notranslate nohighlight">\(QR\)</span> must equal <span class="math notranslate nohighlight">\(A(A^{\top}A)^{-1}A^{\top}\)</span> from
+<a class="reference internal" href="projections-normal-equations.html"><span class="std std-doc">§2.1</span></a>, computed by a completely different
+route and <em>without forming <span class="math notranslate nohighlight">\(A^{\top}A\)</span> at all</em>. That is the promise this
+notebook was written to keep.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the full QR reconstructs A   [max|Δ| = 1.33227e-15 (rtol=0, atol=1e-14)]
+✓  and so does the economic form   [max|Δ| = 1.33227e-15 (rtol=0, atol=1e-14)]
+✓  the full Q is genuinely orthogonal: Q Q^T = I too   [max|Δ| = 5.55112e-16 (rtol=0, atol=1e-14)]
+✓  the economic Q has orthonormal columns   [max|Δ| = 5.55112e-16 (rtol=0, atol=1e-14)]
+✓  Q Q^T equals the section 2.1 projector, with no A^T A formed anywhere   [max|Δ| = 4.44089e-16 (rtol=0, atol=1e-13)]
+✓  the trailing columns of the full Q span N(A^T)   [max|Δ| = 5.52101e-16 (rtol=0, atol=1e-14)]
+✓  and their projector is exactly I - Q Q^T   [max|Δ| = 5.75928e-16 (rtol=0, atol=1e-13)]
+✓  |det A| = prod |r_jj|, since |det Q| = 1   [got 3.33215 vs expected 3.33215 (rtol=1e-11, atol=0)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-6-pivoting-and-the-prologue-s-question-answered">
+<h2>Exercise 6: Pivoting, and the Prologue’s question answered<a class="headerlink" href="#exercise-6-pivoting-and-the-prologue-s-question-answered" title="Link to this heading">#</a></h2>
+<p>The Prologue tried to read a column-space basis off a plain <span class="math notranslate nohighlight">\(QR\)</span> and failed:
+because the third column of its matrix was the sum of the first two, the zero
+appeared in position three rather than at the end, and the leading columns of
+<span class="math notranslate nohighlight">\(Q\)</span> spanned the wrong subspace. Column pivoting is the repair.</p>
+<p><a class="reference internal" href="#equation-eq-qr-pivoted">Eq. 113</a> selects, at each step, whichever remaining column has the
+largest component orthogonal to what is already spanned — the column carrying
+the most new information. The diagonal of <span class="math notranslate nohighlight">\(R\)</span> therefore decreases, and a sharp
+drop in it locates the numerical rank: columns before the drop carried real
+content, columns after it carried only noise.</p>
+<p>Test on <code class="docutils literal notranslate"><span class="pre">la.low_rank_plus_noise(50,</span> <span class="pre">10,</span> <span class="pre">4,</span> <span class="pre">1e-10,</span> <span class="pre">rng)</span></code>, a <span class="math notranslate nohighlight">\(50\times10\)</span> matrix
+built as an exact rank-4 signal plus Gaussian noise of size <span class="math notranslate nohighlight">\(10^{-10}\)</span>. The
+pivoted diagonal should fall from order 1 to order <span class="math notranslate nohighlight">\(10^{-9}\)</span> between positions
+4 and 5 — a gap of about <span class="math notranslate nohighlight">\(3\times10^{9}\)</span>.</p>
+<p>There is an instructive disagreement here, and it is the
+<a class="reference internal" href="../00-machine/floating-point.html"><span class="std std-doc">§0.2</span></a> tolerance question again.
+<code class="docutils literal notranslate"><span class="pre">np.linalg.matrix_rank</span></code> at its <strong>default</strong> tolerance reports 10, not 4, because
+the noise floor <span class="math notranslate nohighlight">\(10^{-10}\)</span> sits far above the default threshold of about
+<span class="math notranslate nohighlight">\(10^{-15}\)</span>: the matrix genuinely has ten nonzero singular values. The pivoted
+diagonal reports 4 because it shows the <em>gap</em>, and it is the gap, not any
+absolute threshold, that says where the signal stops. Both are right; the
+pivoted <span class="math notranslate nohighlight">\(R\)</span> is more informative because it displays the structure instead of
+collapsing it to one number.</p>
+<p><strong>Part a)</strong> Build the test matrix with
+<code class="docutils literal notranslate"><span class="pre">la.low_rank_plus_noise(50,</span> <span class="pre">10,</span> <span class="pre">4,</span> <span class="pre">1e-10,</span> <span class="pre">rng)</span></code> (taking the first return
+value), factor it with <code class="docutils literal notranslate"><span class="pre">scipy.linalg.qr(A,</span> <span class="pre">pivoting=True)</span></code> returning
+<code class="docutils literal notranslate"><span class="pre">(Q,</span> <span class="pre">R,</span> <span class="pre">piv)</span></code>, and confirm <span class="math notranslate nohighlight">\(A\Pi = QR\)</span> to <span class="math notranslate nohighlight">\(10^{-13}\)</span> by comparing
+<code class="docutils literal notranslate"><span class="pre">A[:,</span> <span class="pre">piv]</span></code> against <code class="docutils literal notranslate"><span class="pre">Q</span> <span class="pre">&#64;</span> <span class="pre">R</span></code>.</p>
+<p><strong>Part b)</strong> Confirm the ordering <a class="reference internal" href="#equation-eq-qr-pivoted">Eq. 113</a>: <span class="math notranslate nohighlight">\(|r_{jj}|\)</span> is
+non-increasing to <span class="math notranslate nohighlight">\(10^{-14}\)</span>. Report the ratio <span class="math notranslate nohighlight">\(|r_{44}|/|r_{55}|\)</span> and confirm
+it exceeds <span class="math notranslate nohighlight">\(10^{8}\)</span>, locating the rank at 4.</p>
+<p><strong>Part c)</strong> Show the disagreement honestly: report
+<code class="docutils literal notranslate"><span class="pre">np.linalg.matrix_rank(A)</span></code> at its default tolerance and at <code class="docutils literal notranslate"><span class="pre">tol=1e-8</span></code>, and
+confirm the first gives 10 and the second 4. Plot <span class="math notranslate nohighlight">\(|r_{jj}|\)</span> against <span class="math notranslate nohighlight">\(j\)</span> on a
+log axis beside the singular values, and confirm the two curves show the same
+gap in the same place.</p>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p>Ask for <code class="docutils literal notranslate"><span class="pre">qr_insert_row(Q,</span> <span class="pre">R,</span> <span class="pre">a)</span></code>, which updates an existing <span class="math notranslate nohighlight">\(QR\)</span> factorization
+when a new row <span class="math notranslate nohighlight">\(\mathbf{a}^{\top}\)</span> is appended to <span class="math notranslate nohighlight">\(A\)</span>, using a sequence of
+Givens rotations rather than refactoring from scratch — the operation behind
+recursive least squares and online regression. Then check it yourself on
+<span class="math notranslate nohighlight">\(A\)</span> of shape <span class="math notranslate nohighlight">\((40, 6)\)</span>: the updated factors must satisfy
+<span class="math notranslate nohighlight">\(\|\hat{Q}\hat{R} - \begin{psmallmatrix}A\\ \mathbf{a}^{\top}\end{psmallmatrix}\|
+\le 10^{-12}\)</span>, <span class="math notranslate nohighlight">\(\hat{Q}\)</span> must be orthogonal to <span class="math notranslate nohighlight">\(10^{-13}\)</span>, and the update must
+use <span class="math notranslate nohighlight">\(O(n)\)</span> rotations rather than <span class="math notranslate nohighlight">\(O(mn)\)</span>. The check is yours.</p>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>A Pi = Q R residual : 1.554e-15
+permutation         : [6 8 9 4 2 1 7 0 5 3]
+
+ |r_jj| : [9.723 8.586 7.581 5.286 0.    0.    0.    0.    0.    0.   ]
+ sigma_j: [16.659 13.16   8.929  6.345  0.     0.     0.     0.     0.     0.   ]
+
+non-increasing      : True
+gap |r_44|/|r_55|   : 4.966e+09
+gap sigma_4/sigma_5 : 7.848e+09
+
+matrix_rank, default tol : 10   (the noise floor 1e-10 is above the 1e-15 default threshold)
+matrix_rank, tol = 1e-8  : 4   (the answer the gap points at)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-qr-pivoted">
+<img alt="../../_images/eb1ca8e26a18cfec8ecbe38782411a6b853c560da2399270044b58a09f895953.png" src="../../_images/eb1ca8e26a18cfec8ecbe38782411a6b853c560da2399270044b58a09f895953.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 42 </span><span class="caption-text">Column-pivoted <span class="math notranslate nohighlight">\(QR\)</span> on a <span class="math notranslate nohighlight">\(50\times10\)</span> matrix built as an exact rank-4 signal plus Gaussian noise of size <span class="math notranslate nohighlight">\(10^{-10}\)</span>: the magnitudes <span class="math notranslate nohighlight">\(|r_{jj}|\)</span> of the pivoted triangular factor (ink) beside the singular values (amber), both on a logarithmic axis. Both fall by about nine orders of magnitude between positions 4 and 5, locating the numerical rank at 4 — and both do so by displaying a gap rather than by crossing any absolute threshold, which is why \texttt{matrix_rank} at its default tolerance reports 10 instead.</span><a class="headerlink" href="#fig-qr-pivoted" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-6">
+<h3>Validation 6<a class="headerlink" href="#validation-6" title="Link to this heading">#</a></h3>
+<p>The gap is checked in <strong>both</strong> the pivoted diagonal and the singular values,
+which are computed by unrelated algorithms and must locate the rank in the same
+place. The disagreement with <code class="docutils literal notranslate"><span class="pre">matrix_rank</span></code> is checked deliberately, because it
+is instructive rather than a defect: the default tolerance answers a different
+question, exactly as <a class="reference internal" href="../00-machine/floating-point.html"><span class="std std-doc">§0.2</span></a> established.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  pivoted QR satisfies A Pi = Q R (Eq. 6)   [max|Δ| = 1.55431e-15 (rtol=0, atol=1e-13)]
+✓  the pivoted diagonal is non-increasing, as Eq. 6 requires   [|r_jj| runs 9.72 down to 6.79e-10]
+✓  and drops by more than 10^8 between positions 4 and 5, locating rank 4   [ratio 4.97e+09, against a planted signal rank of 4]
+✓  the singular values show the same gap in the same place   [ratio 7.85e+09, computed by an unrelated algorithm]
+✓  matrix_rank gives 10 at its default tolerance and 4 at tol = 1e-8   [both correct: the default asks whether the floats are exact, the gap asks where the signal stops]
+✓  and the noiseless signal really does have rank 4, counted above an explicit threshold (a count at the default eps-scale tolerance would belong to the machine)   [got 4 vs expected 4 (rtol=0, atol=0)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p>Four constructions of the same factorization, distinguished entirely by what
+floating point does to them.</p>
+<p>The concrete results:</p>
+<ul class="simple">
+<li><p>classical and modified Gram–Schmidt agreed to <span class="math notranslate nohighlight">\(10^{-10}\)</span> at <span class="math notranslate nohighlight">\(\kappa = 10^{2}\)</span>,
+both reconstructing <span class="math notranslate nohighlight">\(A\)</span> to <span class="math notranslate nohighlight">\(10^{-13}\)</span> with exactly triangular <span class="math notranslate nohighlight">\(R\)</span>;</p></li>
+<li><p>across <span class="math notranslate nohighlight">\(\kappa = 10^{2}\)</span> to <span class="math notranslate nohighlight">\(10^{10}\)</span> the departure from orthonormality grew
+with fitted exponents <strong>2.02, 0.97 and 0.01</strong> for classical Gram–Schmidt,
+modified Gram–Schmidt and Householder against the theoretical 2, 1 and 0 —
+the classical version reaching <span class="math notranslate nohighlight">\(\|Q^{\top}Q - I\| = 2.3\)</span>, a <em>total</em> loss of
+orthogonality, while Householder stayed below <span class="math notranslate nohighlight">\(10^{-14}\)</span> throughout;</p></li>
+<li><p>and yet <strong>all three still reconstructed <span class="math notranslate nohighlight">\(A\)</span> to <span class="math notranslate nohighlight">\(10^{-13}\)</span> at every
+<span class="math notranslate nohighlight">\(\kappa\)</span></strong>: the factorization stays accurate while the claimed property of
+<span class="math notranslate nohighlight">\(Q\)</span> evaporates, which is what makes the failure hard to notice;</p></li>
+<li><p>the Householder reflector was symmetric, orthogonal and its own inverse to
+<span class="math notranslate nohighlight">\(10^{-14}\)</span>, cleared a column to <span class="math notranslate nohighlight">\(10^{-14}\)</span>, preserved length exactly, and its
+sign convention avoided a cancellation of more than <strong>ten orders of
+magnitude</strong> on a vector with a dominant first entry;</p></li>
+<li><p>a Givens rotation zeroed its target exactly, preserved the Frobenius norm,
+and left every other row <strong>bit-identical</strong> — the locality that makes it the
+right tool for Hessenberg matrices, five rotations triangularising a
+<span class="math notranslate nohighlight">\(6\times6\)</span> one;</p></li>
+<li><p>the economic <span class="math notranslate nohighlight">\(QR\)</span> gave <span class="math notranslate nohighlight">\(QQ^{\top}\)</span> equal to
+<a class="reference internal" href="projections-normal-equations.html"><span class="std std-doc">§2.1</span></a>’s projector to <span class="math notranslate nohighlight">\(10^{-13}\)</span>
+<strong>without forming <span class="math notranslate nohighlight">\(A^{\top}A\)</span> anywhere</strong>, and the full <span class="math notranslate nohighlight">\(Q\)</span>’s trailing columns
+gave <span class="math notranslate nohighlight">\(N(A^{\top})\)</span> at a fraction of the SVD’s cost;</p></li>
+<li><p>and column-pivoted <span class="math notranslate nohighlight">\(QR\)</span> on a rank-4-plus-<span class="math notranslate nohighlight">\(10^{-10}\)</span>-noise matrix produced a
+non-increasing diagonal with a gap of <span class="math notranslate nohighlight">\(3\times10^{9}\)</span> at position 4, matching
+the singular values’ gap computed by an unrelated algorithm — while
+<code class="docutils literal notranslate"><span class="pre">matrix_rank</span></code> at its default tolerance reported 10, which is a different
+question correctly answered.</p></li>
+</ul>
+<p>Methods met: <code class="docutils literal notranslate"><span class="pre">classical_gram_schmidt</span></code> and <code class="docutils literal notranslate"><span class="pre">modified_gram_schmidt</span></code> written from
+scratch, <code class="docutils literal notranslate"><span class="pre">householder_vector</span></code> with its sign convention, <code class="docutils literal notranslate"><span class="pre">givens_rotation</span></code> with
+<code class="docutils literal notranslate"><span class="pre">np.hypot</span></code>, <code class="docutils literal notranslate"><span class="pre">scipy.linalg.qr</span></code> in full, economic and <code class="docutils literal notranslate"><span class="pre">pivoting=True</span></code> modes, and
+the habit of fitting a power law only where the power law still operates.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Least squares, done properly.</strong> With <span class="math notranslate nohighlight">\(A = QR\)</span>, the normal equations
+collapse: <span class="math notranslate nohighlight">\(A^{\top}A\hat{\mathbf{x}} = A^{\top}\mathbf{b}\)</span> becomes
+<span class="math notranslate nohighlight">\(R\hat{\mathbf{x}} = Q^{\top}\mathbf{b}\)</span>, a triangular solve with no
+<span class="math notranslate nohighlight">\(A^{\top}A\)</span> and no squared condition number.
+<a class="reference internal" href="least-squares-four-ways.html"><span class="std std-doc">§2.3</span></a> measures what that is worth: four
+orders of magnitude by degree 14.</p></li>
+<li><p><strong>When even pivoted <span class="math notranslate nohighlight">\(QR\)</span> is not enough.</strong> The pivoted diagonal locates rank
+well but is not guaranteed to — there are matrices (Kahan’s) where it fails.
+The SVD is guaranteed, and <a class="reference internal" href="../04-svd/svd-geometry.html"><span class="std std-doc">§4.1</span></a> explains what
+it costs to have that guarantee.</p></li>
+<li><p><strong>Orthogonality in function space.</strong> Gram–Schmidt never used the fact that
+vectors are columns of numbers, only that there is an inner product. Running
+it on <span class="math notranslate nohighlight">\(\{1, x, x^2, \dots\}\)</span> under
+<a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html"><span class="std std-doc">§1.5</span></a>’s <span class="math notranslate nohighlight">\(L^2\)</span> inner product
+manufactures the Legendre polynomials, which is
+<a class="reference internal" href="function-space-bases.html"><span class="std std-doc">§2.5</span></a>.</p></li>
+<li><p><strong>Reflections as building blocks.</strong> Householder reflections reappear in
+<a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html"><span class="std std-doc">§5.2</span></a> reducing a matrix to
+Hessenberg form, which is the first half of every practical eigenvalue
+algorithm — and the Givens rotations of Exercise 4 are the second half.</p></li>
+</ul>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h3>
+<div class="docutils container" id="id5">
+<div role="list" class="citation-list">
+<div class="citation" id="id14" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">GVL13</a><span class="fn-bracket">]</span></span>
+<p>Gene H. Golub and Charles F. Van Loan. <em>Matrix Computations</em>. Johns Hopkins University Press, Baltimore, 4 edition, 2013.</p>
+</div>
+<div class="citation" id="id16" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Hig02<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id3">1</a>,<a role="doc-backlink" href="#id4">2</a>)</span>
+<p>Nicholas J. Higham. <em>Accuracy and Stability of Numerical Algorithms</em>. SIAM, Philadelphia, 2 edition, 2002. <a class="reference external" href="https://doi.org/10.1137/1.9780898718027">doi:10.1137/1.9780898718027</a>.</p>
+</div>
+<div class="citation" id="id13" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">TB97</a><span class="fn-bracket">]</span></span>
+<p>Lloyd N. Trefethen and David Bau, III. <em>Numerical Linear Algebra</em>. SIAM, Philadelphia, 1997. <a class="reference external" href="https://doi.org/10.1137/1.9780898719574">doi:10.1137/1.9780898719574</a>.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/02-orthogonality"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="projections-normal-equations.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">2.1 Projections and the Normal Equations</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="least-squares-four-ways.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">2.3 Least Squares Four Ways</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-qr-is">What <span class="math notranslate nohighlight">\(QR\)</span> is</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gramschmidt-twice">Gram–Schmidt, twice</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#householder">Householder</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#givens">Givens</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#column-pivoting">Column pivoting</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-two-gramschmidts-one-line-apart">Exercise 1: Two Gram–Schmidts, one line apart</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-experiment-that-separates-them">Exercise 2: The experiment that separates them</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-householder-building-q-out-of-reflections">Exercise 3: Householder: building <span class="math notranslate nohighlight">\(Q\)</span> out of reflections</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-givens-one-entry-at-a-time">Exercise 4: Givens: one entry at a time</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-two-shapes-and-what-r-knows">Exercise 5: Two shapes, and what <span class="math notranslate nohighlight">\(R\)</span> knows</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-pivoting-and-the-prologue-s-question-answered">Exercise 6: Pivoting, and the Prologue’s question answered</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

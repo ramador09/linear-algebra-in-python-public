@@ -1,0 +1,1613 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="0.3 Vectors: Geometry, Norms, and Inner Products" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/00-machine/vectors-norms-inner-products.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: One operation carries most of the geometry in this course. The inner product takes two vectors and returns a number, and from that number ..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: One operation carries most of the geometry in this course. The inner product takes two vectors and returns a number, and from that number ..." />
+
+    <title>0.3 Vectors: Geometry, Norms, and Inner Products &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/00-machine/vectors-norms-inner-products';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/00-machine/vectors-norms-inner-products.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Chapter I — Matrices, Elimination, and Subspaces" href="../01-matrices/index.html" />
+    <link rel="prev" title="0.2 Floating-Point Reality and the Tolerance Habit" href="floating-point.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter 0 — The Array and the Machine</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/00-machine/vectors-norms-inner-products.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/00-machine/vectors-norms-inner-products.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/00-machine/vectors-norms-inner-products.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/00-machine/vectors-norms-inner-products.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>0.3 Vectors: Geometry, Norms, and Inner Products</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-inner-product-and-the-four-things-it-defines">The inner product, and the four things it defines</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#other-norms">Other norms</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#projection">Projection</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-three-routes-to-one-number">Exercise 1: Three routes to one number</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-length-angle-and-the-inequality-that-makes-angles-exist">Exercise 2: Length, angle, and the inequality that makes angles exist</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-three-norms-and-the-shapes-of-their-unit-balls">Exercise 3: The three norms, and the shapes of their unit balls</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-computing-a-length-without-destroying-it">Exercise 4: Computing a length without destroying it</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-projection-and-the-right-angle-that-runs-the-course">Exercise 5: Projection, and the right angle that runs the course</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-cosine-similarity-a-document-becomes-a-direction">Exercise 6: Cosine similarity: a document becomes a direction</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-7-complex-vectors-and-a-conjugate-that-is-not-optional">Exercise 7: Complex vectors, and a conjugate that is not optional</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-7">Validation 7</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="vectors-geometry-norms-and-inner-products">
+<h1>0.3 Vectors: Geometry, Norms, and Inner Products<a class="headerlink" href="#vectors-geometry-norms-and-inner-products" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter 0 — The Array and the Machine
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;0.3
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">The dot product and everything it buys: length, angle, orthogonality, projection, and the cosine similarity that turns a document into a direction.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;introductory&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;60–90 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p>One operation carries most of the geometry in this course. The inner product
+takes two vectors and returns a number, and from that number alone come length,
+angle, perpendicularity, projection, and the notion of “closest point” that
+Chapter II is built on. It is worth an hour to establish it carefully, because
+every later chapter spends it: least squares is a projection, the spectral
+theorem is a statement about orthogonal directions, and the cosine similarity
+that ranks search results is the same formula with the vectors normalised.</p>
+<p>The notebook is elementary and it is not padding. Three things in it regularly
+surprise people who have used NumPy for years. Computing a length by the
+obvious formula <span class="math notranslate nohighlight">\(\sqrt{\sum x_i^2}\)</span> overflows for perfectly reasonable inputs,
+and so does <code class="docutils literal notranslate"><span class="pre">np.linalg.norm</span></code>, while <code class="docutils literal notranslate"><span class="pre">math.hypot</span></code> does not. The angle formula
+through <code class="docutils literal notranslate"><span class="pre">arccos</span></code> is numerically poor near <span class="math notranslate nohighlight">\(0\)</span> and <span class="math notranslate nohighlight">\(\pi\)</span>, exactly where you most
+want it. And the cosine similarity between two documents built from raw word
+counts is dominated almost entirely by the word “the”, which is the reason
+<a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html"><span class="std std-doc">§8.4</span></a> exists.</p>
+<p>We build the dot product three ways (Exercise 1), extract length and angle from
+it (Exercise 2), meet the family of norms (Exercise 3), compute one safely
+(Exercise 4), split a vector into parallel and perpendicular parts (Exercise
+5), apply the whole apparatus to text (Exercise 6), and extend it to complex
+vectors, where a conjugate that looks optional turns out not to be (Exercise 7).</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate — a genuine error, a valid convention difference, or
+a tolerance set too tight — never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> A working review. For the abstract treatment of inner-product
+spaces, Axler <span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id6" title="Sheldon Axler. Linear Algebra Done Right. Undergraduate Texts in Mathematics. Springer, 4 edition, 2024. doi:10.1007/978-3-031-41026-0.">Axl24</a>]</span> Chapter 6; for the applied register and the
+document-vector application, Boyd and Vandenberghe <span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id7" title="Stephen Boyd and Lieven Vandenberghe. Introduction to Applied Linear Algebra: Vectors, Matrices, and Least Squares. Cambridge University Press, 2018. doi:10.1017/9781108583664.">BV18</a>]</span>
+Chapters 1–3.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="the-inner-product-and-the-four-things-it-defines">
+<h3>The inner product, and the four things it defines<a class="headerlink" href="#the-inner-product-and-the-four-things-it-defines" title="Link to this heading">#</a></h3>
+<p>For <span class="math notranslate nohighlight">\(\mathbf{x}, \mathbf{y} \in \mathbb{R}^n\)</span> the <strong>inner product</strong> is</p>
+<div class="math notranslate nohighlight" id="equation-eq-vectors-dot">
+<span class="eqno">(26)<a class="headerlink" href="#equation-eq-vectors-dot" title="Link to this equation">#</a></span>\[\mathbf{x}^{\top}\mathbf{y} \;=\; \sum_{i=1}^{n} x_i y_i .\]</div>
+<p>It is symmetric, linear in each argument, and positive definite
+(<span class="math notranslate nohighlight">\(\mathbf{x}^{\top}\mathbf{x} &gt; 0\)</span> unless <span class="math notranslate nohighlight">\(\mathbf{x} = \mathbf{0}\)</span>). Those
+three properties are the entire definition of an inner product, and
+<a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html"><span class="std std-doc">§1.5</span></a> will use them on spaces
+whose elements are polynomials rather than columns of numbers.</p>
+<p>Everything geometric follows. The <strong>length</strong> is</p>
+<div class="math notranslate nohighlight" id="equation-eq-vectors-norm">
+<span class="eqno">(27)<a class="headerlink" href="#equation-eq-vectors-norm" title="Link to this equation">#</a></span>\[\|\mathbf{x}\|_2 \;=\; \sqrt{\mathbf{x}^{\top}\mathbf{x}},\]</div>
+<p>the <strong>angle</strong> <span class="math notranslate nohighlight">\(\theta\)</span> between two nonzero vectors satisfies</p>
+<div class="math notranslate nohighlight" id="equation-eq-vectors-angle">
+<span class="eqno">(28)<a class="headerlink" href="#equation-eq-vectors-angle" title="Link to this equation">#</a></span>\[\cos\theta \;=\; \frac{\mathbf{x}^{\top}\mathbf{y}}{\|\mathbf{x}\|_2\,\|\mathbf{y}\|_2},\]</div>
+<p>and <strong>orthogonality</strong> is the case <span class="math notranslate nohighlight">\(\mathbf{x}^{\top}\mathbf{y} = 0\)</span>. For
+<a class="reference internal" href="#equation-eq-vectors-angle">Eq. 28</a> to define an angle at all, the ratio must lie in
+<span class="math notranslate nohighlight">\([-1, 1]\)</span>, which is the <strong>Cauchy–Schwarz inequality</strong></p>
+<div class="math notranslate nohighlight" id="equation-eq-vectors-cauchy">
+<span class="eqno">(29)<a class="headerlink" href="#equation-eq-vectors-cauchy" title="Link to this equation">#</a></span>\[|\mathbf{x}^{\top}\mathbf{y}| \;\le\; \|\mathbf{x}\|_2\,\|\mathbf{y}\|_2 ,\]</div>
+<p>with equality exactly when the vectors are parallel. The triangle inequality
+<span class="math notranslate nohighlight">\(\|\mathbf{x}+\mathbf{y}\| \le \|\mathbf{x}\| + \|\mathbf{y}\|\)</span> follows from it
+in two lines.</p>
+</section>
+<section id="other-norms">
+<h3>Other norms<a class="headerlink" href="#other-norms" title="Link to this heading">#</a></h3>
+<p>The Euclidean length is one member of a family. For <span class="math notranslate nohighlight">\(p \ge 1\)</span>,</p>
+<div class="math notranslate nohighlight" id="equation-eq-vectors-pnorm">
+<span class="eqno">(30)<a class="headerlink" href="#equation-eq-vectors-pnorm" title="Link to this equation">#</a></span>\[\|\mathbf{x}\|_p = \Big(\sum_i |x_i|^p\Big)^{1/p},
+\qquad \|\mathbf{x}\|_\infty = \max_i |x_i| ,\]</div>
+<p>and the three that matter are <span class="math notranslate nohighlight">\(p = 1\)</span> (the sum of magnitudes, whose unit ball
+is a diamond), <span class="math notranslate nohighlight">\(p = 2\)</span> (Euclidean, a circle), and <span class="math notranslate nohighlight">\(p = \infty\)</span> (the largest
+component, a square). They are equivalent in the sense that each bounds the
+others,</p>
+<div class="math notranslate nohighlight" id="equation-eq-vectors-equivalence">
+<span class="eqno">(31)<a class="headerlink" href="#equation-eq-vectors-equivalence" title="Link to this equation">#</a></span>\[\|\mathbf{x}\|_\infty \le \|\mathbf{x}\|_2 \le \|\mathbf{x}\|_1
+\le \sqrt{n}\,\|\mathbf{x}\|_2 ,\]</div>
+<p>so which one you use never changes whether something converges, only how fast
+the number shrinks. Only <span class="math notranslate nohighlight">\(p = 2\)</span> comes from an inner product, which is why it
+is the one with angles.</p>
+</section>
+<section id="projection">
+<h3>Projection<a class="headerlink" href="#projection" title="Link to this heading">#</a></h3>
+<p>The component of <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> along a nonzero direction <span class="math notranslate nohighlight">\(\mathbf{a}\)</span> is</p>
+<div class="math notranslate nohighlight" id="equation-eq-vectors-projection">
+<span class="eqno">(32)<a class="headerlink" href="#equation-eq-vectors-projection" title="Link to this equation">#</a></span>\[\mathbf{p} = \frac{\mathbf{a}^{\top}\mathbf{b}}{\mathbf{a}^{\top}\mathbf{a}}\,\mathbf{a},
+\qquad \mathbf{e} = \mathbf{b} - \mathbf{p},\]</div>
+<p>and a one-line calculation gives <span class="math notranslate nohighlight">\(\mathbf{a}^{\top}\mathbf{e} = 0\)</span>: the
+residual is orthogonal to the direction, always. That single fact is the whole
+of least squares, and <a class="reference internal" href="#equation-eq-vectors-projection">Eq. 32</a> becomes the projection matrix
+of <a class="reference internal" href="../02-orthogonality/projections-normal-equations.html"><span class="std std-doc">§2.1</span></a> once
+<span class="math notranslate nohighlight">\(\mathbf{a}\)</span> is replaced by a matrix. Since <span class="math notranslate nohighlight">\(\mathbf{p} \perp \mathbf{e}\)</span>,
+Pythagoras applies:</p>
+<div class="math notranslate nohighlight" id="equation-eq-vectors-pythagoras">
+<span class="eqno">(33)<a class="headerlink" href="#equation-eq-vectors-pythagoras" title="Link to this equation">#</a></span>\[\|\mathbf{b}\|_2^2 = \|\mathbf{p}\|_2^2 + \|\mathbf{e}\|_2^2 .\]</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data only: the seeded rng, print options, and the machine epsilon. Both of
+this notebook’s own
+methods — the loop inner product and the overflow-safe norm — are built in
+Exercises 1 and 4, where they are the lesson.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">norm</span> <span class="k">as</span> <span class="n">scipy_norm</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">draw</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">la</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random vector below comes from this seed</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-three-routes-to-one-number">
+<h2>Exercise 1: Three routes to one number<a class="headerlink" href="#exercise-1-three-routes-to-one-number" title="Link to this heading">#</a></h2>
+<p>The inner product <a class="reference internal" href="#equation-eq-vectors-dot">Eq. 26</a> is the most-executed operation in
+numerical linear algebra: a matrix–vector product is <span class="math notranslate nohighlight">\(m\)</span> of them, a
+matrix–matrix product is <span class="math notranslate nohighlight">\(mn\)</span> of them. It is worth knowing the three ways to
+write it and that they agree.</p>
+<p>Take the explicit vectors</p>
+<div class="math notranslate nohighlight" id="equation-eq-vectors-example">
+<span class="eqno">(34)<a class="headerlink" href="#equation-eq-vectors-example" title="Link to this equation">#</a></span>\[\mathbf{x} = (1,\, -2,\, 3,\, 0,\, 4)^{\top}, \qquad
+\mathbf{y} = (2,\, 1,\, -1,\, 5,\, 2)^{\top},\]</div>
+<p>for which <a class="reference internal" href="#equation-eq-vectors-dot">Eq. 26</a> gives
+<span class="math notranslate nohighlight">\(1\cdot2 + (-2)\cdot1 + 3\cdot(-1) + 0\cdot5 + 4\cdot2 = 2 - 2 - 3 + 0 + 8 = 5\)</span>.
+Because these are small integers, <code class="docutils literal notranslate"><span class="pre">float64</span></code> stores them exactly and all three
+routes must return exactly <span class="math notranslate nohighlight">\(5.0\)</span> with no rounding whatsoever.</p>
+<p><strong>Part a)</strong> Compute <span class="math notranslate nohighlight">\(\mathbf{x}^{\top}\mathbf{y}\)</span> with the <code class="docutils literal notranslate"><span class="pre">loop_dot</span></code> helper
+you write here as a literal loop, with <code class="docutils literal notranslate"><span class="pre">np.dot</span></code>, and with
+<code class="docutils literal notranslate"><span class="pre">np.einsum(&quot;i,i-&gt;&quot;,</span> <span class="pre">x,</span> <span class="pre">y)</span></code>, and
+confirm all three give exactly <span class="math notranslate nohighlight">\(5.0\)</span>.</p>
+<p><strong>Part b)</strong> Confirm the equivalent spellings <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">&#64;</span> <span class="pre">y</span></code> and <code class="docutils literal notranslate"><span class="pre">np.sum(x</span> <span class="pre">*</span> <span class="pre">y)</span></code> agree
+too, and note that the latter allocates a temporary array of length <span class="math notranslate nohighlight">\(n\)</span> while
+the former does not.</p>
+<p><strong>Part c)</strong> Time the loop and <code class="docutils literal notranslate"><span class="pre">np.dot</span></code> on 200,000-element slices of the
+seeded standard-normal draw and report the ratio between them. State the flop count from
+<code class="docutils literal notranslate"><span class="pre">ecp.linalg.flops(&quot;dot&quot;,</span> <span class="pre">n)</span></code> and check it against <span class="math notranslate nohighlight">\(2n\)</span>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  loop_dot(x, y)             = np.float64(5.0)
+  np.dot(x, y)               = 5.0
+  np.einsum(&quot;i,i-&gt;&quot;, x, y)   = 5.0
+  x @ y                      = 5.0
+  np.sum(x * y)              = 5.0
+
+all exactly 5.0: True
+
+n = 200,000:  loop    35.38 ms   np.dot   0.0518 ms   ratio 683x
+flops(dot, 200000) = 400,000  (= 2n)
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<p>Exact equality is the right check here, not a tolerance: the entries of
+<a class="reference internal" href="#equation-eq-vectors-example">Eq. 34</a> are small integers, so every product and every partial
+sum is representable, and any deviation would be a genuine bug rather than
+rounding.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  all five spellings of the inner product return exactly 5.0   [small integers are exact in float64, so no tolerance is needed]
+✓  np.dot and einsum agree on a 2,000,000-element inner product   [got -903.795 vs expected -903.795 (rtol=1e-09, atol=0)]
+✓  the flop count of an inner product is 2n   [got 400000 vs expected 400000 (rtol=0, atol=0)]
+✓  the Python loop is more than 50x slower than np.dot   [measured 683x at n = 200,000]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-length-angle-and-the-inequality-that-makes-angles-exist">
+<h2>Exercise 2: Length, angle, and the inequality that makes angles exist<a class="headerlink" href="#exercise-2-length-angle-and-the-inequality-that-makes-angles-exist" title="Link to this heading">#</a></h2>
+<p>The angle formula <a class="reference internal" href="#equation-eq-vectors-angle">Eq. 28</a> only defines an angle because
+Cauchy–Schwarz <a class="reference internal" href="#equation-eq-vectors-cauchy">Eq. 29</a> guarantees the ratio never leaves
+<span class="math notranslate nohighlight">\([-1,1]\)</span>. That guarantee is exact in mathematics and <em>not quite</em> exact in
+floating point, which matters: <code class="docutils literal notranslate"><span class="pre">np.arccos</span></code> of anything slightly above 1 returns
+<code class="docutils literal notranslate"><span class="pre">nan</span></code>, and for nearly parallel vectors the computed ratio can exceed 1 by a
+rounding error. Any angle routine that will meet real data must clip.</p>
+<p>There is a second, subtler problem with computing angles this way. Near
+<span class="math notranslate nohighlight">\(\theta = 0\)</span> the cosine is flat — <span class="math notranslate nohighlight">\(\cos\theta \approx 1 - \theta^2/2\)</span> — so an
+error of <span class="math notranslate nohighlight">\(\varepsilon\)</span> in the cosine becomes an error of <span class="math notranslate nohighlight">\(\sqrt{2\varepsilon}
+\approx 2\times10^{-8}\)</span> in the angle. That is eight digits lost, and it is the
+same cancellation <a class="reference internal" href="floating-point.html"><span class="std std-doc">§0.2</span></a> met in the Gram determinant. The repair used in practice
+is <code class="docutils literal notranslate"><span class="pre">np.arctan2</span></code> of the perpendicular and parallel components, which stays
+accurate everywhere.</p>
+<p><strong>Part a)</strong> Verify <a class="reference internal" href="#equation-eq-vectors-cauchy">Eq. 29</a> and the triangle inequality on
+<span class="math notranslate nohighlight">\(10^4\)</span> random pairs from <code class="docutils literal notranslate"><span class="pre">rng.standard_normal((10_000,</span> <span class="pre">5))</span></code>, computing the
+inner products with <code class="docutils literal notranslate"><span class="pre">np.einsum(&quot;ij,ij-&gt;i&quot;,</span> <span class="pre">U,</span> <span class="pre">V)</span></code> and the lengths with
+<code class="docutils literal notranslate"><span class="pre">np.linalg.norm(...,</span> <span class="pre">axis=1)</span></code>. Report the largest observed ratio
+<span class="math notranslate nohighlight">\(|\mathbf{u}^{\top}\mathbf{v}|/(\|\mathbf{u}\|\|\mathbf{v}\|)\)</span> and confirm no
+pair exceeds 1.</p>
+<p><strong>Part b)</strong> Confirm equality holds in Cauchy–Schwarz exactly when the vectors
+are parallel, by testing the specific pair <span class="math notranslate nohighlight">\(\mathbf{u} = (1,2,3)^{\top}\)</span> and
+<span class="math notranslate nohighlight">\(\mathbf{v} = -2\mathbf{u}\)</span>, where the ratio must be exactly 1.</p>
+<p><strong>Part c)</strong> Compare the two angle routines on the pair <span class="math notranslate nohighlight">\(\mathbf{a} = (1,0)\)</span> and
+<span class="math notranslate nohighlight">\(\mathbf{b} = (\cos\theta, \sin\theta)\)</span> for <span class="math notranslate nohighlight">\(\theta = 10^{-2},\dots,10^{-8}\)</span>:
+the <code class="docutils literal notranslate"><span class="pre">arccos</span></code> form of <a class="reference internal" href="#equation-eq-vectors-angle">Eq. 28</a> against
+<code class="docutils literal notranslate"><span class="pre">np.arctan2(|a_1</span> <span class="pre">b_2</span> <span class="pre">-</span> <span class="pre">a_2</span> <span class="pre">b_1|,</span> <span class="pre">a·b)</span></code>. Report the relative error of each
+against the exact <span class="math notranslate nohighlight">\(\theta\)</span>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cauchy-Schwarz over 10,000 pairs:
+  largest |u.v| / (||u|| ||v||) : 0.988067757449
+  pairs exceeding 1             : 0
+  triangle inequality holds     : True
+
+parallel pair ratio: 1.00000000000000000
+
+  theta      rel err (arccos)   rel err (arctan2)
+1e-02      1.442e-13          0.000e+00
+1e-03      7.831e-12          0.000e+00
+1e-04      2.622e-09          0.000e+00
+1e-05      4.137e-08          0.000e+00
+1e-06      6.657e-05          0.000e+00
+1e-07      3.997e-04          0.000e+00
+1e-08      1.000e+00          0.000e+00
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<p>Cauchy–Schwarz is checked as a strict bound over the whole sample rather than
+on one pair, and the parallel case is checked as exact equality. The angle
+comparison is checked as an ordering — <code class="docutils literal notranslate"><span class="pre">arctan2</span></code> must beat <code class="docutils literal notranslate"><span class="pre">arccos</span></code> by orders
+of magnitude at the smallest angle — which is the robust form of the claim.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  Cauchy-Schwarz holds for all 10,000 random pairs   [largest ratio 0.988067757449]
+✓  and so does the triangle inequality   [both follow from positive definiteness of the inner product]
+✓  equality holds exactly for parallel vectors   [got 1 vs expected 1 (rtol=0, atol=1e-15)]
+✓  arctan2 beats arccos by &gt;1000x for the angle at theta = 1e-8   [arccos 1.00e+00 vs arctan2 0.00e+00: the cosine is flat near 0, so inverting it loses half the digits]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-the-three-norms-and-the-shapes-of-their-unit-balls">
+<h2>Exercise 3: The three norms, and the shapes of their unit balls<a class="headerlink" href="#exercise-3-the-three-norms-and-the-shapes-of-their-unit-balls" title="Link to this heading">#</a></h2>
+<p>The Euclidean length is one of a family <a class="reference internal" href="#equation-eq-vectors-pnorm">Eq. 30</a>, and the other
+members are not curiosities. The <span class="math notranslate nohighlight">\(1\)</span>-norm is what makes LASSO regression select
+variables, and it reappears in
+<a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html"><span class="std std-doc">§2.4</span></a> as the
+regularizer that produces sparse solutions; the <span class="math notranslate nohighlight">\(\infty\)</span>-norm is the natural
+measure of worst-case error and is how
+<a class="reference internal" href="../05-numerical/norms-conditioning-stability.html"><span class="std std-doc">§5.1</span></a> states its bounds.</p>
+<p>The clearest way to see the difference is the <strong>unit ball</strong>, the set
+<span class="math notranslate nohighlight">\(\{\mathbf{x} : \|\mathbf{x}\|_p \le 1\}\)</span>. For <span class="math notranslate nohighlight">\(p=2\)</span> it is a disc; for <span class="math notranslate nohighlight">\(p=1\)</span> a
+diamond with vertices on the axes; for <span class="math notranslate nohighlight">\(p=\infty\)</span> a square. The chain
+<a class="reference internal" href="#equation-eq-vectors-equivalence">Eq. 31</a> is the statement that the diamond sits inside the
+disc which sits inside the square, and that the square is not more than
+<span class="math notranslate nohighlight">\(\sqrt{n}\)</span> times bigger than the diamond.</p>
+<p>The corners matter. The <span class="math notranslate nohighlight">\(1\)</span>-norm ball has its extreme points <em>on the axes</em>,
+which is exactly why minimising a <span class="math notranslate nohighlight">\(1\)</span>-norm subject to a constraint tends to
+land on a point with zeros in it, and the <span class="math notranslate nohighlight">\(2\)</span>-norm ball, being round, does not.</p>
+<p><strong>Part a)</strong> For the explicit vector <span class="math notranslate nohighlight">\(\mathbf{x} = (3, -4, 12)^{\top}\)</span>, compute
+<span class="math notranslate nohighlight">\(\|\mathbf{x}\|_1\)</span>, <span class="math notranslate nohighlight">\(\|\mathbf{x}\|_2\)</span>, and <span class="math notranslate nohighlight">\(\|\mathbf{x}\|_\infty\)</span> from
+<a class="reference internal" href="#equation-eq-vectors-pnorm">Eq. 30</a> by hand (as <code class="docutils literal notranslate"><span class="pre">np.sum(np.abs(x))</span></code>,
+<code class="docutils literal notranslate"><span class="pre">np.sqrt(x</span> <span class="pre">&#64;</span> <span class="pre">x)</span></code>, <code class="docutils literal notranslate"><span class="pre">np.max(np.abs(x))</span></code>) and against
+<code class="docutils literal notranslate"><span class="pre">np.linalg.norm(x,</span> <span class="pre">ord=...)</span></code>. The exact answers are <span class="math notranslate nohighlight">\(19\)</span>, <span class="math notranslate nohighlight">\(13\)</span>, and <span class="math notranslate nohighlight">\(12\)</span>.</p>
+<p><strong>Part b)</strong> Verify the chain <a class="reference internal" href="#equation-eq-vectors-equivalence">Eq. 31</a> on <span class="math notranslate nohighlight">\(1000\)</span> random
+vectors in <span class="math notranslate nohighlight">\(\mathbb{R}^7\)</span> from <code class="docutils literal notranslate"><span class="pre">rng.standard_normal((1000,</span> <span class="pre">7))</span></code>, and report
+how tight each inequality gets.</p>
+<p><strong>Part c)</strong> Draw the three unit balls in <span class="math notranslate nohighlight">\(\mathbb{R}^2\)</span> on one axes, marking
+the four extreme points of the <span class="math notranslate nohighlight">\(1\)</span>-norm ball, which are the ones that carry
+zeros.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>      by hand    np.linalg.norm    exact
+p=1     19.0000        19.0000       19.0
+p=2     13.0000        13.0000       13.0
+p=inf   12.0000        12.0000       12.0
+
+over 1000 random vectors in R^7:
+  ||x||_inf &lt;= ||x||_2       : True   tightest ratio 0.9696
+  ||x||_2   &lt;= ||x||_1       : True   tightest ratio 0.6756
+  ||x||_1   &lt;= sqrt(7)||x||_2: True   tightest ratio 0.9876
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-vectors-unit-balls">
+<img alt="../../_images/79aef1dfe80020f65ed065c26fb010cc4c6abf3c6eda14117716e382431082d7.png" src="../../_images/79aef1dfe80020f65ed065c26fb010cc4c6abf3c6eda14117716e382431082d7.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 14 </span><span class="caption-text">The unit balls <span class="math notranslate nohighlight">\(\{\mathbf{x}\in\mathbb{R}^2 : \|\mathbf{x}\|_p \le 1\}\)</span> for <span class="math notranslate nohighlight">\(p = 1\)</span> (diamond), <span class="math notranslate nohighlight">\(p = 2\)</span> (disc), and <span class="math notranslate nohighlight">\(p = \infty\)</span> (square), nested as the equivalence chain of Eq. 6 requires; the amber points are the four extreme points of the <span class="math notranslate nohighlight">\(1\)</span>-norm ball, each of which has a zero component, which is why minimising a <span class="math notranslate nohighlight">\(1\)</span>-norm favours sparse answers.</span><a class="headerlink" href="#fig-vectors-unit-balls" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<p>The three norms of a specific vector are checked against their exact integer
+values, which is possible because <span class="math notranslate nohighlight">\((3,-4,12)\)</span> was chosen as a Pythagorean
+quadruple. The equivalence chain is checked across the whole sample and both
+of its ends are confirmed to be attained, so the constants are shown to be
+sharp rather than merely valid.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the three norms of (3, -4, 12) are exactly 19, 13, and 12   [max|Δ| = 0 (rtol=0, atol=1e-14)]
+✓  the equivalence chain of Eq. 6 holds for all 1000 random vectors   [no norm is more than sqrt(n) from any other]
+✓  the sqrt(n) constant is attained exactly at the all-ones vector   [got 1 vs expected 1 (rtol=0, atol=1e-14)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-computing-a-length-without-destroying-it">
+<h2>Exercise 4: Computing a length without destroying it<a class="headerlink" href="#exercise-4-computing-a-length-without-destroying-it" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-vectors-norm">Eq. 27</a> says <span class="math notranslate nohighlight">\(\|\mathbf{x}\|_2 = \sqrt{\sum x_i^2}\)</span>, and writing
+that formula directly is the most natural thing in the world. It is also
+wrong for a range of perfectly ordinary inputs, and — this is the part worth
+knowing — <strong><code class="docutils literal notranslate"><span class="pre">np.linalg.norm</span></code> is wrong in the same way</strong>, because it computes
+<code class="docutils literal notranslate"><span class="pre">x.dot(x)</span></code> internally.</p>
+<p>The failure is squaring. A <code class="docutils literal notranslate"><span class="pre">float64</span></code> holds magnitudes up to about
+<span class="math notranslate nohighlight">\(1.8\times10^{308}\)</span>, so <span class="math notranslate nohighlight">\(x_i^2\)</span> overflows to infinity once <span class="math notranslate nohighlight">\(|x_i|\)</span> passes about
+<span class="math notranslate nohighlight">\(1.3\times10^{154}\)</span>, and underflows to zero once <span class="math notranslate nohighlight">\(|x_i|\)</span> drops below about
+<span class="math notranslate nohighlight">\(1.5\times10^{-162}\)</span>. Both are well inside the range the vector itself can
+represent. So <span class="math notranslate nohighlight">\(\|(10^{200},\, 2\times10^{200},\, 2\times10^{200})\|_2\)</span>, whose
+exact value is <span class="math notranslate nohighlight">\(3\times10^{200}\)</span> and is perfectly representable, comes back as
+<code class="docutils literal notranslate"><span class="pre">inf</span></code>.</p>
+<p>The repair is one line and is what every serious library does: divide by the
+largest magnitude first, so every square lies in <span class="math notranslate nohighlight">\([0,1]\)</span>, then multiply the
+scale back in. Write <code class="docutils literal notranslate"><span class="pre">scaled_norm(x)</span></code> to do exactly that.</p>
+<p><strong>Write this one yourself</strong> — the implementation is the lesson.
+<code class="docutils literal notranslate"><span class="pre">math.hypot</span></code> uses the same idea and, since Python 3.8, accepts any number of
+arguments. <code class="docutils literal notranslate"><span class="pre">scipy.linalg.norm</span></code> also protects itself; <code class="docutils literal notranslate"><span class="pre">np.linalg.norm</span></code> does not.</p>
+<p><strong>Part a)</strong> For <span class="math notranslate nohighlight">\(\mathbf{v} = (10^{200},\, 2\times10^{200},\, 2\times10^{200})\)</span>,
+whose exact norm is <span class="math notranslate nohighlight">\(3\times10^{200}\)</span>, evaluate the naive
+<code class="docutils literal notranslate"><span class="pre">np.sqrt(np.sum(v**2))</span></code>, <code class="docutils literal notranslate"><span class="pre">np.linalg.norm(v)</span></code>, <code class="docutils literal notranslate"><span class="pre">scipy.linalg.norm(v)</span></code>,
+<code class="docutils literal notranslate"><span class="pre">math.hypot(*v)</span></code>, and the <code class="docutils literal notranslate"><span class="pre">scaled_norm</span></code> helper. Report which return <code class="docutils literal notranslate"><span class="pre">inf</span></code>.</p>
+<p><strong>Part b)</strong> Repeat with <span class="math notranslate nohighlight">\(\mathbf{w} = (10^{-200},\, 2\times10^{-200},\,
+2\times10^{-200})\)</span>, exact norm <span class="math notranslate nohighlight">\(3\times10^{-200}\)</span>, and report which return <span class="math notranslate nohighlight">\(0\)</span>.</p>
+<p><strong>Part c)</strong> Confirm that on an ordinary vector — <code class="docutils literal notranslate"><span class="pre">rng.standard_normal(1000)</span></code> —
+all five routes agree to a relative <span class="math notranslate nohighlight">\(10^{-14}\)</span>, so the protection costs nothing
+in accuracy and is only ever insurance.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>overflow test:  v = (1e200, 2e200, 2e200),  exact norm 3e200
+  np.sqrt(np.sum(v**2))    inf  &lt;- FAILS
+  np.linalg.norm(v)        inf  &lt;- FAILS
+  scipy.linalg.norm(v)     3.000000e+200
+  math.hypot(*v)           3.000000e+200
+  scaled_norm(v)           3.000000e+200
+
+underflow test: w = (1e-200, 2e-200, 2e-200),  exact norm 3e-200
+  np.sqrt(np.sum(v**2))    0.000000e+00  &lt;- FAILS
+  np.linalg.norm(v)        0.000000e+00  &lt;- FAILS
+  scipy.linalg.norm(v)     3.000000e-200
+  math.hypot(*v)           3.000000e-200
+  scaled_norm(v)           3.000000e-200
+
+ordinary vector: all five agree to 2.21e-16 relative
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<p>The failures are asserted as exactly what they are — <code class="docutils literal notranslate"><span class="pre">inf</span></code> and <code class="docutils literal notranslate"><span class="pre">0.0</span></code>, not
+merely “inaccurate” — and the protected routes are required to hit the exact
+answers <span class="math notranslate nohighlight">\(3\times10^{\pm200}\)</span> to a relative <span class="math notranslate nohighlight">\(10^{-15}\)</span>. The last check is what
+makes the advice actionable: the safe routines lose nothing on ordinary input.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  both the naive formula AND np.linalg.norm overflow to inf   [np.linalg.norm computes x.dot(x), so it squares before it scales]
+✓  hypot, scaled_norm and scipy.linalg.norm all return exactly 3e200   [max|Δ| = 0 (rtol=1e-15, atol=0)]
+✓  and at the small end np.linalg.norm underflows to 0 where hypot does not   [hypot returned 3.000e-200 against an exact 3e-200]
+✓  on an ordinary vector all five routes agree to 1e-14 relative   [the protection is insurance, not a trade-off]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/runner/work/linear-algebra-in-python/linear-algebra-in-python/ecp/validate.py:143: RuntimeWarning: overflow encountered in divide
+  ratios = np.where(err_elem &gt; 0, allowed_elem / np.maximum(err_elem, 1e-300),
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-projection-and-the-right-angle-that-runs-the-course">
+<h2>Exercise 5: Projection, and the right angle that runs the course<a class="headerlink" href="#exercise-5-projection-and-the-right-angle-that-runs-the-course" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-vectors-projection">Eq. 32</a> splits any vector <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> into a part along a
+direction <span class="math notranslate nohighlight">\(\mathbf{a}\)</span> and a part perpendicular to it. The whole of Chapter II
+is this picture with <span class="math notranslate nohighlight">\(\mathbf{a}\)</span> replaced by a matrix, so it is worth
+establishing every property here where they can be checked by hand.</p>
+<p>The one that matters is <span class="math notranslate nohighlight">\(\mathbf{a}^{\top}\mathbf{e} = 0\)</span>: whatever
+<span class="math notranslate nohighlight">\(\mathbf{b}\)</span> and <span class="math notranslate nohighlight">\(\mathbf{a}\)</span> are, the residual comes out orthogonal to the
+direction. It is not an approximation or a design goal; it is forced by the
+choice of coefficient in <a class="reference internal" href="#equation-eq-vectors-projection">Eq. 32</a>, and it is what makes
+<span class="math notranslate nohighlight">\(\mathbf{p}\)</span> the <em>closest</em> point of the line to <span class="math notranslate nohighlight">\(\mathbf{b}\)</span>. Everything else
+follows: Pythagoras <a class="reference internal" href="#equation-eq-vectors-pythagoras">Eq. 33</a>, the fact that projecting twice
+changes nothing, and the least-squares normal equations.</p>
+<p>Use the concrete pair</p>
+<div class="math notranslate nohighlight" id="equation-eq-vectors-projection-example">
+<span class="eqno">(35)<a class="headerlink" href="#equation-eq-vectors-projection-example" title="Link to this equation">#</a></span>\[\mathbf{a} = (2,\, 1)^{\top}, \qquad \mathbf{b} = (3,\, 4)^{\top},\]</div>
+<p>for which <span class="math notranslate nohighlight">\(\mathbf{a}^{\top}\mathbf{b} = 10\)</span> and
+<span class="math notranslate nohighlight">\(\mathbf{a}^{\top}\mathbf{a} = 5\)</span>, so the coefficient is exactly <span class="math notranslate nohighlight">\(2\)</span> and
+<span class="math notranslate nohighlight">\(\mathbf{p} = (4,2)^{\top}\)</span>, <span class="math notranslate nohighlight">\(\mathbf{e} = (-1, 2)^{\top}\)</span>. Both are exact, and
+<span class="math notranslate nohighlight">\(\mathbf{a}^{\top}\mathbf{e} = -2 + 2 = 0\)</span> exactly.</p>
+<p><strong>Part a)</strong> Implement <code class="docutils literal notranslate"><span class="pre">project(b,</span> <span class="pre">a)</span></code> returning <span class="math notranslate nohighlight">\((\mathbf{p}, \mathbf{e})\)</span> from
+<a class="reference internal" href="#equation-eq-vectors-projection">Eq. 32</a>, and evaluate it on
+<a class="reference internal" href="#equation-eq-vectors-projection-example">Eq. 35</a>.</p>
+<p><strong>Write this one yourself</strong> — the implementation is the lesson.</p>
+<p><strong>Part b)</strong> Verify on that pair, exactly: <span class="math notranslate nohighlight">\(\mathbf{p} = (4,2)^{\top}\)</span>,
+<span class="math notranslate nohighlight">\(\mathbf{e} = (-1,2)^{\top}\)</span>, <span class="math notranslate nohighlight">\(\mathbf{a}^{\top}\mathbf{e} = 0\)</span>, and Pythagoras
+<a class="reference internal" href="#equation-eq-vectors-pythagoras">Eq. 33</a> with <span class="math notranslate nohighlight">\(\|\mathbf{b}\|^2 = 25 = 20 + 5\)</span>.</p>
+<p><strong>Part c)</strong> Verify the general properties on <span class="math notranslate nohighlight">\(500\)</span> random pairs in
+<span class="math notranslate nohighlight">\(\mathbb{R}^6\)</span>: orthogonality of the residual to <span class="math notranslate nohighlight">\(10^{-13}\)</span>, Pythagoras to
+<span class="math notranslate nohighlight">\(10^{-12}\)</span>, idempotence (projecting <span class="math notranslate nohighlight">\(\mathbf{p}\)</span> again returns <span class="math notranslate nohighlight">\(\mathbf{p}\)</span>),
+and that <span class="math notranslate nohighlight">\(\|\mathbf{p}\| = \|\mathbf{b}\| |\cos\theta|\)</span> with <span class="math notranslate nohighlight">\(\theta\)</span> the angle
+of <a class="reference internal" href="#equation-eq-vectors-angle">Eq. 28</a>. Draw the geometry for
+<a class="reference internal" href="#equation-eq-vectors-projection-example">Eq. 35</a>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>a = [2. 1.],  b = [3. 4.]
+a.b = 10,  a.a = 5,  coefficient = 2
+p = [4. 2.]   (exactly (4, 2))
+e = [-1.  2.]   (exactly (-1, 2))
+a.e = 0.0   (exactly 0)
+||b||^2 = 25 = ||p||^2 + ||e||^2 = 20 + 5
+
+over 500 random pairs in R^6:
+  max |a.e|                      : 1.554e-15
+  max Pythagoras defect          : 3.553e-15
+  max idempotence defect         : 4.441e-16
+  max | ||p|| - ||b|| |cos| |    : 8.882e-16
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-vectors-projection">
+<img alt="../../_images/63a5e9d3f244862452998505c3b691036af7fe2d5bffdbc19c4e994b6b3dbe26.png" src="../../_images/63a5e9d3f244862452998505c3b691036af7fe2d5bffdbc19c4e994b6b3dbe26.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 15 </span><span class="caption-text">The projection of Eq. 7 for <span class="math notranslate nohighlight">\(\mathbf{a} = (2,1)^{\top}\)</span> and <span class="math notranslate nohighlight">\(\mathbf{b} = (3,4)^{\top}\)</span> of Eq. 10: the component <span class="math notranslate nohighlight">\(\mathbf{p} = (4,2)^{\top}\)</span> lies along <span class="math notranslate nohighlight">\(\mathbf{a}\)</span> at twice its length, the residual <span class="math notranslate nohighlight">\(\mathbf{e} = (-1,2)^{\top}\)</span> is drawn from the tip of <span class="math notranslate nohighlight">\(\mathbf{p}\)</span> to the tip of <span class="math notranslate nohighlight">\(\mathbf{b}\)</span>, and the two meet at a right angle, which is what makes <span class="math notranslate nohighlight">\(\mathbf{p}\)</span> the closest point of the line to <span class="math notranslate nohighlight">\(\mathbf{b}\)</span>.</span><a class="headerlink" href="#fig-vectors-projection" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<p>The specific pair <a class="reference internal" href="#equation-eq-vectors-projection-example">Eq. 35</a> is checked exactly,
+because every quantity in it is a small integer. The general properties are
+checked over 500 random pairs, which is the difference between “this example
+works” and “the identity holds”.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  p = (4, 2) exactly for the pair of Eq. 10   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  e = (-1, 2) exactly   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  the residual is exactly orthogonal to the direction   [got 0 vs expected 0 (rtol=0, atol=0)]
+✓  Pythagoras: 25 = 20 + 5, exactly   [got 25 vs expected 25 (rtol=0, atol=0)]
+✓  orthogonality, Pythagoras and idempotence hold for all 500 random pairs   [max defects 1.6e-15, 3.6e-15, 4.4e-16]
+✓  and ||p|| = ||b|| |cos(theta)| with theta the angle of Eq. 3   [got 8.88178e-16 vs expected 0 (rtol=0, atol=1e-12)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-6-cosine-similarity-a-document-becomes-a-direction">
+<h2>Exercise 6: Cosine similarity: a document becomes a direction<a class="headerlink" href="#exercise-6-cosine-similarity-a-document-becomes-a-direction" title="Link to this heading">#</a></h2>
+<p>Here is the first application in the course that is not obviously geometry.
+Take a collection of documents and a vocabulary of <span class="math notranslate nohighlight">\(V\)</span> words. Represent each
+document by the vector in <span class="math notranslate nohighlight">\(\mathbb{R}^V\)</span> whose <span class="math notranslate nohighlight">\(j\)</span>-th entry counts how often
+word <span class="math notranslate nohighlight">\(j\)</span> occurs in it. Two documents about the same subject use overlapping
+words, so their vectors point in similar directions, and
+<a class="reference internal" href="#equation-eq-vectors-angle">Eq. 28</a> measures exactly that. Normalising away the lengths
+gives the <strong>cosine similarity</strong></p>
+<div class="math notranslate nohighlight" id="equation-eq-vectors-cosine">
+<span class="eqno">(36)<a class="headerlink" href="#equation-eq-vectors-cosine" title="Link to this equation">#</a></span>\[\operatorname{cos-sim}(\mathbf{u}, \mathbf{v})
+= \frac{\mathbf{u}^{\top}\mathbf{v}}{\|\mathbf{u}\|_2\,\|\mathbf{v}\|_2},\]</div>
+<p>which ignores document length — a long article and a short note on the same
+topic are similar — and is the standard ranking function in information
+retrieval, and the operation a vector database performs on every query.</p>
+<p>We use the twelve short documents of <code class="docutils literal notranslate"><span class="pre">ecp.linalg.toy_corpus()</span></code>, written on
+three deliberately disjoint subjects (linear algebra, cooking, sailing), four
+documents each. If cosine similarity works, same-subject pairs should score
+higher than different-subject pairs.</p>
+<p>It does not work, on raw counts, and the reason is worth meeting now. The
+highest-frequency words in any English text are “the”, “and”, “a”, “in” — words
+that carry no subject information at all but occur everywhere, so they
+contribute a large positive term to <em>every</em> inner product. Measured on this
+corpus, the mean within-subject similarity is <span class="math notranslate nohighlight">\(0.36\)</span> and the mean
+between-subject similarity is <span class="math notranslate nohighlight">\(0.23\)</span>: a signal, but a weak one, and the <em>worst</em>
+same-subject pair scores below the <em>best</em> different-subject pair, so no
+threshold separates them.</p>
+<p>Dropping those function words changes the picture completely, and in a way
+sharp enough to check: with them gone, the three subjects share no vocabulary
+whatsoever, so <strong>every</strong> between-subject similarity becomes exactly zero.
+Weighting words by how rare they are, rather than deleting a hand-made list, is
+what TF-IDF does, and <a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html"><span class="std std-doc">§8.4</span></a>
+builds it.</p>
+<p><strong>Part a)</strong> Build the <span class="math notranslate nohighlight">\(12 \times V\)</span> term–document matrix from
+<code class="docutils literal notranslate"><span class="pre">la.toy_corpus()</span></code> by splitting each document on whitespace, normalise each row
+to unit length with <code class="docutils literal notranslate"><span class="pre">np.linalg.norm(...,</span> <span class="pre">axis=1,</span> <span class="pre">keepdims=True)</span></code>, and form the
+similarity matrix as <code class="docutils literal notranslate"><span class="pre">Xn</span> <span class="pre">&#64;</span> <span class="pre">Xn.T</span></code>.</p>
+<p><strong>Part b)</strong> Report the mean and the extremes of the within-subject and
+between-subject similarities, and confirm that the minimum within-subject value
+is <em>below</em> the maximum between-subject value, so no threshold separates them.</p>
+<p><strong>Part c)</strong> Repeat with the twenty function words of the <code class="docutils literal notranslate"><span class="pre">STOPWORDS</span></code> set below
+removed, and confirm that every between-subject similarity is now exactly zero
+while the within-subject mean is positive. Draw both similarity matrices as
+heatmaps with <code class="docutils literal notranslate"><span class="pre">ecp.linalg.matrix_heatmap(...,</span> <span class="pre">signed=False)</span></code>, since a
+similarity of nonnegative vectors is nonnegative and a diverging colour scale
+would invent a midpoint that means nothing.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>raw word counts  (vocabulary 93 words)
+  within  subject: mean 0.358  min 0.174  max 0.551
+  between subject: mean 0.233  min 0.060  max 0.444
+  a threshold separates them: False
+
+function words removed  (vocabulary 75 words)
+  within  subject: mean 0.105  min 0.000  max 0.477
+  between subject: mean 0.000  min 0.000  max 0.000
+  a threshold separates them: False
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-vectors-cosine">
+<img alt="../../_images/7702d46c5f7b4b5795b6c0fed4d48cb5c6c809d0e55cc61609088bb812f51438.png" src="../../_images/7702d46c5f7b4b5795b6c0fed4d48cb5c6c809d0e55cc61609088bb812f51438.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 16 </span><span class="caption-text">Cosine similarity of Eq. 11 between all twelve documents of the toy corpus, ordered so that documents 0-3 are on linear algebra, 4-7 on cooking, and 8-11 on sailing. Left: raw word counts, where the function words shared by every document put a similar positive value everywhere and the three-block structure is barely visible. Right: the same corpus with twenty function words removed, where every between-subject entry is exactly zero and only the diagonal blocks survive.</span><a class="headerlink" href="#fig-vectors-cosine" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-6">
+<h3>Validation 6<a class="headerlink" href="#validation-6" title="Link to this heading">#</a></h3>
+<p>The first check records the failure of raw counts precisely — not “the signal
+is weak” but “the worst same-subject pair scores below the best
+different-subject pair, so no threshold works”. The second is exact: after
+removing the function words the subjects share no vocabulary, so the
+between-subject inner products are exactly zero, not merely small.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  on raw counts no threshold separates same-subject from different-subject   [worst within 0.174 &lt; best between 0.444; the shared function words dominate every inner product]
+✓  with function words removed every between-subject similarity is EXACTLY 0   [got 0 vs expected 0 (rtol=0, atol=0)]
+✓  while the within-subject mean stays positive   [0.105: the subjects genuinely share content words]
+✓  every document has cosine similarity 1 with itself   [max|Δ| = 4.44089e-16 (rtol=0, atol=1e-14)]
+✓  and the similarity matrix is symmetric   [max|Δ| = 0 (rtol=0, atol=1e-15)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-7-complex-vectors-and-a-conjugate-that-is-not-optional">
+<h2>Exercise 7: Complex vectors, and a conjugate that is not optional<a class="headerlink" href="#exercise-7-complex-vectors-and-a-conjugate-that-is-not-optional" title="Link to this heading">#</a></h2>
+<p>Quantum states are complex vectors, the discrete Fourier transform is a complex
+matrix, and both appear in this course —
+<a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html"><span class="std std-doc">§3.4</span></a> and
+<a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html"><span class="std std-doc">§6.3</span></a> respectively. Extending
+the inner product to <span class="math notranslate nohighlight">\(\mathbb{C}^n\)</span> takes one change, and it is not decoration.</p>
+<p>Write <span class="math notranslate nohighlight">\(\sum_i x_i y_i\)</span> for complex <span class="math notranslate nohighlight">\(x_i, y_i\)</span> and take <span class="math notranslate nohighlight">\(\mathbf{y} =
+\mathbf{x}\)</span>. The result is <span class="math notranslate nohighlight">\(\sum_i x_i^2\)</span>, which for <span class="math notranslate nohighlight">\(\mathbf{x} = (1+2i)\)</span> is
+<span class="math notranslate nohighlight">\(1 + 4i - 4 = -3 + 4i\)</span>: complex, so it cannot be a squared length, and there is
+no sense in which it is positive. The definition fails at the first hurdle.</p>
+<p>The fix is to conjugate the first argument:</p>
+<div class="math notranslate nohighlight" id="equation-eq-vectors-complex-inner">
+<span class="eqno">(37)<a class="headerlink" href="#equation-eq-vectors-complex-inner" title="Link to this equation">#</a></span>\[\langle \mathbf{x}, \mathbf{y}\rangle = \mathbf{x}^{*}\mathbf{y}
+= \sum_i \overline{x_i}\, y_i,\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathbf{x}^{*} = \overline{\mathbf{x}}^{\top}\)</span> is the <strong>conjugate
+transpose</strong>. Now <span class="math notranslate nohighlight">\(\langle\mathbf{x},\mathbf{x}\rangle = \sum_i |x_i|^2\)</span> is real
+and positive, so <a class="reference internal" href="#equation-eq-vectors-norm">Eq. 27</a> still defines a length. The price is
+that the form is no longer symmetric but <strong>conjugate</strong>-symmetric,
+<span class="math notranslate nohighlight">\(\langle\mathbf{y},\mathbf{x}\rangle =
+\overline{\langle\mathbf{x},\mathbf{y}\rangle}\)</span>, and linear in the second
+argument while conjugate-linear in the first. NumPy spells this <code class="docutils literal notranslate"><span class="pre">np.vdot</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">A.conj().T</span></code> (or <code class="docutils literal notranslate"><span class="pre">A.conj().T</span></code> written <code class="docutils literal notranslate"><span class="pre">A.T.conj()</span></code>) for matrices.</p>
+<p>The trap is that <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">&#64;</span> <span class="pre">y</span></code> and <code class="docutils literal notranslate"><span class="pre">np.dot</span></code> do <strong>not</strong> conjugate. They compute the
+unconjugated form, silently, and on complex input that is almost never what you
+want.</p>
+<p><strong>Part a)</strong> For <span class="math notranslate nohighlight">\(\mathbf{z} = (1+2i,\, 3-i)^{\top}\)</span>, compute <code class="docutils literal notranslate"><span class="pre">z</span> <span class="pre">&#64;</span> <span class="pre">z</span></code>,
+<code class="docutils literal notranslate"><span class="pre">np.dot(z,</span> <span class="pre">z)</span></code>, and <code class="docutils literal notranslate"><span class="pre">np.vdot(z,</span> <span class="pre">z)</span></code>. Confirm the first two give <span class="math notranslate nohighlight">\(5 - 2i\)</span> while
+<code class="docutils literal notranslate"><span class="pre">vdot</span></code> gives <span class="math notranslate nohighlight">\(15\)</span>, which is <span class="math notranslate nohighlight">\(|1+2i|^2 + |3-i|^2 = 5 + 10\)</span>.</p>
+<p><strong>Part b)</strong> Verify conjugate symmetry on the pair <span class="math notranslate nohighlight">\(\mathbf{z}\)</span> and
+<span class="math notranslate nohighlight">\(\mathbf{w} = (2-i,\, 1+i)^{\top}\)</span>: check
+<span class="math notranslate nohighlight">\(\langle\mathbf{w},\mathbf{z}\rangle = \overline{\langle\mathbf{z},\mathbf{w}\rangle}\)</span>
+exactly, and confirm the unconjugated form is symmetric instead — which is
+precisely why it cannot define a length.</p>
+<p><strong>Part c)</strong> Confirm that Cauchy–Schwarz <a class="reference internal" href="#equation-eq-vectors-cauchy">Eq. 29</a> survives the
+extension: over <span class="math notranslate nohighlight">\(2000\)</span> random complex pairs in <span class="math notranslate nohighlight">\(\mathbb{C}^4\)</span> built as
+<code class="docutils literal notranslate"><span class="pre">rng.standard_normal(...)</span> <span class="pre">+</span> <span class="pre">1j</span> <span class="pre">*</span> <span class="pre">rng.standard_normal(...)</span></code>, check
+<span class="math notranslate nohighlight">\(|\langle\mathbf{x},\mathbf{y}\rangle| \le \|\mathbf{x}\|\,\|\mathbf{y}\|\)</span> with
+the norms from <a class="reference internal" href="#equation-eq-vectors-complex-inner">Eq. 37</a>.</p>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p>Ask for a function <code class="docutils literal notranslate"><span class="pre">angle_between(u,</span> <span class="pre">v)</span></code> that returns the angle between two
+real vectors accurately at <em>both</em> ends of the range, near <span class="math notranslate nohighlight">\(0\)</span> and near <span class="math notranslate nohighlight">\(\pi\)</span>,
+rather than only where <code class="docutils literal notranslate"><span class="pre">arccos</span></code> behaves. Then check it yourself against the two
+cases where the answer is known exactly: <span class="math notranslate nohighlight">\(\mathbf{u} = (1,0)\)</span> with
+<span class="math notranslate nohighlight">\(\mathbf{v} = (\cos\theta, \sin\theta)\)</span> must return <span class="math notranslate nohighlight">\(\theta\)</span> to a relative
+<span class="math notranslate nohighlight">\(10^{-10}\)</span> for <span class="math notranslate nohighlight">\(\theta\)</span> down to <span class="math notranslate nohighlight">\(10^{-8}\)</span>, and <span class="math notranslate nohighlight">\(\mathbf{v} = -\mathbf{u} +
+\delta\)</span> must return something within <span class="math notranslate nohighlight">\(10^{-8}\)</span> of <span class="math notranslate nohighlight">\(\pi\)</span>. The check is yours.</p>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>z          = [1.+2.j 3.-1.j]
+z @ z      = (5-2j)          &lt;- unconjugated: complex, not a length
+np.dot(z,z)= (5-2j)          &lt;- the same trap
+np.vdot(z,z)= (15+0j)         &lt;- conjugated: real and positive
+|1+2i|^2 + |3-i|^2 = 15.0
+np.linalg.norm(z)^2 = 15.0
+
+&lt;z, w&gt; = (2-1j)
+&lt;w, z&gt; = (2+1j)
+conjugate symmetric: True
+unconjugated z@w = (8+5j) and w@z = (8+5j): symmetric, hence useless
+
+Cauchy-Schwarz in C^4 over 2000 pairs: max ratio 0.857672, violations 0
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-7">
+<h3>Validation 7<a class="headerlink" href="#validation-7" title="Link to this heading">#</a></h3>
+<p>The values <span class="math notranslate nohighlight">\(5-2i\)</span> and <span class="math notranslate nohighlight">\(15\)</span> are exact, since the entries are Gaussian integers,
+so both are checked without tolerance. Conjugate symmetry is checked exactly
+for the same reason. The Cauchy–Schwarz check confirms the inequality survives
+the extension to <span class="math notranslate nohighlight">\(\mathbb{C}^n\)</span>, which is what licenses talking about angles
+and orthogonality there at all.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the unconjugated form gives 5 - 2i: complex, so not a squared length   [got (5-2j) vs expected (5-2j) (rtol=0, atol=0)]
+✓  the conjugated form of Eq. 12 gives 15 = |1+2i|^2 + |3-i|^2   [got (15+0j) vs expected (15+0j) (rtol=0, atol=0)]
+✓  and it is exactly real, as an inner product must be on the diagonal   [got 0 vs expected 0 (rtol=0, atol=0)]
+✓  the complex inner product is conjugate symmetric   [got (2+1j) vs expected (2+1j) (rtol=0, atol=0)]
+✓  Cauchy-Schwarz survives the extension to C^4 (2000 random pairs)   [which is what lets angle and orthogonality mean anything over the complexes]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p>One operation, <a class="reference internal" href="#equation-eq-vectors-dot">Eq. 26</a>, and everything geometric this course needs
+came out of it.</p>
+<p>The concrete results:</p>
+<ul class="simple">
+<li><p>five spellings of the inner product of
+<span class="math notranslate nohighlight">\(\mathbf{x} = (1,-2,3,0,4)\)</span> and <span class="math notranslate nohighlight">\(\mathbf{y} = (2,1,-1,5,2)\)</span> all returned
+<strong>exactly</strong> <span class="math notranslate nohighlight">\(5.0\)</span>, with <code class="docutils literal notranslate"><span class="pre">np.dot</span></code> beating the Python loop by more than two
+orders of magnitude on <span class="math notranslate nohighlight">\(2\times10^5\)</span> elements;</p></li>
+<li><p>Cauchy–Schwarz and the triangle inequality held on all <span class="math notranslate nohighlight">\(10^4\)</span> random pairs
+tested, with equality attained exactly for a parallel pair;</p></li>
+<li><p>the angle via <code class="docutils literal notranslate"><span class="pre">arccos</span></code> lost more than three orders of magnitude of accuracy
+relative to <code class="docutils literal notranslate"><span class="pre">arctan2</span></code> at <span class="math notranslate nohighlight">\(\theta = 10^{-8}\)</span>, because the cosine is flat there;</p></li>
+<li><p>the three norms of <span class="math notranslate nohighlight">\((3,-4,12)\)</span> came out exactly <span class="math notranslate nohighlight">\(19\)</span>, <span class="math notranslate nohighlight">\(13\)</span>, <span class="math notranslate nohighlight">\(12\)</span>, the
+equivalence chain <a class="reference internal" href="#equation-eq-vectors-equivalence">Eq. 31</a> held on 1000 random vectors,
+and its <span class="math notranslate nohighlight">\(\sqrt{n}\)</span> constant was attained exactly at the all-ones vector;</p></li>
+<li><p><strong>both</strong> the naive <span class="math notranslate nohighlight">\(\sqrt{\sum x_i^2}\)</span> and <code class="docutils literal notranslate"><span class="pre">np.linalg.norm</span></code> overflowed to
+<code class="docutils literal notranslate"><span class="pre">inf</span></code> on a vector of exact norm <span class="math notranslate nohighlight">\(3\times10^{200}\)</span>, and underflowed to <span class="math notranslate nohighlight">\(0\)</span> at
+<span class="math notranslate nohighlight">\(3\times10^{-200}\)</span>, while <code class="docutils literal notranslate"><span class="pre">math.hypot</span></code>, <code class="docutils literal notranslate"><span class="pre">scipy.linalg.norm</span></code> and the scaled
+formula returned the exact answers — and all five agreed to <span class="math notranslate nohighlight">\(10^{-14}\)</span> on
+ordinary input, so the protection is free;</p></li>
+<li><p>projection of <span class="math notranslate nohighlight">\(\mathbf{b} = (3,4)\)</span> onto <span class="math notranslate nohighlight">\(\mathbf{a} = (2,1)\)</span> gave
+<span class="math notranslate nohighlight">\(\mathbf{p} = (4,2)\)</span> and <span class="math notranslate nohighlight">\(\mathbf{e} = (-1,2)\)</span> with
+<span class="math notranslate nohighlight">\(\mathbf{a}^{\top}\mathbf{e} = 0\)</span> and <span class="math notranslate nohighlight">\(25 = 20 + 5\)</span>, all exact, and
+orthogonality, Pythagoras and idempotence held to <span class="math notranslate nohighlight">\(10^{-12}\)</span> over 500 random
+pairs in <span class="math notranslate nohighlight">\(\mathbb{R}^6\)</span>;</p></li>
+<li><p>cosine similarity on raw word counts <strong>failed</strong> to separate three disjoint
+subjects (worst within-subject <span class="math notranslate nohighlight">\(0.174\)</span> below best between-subject <span class="math notranslate nohighlight">\(0.444\)</span>),
+and removing twenty function words drove every between-subject similarity to
+<strong>exactly zero</strong>;</p></li>
+<li><p>and on <span class="math notranslate nohighlight">\(\mathbb{C}^n\)</span> the unconjugated form gave <span class="math notranslate nohighlight">\(5-2i\)</span> for
+<span class="math notranslate nohighlight">\(\langle\mathbf{z},\mathbf{z}\rangle\)</span> while <a class="reference internal" href="#equation-eq-vectors-complex-inner">Eq. 37</a>
+gave exactly <span class="math notranslate nohighlight">\(15\)</span>, real and positive.</p></li>
+</ul>
+<p>Methods met: <code class="docutils literal notranslate"><span class="pre">np.dot</span></code>, <code class="docutils literal notranslate"><span class="pre">np.vdot</span></code>, <code class="docutils literal notranslate"><span class="pre">np.einsum</span></code> for batched inner products,
+<code class="docutils literal notranslate"><span class="pre">np.linalg.norm</span></code> with <code class="docutils literal notranslate"><span class="pre">ord</span></code> and <code class="docutils literal notranslate"><span class="pre">axis</span></code>, <code class="docutils literal notranslate"><span class="pre">math.hypot</span></code> and <code class="docutils literal notranslate"><span class="pre">scipy.linalg.norm</span></code> as
+the overflow-safe alternatives, <code class="docutils literal notranslate"><span class="pre">np.arctan2</span></code> for accurate angles, and the
+term–document matrix as a first look at what a vector can represent.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Projection onto a subspace.</strong> <a class="reference internal" href="#equation-eq-vectors-projection">Eq. 32</a> projected onto a
+single direction. Replacing <span class="math notranslate nohighlight">\(\mathbf{a}\)</span> by a matrix gives
+<span class="math notranslate nohighlight">\(P = A(A^{\top}A)^{-1}A^{\top}\)</span> and the normal equations, which is
+<a class="reference internal" href="../02-orthogonality/projections-normal-equations.html"><span class="std std-doc">§2.1</span></a> and, through
+it, all of least squares.</p></li>
+<li><p><strong>Orthonormal bases.</strong> If a basis is orthonormal, every projection is a
+plain inner product with no matrix to invert. Constructing such a basis is
+the <span class="math notranslate nohighlight">\(QR\)</span> factorization of
+<a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html"><span class="std std-doc">§2.2</span></a>, and the construction is
+repeated application of <a class="reference internal" href="#equation-eq-vectors-projection">Eq. 32</a>.</p></li>
+<li><p><strong>Sparse vectors are the wrong representation.</strong> The document vectors here
+were mostly zeros, and two documents on the same subject could still score
+zero for sharing no exact word. Dense <strong>embeddings</strong> fix that by giving
+related words nearby directions, and
+<a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html"><span class="std std-doc">§8.4</span></a> builds them, with
+<a class="reference internal" href="#equation-eq-vectors-cosine">Eq. 36</a> still the ranking function.</p></li>
+<li><p><strong>Inner products on function spaces.</strong> Nothing in
+<a class="reference internal" href="#equation-eq-vectors-dot">Eq. 26</a> needs the vectors to be lists of numbers. Replacing the
+sum by an integral gives an inner product on functions, and
+<a class="reference internal" href="../02-orthogonality/function-space-bases.html"><span class="std std-doc">§2.5</span></a> uses it to build the
+Legendre and Chebyshev polynomials by exactly the projection above.</p></li>
+</ul>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h3>
+<div class="docutils container" id="id3">
+<div role="list" class="citation-list">
+<div class="citation" id="id6" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">Axl24</a><span class="fn-bracket">]</span></span>
+<p>Sheldon Axler. <em>Linear Algebra Done Right</em>. Undergraduate Texts in Mathematics. Springer, 4 edition, 2024. <a class="reference external" href="https://doi.org/10.1007/978-3-031-41026-0">doi:10.1007/978-3-031-41026-0</a>.</p>
+</div>
+<div class="citation" id="id7" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">BV18</a><span class="fn-bracket">]</span></span>
+<p>Stephen Boyd and Lieven Vandenberghe. <em>Introduction to Applied Linear Algebra: Vectors, Matrices, and Least Squares</em>. Cambridge University Press, 2018. <a class="reference external" href="https://doi.org/10.1017/9781108583664">doi:10.1017/9781108583664</a>.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/00-machine"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="floating-point.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">0.2 Floating-Point Reality and the Tolerance Habit</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../01-matrices/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Chapter I — Matrices, Elimination, and Subspaces</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-inner-product-and-the-four-things-it-defines">The inner product, and the four things it defines</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#other-norms">Other norms</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#projection">Projection</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-three-routes-to-one-number">Exercise 1: Three routes to one number</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-length-angle-and-the-inequality-that-makes-angles-exist">Exercise 2: Length, angle, and the inequality that makes angles exist</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-three-norms-and-the-shapes-of-their-unit-balls">Exercise 3: The three norms, and the shapes of their unit balls</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-computing-a-length-without-destroying-it">Exercise 4: Computing a length without destroying it</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-projection-and-the-right-angle-that-runs-the-course">Exercise 5: Projection, and the right angle that runs the course</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-cosine-similarity-a-document-becomes-a-direction">Exercise 6: Cosine similarity: a document becomes a direction</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-7-complex-vectors-and-a-conjugate-that-is-not-optional">Exercise 7: Complex vectors, and a conjugate that is not optional</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-7">Validation 7</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

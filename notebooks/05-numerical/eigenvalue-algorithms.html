@@ -1,0 +1,1431 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="5.2 How Eigenvalues Are Really Computed" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/05-numerical/eigenvalue-algorithms.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: Every eig and eigh call this course has made was a black box. This notebook opens it, building the actual algorithm in stages: power itera..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: Every eig and eigh call this course has made was a black box. This notebook opens it, building the actual algorithm in stages: power itera..." />
+
+    <title>5.2 How Eigenvalues Are Really Computed &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/05-numerical/eigenvalue-algorithms';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/05-numerical/eigenvalue-algorithms.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers" href="sparse-matrices.html" />
+    <link rel="prev" title="5.1 Norms, Conditioning, and Backward Stability" href="norms-conditioning-stability.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter V — Numerical Linear Algebra</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/05-numerical/eigenvalue-algorithms.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/05-numerical/eigenvalue-algorithms.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/05-numerical/eigenvalue-algorithms.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/05-numerical/eigenvalue-algorithms.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>5.2 How Eigenvalues Are Really Computed</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#power-iteration-and-shifting-it">Power iteration, and shifting it</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#rayleigh-quotient-iteration">Rayleigh-quotient iteration</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hessenberg-form">Hessenberg form</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-qr-algorithm-and-why-shifting-is-everything">The QR algorithm, and why shifting is everything</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-never-the-characteristic-polynomial">Why never the characteristic polynomial</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-power-iteration-redirected-shift-invert">Exercise 1: Power iteration redirected: shift-invert</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-rayleigh-quotient-iteration-measured-cubic-convergence">Exercise 2: Rayleigh-quotient iteration: measured cubic convergence</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-hessenberg-form-the-reduction-that-makes-qr-affordable">Exercise 3: Hessenberg form: the reduction that makes QR affordable</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-the-qr-algorithm-unshifted-shifted-deflated">Exercise 4: The QR algorithm: unshifted, shifted, deflated</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-the-characteristic-polynomial-is-a-trap">Exercise 5: The characteristic polynomial is a trap</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="how-eigenvalues-are-really-computed">
+<h1>5.2 How Eigenvalues Are Really Computed<a class="headerlink" href="#how-eigenvalues-are-really-computed" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter V — Numerical Linear Algebra
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;5.2
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">Not from the characteristic polynomial — that route loses thirteen digits on a diagonal matrix. The real algorithm is a chain of similarity transformations: reduce to Hessenberg, iterate QR with a shift so good its convergence is cubic, deflate, repeat.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;advanced&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;120–150 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p>Every <code class="docutils literal notranslate"><span class="pre">eig</span></code> and <code class="docutils literal notranslate"><span class="pre">eigh</span></code> call this course has made was a black box. This
+notebook opens it, building the actual algorithm in stages: power iteration
+(the seed idea, from
+<a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html"><span class="std std-doc">§3.1</span></a>), its shift-invert
+refinement for interior eigenvalues, Rayleigh-quotient iteration whose
+convergence is measurably <em>cubic</em>, the Householder reduction to Hessenberg
+form that makes everything affordable, and finally the shifted QR algorithm
+with deflation — the method inside LAPACK, and the reason <code class="docutils literal notranslate"><span class="pre">eig</span></code> costs a
+predictable <span class="math notranslate nohighlight">\(O(n^3)\)</span> for any matrix at all.</p>
+<p>Two measurements carry the story. <strong>The shift is not an optimisation but the
+algorithm</strong>: on the same <span class="math notranslate nohighlight">\(8\times8\)</span> symmetric matrix, unshifted QR needs 100
+sweeps and Wilkinson-shifted QR needs 15 — and RQI, the shift idea in its
+purest form, converges so violently that it terminates by making
+<span class="math notranslate nohighlight">\(A - \mu I\)</span> <em>exactly singular</em>, which is not a failure but the success
+condition. And <strong>the characteristic polynomial is a trap</strong>: rooting the
+degree-20 polynomial of <span class="math notranslate nohighlight">\(\operatorname{diag}(1,\dots,20)\)</span> — a matrix whose
+eigenvalues could not be more visible — misplaces a root by <span class="math notranslate nohighlight">\(0.09\)</span>, thirteen
+digits worse than <code class="docutils literal notranslate"><span class="pre">eigvals</span></code> on the same matrix, before any perturbation is
+even applied.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> Trefethen and Bau <span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id14" title="Lloyd N. Trefethen and David Bau, III. Numerical Linear Algebra. SIAM, Philadelphia, 1997. doi:10.1137/1.9780898719574.">TB97</a>]</span> Lectures 25–29 are the
+canonical account; Golub and Van Loan <span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id15" title="Gene H. Golub and Charles F. Van Loan. Matrix Computations. Johns Hopkins University Press, Baltimore, 4 edition, 2013.">GVL13</a>]</span> Chapters 7–8 the
+reference; Watkins <span class="bibtex-citation" id="id3">[<a class="reference internal" href="#id21" title="David S. Watkins. Fundamentals of Matrix Computations. Wiley, 3 edition, 2010.">Wat10</a>]</span> the modern treatment of QR’s inner
+life; Wilkinson’s polynomial story is retold in Higham <span class="bibtex-citation" id="id4">[<a class="reference internal" href="#id17" title="Nicholas J. Higham. Accuracy and Stability of Numerical Algorithms. SIAM, Philadelphia, 2 edition, 2002. doi:10.1137/1.9780898718027.">Hig02</a>]</span>.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="power-iteration-and-shifting-it">
+<h3>Power iteration, and shifting it<a class="headerlink" href="#power-iteration-and-shifting-it" title="Link to this heading">#</a></h3>
+<p><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html"><span class="std std-doc">§3.1</span></a> built power
+iteration: <span class="math notranslate nohighlight">\(\mathbf{x}_{k+1} = A\mathbf{x}_k/\|A\mathbf{x}_k\|\)</span> converges to
+the dominant eigenvector at the linear rate <span class="math notranslate nohighlight">\(|\lambda_2/\lambda_1|\)</span>. Two
+transformations of <span class="math notranslate nohighlight">\(A\)</span> redirect it anywhere. <strong>Shift-invert</strong> applies power
+iteration to <span class="math notranslate nohighlight">\((A - \mu I)^{-1}\)</span>, whose dominant eigenvalue is
+<span class="math notranslate nohighlight">\(1/(\lambda_j - \mu)\)</span> for the <span class="math notranslate nohighlight">\(\lambda_j\)</span> <em>nearest</em> <span class="math notranslate nohighlight">\(\mu\)</span>:</p>
+<div class="math notranslate nohighlight" id="equation-eq-eiga-shiftinvert">
+<span class="eqno">(226)<a class="headerlink" href="#equation-eq-eiga-shiftinvert" title="Link to this equation">#</a></span>\[\mathbf{x}_{k+1} = \frac{(A - \mu I)^{-1}\mathbf{x}_k}{\|(A - \mu I)^{-1}\mathbf{x}_k\|},
+\qquad \text{rate } \Bigl|\frac{\lambda_{\text{near}} - \mu}{\lambda_{\text{next}} - \mu}\Bigr| .\]</div>
+<p>One LU factorization, reused every step — never an explicit inverse. The
+closer <span class="math notranslate nohighlight">\(\mu\)</span> sits to an eigenvalue, the faster; which suggests moving <span class="math notranslate nohighlight">\(\mu\)</span>
+<em>during</em> the iteration.</p>
+</section>
+<section id="rayleigh-quotient-iteration">
+<h3>Rayleigh-quotient iteration<a class="headerlink" href="#rayleigh-quotient-iteration" title="Link to this heading">#</a></h3>
+<p>Setting <span class="math notranslate nohighlight">\(\mu_k = \rho(\mathbf{x}_k)\)</span>, the Rayleigh quotient of the current
+iterate, gives</p>
+<div class="math notranslate nohighlight" id="equation-eq-eiga-rqi">
+<span class="eqno">(227)<a class="headerlink" href="#equation-eq-eiga-rqi" title="Link to this equation">#</a></span>\[\mathbf{x}_{k+1} = \frac{(A - \mu_kI)^{-1}\mathbf{x}_k}{\|\cdot\|},
+\qquad \mu_{k+1} = \mathbf{x}_{k+1}^{\top}A\mathbf{x}_{k+1},\]</div>
+<p>and for symmetric <span class="math notranslate nohighlight">\(A\)</span> the convergence is <strong>cubic</strong>: the error roughly cubes
+each step, because the eigenvalue estimate is quadratically accurate in the
+eigenvector error (<a class="reference internal" href="../03-eigenvalues/spectral-theorem.html"><span class="std std-doc">§3.2</span></a>) and the
+eigenvector step is linear in the shift’s accuracy. Success announces itself
+violently — <span class="math notranslate nohighlight">\(A - \mu I\)</span> becomes numerically singular <em>because</em> <span class="math notranslate nohighlight">\(\mu\)</span> has
+converged — so the singular solve is the stopping condition, not a crash.</p>
+</section>
+<section id="hessenberg-form">
+<h3>Hessenberg form<a class="headerlink" href="#hessenberg-form" title="Link to this heading">#</a></h3>
+<p>QR iteration on a full matrix costs <span class="math notranslate nohighlight">\(O(n^3)\)</span> <em>per sweep</em>. The fix is one
+<span class="math notranslate nohighlight">\(O(n^3)\)</span> reduction up front: Householder reflections build</p>
+<div class="math notranslate nohighlight" id="equation-eq-eiga-hessenberg">
+<span class="eqno">(228)<a class="headerlink" href="#equation-eq-eiga-hessenberg" title="Link to this equation">#</a></span>\[A = QHQ^{\top}, \qquad h_{ij} = 0 \text{ for } i &gt; j + 1,\]</div>
+<p>an <strong>upper Hessenberg</strong> matrix — triangular plus one subdiagonal — similar to
+<span class="math notranslate nohighlight">\(A\)</span>, so the spectrum is untouched. A QR sweep on a Hessenberg matrix costs
+<span class="math notranslate nohighlight">\(O(n^2)\)</span> and <em>preserves the form</em>, which is what makes iterating affordable.
+For symmetric <span class="math notranslate nohighlight">\(A\)</span>, Hessenberg means tridiagonal and sweeps drop to <span class="math notranslate nohighlight">\(O(n)\)</span>.</p>
+</section>
+<section id="the-qr-algorithm-and-why-shifting-is-everything">
+<h3>The QR algorithm, and why shifting is everything<a class="headerlink" href="#the-qr-algorithm-and-why-shifting-is-everything" title="Link to this heading">#</a></h3>
+<p>The unshifted iteration factors and remultiplies:</p>
+<div class="math notranslate nohighlight" id="equation-eq-eiga-qr">
+<span class="eqno">(229)<a class="headerlink" href="#equation-eq-eiga-qr" title="Link to this equation">#</a></span>\[H_k = Q_kR_k, \qquad H_{k+1} = R_kQ_k = Q_k^{\top}H_kQ_k ,\]</div>
+<p>a similarity transformation whose subdiagonal entries decay like
+<span class="math notranslate nohighlight">\(|\lambda_{i+1}/\lambda_i|^k\)</span> — linear, and painfully slow for close
+eigenvalues. The <strong>shifted</strong> iteration factors <span class="math notranslate nohighlight">\(H_k - \mu_kI\)</span> instead and
+adds <span class="math notranslate nohighlight">\(\mu_kI\)</span> back:</p>
+<div class="math notranslate nohighlight" id="equation-eq-eiga-shifted">
+<span class="eqno">(230)<a class="headerlink" href="#equation-eq-eiga-shifted" title="Link to this equation">#</a></span>\[H_k - \mu_kI = Q_kR_k, \qquad H_{k+1} = R_kQ_k + \mu_kI ,\]</div>
+<p>with <span class="math notranslate nohighlight">\(\mu_k\)</span> the <strong>Wilkinson shift</strong> — the eigenvalue of the trailing
+<span class="math notranslate nohighlight">\(2\times2\)</span> block nearest its corner entry. This is RQI in disguise acting on
+the last row, and it inherits the cubic convergence: the last subdiagonal
+entry collapses in a handful of sweeps, the trailing eigenvalue is declared
+converged and <strong>deflated</strong> (the active block shrinks by one), and the
+iteration continues on what remains.</p>
+</section>
+<section id="why-never-the-characteristic-polynomial">
+<h3>Why never the characteristic polynomial<a class="headerlink" href="#why-never-the-characteristic-polynomial" title="Link to this heading">#</a></h3>
+<p>Polynomial coefficients are a catastrophically compressed encoding of roots:
+for Wilkinson’s polynomial <span class="math notranslate nohighlight">\(\prod_{r=1}^{20}(x - r)\)</span> the map from
+coefficients back to roots has condition numbers up to <span class="math notranslate nohighlight">\(10^{13}\)</span>, so even
+<em>exactly correct</em> coefficients, once rounded to <code class="docutils literal notranslate"><span class="pre">float64</span></code>, no longer encode
+the roots to more than a few digits. <code class="docutils literal notranslate"><span class="pre">eig</span></code> works on the matrix, where the
+eigenvalues are perfectly conditioned
+(<a class="reference internal" href="../03-eigenvalues/spectral-theorem.html"><span class="std std-doc">§3.2</span></a>’s Weyl bound), and that is
+the entire reason the detour through <a class="reference internal" href="#equation-eq-eiga-hessenberg">Eq. 228</a> and
+<a class="reference internal" href="#equation-eq-eiga-shifted">Eq. 230</a> exists.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data and instruments only: the planted-spectrum test matrix and the
+Rayleigh quotient restated from where it was built. Every algorithm here —
+power, shift-invert, RQI, QR — is built in the exercises.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">hessenberg</span><span class="p">,</span> <span class="n">lu_factor</span><span class="p">,</span> <span class="n">lu_solve</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">la</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random array below comes from this seed</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+
+<span class="c1"># The worked matrix: symmetric 8x8 with a KNOWN spectrum, planted by an</span>
+<span class="c1"># orthogonal similarity so every method below can be scored against the truth.</span>
+<span class="n">LAM_TRUE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">9.0</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">])</span>
+<span class="n">_Qp</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">((</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">)))</span>
+<span class="n">S8</span> <span class="o">=</span> <span class="n">_Qp</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">LAM_TRUE</span><span class="p">)</span> <span class="o">@</span> <span class="n">_Qp</span><span class="o">.</span><span class="n">T</span>
+<span class="n">S8</span> <span class="o">=</span> <span class="p">(</span><span class="n">S8</span> <span class="o">+</span> <span class="n">S8</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+<span class="n">TOL_S</span> <span class="o">=</span> <span class="mf">100.0</span> <span class="o">*</span> <span class="n">EPS</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">S8</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+
+<span class="c1"># built from scratch in §3.2; restated here as an instrument.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rayleigh</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The Rayleigh quotient x^T A x / x^T x of 3.2, the eigenvalue estimator.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span> <span class="o">@</span> <span class="n">A</span> <span class="o">@</span> <span class="n">x</span> <span class="o">/</span> <span class="p">(</span><span class="n">x</span> <span class="o">@</span> <span class="n">x</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-power-iteration-redirected-shift-invert">
+<h2>Exercise 1: Power iteration redirected: shift-invert<a class="headerlink" href="#exercise-1-power-iteration-redirected-shift-invert" title="Link to this heading">#</a></h2>
+<p>Power iteration finds only the dominant eigenvalue.
+<a class="reference internal" href="#equation-eq-eiga-shiftinvert">Eq. 226</a> finds <em>any</em> eigenvalue, by handing power iteration
+a matrix whose dominant eigenvalue is the one wanted. The target here is the
+interior eigenvalue <span class="math notranslate nohighlight">\(4\)</span> of <code class="docutils literal notranslate"><span class="pre">S8</span></code>, invisible to plain power iteration.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">power_iteration(A,</span> <span class="pre">x0,</span> <span class="pre">n_steps)</span></code> (five lines, from
+<a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html"><span class="std std-doc">§3.1</span></a>) and run 60 steps
+on <code class="docutils literal notranslate"><span class="pre">S8</span></code> from a fixed random start. Confirm the Rayleigh quotient converges to
+the <strong>dominant</strong> <span class="math notranslate nohighlight">\(\lambda = 9\)</span>, and confirm the measured error-contraction
+rate over steps 10–50 matches <span class="math notranslate nohighlight">\((\lambda_2/\lambda_1)^2 = (7/9)^2 \approx
+0.605\)</span> within <span class="math notranslate nohighlight">\(5\%\)</span>, by fitting the log-error slope — the quotient’s error
+contracts at twice the vector’s exponential rate, the
+<a class="reference internal" href="../03-eigenvalues/spectral-theorem.html"><span class="std std-doc">§3.2</span></a> fact.</p>
+<p><strong>Write this one yourself</strong> — the implementation is the lesson.</p>
+<p><strong>Part b)</strong> Write <code class="docutils literal notranslate"><span class="pre">shift_invert(A,</span> <span class="pre">mu,</span> <span class="pre">x0,</span> <span class="pre">n_steps)</span></code> implementing
+<a class="reference internal" href="#equation-eq-eiga-shiftinvert">Eq. 226</a>: factor <span class="math notranslate nohighlight">\(A - \mu I\)</span> <strong>once</strong> with
+<code class="docutils literal notranslate"><span class="pre">scipy.linalg.lu_factor</span></code>, then <code class="docutils literal notranslate"><span class="pre">lu_solve</span></code> inside the loop — never an
+explicit inverse, per
+<a class="reference internal" href="../01-matrices/inverses-rank-cr.html"><span class="std std-doc">§1.3</span></a>. Run it with <span class="math notranslate nohighlight">\(\mu = 4.2\)</span> and
+confirm it converges to <span class="math notranslate nohighlight">\(\lambda = 4\)</span>, the eigenvalue nearest the shift.</p>
+<p><strong>Part c)</strong> Confirm the rate is the <em>shifted</em> ratio: with <span class="math notranslate nohighlight">\(\mu = 4.2\)</span> the
+two nearest eigenvalues are <span class="math notranslate nohighlight">\(4\)</span> (distance <span class="math notranslate nohighlight">\(0.2\)</span>) and <span class="math notranslate nohighlight">\(5\)</span> (distance <span class="math notranslate nohighlight">\(0.8\)</span>),
+predicting vector contraction <span class="math notranslate nohighlight">\(0.2/0.8 = 0.25\)</span> per step — <span class="math notranslate nohighlight">\(0.25^2 = 0.0625\)</span>
+for the Rayleigh quotient’s error, which is what the fit sees. Confirm
+within <span class="math notranslate nohighlight">\(20\%\)</span>.</p>
+<p><strong>Part d)</strong> Confirm the accuracy dial: with <span class="math notranslate nohighlight">\(\mu = 4.02\)</span> the predicted rate
+is <span class="math notranslate nohighlight">\(0.02/0.98 \approx 0.020\)</span>, and the iteration reaches <span class="math notranslate nohighlight">\(10^{-12}\)</span> in a
+handful of steps. Report the step counts to <span class="math notranslate nohighlight">\(10^{-10}\)</span> for both shifts.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>power iteration -&gt; 9.0000000000 (dominant lambda = 9)
+  fitted contraction e^-0.5026 = 0.6050 vs (7/9)^2 = 0.6049 for the Rayleigh quotient
+
+shift-invert mu = 4.2 -&gt; 4.0000000000 (nearest lambda = 4)
+  fitted contraction 0.0614 vs (0.2/0.8)^2 = 0.0625 for the Rayleigh quotient
+
+steps to 1e-10: mu = 4.2 -&gt; 8, mu = 4.02 -&gt; 3
+the shift is an accuracy dial: closer shift, faster convergence
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<p>Both rates are gated as fitted slopes against their <em>squared</em> ratios — the
+Rayleigh quotient converges at twice the vector’s exponential rate for
+symmetric matrices, exactly as
+<a class="reference internal" href="../03-eigenvalues/spectral-theorem.html"><span class="std std-doc">§3.2</span></a> measured — following the
+course’s rule that fitted exponents are gated and single iterations are not.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  power iteration converges to the DOMINANT eigenvalue 9   [got [9.] vs expected [9.] (rtol=0, atol=1e-09)]
+✓  at the squared ratio (lambda_2/lambda_1)^2, since A is symmetric   [got [0.60497114] vs expected [0.60493827] (rtol=0.05, atol=0)]
+✓  shift-invert with mu = 4.2 converges to the NEAREST eigenvalue 4 (Eq. 1)   [got [4.] vs expected [4.] (rtol=0, atol=1e-09)]
+✓  at the squared shifted ratio (0.2/0.8)^2   [got [0.061391] vs expected [0.0625] (rtol=0.2, atol=0)]
+✓  and a closer shift converges in fewer steps: the accuracy dial   [3 steps at mu = 4.02 against 8 at mu = 4.2]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-rayleigh-quotient-iteration-measured-cubic-convergence">
+<h2>Exercise 2: Rayleigh-quotient iteration: measured cubic convergence<a class="headerlink" href="#exercise-2-rayleigh-quotient-iteration-measured-cubic-convergence" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-eiga-rqi">Eq. 227</a> closes the loop: use the current eigenvalue estimate as the
+next shift. For symmetric matrices the payoff is <strong>cubic</strong> convergence — the
+error roughly <em>cubes</em> each step — and the endgame is distinctive: the
+iteration succeeds by driving <span class="math notranslate nohighlight">\(A - \mu I\)</span> numerically singular, so the
+<code class="docutils literal notranslate"><span class="pre">LinAlgError</span></code> from <code class="docutils literal notranslate"><span class="pre">solve</span></code> is the algorithm announcing victory, and the guard
+around it is part of the method, not defensive clutter.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">rqi(A,</span> <span class="pre">x0,</span> <span class="pre">n_steps)</span></code> implementing <a class="reference internal" href="#equation-eq-eiga-rqi">Eq. 227</a> with
+<code class="docutils literal notranslate"><span class="pre">np.linalg.solve</span></code> inside a <code class="docutils literal notranslate"><span class="pre">try/except</span> <span class="pre">np.linalg.LinAlgError</span></code> that <strong>breaks</strong>
+on singularity. Run from the same <code class="docutils literal notranslate"><span class="pre">x0</span></code> and report the error history against
+the nearest true eigenvalue.</p>
+<p><strong>Part b)</strong> The measured errors: <span class="math notranslate nohighlight">\(2.9\times10^{-1}, 1.7\times10^{-1},
+3.1\times10^{-2}, 3.6\times10^{-5}, 4.4\times10^{-14}\)</span> — five steps from
+nothing to machine precision. Fit the local convergence exponent
+<span class="math notranslate nohighlight">\(p = \log e_{k+1}/\log e_k\)</span> on the clean middle pairs and confirm it lands in
+<span class="math notranslate nohighlight">\([2.5, 3.5]\)</span>: measured <span class="math notranslate nohighlight">\(2.96\)</span>, and the manifest’s claim of cubic convergence
+is a <em>measurement</em>, not a citation.</p>
+<p><strong>Part c)</strong> Report whether the singular-solve event occurred (on this machine
+it does, at iteration 7 — <span class="math notranslate nohighlight">\(\mu\)</span> has converged so exactly that
+<span class="math notranslate nohighlight">\(A - \mu I\)</span> is singular <em>to rounding</em>). Whether and when it fires is a
+bit-level outcome, so it is reported, never gated; what is gated is the final
+error, below <span class="math notranslate nohighlight">\(10^{-12}\)</span> either way.</p>
+<p><strong>Part d)</strong> Contrast the three methods on one axis: power (linear, rate
+<span class="math notranslate nohighlight">\(0.60\)</span>), shift-invert at <span class="math notranslate nohighlight">\(4.2\)</span> (linear, rate <span class="math notranslate nohighlight">\(0.0625\)</span>), RQI (cubic). Plot
+error against iteration on a log axis — the standard picture of this
+subject, now with every curve measured rather than sketched.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>RQI errors: 2.86e-01 1.66e-01 3.13e-02 3.57e-05 4.62e-14 8.88e-16 8.88e-16 8.88e-16 8.88e-16 8.88e-16 8.88e-16
+local convergence exponents log(e_k+1)/log(e_k): [&#39;2.96&#39;]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-eiga-races">
+<img alt="../../_images/61f336d4db80ad640b3fcb90bfe7e9c728e65fdcf33aa158f068f5b413b83acd.png" src="../../_images/61f336d4db80ad640b3fcb90bfe7e9c728e65fdcf33aa158f068f5b413b83acd.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 94 </span><span class="caption-text">Error against iteration for the three iterations on the same symmetric <span class="math notranslate nohighlight">\(8\times8\)</span> matrix, log scale: power iteration (linear at the squared ratio <span class="math notranslate nohighlight">\((7/9)^2 = 0.60\)</span>), shift-invert with <span class="math notranslate nohighlight">\(\mu = 4.2\)</span> (linear at <span class="math notranslate nohighlight">\((0.2/0.8)^2 = 0.0625\)</span>), and Rayleigh-quotient iteration, whose error goes <span class="math notranslate nohighlight">\(10^{-1} \to 10^{-2} \to 10^{-5} \to 10^{-14}\)</span> – a measured local exponent of <span class="math notranslate nohighlight">\(2.96\)</span>, the cubic convergence the textbooks promise. RQI’s curve simply stops: its next solve raised LinAlgError because <span class="math notranslate nohighlight">\(A - \mu I\)</span> had become singular to rounding, which is the algorithm succeeding.</span><a class="headerlink" href="#fig-eiga-races" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<p>The cubic exponent is gated as a fitted quantity in a band, and the
+singular-solve event — a bit-level outcome the two CI machines may time
+differently — is reported only. The final error is what both machines must
+agree on.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  RQI&#39;s measured convergence exponent is cubic: in [2.5, 3.5] (Eq. 2)   [local exponents [&#39;2.96&#39;], against 2 for quadratic and 1 for linear — the textbook claim, measured]
+✓  reaching machine-level accuracy within five shifts   [whether the endgame&#39;s singular solve fires, and at which iteration, is a bit-level outcome — reported above, never gated [8.88178e-16 &lt; 1e-12]]
+✓  and at EQUAL step counts, RQI at step 4 beats power by six-plus orders   [4.6e-14 against 2.6e-01 at four steps each — and 4.6e-14 also beats power&#39;s entire 35-step run (4.8e-08) by six orders: each RQI step costs a fresh solve, and buys the world]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-hessenberg-form-the-reduction-that-makes-qr-affordable">
+<h2>Exercise 3: Hessenberg form: the reduction that makes QR affordable<a class="headerlink" href="#exercise-3-hessenberg-form-the-reduction-that-makes-qr-affordable" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-eiga-hessenberg">Eq. 228</a> is the unglamorous step that makes everything else
+practical. This exercise verifies its three claims — similarity, structure,
+cost — on a random <span class="math notranslate nohighlight">\(8\times8\)</span> and on <code class="docutils literal notranslate"><span class="pre">S8</span></code>.</p>
+<p><strong>Part a)</strong> Compute <code class="docutils literal notranslate"><span class="pre">H,</span> <span class="pre">Q</span> <span class="pre">=</span> <span class="pre">scipy.linalg.hessenberg(A,</span> <span class="pre">calc_q=True)</span></code> for a
+random <span class="math notranslate nohighlight">\(8\times8\)</span>. Confirm <span class="math notranslate nohighlight">\(QHQ^{\top} = A\)</span> to <code class="docutils literal notranslate"><span class="pre">100</span> <span class="pre">eps</span> <span class="pre">||A||</span></code> and
+<span class="math notranslate nohighlight">\(Q^{\top}Q = I\)</span> to <span class="math notranslate nohighlight">\(10^{-13}\)</span>: a genuine orthogonal similarity.</p>
+<p><strong>Part b)</strong> Confirm the structure: every entry strictly below the first
+subdiagonal is <strong>exactly</strong> zero — these entries are never computed, only
+stored as zeros by the LAPACK routine, so exact equality is legitimate here
+(they are structural, not rounded).</p>
+<p><strong>Part c)</strong> Confirm the spectrum survives: sorted <code class="docutils literal notranslate"><span class="pre">eigvals(H)</span></code> against
+<code class="docutils literal notranslate"><span class="pre">eigvals(A)</span></code> to <span class="math notranslate nohighlight">\(10^{-11}\)</span> — similarity preserves eigenvalues, per
+<a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html"><span class="std std-doc">§3.5</span></a>, and the reduction
+is backward stable so the agreement is near rounding.</p>
+<p><strong>Part d)</strong> Confirm symmetry buys tridiagonality: <code class="docutils literal notranslate"><span class="pre">hessenberg(S8)</span></code> has its
+strictly-upper triangle beyond the superdiagonal at rounding scale (symmetric
+Hessenberg = tridiagonal), which is why <code class="docutils literal notranslate"><span class="pre">eigh</span></code> is faster than <code class="docutils literal notranslate"><span class="pre">eig</span></code>.</p>
+<p><strong>Part e)</strong> Confirm the cost argument by counting, not timing: one QR
+factorization of a full <span class="math notranslate nohighlight">\(n\times n\)</span> costs <span class="math notranslate nohighlight">\(\sim\tfrac43n^3\)</span> flops, of a
+Hessenberg matrix <span class="math notranslate nohighlight">\(\sim 3n^2\)</span> (one Givens rotation per subdiagonal entry).
+Report the ratio at <span class="math notranslate nohighlight">\(n = 8\)</span> and <span class="math notranslate nohighlight">\(n = 1000\)</span>: the reduction converts an
+<span class="math notranslate nohighlight">\(O(n^4)\)</span> total iteration into <span class="math notranslate nohighlight">\(O(n^3)\)</span>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Q H Q^T = A to 1.44e-15;  Q^T Q = I to 4.44e-16
+strictly below the subdiagonal: 0.0  (exactly zero, structural)
+spectrum preserved to 7.54e-15
+
+symmetric input -&gt; tridiagonal: strictly above the superdiagonal 1.15e-15
+QR sweep cost at n = 8: full ~6.8e+02 vs Hessenberg ~1.9e+02  (4x)
+QR sweep cost at n = 1000: full ~1.3e+09 vs Hessenberg ~3.0e+06  (444x)
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<p>The structural zeros are gated exactly — with the reason stated, since
+“exactly zero” is otherwise forbidden by the gating rules: these entries are
+<em>stored</em>, never computed, so no rounding ever touches them. Everything
+computed is gated at scaled tolerances.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  Hessenberg reduction is an orthogonal similarity: A = Q H Q^T (Eq. 3)   [reconstruction 1.4e-15, orthogonality 4.4e-16]
+✓  with the entries below the subdiagonal EXACTLY zero   [legitimate exactness: LAPACK stores these as zeros and never computes them, so no rounding is involved (gating rule 3&#39;s exception)]
+✓  and the spectrum is untouched, as similarity requires   [7.54155e-15 &lt; 1e-11]
+✓  symmetric input reduces to TRIDIAGONAL, which is why eigh beats eig   [1.15198e-15 &lt; 1.9984e-13]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-the-qr-algorithm-unshifted-shifted-deflated">
+<h2>Exercise 4: The QR algorithm: unshifted, shifted, deflated<a class="headerlink" href="#exercise-4-the-qr-algorithm-unshifted-shifted-deflated" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-eiga-qr">Eq. 229</a> is two lines of code that diagonalise a matrix, and
+<a class="reference internal" href="#equation-eq-eiga-shifted">Eq. 230</a> is the one change that makes those two lines an
+algorithm people can afford. This exercise writes both and races them on
+<code class="docutils literal notranslate"><span class="pre">S8</span></code>, whose known spectrum scores the results.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">qr_unshifted(A,</span> <span class="pre">tol)</span></code>: reduce to Hessenberg, then repeat
+<span class="math notranslate nohighlight">\(H \leftarrow RQ\)</span> from <span class="math notranslate nohighlight">\(H = QR\)</span> until every subdiagonal entry is below
+<code class="docutils literal notranslate"><span class="pre">tol</span></code>. Confirm it converges on <code class="docutils literal notranslate"><span class="pre">S8</span></code> — the diagonal, sorted, matches the true
+spectrum to <span class="math notranslate nohighlight">\(10^{-10}\)</span> — and record the sweep count: <strong>100</strong>.</p>
+<p><strong>Write this one yourself</strong> — the implementation is the lesson.</p>
+<p><strong>Part b)</strong> Confirm each sweep is a similarity: after five sweeps,
+<code class="docutils literal notranslate"><span class="pre">eigvals</span></code> of the iterate still matches the true spectrum to <span class="math notranslate nohighlight">\(10^{-11}\)</span>. The
+iteration never changes the answer, only its visibility.</p>
+<p><strong>Part c)</strong> Write <code class="docutils literal notranslate"><span class="pre">qr_shifted(A,</span> <span class="pre">tol)</span></code> implementing <a class="reference internal" href="#equation-eq-eiga-shifted">Eq. 230</a>
+with the Wilkinson shift from the trailing <span class="math notranslate nohighlight">\(2\times2\)</span> block and deflation:
+when the last subdiagonal entry of the active block dies, record the corner
+eigenvalue and shrink the block. Confirm the same accuracy — every deflated
+eigenvalue matches the truth to <span class="math notranslate nohighlight">\(10^{-10}\)</span> — in <strong>15</strong> sweeps: <span class="math notranslate nohighlight">\(6.7\times\)</span>
+fewer, clearing the manifest’s factor-of-three requirement with room.</p>
+<p><strong>Part d)</strong> Confirm the mechanism: under the shifted iteration the <em>last</em>
+subdiagonal entry dies at a super-linear rate (its magnitude over the first
+four sweeps drops by many orders), while under the unshifted iteration the
+same entry contracts by only <span class="math notranslate nohighlight">\(|\lambda_8/\lambda_7|= 1/1.5 \approx 0.67\)</span> per
+sweep. Report both sequences.</p>
+<p><strong>Part e)</strong> Plot the subdiagonal magnitudes of the unshifted iterate as a
+heat sequence over sweeps 0, 10, 30, 100 — the matrix visibly converging to
+triangular, slowest where eigenvalues are closest.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>unshifted QR: 100 sweeps, worst eigenvalue error 1.5e-14
+after 5 sweeps the spectrum is still exact to 4.0e-15: each sweep is a similarity
+
+shifted QR + deflation: 15 sweeps, worst error 3.1e-15
+speedup 6.7x — the shift is the algorithm
+
+last subdiagonal under the SHIFT, first sweeps: [&#39;1.7e-03&#39;, &#39;4.0e-10&#39;, &#39;9.9e-29&#39;, &#39;6.3e-02&#39;]
+unshifted prediction for that entry: contraction 0.667/sweep — 57 sweeps to die alone
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-eiga-deflation">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f633f6d8d70&gt;
+</pre></div>
+</div>
+<figcaption>
+<p><span class="caption-number">Fig. 95 </span><span class="caption-text">The unshifted QR iterate at sweeps 0, 10, 30 and 100 (termination), drawn as <span class="math notranslate nohighlight">\(\log_{10}\)</span> of entry magnitudes. The matrix converges to triangular from the bottom up, each subdiagonal entry dying at its own linear rate <span class="math notranslate nohighlight">\(|\lambda_{i+1}/\lambda_i|\)</span> – slowest for the pair 4 and 5 (ratio 0.8, which alone stretches the run to <span class="math notranslate nohighlight">\(\ln 10^{-10}/\ln 0.8 \approx 103\)</span> sweeps). The shifted iteration kills the same entries in one to three sweeps each by aiming at them, which is the entire 6.7x difference.</span><a class="headerlink" href="#fig-eiga-deflation" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<figure class="align-default" id="id5">
+<img alt="../../_images/f7d3e35080ceb626dad84541327bf5839dd19f56f196edab361fbd21647f750c.png" src="../../_images/f7d3e35080ceb626dad84541327bf5839dd19f56f196edab361fbd21647f750c.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 96 </span><span class="caption-text">The unshifted QR iterate at sweeps 0, 10, 30 and 100 (termination), drawn as <span class="math notranslate nohighlight">\(\log_{10}\)</span> of entry magnitudes. The matrix converges to triangular from the bottom up, each subdiagonal entry dying at its own linear rate <span class="math notranslate nohighlight">\(|\lambda_{i+1}/\lambda_i|\)</span> – slowest for the pair 4 and 5 (ratio 0.8, which alone stretches the run to <span class="math notranslate nohighlight">\(\ln 10^{-10}/\ln 0.8 \approx 103\)</span> sweeps). The shifted iteration kills the same entries in one to three sweeps each by aiming at them, which is the entire 6.7x difference.</span><a class="headerlink" href="#id5" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<p>Both routes are scored against the <em>planted</em> spectrum rather than against
+<code class="docutils literal notranslate"><span class="pre">eigvals</span></code>, so the check is independent of the library the algorithm is meant
+to explain. The sweep-count comparison is a ratio of two deterministic
+integer counts on one machine — but the counts depend on rounding near the
+deflation threshold, so the gate takes the manifest’s factor of three, not
+the measured 6.7.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  unshifted QR converges to the planted spectrum (Eq. 4)   [100 sweeps of pure factor-and-remultiply [1.5099e-14 &lt; 1e-10]]
+✓  and every sweep is a similarity: the spectrum never moves, only its visibility   [3.9968e-15 &lt; 1e-11]
+✓  shifted QR with deflation reaches the same accuracy (Eq. 5)   [15 sweeps with the Wilkinson shift [3.10862e-15 &lt; 1e-10]]
+✓  in at most a third of the sweeps — here 6.7x fewer   [15 against 100: the gate takes the manifest&#39;s factor of three because exact sweep counts wobble with rounding at the deflation threshold; the measured margin is far larger]
+✓  the shifted iteration kills the last subdiagonal super-linearly   [[&#39;2e-03&#39;, &#39;4e-10&#39;, &#39;1e-28&#39;, &#39;6e-02&#39;] against the unshifted rate 0.67 per sweep — RQI in disguise, acting on the last row]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-the-characteristic-polynomial-is-a-trap">
+<h2>Exercise 5: The characteristic polynomial is a trap<a class="headerlink" href="#exercise-5-the-characteristic-polynomial-is-a-trap" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html"><span class="std std-doc">§3.1</span></a> promised this
+demonstration; here it is. The matrix is <span class="math notranslate nohighlight">\(\operatorname{diag}(1, 2, \dots,
+20)\)</span> — its eigenvalues are <em>printed on it</em> — and the experiment is to recover
+them from its characteristic polynomial, Wilkinson’s
+<span class="math notranslate nohighlight">\(w(x) = \prod_{r=1}^{20}(x - r)\)</span>.</p>
+<p><strong>Part a)</strong> Build the exact coefficients by convolving <span class="math notranslate nohighlight">\((x - r)\)</span> factors in
+integer arithmetic (<code class="docutils literal notranslate"><span class="pre">object</span></code> dtype keeps them exact; the largest is
+<span class="math notranslate nohighlight">\(20! \approx 2.4\times10^{18}\)</span>, beyond <code class="docutils literal notranslate"><span class="pre">float64</span></code>’s integer range). Then round
+to <code class="docutils literal notranslate"><span class="pre">float64</span></code> and call <code class="docutils literal notranslate"><span class="pre">np.roots</span></code>. Report the worst distance from any computed
+root to its true integer: <strong><span class="math notranslate nohighlight">\(0.09\)</span></strong> — the roots of the <em>exactly correct</em>
+polynomial, merely rounded, are wrong in the second digit.</p>
+<p><strong>Part b)</strong> Score the matrix route on the same problem:
+<code class="docutils literal notranslate"><span class="pre">eigvals(diag(1..20))</span></code> is exact to <span class="math notranslate nohighlight">\(0\)</span> on this machine — gate <span class="math notranslate nohighlight">\(\le
+10^{-13}\)</span>. The same twenty numbers, thirteen orders better, because the
+matrix encoding of a spectrum is perfectly conditioned where the coefficient
+encoding is catastrophically compressed.</p>
+<p><strong>Part c)</strong> Confirm the compression numerically: the coefficients span 18
+orders of magnitude, and perturbing the <span class="math notranslate nohighlight">\(x^{19}\)</span> coefficient alone by a
+<em>relative</em> <span class="math notranslate nohighlight">\(10^{-10}\)</span> scatters ten roots off the real axis, with imaginary
+parts up to order 1. Report the count of complex roots and the largest
+<span class="math notranslate nohighlight">\(|\operatorname{Im}|\)</span>.</p>
+<p><strong>Part d)</strong> Close with the cost of the real algorithm — and with a caution
+about <em>measuring</em> it. The FLOP model prices <code class="docutils literal notranslate"><span class="pre">eig</span></code> at <span class="math notranslate nohighlight">\(\sim25n^3\)</span>
+(<code class="docutils literal notranslate"><span class="pre">la.flops(&quot;eig&quot;,</span> <span class="pre">n)</span></code>), so the <span class="math notranslate nohighlight">\(n = 400\)</span> problem costs exactly <span class="math notranslate nohighlight">\(64\times\)</span> the
+<span class="math notranslate nohighlight">\(n = 100\)</span> one; gate that ratio, which is arithmetic. Then time both and
+report the measured exponent <strong>without gating it</strong>: at these sizes it comes
+out near <span class="math notranslate nohighlight">\(1.7\)</span>, nowhere near <span class="math notranslate nohighlight">\(3\)</span>, because a multithreaded LAPACK at
+<span class="math notranslate nohighlight">\(n \le 400\)</span> is dominated by overhead and memory rather than by the
+asymptotic arithmetic. Small-<span class="math notranslate nohighlight">\(n\)</span> timings do not reveal exponents, and a gate
+on this number would be a gate on the machine’s thread scheduler.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>largest coefficient: 1.380e+19 (exact integer)
+np.roots on the rounded coefficients: worst distance to a true root = 0.085
+eigvals(diag(1..20)): worst error 0.0e+00
+same spectrum, 9e+14x apart: the coefficients are the trap, not the arithmetic
+
+coefficient span: 19 orders of magnitude
+perturb a19 by a RELATIVE 1e-10: 10 roots leave the real axis, max |Im| = 2.05
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>FLOP model: eig(400) / eig(100) = 64x — exact arithmetic, gated
+measured times [&#39;0.005s&#39;, &#39;0.020s&#39;, &#39;0.087s&#39;]; fitted exponent 2.04 — nowhere near 3, because n &lt;= 400 is overhead-dominated
+small-n wall clock does not reveal exponents; reported, never gated
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-eiga-wilkinson">
+<img alt="../../_images/0b537e19d4dc1047cb1a318dc85af2142004bd669b6b515bb76e842db26701aa.png" src="../../_images/0b537e19d4dc1047cb1a318dc85af2142004bd669b6b515bb76e842db26701aa.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 97 </span><span class="caption-text">The twenty roots of Wilkinson’s polynomial <span class="math notranslate nohighlight">\(\prod(x-r)\)</span> after a single coefficient, <span class="math notranslate nohighlight">\(a_{19}\)</span>, is perturbed by a relative <span class="math notranslate nohighlight">\(10^{-10}\)</span>: half of them leave the real axis entirely, with imaginary parts of order one (navy), against the true integer roots (amber ticks). The coefficients span 18 orders of magnitude, and the map from them back to the roots carries condition numbers up to <span class="math notranslate nohighlight">\(10^{13}\)</span> – so the characteristic polynomial destroys a spectrum that the matrix itself, per Weyl, holds perfectly. This is why no library computes eigenvalues from det(A - lambda I) = 0.</span><a class="headerlink" href="#fig-eiga-wilkinson" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p>The QR iteration here recomputed a full QR each sweep; production code
+instead applies the shift <em>implicitly</em>, chasing a single “bulge” down the
+Hessenberg matrix with <span class="math notranslate nohighlight">\(O(n)\)</span> Givens rotations — same mathematics, no
+subtraction of <span class="math notranslate nohighlight">\(\mu I\)</span> ever performed. Ask your assistant for a
+<code class="docutils literal notranslate"><span class="pre">givens_qr_sweep(H,</span> <span class="pre">mu)</span></code> implementing one implicit sweep on a symmetric
+tridiagonal matrix. Then check it against the mathematics rather than a
+demo: (i) its output matches one explicit sweep of Eq. 5 to <span class="math notranslate nohighlight">\(10^{-12}\)</span> on
+<code class="docutils literal notranslate"><span class="pre">hessenberg(S8)</span></code>, (ii) it preserves the tridiagonal structure exactly, and
+(iii) its flop count — count the rotations — is <span class="math notranslate nohighlight">\(O(n)\)</span> where the explicit
+sweep’s is <span class="math notranslate nohighlight">\(O(n^2)\)</span>. The check is yours.</p>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<p>The polynomial’s failure is gated as a <em>floor</em> (at least this bad) and the
+matrix route as a ceiling, because the exact wrongness of ill-conditioned
+roots is machine luck while the wrongness itself is the theorem. The timing
+exponent is a fitted trend per the gating rules; the times themselves are
+testimony.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  rooting the EXACT polynomial loses 12+ digits; eigvals loses none   [worst root error 0.085 against 0.0e+00 from the matrix — the same twenty numbers, and only the encoding differs]
+✓  a relative 1e-10 nudge of ONE coefficient throws roots into the plane   [10 complex roots, max |Im| = 2.05, from coefficients spanning 19 orders]
+✓  the cost MODEL scales as n^3: eig(400) costs exactly 64x eig(100)   [got [64.] vs expected [64.] (rtol=0, atol=1e-09)]
+measured small-n exponent, reported and never gated: 2.04 at n = 100..400 — a multithreaded LAPACK here is overhead- and memory-dominated, so small-n timing cannot exhibit the asymptotic exponent. The FLOP ratio is the gate; the stopwatch never is
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p><strong>Three iterations, three measured rates.</strong> Power iteration converged to the
+dominant <span class="math notranslate nohighlight">\(\lambda = 9\)</span> at the squared ratio <span class="math notranslate nohighlight">\((7/9)^2 = 0.60\)</span> per step;
+shift-invert with <span class="math notranslate nohighlight">\(\mu = 4.2\)</span> found the <em>interior</em> <span class="math notranslate nohighlight">\(\lambda = 4\)</span> at
+<span class="math notranslate nohighlight">\((0.2/0.8)^2 = 0.0625\)</span>, one LU factorization reused throughout; and RQI went
+<span class="math notranslate nohighlight">\(2.9\times10^{-1} \to 3.1\times10^{-2} \to 3.6\times10^{-5} \to
+4.4\times10^{-14}\)</span> — local exponent <strong>2.96</strong>, the cubic convergence of the
+textbooks, measured — before terminating by driving <span class="math notranslate nohighlight">\(A - \mu I\)</span> exactly
+singular, which is the success condition wearing an exception.</p>
+<p><strong>Hessenberg is the enabling reduction.</strong> <span class="math notranslate nohighlight">\(QHQ^{\top} = A\)</span> at rounding, the
+below-subdiagonal entries <em>exactly</em> zero (structural, never computed — the
+stated exception to the no-exact-zeros rule), the spectrum preserved to
+<span class="math notranslate nohighlight">\(10^{-14}\)</span>, symmetric input collapsing to tridiagonal, and a per-sweep cost
+falling from <span class="math notranslate nohighlight">\(\tfrac43n^3\)</span> to <span class="math notranslate nohighlight">\(3n^2\)</span>: <span class="math notranslate nohighlight">\(444\times\)</span> at <span class="math notranslate nohighlight">\(n = 1000\)</span>.</p>
+<p><strong>The shift is the algorithm.</strong> Unshifted QR: 100 sweeps to <span class="math notranslate nohighlight">\(10^{-14}\)</span>.
+Wilkinson-shifted with deflation: 15 sweeps to the same accuracy — <span class="math notranslate nohighlight">\(6.7\times\)</span>
+fewer, gated at the manifest’s 3× because sweep counts wobble at the
+deflation threshold. The mechanism is visible in the last subdiagonal entry:
+super-linear collapse under the shift against a predicted <span class="math notranslate nohighlight">\(0.67\)</span>/sweep
+without it, and the heat-sequence shows the unshifted matrix converging
+bottom-up, slowest between the close eigenvalues.</p>
+<p><strong>The characteristic polynomial destroys what the matrix preserves.</strong> The
+<em>exact</em> integer coefficients of <span class="math notranslate nohighlight">\(\prod(x - r)\)</span>, merely rounded to <code class="docutils literal notranslate"><span class="pre">float64</span></code>,
+yield roots wrong by <span class="math notranslate nohighlight">\(0.09\)</span> — thirteen orders worse than <code class="docutils literal notranslate"><span class="pre">eigvals</span></code> on
+<span class="math notranslate nohighlight">\(\operatorname{diag}(1..20)\)</span> — and a relative <span class="math notranslate nohighlight">\(10^{-10}\)</span> nudge to one
+coefficient throws half the spectrum into the complex plane. The
+coefficients span 18 orders of magnitude; the matrix encoding, by Weyl, is
+perfectly conditioned. That asymmetry is the entire reason the
+Hessenberg-plus-shifted-QR detour exists. Its cost model is <span class="math notranslate nohighlight">\(n^3\)</span> — an
+exact <span class="math notranslate nohighlight">\(64\times\)</span> from <span class="math notranslate nohighlight">\(n = 100\)</span> to <span class="math notranslate nohighlight">\(400\)</span> — while the <em>measured</em> small-<span class="math notranslate nohighlight">\(n\)</span>
+exponent of <span class="math notranslate nohighlight">\(1.7\)</span> is itself the closing lesson: wall clocks at small <span class="math notranslate nohighlight">\(n\)</span> do
+not exhibit asymptotics, which is why the model is gated and the stopwatch
+is not.</p>
+<p><strong>Methods introduced.</strong> <code class="docutils literal notranslate"><span class="pre">power_iteration</span></code>, <code class="docutils literal notranslate"><span class="pre">shift_invert</span></code> via
+<code class="docutils literal notranslate"><span class="pre">lu_factor</span></code>/<code class="docutils literal notranslate"><span class="pre">lu_solve</span></code>, <code class="docutils literal notranslate"><span class="pre">rqi</span></code> with the singular-solve success guard,
+<code class="docutils literal notranslate"><span class="pre">scipy.linalg.hessenberg</span></code>, hand-written unshifted and Wilkinson-shifted QR
+with deflation, exact polynomial coefficients in <code class="docutils literal notranslate"><span class="pre">object</span></code> arithmetic, and
+fitted cost exponents.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>The unsymmetric endgame.</strong> On non-normal matrices the same machinery
+produces the Schur form of
+<a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html"><span class="std std-doc">§3.5</span></a> — QR converges to
+triangular, not diagonal — with double implicit shifts to keep complex
+pairs in real arithmetic.</p></li>
+<li><p><strong>When <span class="math notranslate nohighlight">\(n\)</span> forbids even one reduction.</strong> Hessenberg costs <span class="math notranslate nohighlight">\(O(n^3)\)</span>; at
+<span class="math notranslate nohighlight">\(n = 10^6\)</span> that is the wall. Krylov methods
+(<a class="reference internal" href="krylov-gmres-preconditioning.html"><span class="std std-doc">§5.5</span></a>) extract eigenvalues from
+matrix–vector products alone — power iteration’s idea, industrialised.</p></li>
+<li><p><strong>Divide and conquer, bisection, MRRR.</strong> For symmetric tridiagonals LAPACK
+holds faster specialists than shifted QR; interlacing
+(<a class="reference internal" href="../03-eigenvalues/spectral-theorem.html"><span class="std std-doc">§3.2</span></a>) powers the bisection
+route to any single eigenvalue without its neighbours.</p></li>
+<li><p><strong>The SVD by the same engine.</strong>
+<a class="reference internal" href="../04-svd/svd-geometry.html"><span class="std std-doc">§4.1</span></a> promised that no Gram matrix is ever
+formed: LAPACK bidiagonalises and runs an implicit shifted QR on the
+bidiagonal — this notebook’s algorithm, transposed to singular values.</p></li>
+</ul>
+<div class="docutils container" id="id6">
+<div role="list" class="citation-list">
+<div class="citation" id="id15" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">GVL13</a><span class="fn-bracket">]</span></span>
+<p>Gene H. Golub and Charles F. Van Loan. <em>Matrix Computations</em>. Johns Hopkins University Press, Baltimore, 4 edition, 2013.</p>
+</div>
+<div class="citation" id="id17" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">Hig02</a><span class="fn-bracket">]</span></span>
+<p>Nicholas J. Higham. <em>Accuracy and Stability of Numerical Algorithms</em>. SIAM, Philadelphia, 2 edition, 2002. <a class="reference external" href="https://doi.org/10.1137/1.9780898718027">doi:10.1137/1.9780898718027</a>.</p>
+</div>
+<div class="citation" id="id14" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">TB97</a><span class="fn-bracket">]</span></span>
+<p>Lloyd N. Trefethen and David Bau, III. <em>Numerical Linear Algebra</em>. SIAM, Philadelphia, 1997. <a class="reference external" href="https://doi.org/10.1137/1.9780898719574">doi:10.1137/1.9780898719574</a>.</p>
+</div>
+<div class="citation" id="id21" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">Wat10</a><span class="fn-bracket">]</span></span>
+<p>David S. Watkins. <em>Fundamentals of Matrix Computations</em>. Wiley, 3 edition, 2010.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/05-numerical"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="norms-conditioning-stability.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">5.1 Norms, Conditioning, and Backward Stability</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="sparse-matrices.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#power-iteration-and-shifting-it">Power iteration, and shifting it</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#rayleigh-quotient-iteration">Rayleigh-quotient iteration</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hessenberg-form">Hessenberg form</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-qr-algorithm-and-why-shifting-is-everything">The QR algorithm, and why shifting is everything</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-never-the-characteristic-polynomial">Why never the characteristic polynomial</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-power-iteration-redirected-shift-invert">Exercise 1: Power iteration redirected: shift-invert</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-rayleigh-quotient-iteration-measured-cubic-convergence">Exercise 2: Rayleigh-quotient iteration: measured cubic convergence</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-hessenberg-form-the-reduction-that-makes-qr-affordable">Exercise 3: Hessenberg form: the reduction that makes QR affordable</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-the-qr-algorithm-unshifted-shifted-deflated">Exercise 4: The QR algorithm: unshifted, shifted, deflated</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-the-characteristic-polynomial-is-a-trap">Exercise 5: The characteristic polynomial is a trap</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

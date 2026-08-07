@@ -1,0 +1,62 @@
+# Deploy the already-built site to GitHub Pages via Actions.
+#
+# This file is NOT used by the master repo. It is copied into the published tree
+# by .github/workflows/publish.yml, so it lands on the PUBLIC repo's gh-pages
+# branch alongside the HTML and runs there.
+#
+# Why it exists: GitHub's legacy (branch-source) Pages builder runs the Jekyll
+# pipeline over the branch on every push. This site is already built HTML with a
+# .nojekyll marker, so that work is pure overhead — and it grew with the book,
+# measured at 314 s, 386 s, 447 s and 612 s as the course reached 13, 14, 15 and
+# 17 notebooks. The legacy builder times out at ten minutes, so at 612 s the site
+# stopped publishing altogether: every later build either errored instantly or
+# hung, while the deploy step stayed green because the HTML did reach the branch.
+#
+# The Actions path skips Jekyll entirely: it tars the directory, uploads it as an
+# artifact, and deploys. Seconds rather than minutes, and it does not grow with
+# the book.
+#
+# Requires the public repo's Pages source to be set to "GitHub Actions"
+# (build_type: workflow).
+name: deploy-pages
+
+on:
+  push:
+    branches: [gh-pages]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deployment at a time, and never cancel one in flight: a half-finished
+# Pages deployment is worse than a slightly stale one.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out the built site
+        uses: actions/checkout@v4
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      # The whole branch IS the site. `.nojekyll` travels with it, so the
+      # underscore-prefixed directories Sphinx emits (_static, _images,
+      # _sources) are served rather than skipped.
+      - name: Upload the site as a Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

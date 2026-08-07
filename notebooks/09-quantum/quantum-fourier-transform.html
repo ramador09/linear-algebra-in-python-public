@@ -1,0 +1,1285 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="9.5 The Quantum Fourier Transform is the DFT Matrix" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/09-quantum/quantum-fourier-transform.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: §6.3 built the unitary DFT matrix to diagonalize circulants. Quantum computing’s most famous subroutine — the transform inside Shor’s fact..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: §6.3 built the unitary DFT matrix to diagonalize circulants. Quantum computing’s most famous subroutine — the transform inside Shor’s fact..." />
+
+    <title>9.5 The Quantum Fourier Transform is the DFT Matrix &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/09-quantum/quantum-fourier-transform';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/09-quantum/quantum-fourier-transform.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="E.1 Five Factorizations, One Idea" href="../epilogue/five-factorizations-one-idea.html" />
+    <link rel="prev" title="9.4 Measurement, Channels, and the Choi Matrix" href="measurement-channels-choi.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter IX — Quantum Information as Linear Algebra</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/09-quantum/quantum-fourier-transform.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/09-quantum/quantum-fourier-transform.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/09-quantum/quantum-fourier-transform.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/09-quantum/quantum-fourier-transform.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>9.5 The Quantum Fourier Transform is the DFT Matrix</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#one-matrix-sign-flipped">One matrix, sign flipped</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-circuit-a-factorization-theorem">The circuit: a factorization theorem</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#period-finding">Period finding</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#deutschjozsa-one-inner-product">Deutsch–Jozsa: one inner product</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-the-matrix-inherited-from-chapter-vi">Exercise 1: The matrix, inherited from Chapter VI</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-circuit-a-factorization-multiplied-back">Exercise 2: The circuit: a factorization, multiplied back</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-period-finding-exact-quarters">Exercise 3: Period finding: exact quarters</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-deutschjozsa-exhaustively">Exercise 4: Deutsch–Jozsa, exhaustively</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-one-eigenbasis-two-subjects">Exercise 5: One eigenbasis, two subjects</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="the-quantum-fourier-transform-is-the-dft-matrix">
+<h1>9.5 The Quantum Fourier Transform is the DFT Matrix<a class="headerlink" href="#the-quantum-fourier-transform-is-the-dft-matrix" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter IX — Quantum Information as Linear Algebra
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;9.5
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">The quantum computer&#x27;s signature transform is a matrix this course built two chapters ago: the unitary DFT, conjugated. Its circuit is a factorization theorem, period finding is one matrix-vector product with exact quarter-mass peaks, and Deutsch-Jozsa is a single inner product — the chapter closes where the FFT began.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;advanced&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;120–150 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html"><span class="std std-doc">§6.3</span></a> built the unitary
+DFT matrix to diagonalize circulants. Quantum computing’s most famous
+subroutine — the transform inside Shor’s factoring algorithm — is the
+<strong>same matrix with the exponent’s sign flipped</strong>, and this notebook
+gates that identification down to the last bit before spending it three
+ways.</p>
+<p>First, the <strong>circuit</strong>: the QFT on three qubits factors into three
+Hadamards and three controlled phase rotations — a factorization theorem
+for a <span class="math notranslate nohighlight">\(2^n \times 2^n\)</span> unitary into <span class="math notranslate nohighlight">\(n(n{+}1)/2\)</span> two-level pieces, gated
+by multiplying the pieces back together. Second, <strong>period finding</strong>, the
+linear-algebra heart of Shor: apply the QFT to a vector supported on an
+arithmetic progression of period <span class="math notranslate nohighlight">\(r\)</span> and the mass lands on multiples of
+<span class="math notranslate nohighlight">\(N/r\)</span> — <em>exactly</em>, quarter after quarter, with off-peak amplitudes at
+rounding zero. Third, <strong>Deutsch–Jozsa</strong>, run as pure linear algebra: one
+inner product decides constant-versus-balanced, and the notebook
+enumerates <em>all seventy</em> balanced oracles on three bits to show the
+amplitude vanishes for every one.</p>
+<p>The closer is the chapter’s thesis in one line: the operator this
+transform diagonalizes is the cyclic shift, which is
+<a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html"><span class="std std-doc">§6.3</span></a>’s circulant
+generator — quantum information and classical signal processing sharing
+one eigenbasis, because they were always the same linear algebra.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> Nielsen and Chuang <span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id63" title="Michael A. Nielsen and Isaac L. Chuang. Quantum Computation and Quantum Information. Cambridge University Press, Cambridge, 10th anniversary edition, 2010. doi:10.1017/CBO9780511976667.">NC10</a>]</span> Chapter 5;
+Deutsch–Jozsa is <span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id68" title="David Deutsch and Richard Jozsa. Rapid solution of problems by quantum computation. Proceedings of the Royal Society of London A, 439(1907):553–558, 1992. doi:10.1098/rspa.1992.0167.">DJ92</a>]</span>. The DFT conventions are
+<a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html"><span class="std std-doc">§6.3</span></a>’s, and the gate
+machinery is <a class="reference internal" href="qubits-gates-bloch.html"><span class="std std-doc">§9.1</span></a>’s and
+<a class="reference internal" href="tensor-products-entanglement.html"><span class="std std-doc">§9.2</span></a>’s.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="one-matrix-sign-flipped">
+<h3>One matrix, sign flipped<a class="headerlink" href="#one-matrix-sign-flipped" title="Link to this heading">#</a></h3>
+<p>The QFT on <span class="math notranslate nohighlight">\(N = 2^n\)</span> amplitudes is</p>
+<div class="math notranslate nohighlight" id="equation-eq-qf-matrix">
+<span class="eqno">(312)<a class="headerlink" href="#equation-eq-qf-matrix" title="Link to this equation">#</a></span>\[(\mathrm{QFT}_N)_{jk} \;=\; \frac{\omega^{jk}}{\sqrt N},
+\qquad \omega = e^{2\pi i/N} ,\]</div>
+<p>which is the entrywise <strong>conjugate</strong> of
+<a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html"><span class="std std-doc">§6.3</span></a>’s unitary DFT
+<span class="math notranslate nohighlight">\(F_{jk} = e^{-2\pi ijk/N}/\sqrt N\)</span> — same rows, opposite winding.
+Conjugating a unitary matrix entrywise keeps it unitary, so everything
+6.3 proved transfers wholesale, including the fourth-power identity
+<span class="math notranslate nohighlight">\(\mathrm{QFT}^4 = I\)</span> (with <span class="math notranslate nohighlight">\(\mathrm{QFT}^2\)</span> the reflection permutation
+<span class="math notranslate nohighlight">\(j \mapsto -j \bmod N\)</span>) and the eigenvalue alphabet <span class="math notranslate nohighlight">\(\{1, i, -1, -i\}\)</span>.</p>
+</section>
+<section id="the-circuit-a-factorization-theorem">
+<h3>The circuit: a factorization theorem<a class="headerlink" href="#the-circuit-a-factorization-theorem" title="Link to this heading">#</a></h3>
+<p>Writing the row index in bits, <span class="math notranslate nohighlight">\(j = j_1j_2\cdots j_n\)</span> (most significant
+first), the QFT factors into one Hadamard per qubit and a cascade of
+<strong>controlled phase rotations</strong></p>
+<div class="math notranslate nohighlight" id="equation-eq-qf-circuit">
+<span class="eqno">(313)<a class="headerlink" href="#equation-eq-qf-circuit" title="Link to this equation">#</a></span>\[R_m \;=\; \operatorname{diag}\bigl(1,\, e^{2\pi i/2^m}\bigr),
+\qquad m = 2, \dots, n ,\]</div>
+<p>applied from each less-significant qubit to each more-significant one,
+followed by a qubit-order reversal: <span class="math notranslate nohighlight">\(n\)</span> Hadamards and <span class="math notranslate nohighlight">\(n(n-1)/2\)</span>
+controlled phases — <span class="math notranslate nohighlight">\(n(n{+}1)/2\)</span> gates for a <span class="math notranslate nohighlight">\(2^n\)</span>-dimensional unitary,
+against the <span class="math notranslate nohighlight">\(N^2\)</span> entries of the dense matrix. The exercise <em>is</em> the
+proof: multiply the pieces and compare.</p>
+</section>
+<section id="period-finding">
+<h3>Period finding<a class="headerlink" href="#period-finding" title="Link to this heading">#</a></h3>
+<p>Let <span class="math notranslate nohighlight">\(|\psi\rangle\)</span> be uniform on the arithmetic progression
+<span class="math notranslate nohighlight">\(\{x_0, x_0 + r, x_0 + 2r, \dots\}\)</span> with <span class="math notranslate nohighlight">\(r \mid N\)</span>. Then</p>
+<div class="math notranslate nohighlight" id="equation-eq-qf-period">
+<span class="eqno">(314)<a class="headerlink" href="#equation-eq-qf-period" title="Link to this equation">#</a></span>\[\begin{split}\bigl|(\mathrm{QFT}\,\psi)_k\bigr|^2 \;=\;
+\begin{cases} 1/r &amp; k \in \{0, N/r, 2N/r, \dots\} \\[2pt]
+0 &amp; \text{otherwise} , \end{cases}\end{split}\]</div>
+<p>a geometric-series cancellation: off the peaks the <span class="math notranslate nohighlight">\(r\)</span> phasors close
+into a polygon and sum to zero <em>exactly</em>, and the offset <span class="math notranslate nohighlight">\(x_0\)</span> moves
+only phases, never masses. Reading the peak spacing recovers <span class="math notranslate nohighlight">\(r\)</span> — the
+entire quantum content of Shor’s algorithm, with the number theory
+outsourced to classical post-processing.</p>
+</section>
+<section id="deutschjozsa-one-inner-product">
+<h3>Deutsch–Jozsa: one inner product<a class="headerlink" href="#deutschjozsa-one-inner-product" title="Link to this heading">#</a></h3>
+<p>For an oracle <span class="math notranslate nohighlight">\(f: \{0,1\}^n \to \{0,1\}\)</span> promised constant or balanced,
+apply <span class="math notranslate nohighlight">\(H^{\otimes n}\)</span>, the sign flip <span class="math notranslate nohighlight">\((-1)^{f}\)</span>, and <span class="math notranslate nohighlight">\(H^{\otimes n}\)</span> to
+<span class="math notranslate nohighlight">\(|0\cdots0\rangle\)</span>. The amplitude left on <span class="math notranslate nohighlight">\(|0\cdots0\rangle\)</span> is</p>
+<div class="math notranslate nohighlight" id="equation-eq-qf-dj">
+<span class="eqno">(315)<a class="headerlink" href="#equation-eq-qf-dj" title="Link to this equation">#</a></span>\[\begin{split}a_0 \;=\; \frac{1}{2^n}\sum_{x} (-1)^{f(x)} \;=\;
+\begin{cases} \pm1 &amp; f \text{ constant} \\[2pt]
+0 &amp; f \text{ balanced} , \end{cases}\end{split}\]</div>
+<p>the <em>mean of the oracle’s signs</em> — a single inner product between the
+sign vector and the all-ones vector, deciding with one query what
+classically takes <span class="math notranslate nohighlight">\(2^{n-1}+1\)</span>.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data and restated instruments only: the one-qubit gates of
+<a class="reference internal" href="qubits-gates-bloch.html"><span class="std std-doc">§9.1</span></a>, the control projectors, and the DFT
+convention of <a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html"><span class="std std-doc">§6.3</span></a>
+restated as a constructor. The QFT matrix, the circuit assembly, the
+period-finding demonstration and the Deutsch–Jozsa evaluator are all
+built in the exercises, where they are the lesson.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random draw below comes from this seed</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+
+<span class="c1"># data: the one-qubit cast — Hadamard and the control projectors.</span>
+<span class="n">I2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+<span class="n">GATE_H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
+<span class="n">PROJ_0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">complex</span><span class="p">)</span>
+<span class="n">PROJ_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">complex</span><span class="p">)</span>
+
+
+<span class="c1"># built from scratch in §6.3; restated here as an instrument.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">unitary_dft</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;6.3&#39;s unitary DFT matrix: F_jk = exp(-2 pi i jk / N) / sqrt(N).&quot;&quot;&quot;</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="n">j</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span> <span class="o">/</span> <span class="n">N</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-the-matrix-inherited-from-chapter-vi">
+<h2>Exercise 1: The matrix, inherited from Chapter VI<a class="headerlink" href="#exercise-1-the-matrix-inherited-from-chapter-vi" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-qf-matrix">Eq. 312</a> says the QFT is one conjugation away from a matrix
+the course already owns. This exercise builds it, gates the
+inheritance, and collects the structural identities that come free.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">qft_matrix(N)</span></code> as
+<code class="docutils literal notranslate"><span class="pre">np.exp(2j</span> <span class="pre">*</span> <span class="pre">np.pi</span> <span class="pre">*</span> <span class="pre">np.outer(idx,</span> <span class="pre">idx)</span> <span class="pre">/</span> <span class="pre">N)</span> <span class="pre">/</span> <span class="pre">np.sqrt(N)</span></code>, and gate
+the handshake with <a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html"><span class="std std-doc">§6.3</span></a>:
+<code class="docutils literal notranslate"><span class="pre">qft_matrix(8)</span></code> <strong>equals</strong> <code class="docutils literal notranslate"><span class="pre">np.conj(unitary_dft(8))</span></code> — with
+<code class="docutils literal notranslate"><span class="pre">np.array_equal</span></code>, since <code class="docutils literal notranslate"><span class="pre">conj</span></code> flips sign bits without arithmetic and
+the two constructors evaluate the same cosines and sines (fallback
+<span class="math notranslate nohighlight">\(10^{-15}\)</span> if a future libm disagrees). Gate unitarity to
+<span class="math notranslate nohighlight">\(100\,\varepsilon\)</span>.</p>
+<p><strong>Write this one yourself</strong> — one outer product; the sign in the
+exponent is the entire difference between signal processing and
+quantum computing conventions.</p>
+<p><strong>Part b)</strong> Gate the inherited structure at <span class="math notranslate nohighlight">\(N = 8\)</span>, all to
+<span class="math notranslate nohighlight">\(10^{-13}\)</span>: <span class="math notranslate nohighlight">\(\mathrm{QFT}^2\)</span> equals the reflection permutation
+<span class="math notranslate nohighlight">\(j \mapsto -j \bmod 8\)</span> (an exact 0/1 matrix), <span class="math notranslate nohighlight">\(\mathrm{QFT}^4 = I\)</span>,
+and the eigenvalue alphabet — the multiplicities of
+<span class="math notranslate nohighlight">\(\{1, i, -1, -i\}\)</span> are <span class="math notranslate nohighlight">\((3, 2, 2, 1)\)</span>, counted after rounding
+eigenvalues to <span class="math notranslate nohighlight">\(6\)</span> digits (integer counts over <span class="math notranslate nohighlight">\(O(1)\)</span> gaps).</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>QFT_8 == conj(F_dft): bitwise True (gap 0.0e+00); unitarity 7.1e-16
+QFT^2 = reflection to 1.2e-15; QFT^4 = I to 2.4e-15
+eigenvalue multiplicities (1, i, -1, -i): (3, 2, 2, 1)
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the QFT is 6.3&#39;s unitary DFT, conjugated — bitwise today (Eq. 1)   [np.conj flips sign bits without arithmetic, so the two constructors agree exactly; the 1e-15 fallback is stated in case a future libm evaluates the two windings differently]
+✓  unitary, with QFT^2 the reflection and QFT^4 the identity   [the fourth-power identity at 2.4e-15: four Fourier transforms take every signal home, by way of one mirror]
+✓  and the eigenvalue alphabet {1, i, -1, -i} has multiplicities (3, 2, 2, 1) at N = 8   [integer counts over O(1) gaps — the fourth roots of unity, distributed by the classical multiplicity formula]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-the-circuit-a-factorization-multiplied-back">
+<h2>Exercise 2: The circuit: a factorization, multiplied back<a class="headerlink" href="#exercise-2-the-circuit-a-factorization-multiplied-back" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-qf-circuit">Eq. 313</a> claims a <span class="math notranslate nohighlight">\(64\)</span>-entry unitary factors into six
+elementary gates and a swap. The proof is multiplication, and the
+reader performs it.</p>
+<p><strong>Part a)</strong> Write the lifting machinery for <span class="math notranslate nohighlight">\(n = 3\)</span> qubits
+(big-endian: qubit <span class="math notranslate nohighlight">\(0\)</span> carries the most significant bit):
+<code class="docutils literal notranslate"><span class="pre">op_on(qubit,</span> <span class="pre">U)</span></code> placing a one-qubit gate by Kronecker products, and
+<code class="docutils literal notranslate"><span class="pre">cphase(control,</span> <span class="pre">target,</span> <span class="pre">phi)</span></code> as
+<span class="math notranslate nohighlight">\(P_0^{(c)} \otimes I + P_1^{(c)} \otimes
+\operatorname{diag}(1, e^{i\phi})^{(t)}\)</span> from the Setup’s projectors.
+Gate every constructed gate unitary to <span class="math notranslate nohighlight">\(100\,\varepsilon\)</span>.</p>
+<p><strong>Write these yourself</strong> — the lift from one-qubit gates to
+<span class="math notranslate nohighlight">\(2^n\)</span>-dimensional operators is <a class="reference internal" href="tensor-products-entanglement.html"><span class="std std-doc">§9.2</span></a>’s
+Kronecker dictionary, exercised.</p>
+<p><strong>Part b)</strong> Assemble the standard circuit — <span class="math notranslate nohighlight">\(H\)</span> on qubit 0, <span class="math notranslate nohighlight">\(R_2\)</span> from
+qubit 1 and <span class="math notranslate nohighlight">\(R_3\)</span> from qubit 2 onto qubit 0, <span class="math notranslate nohighlight">\(H\)</span> on qubit 1, <span class="math notranslate nohighlight">\(R_2\)</span>
+from qubit 2 onto qubit 1, <span class="math notranslate nohighlight">\(H\)</span> on qubit 2, then the outer-qubit swap —
+and gate the product equal to <code class="docutils literal notranslate"><span class="pre">qft_matrix(8)</span></code> to <span class="math notranslate nohighlight">\(10^{-13}\)</span>. Gate the
+ledger as arithmetic: <span class="math notranslate nohighlight">\(n(n{+}1)/2 = 6\)</span> Hadamard-and-phase gates
+against the dense matrix’s <span class="math notranslate nohighlight">\(N^2 = 64\)</span> entries, with the general-<span class="math notranslate nohighlight">\(n\)</span>
+counts <span class="math notranslate nohighlight">\(n(n{+}1)/2\)</span> versus <span class="math notranslate nohighlight">\(4^n\)</span> stated for <span class="math notranslate nohighlight">\(n = 10\)</span>
+(<span class="math notranslate nohighlight">\(55\)</span> against <span class="math notranslate nohighlight">\(1{,}048{,}576\)</span>) — counted, never timed.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>every lifted gate unitary to 2.2e-16
+circuit product vs qft_matrix(8): 1.4e-15 (6 gates + 1 swap against 64 dense entries; at n = 10: 55 against 1,048,576)
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  each lifted gate is unitary   [Kronecker lifts of unitaries are unitary — 9.2&#39;s mixed-product identity, spent on circuit hardware [2.22045e-16 &lt; 2.22045e-14]]
+✓  six gates and a swap multiply back to the QFT (Eq. 2)   [factorization verified by multiplication at 1.4e-15, with the ledger as arithmetic: n(n+1)/2 = 6 against N^2 = 64 here, 55 against 1,048,576 at ten qubits — counted, never timed]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-period-finding-exact-quarters">
+<h2>Exercise 3: Period finding: exact quarters<a class="headerlink" href="#exercise-3-period-finding-exact-quarters" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-qf-period">Eq. 314</a> is the engine of Shor’s algorithm, and for
+<span class="math notranslate nohighlight">\(r \mid N\)</span> it is <em>exact</em>: the off-peak phasor polygons close. This
+exercise runs it at <span class="math notranslate nohighlight">\(N = 16\)</span>, <span class="math notranslate nohighlight">\(r = 4\)</span>, offset <span class="math notranslate nohighlight">\(x_0 = 3\)</span>.</p>
+<p><strong>Part a)</strong> Build the periodic state — uniform amplitudes
+<span class="math notranslate nohighlight">\(1/\sqrt{N/r} = \tfrac12\)</span> on <span class="math notranslate nohighlight">\(\{3, 7, 11, 15\}\)</span> — apply
+<code class="docutils literal notranslate"><span class="pre">qft_matrix(16)</span></code>, and gate the mass pattern: squared magnitudes equal
+<span class="math notranslate nohighlight">\(1/r = \tfrac14\)</span> at <span class="math notranslate nohighlight">\(k \in \{0, 4, 8, 12\}\)</span> to <span class="math notranslate nohighlight">\(10^{-13}\)</span>, and below
+<span class="math notranslate nohighlight">\(10^{-25}\)</span> everywhere else (squared rounding: the polygon sums are
+<span class="math notranslate nohighlight">\(10^{-15}\)</span>-scale amplitudes, and their squares sit near <span class="math notranslate nohighlight">\(10^{-30}\)</span>).</p>
+<p><strong>Part b)</strong> Read the period the way Shor’s classical half does: gate
+that the set of indices carrying more than <span class="math notranslate nohighlight">\(1\%\)</span> of the mass is
+<em>exactly</em> <span class="math notranslate nohighlight">\(\{0, 4, 8, 12\}\)</span> (integer set equality) with common
+spacing <span class="math notranslate nohighlight">\(N/r = 4\)</span>, so <span class="math notranslate nohighlight">\(r = N/\text{spacing} = 4\)</span> — the period,
+recovered from spectral positions alone.</p>
+<p><strong>Part c)</strong> Gate the offset’s irrelevance: repeating Part a with
+<span class="math notranslate nohighlight">\(x_0 = 0\)</span> and <span class="math notranslate nohighlight">\(x_0 = 1\)</span> changes the peak <em>phases</em> (report the largest
+phase difference) but not the masses — squared magnitudes agree with
+Part a’s to <span class="math notranslate nohighlight">\(10^{-14}\)</span>. Draw the periodic vector and its QFT mass
+spectrum.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>peak masses vs 1/4: 0.0e+00; off-peak floor 1.7e-30
+mass-carrying indices: [0, 4, 8, 12] — spacing 4, so r = 4
+offset moves phases (up to 3.14 rad, wrapped) but masses only by 1.2e-30
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the QFT of a period-4 state carries exact quarter masses (Eq. 3)   [peaks at 1/4 within 0.0e+00, off-peak squared magnitudes below 1.7e-30 — the phasor polygons close exactly, which is a geometric series doing quantum work]
+✓  and the period reads off the peak positions as integers   [mass-carrying indices exactly {0, 4, 8, 12}, spacing N/r = 4 — the quantum half of Shor&#39;s algorithm, complete; the number theory that turns r into factors is classical post-processing]
+✓  the offset moves phases, never masses   [x0 = 0, 1, 3 give identical spectra to rounding while the peak phases swing — which is why the measurement statistics need no knowledge of where the progression starts [1.23544e-30 &lt; 1e-14]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-qf-period">
+<img alt="../../_images/d9012798887ed1e5ed610f67d6e1f35943fe246874ac658a813049fd9bcdff47.png" src="../../_images/d9012798887ed1e5ed610f67d6e1f35943fe246874ac658a813049fd9bcdff47.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 174 </span><span class="caption-text">Period finding at <span class="math notranslate nohighlight">\(N = 16\)</span>, <span class="math notranslate nohighlight">\(r = 4\)</span>, offset <span class="math notranslate nohighlight">\(x_0 = 3\)</span>. Left: the input state — uniform amplitude <span class="math notranslate nohighlight">\(1/2\)</span> on the arithmetic progression <span class="math notranslate nohighlight">\(\{3, 7, 11, 15\}\)</span>. Right: the squared magnitudes of its QFT — exactly <span class="math notranslate nohighlight">\(1/4\)</span> on <span class="math notranslate nohighlight">\(\{0, 4, 8, 12\}\)</span> and rounding-zero elsewhere, gated at <span class="math notranslate nohighlight">\(10^{-25}\)</span> on the squares. The peak spacing <span class="math notranslate nohighlight">\(N/r = 4\)</span> hands back the period; the offset never appears, having gone entirely into phases.</span><a class="headerlink" href="#fig-qf-period" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-deutschjozsa-exhaustively">
+<h2>Exercise 4: Deutsch–Jozsa, exhaustively<a class="headerlink" href="#exercise-4-deutschjozsa-exhaustively" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-qf-dj">Eq. 315</a> reduces a query-complexity milestone to one inner
+product. Three qubits are small enough to check <strong>every</strong> promised
+oracle — both constants and all <span class="math notranslate nohighlight">\(\binom{8}{4} = 70\)</span> balanced
+functions — so the gate is an enumeration, not a sample.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">dj_amplitude(f)</span></code> returning the <span class="math notranslate nohighlight">\(|000\rangle\)</span>
+amplitude of <span class="math notranslate nohighlight">\(H^{\otimes3}\,(-1)^{f}\,H^{\otimes3}|000\rangle\)</span>, with
+<span class="math notranslate nohighlight">\(H^{\otimes3}\)</span> from Exercise 2’s <code class="docutils literal notranslate"><span class="pre">op_on</span></code> products and the oracle as
+<code class="docutils literal notranslate"><span class="pre">np.diag((-1.0)**f)</span></code>. Gate the two constant oracles at <span class="math notranslate nohighlight">\(a_0 = \pm1\)</span>
+to <span class="math notranslate nohighlight">\(10^{-14}\)</span>.</p>
+<p><strong>Part b)</strong> Enumerate all <span class="math notranslate nohighlight">\(70\)</span> balanced oracles
+(<code class="docutils literal notranslate"><span class="pre">itertools.combinations</span></code> choosing the four inputs mapped to <span class="math notranslate nohighlight">\(1\)</span>) and
+gate every amplitude below <span class="math notranslate nohighlight">\(10^{-14}\)</span> — the promise problem solved
+with certainty by one query, verified over its entire promise class.</p>
+<p><strong>Part c)</strong> Gate the identity behind it: for <span class="math notranslate nohighlight">\(20\)</span> seeded arbitrary
+(non-promised) oracles <span class="math notranslate nohighlight">\(f\)</span>, <code class="docutils literal notranslate"><span class="pre">dj_amplitude(f)</span></code> equals
+<code class="docutils literal notranslate"><span class="pre">np.mean((-1.0)**f)</span></code> to <span class="math notranslate nohighlight">\(10^{-14}\)</span> — the algorithm computes the mean
+of the signs, an inner product with the uniform vector, and the
+promise is what makes that one number decisive.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>constant oracles: amplitudes +1.000000000000, -1.000000000000
+all 70 balanced oracles: largest |amplitude| 2.8e-17
+amplitude = mean of signs, arbitrary oracles: worst 3.3e-16
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  constant oracles return the full +-1 amplitude (Eq. 4)   [all interference constructive: one query, certainty, sign intact [4.44089e-16 &lt; 1e-14]]
+✓  and every one of the 70 balanced oracles returns amplitude zero   [the entire promise class enumerated — C(8,4) = 70 oracles, worst |a_0| = 2.8e-17: perfectly destructive interference, seventy times over]
+✓  because the algorithm computes the mean of the oracle&#39;s signs   [one inner product with the uniform vector — the quantum speedup, read as linear algebra with the mystery relocated to the promise [3.33067e-16 &lt; 1e-14]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-one-eigenbasis-two-subjects">
+<h2>Exercise 5: One eigenbasis, two subjects<a class="headerlink" href="#exercise-5-one-eigenbasis-two-subjects" title="Link to this heading">#</a></h2>
+<p>The chapter’s thesis, closed: the operator the QFT diagonalizes is the
+<strong>cyclic shift</strong> <span class="math notranslate nohighlight">\(S|j\rangle = |j{+}1 \bmod N\rangle\)</span> — the generator
+of <a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html"><span class="std std-doc">§6.3</span></a>’s circulants.
+Signal processing and quantum computing share an eigenbasis because
+they always shared this matrix.</p>
+<p><strong>Part a)</strong> Build <span class="math notranslate nohighlight">\(S\)</span> at <span class="math notranslate nohighlight">\(N = 8\)</span> as an exact 0/1 permutation and gate
+the diagonalization
+<span class="math notranslate nohighlight">\(\mathrm{QFT}^{\dagger}\,S\,\mathrm{QFT} =
+\operatorname{diag}(\omega^{-k})\)</span> to <span class="math notranslate nohighlight">\(10^{-13}\)</span> — the shift’s
+eigenvalues are the roots of unity, in the order the transform’s
+columns dictate.</p>
+<p><strong>Part b)</strong> Gate the circulant consequence, 6.3’s theorem re-entered
+from the quantum side: for a seeded random circulant built as
+<span class="math notranslate nohighlight">\(C = \sum_{m} c_m S^m\)</span>, the matrix
+<span class="math notranslate nohighlight">\(\mathrm{QFT}^{\dagger}\,C\,\mathrm{QFT}\)</span> is diagonal to <span class="math notranslate nohighlight">\(10^{-12}\)</span>
+with diagonal equal to the (conjugate-convention) DFT of <span class="math notranslate nohighlight">\(c\)</span> — every
+translation-invariant operator is diagonal in the Fourier basis,
+which is the one sentence 6.3 and this chapter both orbit.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>QFT&#39; S QFT = diag(omega^-k): 8.1e-16
+random circulant: off-diagonal 2.9e-15, diagonal vs DFT of c 1.2e-14
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the QFT diagonalizes the cyclic shift onto the roots of unity   [S is 6.3&#39;s circulant generator; its Fourier eigenvalues are omega^-k in the transform&#39;s own column order — one matrix, two subjects [8.05594e-16 &lt; 1e-13]]
+✓  so every circulant is diagonal in the Fourier basis (6.3, re-entered)   [a seeded random circulant conjugates to diagonal at 2.9e-15 with the DFT of its symbol on the diagonal — translation invariance IS diagonality here, whichever subject is speaking]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p><strong>The transform was already on the shelf.</strong> <code class="docutils literal notranslate"><span class="pre">qft_matrix(8)</span></code> equalled
+the conjugate of <a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html"><span class="std std-doc">§6.3</span></a>’s
+constructor <strong>bitwise</strong>, inherited unitarity at rounding, satisfied
+<span class="math notranslate nohighlight">\(\mathrm{QFT}^2 = \)</span> reflection and <span class="math notranslate nohighlight">\(\mathrm{QFT}^4 = I\)</span> at
+<span class="math notranslate nohighlight">\(10^{-15}\)</span>-scale, and carried the eigenvalue alphabet <span class="math notranslate nohighlight">\(\{1, i, -1,
+-i\}\)</span> with multiplicities exactly <span class="math notranslate nohighlight">\((3, 2, 2, 1)\)</span>.</p>
+<p><strong>The circuit is a factorization theorem, proved by multiplying.</strong> Six
+lifted gates and a swap reproduced the <span class="math notranslate nohighlight">\(8\times8\)</span> transform at
+<span class="math notranslate nohighlight">\(1.4\times10^{-15}\)</span>, with the ledger counted, never timed:
+<span class="math notranslate nohighlight">\(n(n{+}1)/2\)</span> against <span class="math notranslate nohighlight">\(4^n\)</span> — <span class="math notranslate nohighlight">\(55\)</span> gates versus a million entries at
+ten qubits.</p>
+<p><strong>Period finding ran on exact cancellation.</strong> The period-4 state’s QFT
+put mass <span class="math notranslate nohighlight">\(\tfrac14\)</span> on <span class="math notranslate nohighlight">\(\{0, 4, 8, 12\}\)</span> with off-peak squares below
+<span class="math notranslate nohighlight">\(10^{-30}\)</span>; the spacing handed back <span class="math notranslate nohighlight">\(r = 4\)</span> as integer arithmetic; and
+the offset moved peak phases by up to <span class="math notranslate nohighlight">\(\pi\)</span> while moving masses by
+<span class="math notranslate nohighlight">\(10^{-30}\)</span>-scale — Shor’s quantum half, complete.</p>
+<p><strong>Deutsch–Jozsa was an enumeration, not a demo.</strong> Both constant
+oracles returned <span class="math notranslate nohighlight">\(\pm1\)</span> and <strong>all seventy</strong> balanced oracles returned
+zero at <span class="math notranslate nohighlight">\(10^{-16}\)</span>-scale, because the amplitude <em>is</em> the mean of the
+oracle’s signs — one inner product, verified over the entire promise
+class.</p>
+<p><strong>One eigenbasis, two subjects.</strong> The QFT diagonalized the cyclic
+shift onto <span class="math notranslate nohighlight">\(\omega^{-k}\)</span> and, with it, a seeded random circulant onto
+the DFT of its symbol — <a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html"><span class="std std-doc">§6.3</span></a>’s
+theorem, re-entered from the quantum side. The chapter closes where
+the course’s structure story began: find the right basis, and the
+operator was diagonal all along.</p>
+<p><strong>Methods introduced.</strong> <code class="docutils literal notranslate"><span class="pre">qft_matrix</span></code> and the bitwise conjugation
+handshake, <code class="docutils literal notranslate"><span class="pre">op_on</span></code>/<code class="docutils literal notranslate"><span class="pre">cphase</span></code> circuit lifting, factorization-by-
+multiplication, exact-quarter period reading, <code class="docutils literal notranslate"><span class="pre">dj_amplitude</span></code> with
+exhaustive promise-class enumeration, and the shift-diagonalization
+closing identity.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Shor, the rest of it.</strong> The quantum half gated here — periodic
+state in, peak spacing out — becomes a factoring algorithm through
+modular exponentiation (building the periodic state for
+<span class="math notranslate nohighlight">\(f(x) = a^x \bmod M\)</span>) and continued fractions (reading <span class="math notranslate nohighlight">\(r\)</span> when
+<span class="math notranslate nohighlight">\(r \nmid N\)</span> smears the peaks). Both halves are classical; the QFT
+is the only quantum ingredient.</p></li>
+<li><p><strong>Phase estimation.</strong> Replace the periodic state by an eigenvector
+of a unitary <span class="math notranslate nohighlight">\(U\)</span> and the same circuit estimates its eigenphase —
+the template that turns <a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html"><span class="std std-doc">§5.2</span></a>’s
+eigenvalue problem into a quantum subroutine, and the engine of
+quantum chemistry algorithms.</p></li>
+<li><p><strong>The FFT, quantum and classical.</strong> The circuit’s <span class="math notranslate nohighlight">\(n(n{+}1)/2\)</span>
+scaling is the FFT’s divide-and-conquer wearing gates; the classical
+<span class="math notranslate nohighlight">\(N\log N\)</span> and the quantum <span class="math notranslate nohighlight">\(\log^2 N\)</span> both come from the same
+factorization of the same matrix — with the quantum version reading
+out only samples, never the full spectrum, which is the honest
+price of the exponential compression.</p></li>
+<li><p><strong>Chapter IX, closed.</strong> Five notebooks, one thesis: states are
+vectors, gates are unitaries, entanglement is an SVD, physicality
+is a psd test, and the subject’s most famous numbers — <span class="math notranslate nohighlight">\(\ln 2\)</span>,
+<span class="math notranslate nohighlight">\(2\sqrt2\)</span>, <span class="math notranslate nohighlight">\(\tfrac14\)</span> — are exact algebra the course could gate in
+symbols. Quantum information is linear algebra with a promise
+attached.</p></li>
+</ul>
+<div class="docutils container" id="id3">
+<div role="list" class="citation-list">
+<div class="citation" id="id68" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">DJ92</a><span class="fn-bracket">]</span></span>
+<p>David Deutsch and Richard Jozsa. Rapid solution of problems by quantum computation. <em>Proceedings of the Royal Society of London A</em>, 439(1907):553–558, 1992. <a class="reference external" href="https://doi.org/10.1098/rspa.1992.0167">doi:10.1098/rspa.1992.0167</a>.</p>
+</div>
+<div class="citation" id="id63" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">NC10</a><span class="fn-bracket">]</span></span>
+<p>Michael A. Nielsen and Isaac L. Chuang. <em>Quantum Computation and Quantum Information</em>. Cambridge University Press, Cambridge, 10th anniversary edition, 2010. <a class="reference external" href="https://doi.org/10.1017/CBO9780511976667">doi:10.1017/CBO9780511976667</a>.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/09-quantum"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="measurement-channels-choi.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">9.4 Measurement, Channels, and the Choi Matrix</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../epilogue/five-factorizations-one-idea.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">E.1 Five Factorizations, One Idea</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#one-matrix-sign-flipped">One matrix, sign flipped</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-circuit-a-factorization-theorem">The circuit: a factorization theorem</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#period-finding">Period finding</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#deutschjozsa-one-inner-product">Deutsch–Jozsa: one inner product</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-the-matrix-inherited-from-chapter-vi">Exercise 1: The matrix, inherited from Chapter VI</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-circuit-a-factorization-multiplied-back">Exercise 2: The circuit: a factorization, multiplied back</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-period-finding-exact-quarters">Exercise 3: Period finding: exact quarters</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-deutschjozsa-exhaustively">Exercise 4: Deutsch–Jozsa, exhaustively</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-one-eigenbasis-two-subjects">Exercise 5: One eigenbasis, two subjects</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

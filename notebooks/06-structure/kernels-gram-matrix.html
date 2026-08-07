@@ -1,0 +1,1380 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="6.5 Positive Definite Kernels and the Gram Matrix" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/06-structure/kernels-gram-matrix.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: Chapter VI closes where structure meets learning. A kernel k(x, y) is an inner product in disguise — an inner product of feature vectors\v..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: Chapter VI closes where structure meets learning. A kernel k(x, y) is an inner product in disguise — an inner product of feature vectors\v..." />
+
+    <title>6.5 Positive Definite Kernels and the Gram Matrix &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/06-structure/kernels-gram-matrix';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/06-structure/kernels-gram-matrix.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="6.6 The Kalman Filter: Least Squares, Recursively" href="kalman-recursive-least-squares.html" />
+    <link rel="prev" title="6.4 Kronecker Products, vec, and Separable Problems" href="kronecker-vec-separable.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/06-structure/kernels-gram-matrix.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/06-structure/kernels-gram-matrix.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/06-structure/kernels-gram-matrix.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/06-structure/kernels-gram-matrix.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>6.5 Positive Definite Kernels and the Gram Matrix</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#kernels-are-inner-products-gram-matrices-carry-them">Kernels are inner products; Gram matrices carry them</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-kernel-trick-and-what-it-costs">The kernel trick, and what it costs</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#kernel-pca">Kernel PCA</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-three-gram-matrices-and-what-positive-definite-survives">Exercise 1: Three Gram matrices, and what “positive definite” survives</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-kernel-trick-made-explicit-once">Exercise 2: The kernel trick, made explicit once</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-spectrum-is-the-price-list">Exercise 3: The spectrum is the price list</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-kernel-ridge-regression-one-solve-three-certificates">Exercise 4: Kernel ridge regression: one solve, three certificates</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-nystrom-compression-with-one-sided-certificates">Exercise 5: Nyström: compression with one-sided certificates</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-kernel-pca-the-rings-come-apart">Exercise 6: Kernel PCA: the rings come apart</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="positive-definite-kernels-and-the-gram-matrix">
+<h1>6.5 Positive Definite Kernels and the Gram Matrix<a class="headerlink" href="#positive-definite-kernels-and-the-gram-matrix" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter VI — Structure, Graphs, and Fast Algorithms
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;6.5
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">Replace every inner product with a kernel and linear methods learn curves without ever leaving linear algebra: the Gram matrix carries the geometry, its positive definiteness is the license, its eigendecay is the price list — and two concentric rings that no hyperplane can separate come apart on the first kernel principal component.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;advanced&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;105–135 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p>Chapter VI closes where structure meets learning. A <strong>kernel</strong>
+<span class="math notranslate nohighlight">\(k(x, y)\)</span> is an inner product in disguise — an inner product of feature
+vectors <span class="math notranslate nohighlight">\(\varphi(x)\)</span> that may live in six dimensions (the quadratic
+kernel, whose feature map this notebook builds explicitly and checks to
+<span class="math notranslate nohighlight">\(10^{-14}\)</span>) or infinitely many (the RBF kernel, whose exponential is a
+Taylor series of them). All the algorithm ever touches is the <strong>Gram
+matrix</strong> <span class="math notranslate nohighlight">\(K_{ij} = k(x_i, x_j)\)</span>, and everything the subject promises is
+a property of that matrix: symmetry (measured exactly zero here, gated
+at rounding per the course’s BLAS rule), positive semidefiniteness
+(<em>proved</em> for the linear kernel by a quadratic-form identity, measured
+for the rest — with the RBF’s <span class="math notranslate nohighlight">\(\lambda_{\min}\)</span> collapsing from
+<span class="math notranslate nohighlight">\(10^{-4}\)</span> to <span class="math notranslate nohighlight">\(10^{-15}\)</span> as the bandwidth widens: near-singularity as a
+design dial), and an eigenvalue decay whose steepness <em>is</em> the kernel’s
+effective dimension.</p>
+<p>The algorithms follow as linear algebra. <strong>Kernel ridge regression</strong> is
+one solve against <span class="math notranslate nohighlight">\(K + \lambda I\)</span> — gated to coincide with ordinary
+ridge when the kernel is linear (the kernel trick adds nothing when
+there is nothing to add), with its training residual provably monotone
+in <span class="math notranslate nohighlight">\(\lambda\)</span> and the identity <span class="math notranslate nohighlight">\(y - K\alpha = \lambda\alpha\)</span> certifying
+the solve. The <strong>Nyström approximation</strong> compresses <span class="math notranslate nohighlight">\(K\)</span> through <span class="math notranslate nohighlight">\(m\)</span>
+landmark columns with two one-sided theorems gated (the residual is a
+Schur complement, hence PSD; its spectral norm is at most its trace).
+And <strong>kernel PCA</strong> ends the chapter with the subject’s signature picture:
+two concentric rings, provably inseparable by any line — plain PCA’s
+best threshold scores 72% — pulled apart at <strong>100%</strong> with a 0.10 margin
+by the first RBF kernel component.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> Schölkopf and Smola <span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id35" title="Bernhard Schölkopf and Alexander J. Smola. Learning with Kernels: Support Vector Machines, Regularization, Optimization, and Beyond. MIT Press, 2002.">ScholkopfS02</a>]</span> is the subject’s
+book; Hastie, Tibshirani and Friedman <span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id42" title="Trevor Hastie, Robert Tibshirani, and Jerome Friedman. The Elements of Statistical Learning. Springer, 2 edition, 2009. doi:10.1007/978-0-387-84858-7.">HTF09</a>]</span> Chapters 5
+and 12 for the statistical reading. The spectral tools are
+<a class="reference internal" href="../03-eigenvalues/spectral-theorem.html"><span class="std std-doc">§3.2</span></a>’s and the
+regularization story is <a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html"><span class="std std-doc">§2.4</span></a>’s,
+both now wearing kernels.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="kernels-are-inner-products-gram-matrices-carry-them">
+<h3>Kernels are inner products; Gram matrices carry them<a class="headerlink" href="#kernels-are-inner-products-gram-matrices-carry-them" title="Link to this heading">#</a></h3>
+<p>A symmetric <span class="math notranslate nohighlight">\(k\)</span> is <strong>positive definite</strong> when every Gram matrix
+<span class="math notranslate nohighlight">\(K_{ij} = k(x_i, x_j)\)</span> is PSD. Mercer’s side of the story constructs
+the certificate: <span class="math notranslate nohighlight">\(k(x, y) = \varphi(x)^{\top}\varphi(y)\)</span> for some
+feature map, whence</p>
+<div class="math notranslate nohighlight" id="equation-eq-kg-psd">
+<span class="eqno">(260)<a class="headerlink" href="#equation-eq-kg-psd" title="Link to this equation">#</a></span>\[v^{\top}Kv \;=\; \Bigl\lVert \sum_i v_i\,\varphi(x_i)\Bigr\rVert^2
+\;\ge\; 0\]</div>
+<p>— an identity, not a numerical accident. The three workhorses:
+linear <span class="math notranslate nohighlight">\(x^{\top}y\)</span> (features: <span class="math notranslate nohighlight">\(x\)</span> itself), polynomial
+<span class="math notranslate nohighlight">\((x^{\top}y + c)^p\)</span> (features: all monomials to degree <span class="math notranslate nohighlight">\(p\)</span>, with
+explicit <span class="math notranslate nohighlight">\(\sqrt{2}\)</span> weights), RBF
+<span class="math notranslate nohighlight">\(\exp(-\lVert x - y\rVert^2/2\sigma^2)\)</span> (features: an infinite Taylor
+tower; every Gram matrix strictly PD, though its smallest eigenvalue
+can be smaller than <span class="math notranslate nohighlight">\(\varepsilon\)</span> — “strictly” is a mathematician’s
+word, and the bandwidth decides whether the machine agrees).</p>
+</section>
+<section id="the-kernel-trick-and-what-it-costs">
+<h3>The kernel trick, and what it costs<a class="headerlink" href="#the-kernel-trick-and-what-it-costs" title="Link to this heading">#</a></h3>
+<p>Any algorithm phrased in inner products alone can swap them for kernels
+— implicitly working in feature space without visiting it. <strong>Kernel
+ridge regression</strong> minimizes in that space; the representer theorem
+collapses the answer onto the data:</p>
+<div class="math notranslate nohighlight" id="equation-eq-kg-krr">
+<span class="eqno">(261)<a class="headerlink" href="#equation-eq-kg-krr" title="Link to this equation">#</a></span>\[f(x) = \sum_i \alpha_i\,k(x, x_i), \qquad
+(K + \lambda I)\,\alpha = y ,\]</div>
+<p>an <span class="math notranslate nohighlight">\(n \times n\)</span> solve however large the feature space. The price is
+hidden in <span class="math notranslate nohighlight">\(K\)</span>’s spectrum: smooth kernels have fast eigendecay, so most
+of <span class="math notranslate nohighlight">\(K\)</span> is numerically low-rank — which is simultaneously why
+regularization is mandatory (<a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html"><span class="std std-doc">§2.4</span></a>
+with <span class="math notranslate nohighlight">\(K\)</span>’s tail as the small singular values) and why the <strong>Nyström</strong>
+compression works:</p>
+<div class="math notranslate nohighlight" id="equation-eq-kg-nystrom">
+<span class="eqno">(262)<a class="headerlink" href="#equation-eq-kg-nystrom" title="Link to this equation">#</a></span>\[\widehat K = K_{:,S}\,K_{S,S}^{-1}\,K_{S,:}, \qquad
+K - \widehat K \;=\; \text{Schur complement} \;\succeq\; 0,
+\qquad \lVert K - \widehat K\rVert_2 \le
+\operatorname{tr}(K - \widehat K),\]</div>
+<p>both inequalities theorems (<a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html"><span class="std std-doc">§3.3</span></a>’s
+Schur complements; spectral norm at most trace for PSD), gated
+one-sidedly below.</p>
+</section>
+<section id="kernel-pca">
+<h3>Kernel PCA<a class="headerlink" href="#kernel-pca" title="Link to this heading">#</a></h3>
+<p>PCA on the features, executed on the Gram matrix: centre in feature
+space (<span class="math notranslate nohighlight">\(K_c = HKH\)</span>, <span class="math notranslate nohighlight">\(H = I - \tfrac1n\mathbf{1}\mathbf{1}^{\top}\)</span>),
+eigendecompose, and the coordinates <span class="math notranslate nohighlight">\(\sqrt{\lambda_j}\,v_j\)</span> are the
+projections. Nonlinear structure that no hyperplane sees — concentric
+rings — becomes linearly separable in the kernel coordinates, which is
+the picture this chapter ends on.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data only: the fixed points and the seeded rng. The three Gram
+constructions — linear, polynomial, RBF via the distance identity — are
+Exercise 1’s build.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random array below comes from this seed</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+
+<span class="n">N_PTS</span> <span class="o">=</span> <span class="mi">60</span>
+<span class="n">X_pts</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">((</span><span class="n">N_PTS</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+
+
+<span class="n">SIGMAS</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-three-gram-matrices-and-what-positive-definite-survives">
+<h2>Exercise 1: Three Gram matrices, and what “positive definite” survives<a class="headerlink" href="#exercise-1-three-gram-matrices-and-what-positive-definite-survives" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">rbf_gram(A,</span> <span class="pre">B,</span> <span class="pre">sigma)</span></code> — the squared-distance identity
+<span class="math notranslate nohighlight">\(\lVert a-b\rVert^2 = \lVert a\rVert^2 + \lVert b\rVert^2 - 2a\cdot b\)</span>,
+then the exponential — and build the linear, quadratic-polynomial and RBF
+Gram matrices on the 60 fixed points at all three bandwidths.</p>
+<p><strong>Write <code class="docutils literal notranslate"><span class="pre">rbf_gram</span></code> yourself</strong> — the distance identity is the lesson. Gate symmetry at
+<span class="math notranslate nohighlight">\(10^{-14}\)</span>: measured <em>exactly zero</em> here for all three — but the RBF
+distance matrix passes through a <code class="docutils literal notranslate"><span class="pre">gemm</span></code>, and the course’s first CI
+lesson says a different BLAS may split the difference at <span class="math notranslate nohighlight">\(10^{-16}\)</span>,
+so the gate leaves room it did not need today.</p>
+<p><strong>Part b)</strong> Prove, don’t measure, the linear kernel’s psd-ness:
+<a class="reference internal" href="#equation-eq-kg-psd">Eq. 260</a> says <span class="math notranslate nohighlight">\(v^{\top}K_{\text{lin}}v = \lVert X^{\top}v\rVert^2\)</span>
+— gate the <em>identity</em> on 100 random vectors at <span class="math notranslate nohighlight">\(10^{-12}\)</span>, which
+certifies nonnegativity with no eigensolver at all.</p>
+<p><strong>Part c)</strong> Measure the rest: <code class="docutils literal notranslate"><span class="pre">eigvalsh</span></code> smallest eigenvalues at
+<span class="math notranslate nohighlight">\(\lambda_{\min} \ge -10^{-12}\lVert K\rVert\)</span> for the polynomial and all
+three RBF bandwidths — and <em>report</em> the RBF’s collapse:
+<span class="math notranslate nohighlight">\(\lambda_{\min} = 5.6\times10^{-4}\)</span> at <span class="math notranslate nohighlight">\(\sigma = 0.3\)</span>,
+<span class="math notranslate nohighlight">\(1.1\times10^{-11}\)</span> at <span class="math notranslate nohighlight">\(\sigma = 1\)</span>, <span class="math notranslate nohighlight">\(-3\times10^{-15}\)</span> at <span class="math notranslate nohighlight">\(\sigma = 3\)</span>.
+Strict positive definiteness is a theorem about real numbers; at wide
+bandwidth the machine rounds it to a sign it no longer certifies —
+the conditioning dial Exercise 3 prices.</p>
+<p><strong>Part d)</strong> Draw the three RBF Grams as heatmaps: nearly diagonal at
+<span class="math notranslate nohighlight">\(\sigma = 0.3\)</span>, structured at <span class="math notranslate nohighlight">\(\sigma = 1\)</span>, nearly rank-one at
+<span class="math notranslate nohighlight">\(\sigma = 3\)</span> — the same dial, seen as texture.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>symmetry gaps: {&#39;linear&#39;: &#39;0.0e+00&#39;, &#39;poly&#39;: &#39;0.0e+00&#39;, &#39;rbf(1)&#39;: &#39;0.0e+00&#39;} (all exactly zero on this BLAS)
+v&#39;Kv = ||X&#39;v||^2 identity (relative): 2.3e-15 — psd proved, not measured
+poly: lambda_min -4.56e-14, lambda_max 237.0
+rbf(0.3): lambda_min 5.65e-04, lambda_max 5.1
+rbf(1.0): lambda_min 1.14e-11, lambda_max 23.6
+rbf(3.0): lambda_min -3.35e-15, lambda_max 50.2
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-kg-grams">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f674c9e85c0&gt;
+</pre></div>
+</div>
+<figcaption>
+<p><span class="caption-number">Fig. 123 </span><span class="caption-text">The RBF Gram matrix at three bandwidths on the same 60 points. At <span class="math notranslate nohighlight">\(\sigma = 0.3\)</span> (left) only near neighbours correlate and the matrix is nearly diagonal – full rank, <span class="math notranslate nohighlight">\(\lambda_{\min} = 5.6\times10^{-4}\)</span>. At <span class="math notranslate nohighlight">\(\sigma = 1\)</span> (centre) the cluster structure of the data appears. At <span class="math notranslate nohighlight">\(\sigma = 3\)</span> (right) everything correlates with everything, the matrix approaches rank one, and <span class="math notranslate nohighlight">\(\lambda_{\min}\)</span> has collapsed through <span class="math notranslate nohighlight">\(10^{-11}\)</span> to rounding level: ‘strictly positive definite’ is true of the real numbers and unenforceable by the machine – bandwidth is a conditioning dial, and Exercise 3 reads its price list off the spectrum.</span><a class="headerlink" href="#fig-kg-grams" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<figure class="align-default" id="id3">
+<img alt="../../_images/d223123dd04c4e2de04f99d9c571cfdea11250041017c8876216a7a6aeb1d513.png" src="../../_images/d223123dd04c4e2de04f99d9c571cfdea11250041017c8876216a7a6aeb1d513.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 124 </span><span class="caption-text">The RBF Gram matrix at three bandwidths on the same 60 points. At <span class="math notranslate nohighlight">\(\sigma = 0.3\)</span> (left) only near neighbours correlate and the matrix is nearly diagonal – full rank, <span class="math notranslate nohighlight">\(\lambda_{\min} = 5.6\times10^{-4}\)</span>. At <span class="math notranslate nohighlight">\(\sigma = 1\)</span> (centre) the cluster structure of the data appears. At <span class="math notranslate nohighlight">\(\sigma = 3\)</span> (right) everything correlates with everything, the matrix approaches rank one, and <span class="math notranslate nohighlight">\(\lambda_{\min}\)</span> has collapsed through <span class="math notranslate nohighlight">\(10^{-11}\)</span> to rounding level: ‘strictly positive definite’ is true of the real numbers and unenforceable by the machine – bandwidth is a conditioning dial, and Exercise 3 reads its price list off the spectrum.</span><a class="headerlink" href="#id3" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  all three Gram matrices are symmetric at rounding level   [measured exactly zero — but the RBF distances pass through a gemm, and the course&#39;s first CI lesson says never to gate a matmul on exact equality, so the gate keeps the room it did not need today]
+✓  the linear kernel is psd by identity, not by eigensolver (Eq. 1)   [v&#39;Kv = ||X&#39;v||^2 on 100 random vectors — Mercer&#39;s certificate, checked as arithmetic]
+✓  and every measured Gram matrix is psd to eigensolver accuracy   [lambda_min from 6e-04 down to -3e-15 as the bandwidth widens: the theorem says strictly positive, the machine keeps only the sign it can afford (reported as the conditioning dial)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-the-kernel-trick-made-explicit-once">
+<h2>Exercise 2: The kernel trick, made explicit once<a class="headerlink" href="#exercise-2-the-kernel-trick-made-explicit-once" title="Link to this heading">#</a></h2>
+<p>The trick is only honest if the implicit feature space actually exists.
+For the quadratic kernel it can be built by hand.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">phi_quadratic(A)</span></code> for <span class="math notranslate nohighlight">\(d = 2\)</span>: the map
+<span class="math notranslate nohighlight">\(x \mapsto (1,\ \sqrt2 x_1,\ \sqrt2 x_2,\ x_1^2,\ x_2^2,\
+\sqrt2 x_1x_2)\)</span>, six features. Gate
+<span class="math notranslate nohighlight">\(\Phi\Phi^{\top} = (XX^{\top} + 1)^2\)</span> to <span class="math notranslate nohighlight">\(10^{-12}\)</span> at the values’
+scale — the trick, verified as an identity on all <span class="math notranslate nohighlight">\(60^2\)</span> pairs.</p>
+<p><strong>Write this one yourself</strong> — the <span class="math notranslate nohighlight">\(\sqrt2\)</span> weights are where first
+attempts fail.</p>
+<p><strong>Part b)</strong> Count what the trick avoids: degree-<span class="math notranslate nohighlight">\(p\)</span> features in <span class="math notranslate nohighlight">\(d\)</span>
+dimensions number <span class="math notranslate nohighlight">\(\binom{d+p}{p}\)</span> — gate the count 6 at <span class="math notranslate nohighlight">\((d,p)=(2,2)\)</span>
+and report the ledger at <span class="math notranslate nohighlight">\((d,p) = (100, 5)\)</span>: 96 million features
+against an <span class="math notranslate nohighlight">\(n \times n\)</span> Gram matrix, which is the whole economic case.</p>
+<p><strong>Part c)</strong> The RBF has no finite table: expand
+<span class="math notranslate nohighlight">\(e^{x^{\top}y/\sigma^2}\)</span> ten Taylor terms on a pair of points and watch
+the truncated “feature inner product” converge to the kernel — report
+the term-10 error, the infinite tower glimpsed from its base.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Phi Phi&#39; vs (XX&#39; + 1)^2: 1.4e-14 at scale 49 — the trick, verified
+feature counts: (d,p) = (2,2) -&gt; 6; (100,5) -&gt; 96,560,646 — against a 60x60 Gram matrix
+RBF Taylor tower, 10 terms: relative error 2.1e-16 — the infinite feature space, glimpsed from its base
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the explicit six-feature map reproduces the quadratic kernel (Eq. 1)   [1e-14 at scale 49 across all 3600 pairs — the sqrt(2) weights are load-bearing, and the identity is exact mathematics rounding normally]
+✓  and the counting ledger is the trick&#39;s economic case   [binomial(d+p, p): 6 features here, 96,560,646 at (100, 5) — the Gram matrix never grows past n x n]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-the-spectrum-is-the-price-list">
+<h2>Exercise 3: The spectrum is the price list<a class="headerlink" href="#exercise-3-the-spectrum-is-the-price-list" title="Link to this heading">#</a></h2>
+<p>Smoothness in the kernel is decay in the spectrum, and decay is both
+the danger and the discount.</p>
+<p><strong>Part a)</strong> Compute the sorted eigenvalues of the three RBF Grams and
+draw them on a log axis. Gate the ordering that makes the dial a dial:
+<span class="math notranslate nohighlight">\(\lambda_{20}/\lambda_1 &gt; 0.05\)</span> at <span class="math notranslate nohighlight">\(\sigma = 0.3\)</span> (slow decay — the
+matrix is genuinely 60-dimensional) and
+<span class="math notranslate nohighlight">\(\lambda_{20}/\lambda_1 &lt; 10^{-5}\)</span> at <span class="math notranslate nohighlight">\(\sigma = 3\)</span> (measured
+<span class="math notranslate nohighlight">\(10^{-7}\)</span> — twenty modes in, the matrix has nothing left).</p>
+<p><strong>Part b)</strong> Connect to <a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html"><span class="std std-doc">§2.4</span></a>:
+the tail eigenvalues are the small singular values of the kernel
+problem, so unregularized kernel solves divide by them. Report
+<span class="math notranslate nohighlight">\(\kappa(K)\)</span> at the three bandwidths — the price list the ridge
+parameter of Exercise 4 pays down.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>lambda_20 / lambda_1: sigma 0.3 -&gt; 0.21, sigma 3.0 -&gt; 1.1e-07
+sigma 0.3: kappa(K) ~ 9.1e+03
+sigma 1.0: kappa(K) ~ 2.1e+12
+sigma 3.0: kappa(K) ~ 4.5e+15
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-kg-decay">
+<img alt="../../_images/807c3bdde4f32cbae06ef9cb27b4a73fa119a1577d1c782d8a4627f5fb266d70.png" src="../../_images/807c3bdde4f32cbae06ef9cb27b4a73fa119a1577d1c782d8a4627f5fb266d70.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 125 </span><span class="caption-text">The RBF Gram spectra at the three bandwidths, log axis. Narrow bandwidth (<span class="math notranslate nohighlight">\(\sigma = 0.3\)</span>, ink) decays gently – the 60 points are genuinely 60-dimensional to this kernel. Wide bandwidth (<span class="math notranslate nohighlight">\(\sigma = 3\)</span>, light) falls off a cliff: <span class="math notranslate nohighlight">\(\lambda_{20}/\lambda_1 \approx 10^{-7}\)</span>, and the tail drowns below machine precision (the flat shelf at <span class="math notranslate nohighlight">\(10^{-15}\)</span> is rounding, not spectrum). This decay is simultaneously the danger (2.4’s small singular values – unregularized solves divide by the tail) and the discount (Exercise 5’s Nystrom compression works because so little of the matrix is left after twenty modes).</span><a class="headerlink" href="#fig-kg-decay" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  bandwidth sets the decay: 20 modes in, the narrow kernel is alive and the wide one is spent   [lambda_20/lambda_1 = 0.21 against 1e-07 — two orders of margin on each side of the gates, and the dial explains both the danger (2.4&#39;s tail) and the discount (Nystrom, next)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-kernel-ridge-regression-one-solve-three-certificates">
+<h2>Exercise 4: Kernel ridge regression: one solve, three certificates<a class="headerlink" href="#exercise-4-kernel-ridge-regression-one-solve-three-certificates" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-kg-krr">Eq. 261</a> is the workhorse. Three different kinds of check pin it.</p>
+<p><strong>Part a)</strong> <em>The trick adds nothing when there is nothing to add:</em> with
+the <strong>linear</strong> kernel, gate that KRR’s predictions equal ordinary ridge
+regression’s (<span class="math notranslate nohighlight">\(w = (X^{\top}X + \lambda I)^{-1}X^{\top}y\)</span>) to
+<span class="math notranslate nohighlight">\(10^{-10}\)</span> at <span class="math notranslate nohighlight">\(\lambda = 1\)</span> — same minimizer, primal and dual
+coordinates.</p>
+<p><strong>Part b)</strong> <em>The solve certifies itself:</em> <span class="math notranslate nohighlight">\((K+\lambda I)\alpha = y\)</span>
+rearranges to <span class="math notranslate nohighlight">\(y - K\alpha = \lambda\alpha\)</span> — gate this identity at
+<span class="math notranslate nohighlight">\(10^{-11}\)</span> scale for the RBF fit below; it is the representer theorem’s
+residual equation, and any solver that passes it solved the right
+system.</p>
+<p><strong>Part c)</strong> <em>Regularization is monotone:</em> on a 1-D RBF regression
+(<span class="math notranslate nohighlight">\(y = \sin(1.5x)\)</span> plus noise, <span class="math notranslate nohighlight">\(\sigma = 1\)</span>), gate that the training
+residual norm strictly increases across
+<span class="math notranslate nohighlight">\(\lambda = 10^{-6}, 10^{-4}, 10^{-2}, 1, 100\)</span> — a theorem (the ridge
+path trades data fit for norm monotonically), measured as five numbers.</p>
+<p><strong>Part d)</strong> Draw the three fits at <span class="math notranslate nohighlight">\(\lambda = 10^{-6}, 10^{-2}, 10\)</span>:
+interpolation wiggle, honest fit, oversmoothing — <a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html"><span class="std std-doc">§2.4</span></a>’s
+bias–variance dial with kernels on.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>KRR(linear) vs ordinary ridge predictions: 1.1e-15
+training residuals along the ridge path: [&#39;0.511&#39;, &#39;0.597&#39;, &#39;0.635&#39;, &#39;1.095&#39;, &#39;4.272&#39;] — strictly increasing: True
+self-certificate y - K alpha = lambda alpha: 9.9e-15
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-kg-krr">
+<img alt="../../_images/2df312d5d4f4e12c3ba38dd24bd5207db34cd0039b7e19c71974c6fd5580c073.png" src="../../_images/2df312d5d4f4e12c3ba38dd24bd5207db34cd0039b7e19c71974c6fd5580c073.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 126 </span><span class="caption-text">Kernel ridge regression on 40 noisy samples of <span class="math notranslate nohighlight">\(\sin(1.5x)\)</span> with the RBF kernel, at three regularizations. At <span class="math notranslate nohighlight">\(\lambda = 10^{-6}\)</span> (light) the fit chases the noise – the Gram tail’s tiny eigenvalues are being inverted, 2.4’s disease. At <span class="math notranslate nohighlight">\(\lambda = 10^{-2}\)</span> (amber) the curve is the signal. At <span class="math notranslate nohighlight">\(\lambda = 10\)</span> (ink, dashed) the fit is oversmoothed toward zero – the prior has outvoted the data. The training residual is provably monotone along this path (gated as five numbers), which is the algebra underneath the familiar bias-variance picture.</span><a class="headerlink" href="#fig-kg-krr" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  kernel ridge with the linear kernel IS ordinary ridge (Eq. 2)   [1e-15 between dual and primal predictions: the trick adds nothing when there is nothing to add — the sanity anchor of the whole subject]
+✓  the representer residual identity y - K alpha = lambda alpha holds   [an exact rearrangement of the solve, so passing it certifies the system that was solved [9.87405e-15 &lt; 1e-11]]
+✓  and the training residual is strictly monotone along the ridge path   [0.511 up to 4.272 across eight decades of lambda: the theorem measured as five numbers]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-nystrom-compression-with-one-sided-certificates">
+<h2>Exercise 5: Nyström: compression with one-sided certificates<a class="headerlink" href="#exercise-5-nystrom-compression-with-one-sided-certificates" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-kg-nystrom">Eq. 262</a> compresses <span class="math notranslate nohighlight">\(K\)</span> through <span class="math notranslate nohighlight">\(m\)</span> landmark columns; the
+decay of Exercise 3 is why it works, and two theorems say how well.</p>
+<p><strong>Part a)</strong> Build the Nyström approximation of the <span class="math notranslate nohighlight">\(\sigma = 1\)</span> Gram
+matrix from the first <span class="math notranslate nohighlight">\(m = 15\)</span> columns (with a <span class="math notranslate nohighlight">\(10^{-12}\)</span> jitter on the
+landmark block for the inverse). Gate the Schur-complement theorem: the
+residual <span class="math notranslate nohighlight">\(R = K - \widehat K\)</span> has
+<span class="math notranslate nohighlight">\(\lambda_{\min}(R) \ge -10^{-10}\lVert K\rVert\)</span> — the approximation
+never overshoots, in the PSD order.</p>
+<p><strong>Part b)</strong> Gate the second theorem, one-sidedly:
+<span class="math notranslate nohighlight">\(\lVert R\rVert_2 \le \operatorname{tr}(R)\)</span> (spectral norm at most
+trace, for PSD matrices) — the computable bound, since
+<span class="math notranslate nohighlight">\(\operatorname{tr}(R)\)</span> needs only diagonal entries.</p>
+<p><strong>Part c)</strong> Report the compression curve: relative error
+<span class="math notranslate nohighlight">\(\lVert R\rVert_2/\lVert K\rVert_2\)</span> at <span class="math notranslate nohighlight">\(m = 5, 10, 15, 20, 30\)</span> —
+decaying with the spectrum, as Exercise 3 promised.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Nystrom m = 15: lambda_min(R) = 9.6e-13; ||R||_2 = 1.666 &lt;= tr(R) = 4.375
+  m =  5: relative error 2.0e-01
+  m = 10: relative error 1.3e-01
+  m = 15: relative error 7.1e-02
+  m = 20: relative error 6.9e-02
+  m = 30: relative error 2.9e-02
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the Nystrom residual is PSD: the approximation never overshoots (Eq. 3)   [lambda_min(R) = 1e-12 — R is a Schur complement of a PSD matrix (3.3), gated one-sidedly with eigensolver slack]
+✓  and its spectral norm sits under its trace, as PSD demands   [1.666 against 4.375: the computable bound — the trace needs only the diagonal, which is why it is the practical certificate]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-6-kernel-pca-the-rings-come-apart">
+<h2>Exercise 6: Kernel PCA: the rings come apart<a class="headerlink" href="#exercise-6-kernel-pca-the-rings-come-apart" title="Link to this heading">#</a></h2>
+<p>The chapter’s closing picture: nonlinear structure, linear tools, one
+kernel in between.</p>
+<p><strong>Part a)</strong> Generate two concentric rings (radii 1 and 3, fifty points
+each, radial noise 0.08). Gate the <em>impossibility</em> first: plain PCA’s
+best single-threshold accuracy on either principal component is <strong>72%</strong>
+— gated below 90%, legitimately, because no linear projection separates
+concentric rings (a mathematical fact about the geometry, not a
+machine artifact).</p>
+<p><strong>Part b)</strong> Centre the RBF (<span class="math notranslate nohighlight">\(\sigma = 1\)</span>) Gram matrix in feature space:
+<span class="math notranslate nohighlight">\(K_c = HKH\)</span>. Gate the centring: row means at rounding level — the
+feature-space mean really is removed, though no feature was ever
+computed.</p>
+<p><strong>Part c)</strong> Kernel PCA: top eigenvector of <span class="math notranslate nohighlight">\(K_c\)</span>, coordinates
+<span class="math notranslate nohighlight">\(z = \sqrt{\lambda_1}\,v_1\)</span>. Gate the separation: a single threshold on
+<span class="math notranslate nohighlight">\(z\)</span> classifies the rings at <strong>100%</strong>, with the gap between the classes’
+score bands at 0.10 — eleven orders above rounding, which is what makes
+the exact-accuracy gate honest (gated at 0.05: the gap is a
+deterministic geometric property of this dataset, and the eigensolver
+perturbs it only at the <span class="math notranslate nohighlight">\(10^{-12}\)</span> level).</p>
+<p><strong>Part d)</strong> Draw the data coloured by ring, and the kernel coordinates
+<span class="math notranslate nohighlight">\((z_1, z_2)\)</span> with the separating threshold — the picture the chapter
+was building toward: structure the Gram matrix saw that no hyperplane
+could.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>plain PCA, best single-threshold accuracy: 0.72 — concentric rings defeat every line
+feature-space centring: max row mean 2.4e-16
+kernel PCA, first-component accuracy: 1.00, class gap 0.096
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-kg-rings">
+<img alt="../../_images/988a485dccf497ace9a142d47828304e3e73198a7d54df4df89ebd45607a8375.png" src="../../_images/988a485dccf497ace9a142d47828304e3e73198a7d54df4df89ebd45607a8375.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 127 </span><span class="caption-text">The chapter’s closing picture. Left: two concentric rings – no line separates them, and plain PCA’s best threshold scores 72% (gated as an impossibility of the geometry, not a failure of the solver). Right: the same hundred points in the first two kernel-PCA coordinates (RBF, <span class="math notranslate nohighlight">\(\sigma = 1\)</span>): the rings land in disjoint bands of the first component, a single threshold (dotted) classifies at 100%, and the 0.10 gap between the bands is eleven orders above rounding – which is what licenses an exact-accuracy gate. The Gram matrix saw the radial structure because the kernel measures distances, not directions: structure, the chapter’s theme, carried by a matrix to the doorstep of learning, which is Chapter VIII’s subject.</span><a class="headerlink" href="#fig-kg-rings" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p>The bandwidth <span class="math notranslate nohighlight">\(\sigma = 1\)</span> was chosen, not derived. Ask your assistant
+for <code class="docutils literal notranslate"><span class="pre">kpca_bandwidth_sweep(rings,</span> <span class="pre">labels,</span> <span class="pre">sigmas)</span></code> returning the
+first-component threshold accuracy and the class gap per bandwidth,
+then check it against the mathematics rather than a demo: (i) at
+<span class="math notranslate nohighlight">\(\sigma \to 0\)</span> the Gram matrix approaches the identity, every
+eigenvalue ties, and the accuracy collapses toward chance; (ii) at
+<span class="math notranslate nohighlight">\(\sigma \to \infty\)</span> the kernel linearizes (<span class="math notranslate nohighlight">\(K \approx\)</span> affine in
+<span class="math notranslate nohighlight">\(\lVert x-y\rVert^2\)</span>) and the accuracy approaches plain PCA’s; (iii)
+map the working window in between and <em>measure</em> its width — on these
+hundred points it is narrower than folklore suggests (this notebook
+found 82% at <span class="math notranslate nohighlight">\(\sigma = 0.7\)</span> and 93% at <span class="math notranslate nohighlight">\(\sigma = 1.5\)</span> on the first
+component alone), and stating the measured window is the honest form
+of the robustness claim. The check is yours.</p>
+</div>
+<section id="validation-6">
+<h3>Validation 6<a class="headerlink" href="#validation-6" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  no linear projection separates the rings: plain PCA tops out at 72%   [gated as geometry, not solver failure — concentric rings are the textbook counterexample to linear separability, which is what makes them the honest test]
+✓  feature-space centring works without visiting feature space   [HKH removes a mean no one computed — the kernel trick applied to the humblest preprocessing step [2.37033e-16 &lt; 1e-13]]
+✓  and the first kernel component separates the rings completely   [100% at a single threshold with a 0.10 gap between the class bands — eleven orders above the eigensolver&#39;s rounding, so the exact gate is licensed, exactly as 6.1&#39;s bisection was]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p><strong>Positive definiteness was proved where provable, measured where not.</strong>
+The linear kernel’s psd-ness was an identity
+(<span class="math notranslate nohighlight">\(v^{\top}Kv = \lVert X^{\top}v\rVert^2\)</span>, gated at <span class="math notranslate nohighlight">\(10^{-12}\)</span> on 100
+vectors); the polynomial and RBF Grams cleared
+<span class="math notranslate nohighlight">\(\lambda_{\min} \ge -10^{-12}\lVert K\rVert\)</span>; symmetry measured exactly
+zero but was gated at <span class="math notranslate nohighlight">\(10^{-14}\)</span> because Gram matrices pass through
+<code class="docutils literal notranslate"><span class="pre">gemm</span></code> and the course’s first CI lesson is not negotiable. The RBF’s
+<span class="math notranslate nohighlight">\(\lambda_{\min}\)</span> collapsed from <span class="math notranslate nohighlight">\(10^{-4}\)</span> to rounding level as the
+bandwidth widened — the conditioning dial that organized the notebook.</p>
+<p><strong>The trick was made explicit exactly once, then trusted.</strong> The
+six-feature quadratic map reproduced its kernel across all 3600 pairs
+at <span class="math notranslate nohighlight">\(10^{-14}\)</span>; the counting ledger (6 features here, 96 million at
+<span class="math notranslate nohighlight">\((d,p) = (100,5)\)</span>, Gram matrix <span class="math notranslate nohighlight">\(n \times n\)</span> regardless) is the
+economics; the RBF’s Taylor tower converged to its kernel from below.</p>
+<p><strong>Every algorithm came with its own certificate.</strong> KRR with the linear
+kernel <em>equalled</em> ordinary ridge (<span class="math notranslate nohighlight">\(10^{-15}\)</span> — the trick adds nothing
+when there is nothing to add); the solve certified itself through
+<span class="math notranslate nohighlight">\(y - K\alpha = \lambda\alpha\)</span>; the training residual rose strictly
+monotonically across eight decades of <span class="math notranslate nohighlight">\(\lambda\)</span>. Nyström’s residual was
+PSD (Schur complement) with spectral norm under its trace — two
+one-sided theorems, gated one-sidedly.</p>
+<p><strong>And the rings came apart.</strong> Plain PCA topped out at 72% (gated below
+90% as a fact of geometry); kernel PCA centred the features nobody
+computed (<span class="math notranslate nohighlight">\(10^{-16}\)</span> row means), and its first component classified the
+rings at 100% with a 0.10 gap — an exact gate licensed by a margin
+eleven orders above rounding, closing Chapter VI the way
+<a class="reference internal" href="graphs-laplacian.html"><span class="std std-doc">§6.1</span></a>’s spectral bisection opened it.</p>
+<p><strong>Methods introduced.</strong> <code class="docutils literal notranslate"><span class="pre">rbf_gram</span></code> via the distance identity,
+quadratic-form psd certificates, explicit feature maps, feature-count
+ledgers, Gram eigendecay as a design diagnostic, kernel ridge with
+primal–dual and self-certification checks, Nyström with Schur and
+trace bounds, and kernel PCA with feature-space centring.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Chapter VI, closed.</strong> Graphs (<a class="reference internal" href="graphs-laplacian.html"><span class="std std-doc">§6.1</span></a>),
+Markov chains (<a class="reference internal" href="markov-perron-pagerank.html"><span class="std std-doc">§6.2</span></a>), circulants
+(<a class="reference internal" href="circulant-toeplitz-fft.html"><span class="std std-doc">§6.3</span></a>), Kronecker structure
+(<a class="reference internal" href="kronecker-vec-separable.html"><span class="std std-doc">§6.4</span></a>) and kernels: five ways a
+matrix can <em>be</em> a structure rather than merely store numbers.</p></li>
+<li><p><strong>Tensors next.</strong> When data has three indices instead of two, the
+Gram-matrix move generalizes to unfoldings —
+<a class="reference internal" href="../07-tensors/einsum-contraction.html"><span class="std std-doc">§7.1</span></a> opens Chapter VII with
+<code class="docutils literal notranslate"><span class="pre">einsum</span></code> as the index calculus everything else compiles to.</p></li>
+<li><p><strong>Kernels at scale are spectra at work.</strong> Random-feature and Nyström
+methods approximate <span class="math notranslate nohighlight">\(K\)</span> precisely because of Exercise 3’s decay;
+modern Gaussian-process libraries are Krylov solvers
+(<a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html"><span class="std std-doc">§5.5</span></a>) against
+kernel operators never formed (<a class="reference internal" href="kronecker-vec-separable.html"><span class="std std-doc">§6.4</span></a>’s
+discipline).</p></li>
+<li><p><strong>From kernels to features learned.</strong> Chapter VIII replaces the fixed
+<span class="math notranslate nohighlight">\(\varphi\)</span> with a trained one: <a class="reference internal" href="../08-learning/learning-as-least-squares.html"><span class="std std-doc">§8.1</span></a>
+starts from least squares and walks to networks, where the Gram
+matrix reappears as the neural tangent kernel.</p></li>
+</ul>
+<div class="docutils container" id="id4">
+<div role="list" class="citation-list">
+<div class="citation" id="id42" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">HTF09</a><span class="fn-bracket">]</span></span>
+<p>Trevor Hastie, Robert Tibshirani, and Jerome Friedman. <em>The Elements of Statistical Learning</em>. Springer, 2 edition, 2009. <a class="reference external" href="https://doi.org/10.1007/978-0-387-84858-7">doi:10.1007/978-0-387-84858-7</a>.</p>
+</div>
+<div class="citation" id="id35" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">ScholkopfS02</a><span class="fn-bracket">]</span></span>
+<p>Bernhard Schölkopf and Alexander J. Smola. <em>Learning with Kernels: Support Vector Machines, Regularization, Optimization, and Beyond</em>. MIT Press, 2002.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/06-structure"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="kronecker-vec-separable.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">6.4 Kronecker Products, vec, and Separable Problems</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="kalman-recursive-least-squares.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">6.6 The Kalman Filter: Least Squares, Recursively</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#kernels-are-inner-products-gram-matrices-carry-them">Kernels are inner products; Gram matrices carry them</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-kernel-trick-and-what-it-costs">The kernel trick, and what it costs</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#kernel-pca">Kernel PCA</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-three-gram-matrices-and-what-positive-definite-survives">Exercise 1: Three Gram matrices, and what “positive definite” survives</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-kernel-trick-made-explicit-once">Exercise 2: The kernel trick, made explicit once</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-spectrum-is-the-price-list">Exercise 3: The spectrum is the price list</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-kernel-ridge-regression-one-solve-three-certificates">Exercise 4: Kernel ridge regression: one solve, three certificates</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-nystrom-compression-with-one-sided-certificates">Exercise 5: Nyström: compression with one-sided certificates</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-kernel-pca-the-rings-come-apart">Exercise 6: Kernel PCA: the rings come apart</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

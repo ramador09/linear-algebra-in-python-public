@@ -1,0 +1,1267 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/09-quantum/chsh-tsirelson.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: The CHSH game is the cleanest confrontation physics ever staged: two players, two questions each, a correlation score — and a hard ceiling..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: The CHSH game is the cleanest confrontation physics ever staged: two players, two questions each, a correlation score — and a hard ceiling..." />
+
+    <title>9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/09-quantum/chsh-tsirelson';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/09-quantum/chsh-tsirelson.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="9.4 Measurement, Channels, and the Choi Matrix" href="measurement-channels-choi.html" />
+    <link rel="prev" title="9.2 Two Qubits: Tensor Products and Entanglement" href="tensor-products-entanglement.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter IX — Quantum Information as Linear Algebra</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/09-quantum/chsh-tsirelson.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/09-quantum/chsh-tsirelson.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/09-quantum/chsh-tsirelson.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/09-quantum/chsh-tsirelson.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-game-and-the-classical-ceiling">The game, and the classical ceiling</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-quantum-score-is-an-eigenvalue">The quantum score is an eigenvalue</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tsirelson-why-2-sqrt2-and-no-further">Tsirelson: why <span class="math notranslate nohighlight">\(2\sqrt2\)</span> and no further</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-game-at-the-optimum">The game at the optimum</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-sixteen-strategies-one-integer-verdict">Exercise 1: Sixteen strategies, one integer verdict</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-quantum-score-is-an-eigenvalue">Exercise 2: The quantum score is an eigenvalue</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-tsirelson-s-ceiling-from-one-identity">Exercise 3: Tsirelson’s ceiling, from one identity</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-the-game-played">Exercise 4: The game, played</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-the-dial-from-classical-to-quantum">Exercise 5: The dial from classical to quantum</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="the-chsh-game-tsirelson-s-bound-is-an-eigenvalue">
+<h1>9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue<a class="headerlink" href="#the-chsh-game-tsirelson-s-bound-is-an-eigenvalue" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter IX — Quantum Information as Linear Algebra
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;9.3
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">Sixteen classical strategies, every one landing exactly on plus or minus two. One 4x4 Hermitian matrix whose largest eigenvalue is 2 sqrt 2 — symbolically, says SymPy. Between those two numbers sits the experimental refutation of local realism, and all of it is an eigenvalue problem this course can finish in an afternoon.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;advanced&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;120–150 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p>The CHSH game is the cleanest confrontation physics ever staged: two
+players, two questions each, a correlation score — and a hard ceiling of
+<span class="math notranslate nohighlight">\(2\)</span> for <em>any</em> strategy built from pre-agreed answers. Quantum mechanics
+scores <span class="math notranslate nohighlight">\(2\sqrt2\)</span>. Experiments agree with quantum mechanics. Something in
+the classical worldview has to give, and Bell-test experiments earned the
+2022 Nobel Prize for showing it gives in the laboratory.</p>
+<p>This notebook’s claim is that the whole confrontation is linear algebra
+the course already owns. The classical ceiling is a <em>finite enumeration</em>:
+sixteen deterministic strategies, each scoring exactly <span class="math notranslate nohighlight">\(\pm2\)</span> — integers,
+gated with <code class="docutils literal notranslate"><span class="pre">==</span></code>. The quantum score is the <strong>largest eigenvalue of one
+<span class="math notranslate nohighlight">\(4\times4\)</span> Hermitian matrix</strong>, computed by <code class="docutils literal notranslate"><span class="pre">eigvalsh</span></code> at rounding and by
+SymPy exactly; the Bell pair of
+<a class="reference internal" href="tensor-products-entanglement.html"><span class="std std-doc">§9.2</span></a> is its top eigenvector. And
+the ceiling above <em>that</em> — Tsirelson’s bound, the statement that quantum
+mechanics itself can do no better — falls out of a one-line operator
+identity for <span class="math notranslate nohighlight">\(C^2\)</span> that the reader verifies directly.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> The inequality is Clauser–Horne–Shimony–Holt
+<span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id66" title="John F. Clauser, Michael A. Horne, Abner Shimony, and Richard A. Holt. Proposed experiment to test local hidden-variable theories. Physical Review Letters, 23(15):880–884, 1969. doi:10.1103/PhysRevLett.23.880.">CHSH69</a>]</span>; the quantum ceiling is Tsirelson’s
+<span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id67" title="Boris S. Cirel'son. Quantum generalizations of Bell's inequality. Letters in Mathematical Physics, 4(2):93–100, 1980. doi:10.1007/BF00417500.">Cirelson80</a>]</span>; Nielsen and Chuang <span class="bibtex-citation" id="id3">[<a class="reference internal" href="#id65" title="Michael A. Nielsen and Isaac L. Chuang. Quantum Computation and Quantum Information. Cambridge University Press, Cambridge, 10th anniversary edition, 2010. doi:10.1017/CBO9780511976667.">NC10</a>]</span> §2.6
+gives the standard treatment. The states and measurements are
+<a class="reference internal" href="qubits-gates-bloch.html"><span class="std std-doc">§9.1</span></a>’s and
+<a class="reference internal" href="tensor-products-entanglement.html"><span class="std std-doc">§9.2</span></a>’s.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="the-game-and-the-classical-ceiling">
+<h3>The game, and the classical ceiling<a class="headerlink" href="#the-game-and-the-classical-ceiling" title="Link to this heading">#</a></h3>
+<p>A referee sends Alice a bit <span class="math notranslate nohighlight">\(x\)</span> and Bob a bit <span class="math notranslate nohighlight">\(y\)</span>, uniformly. Each
+returns a bit; they win when <span class="math notranslate nohighlight">\(a \oplus b = x \wedge y\)</span> — answers must
+<em>agree</em> unless both questions were <span class="math notranslate nohighlight">\(1\)</span>. Writing answers as <span class="math notranslate nohighlight">\(\pm1\)</span>
+variables <span class="math notranslate nohighlight">\(a_x, b_y\)</span> fixed in advance (a <strong>deterministic local
+strategy</strong>), the score is</p>
+<div class="math notranslate nohighlight" id="equation-eq-ch-score">
+<span class="eqno">(304)<a class="headerlink" href="#equation-eq-ch-score" title="Link to this equation">#</a></span>\[\mathcal{S} \;=\; a_0b_0 + a_0b_1 + a_1b_0 - a_1b_1
+\;=\; a_0(b_0 + b_1) + a_1(b_0 - b_1) .\]</div>
+<p>One of <span class="math notranslate nohighlight">\(b_0 + b_1\)</span> and <span class="math notranslate nohighlight">\(b_0 - b_1\)</span> is always <span class="math notranslate nohighlight">\(0\)</span> and the other <span class="math notranslate nohighlight">\(\pm2\)</span>,
+so <strong>every</strong> deterministic strategy scores exactly <span class="math notranslate nohighlight">\(\pm2\)</span> — the CHSH
+bound <span class="math notranslate nohighlight">\(|\mathcal{S}| \le 2\)</span> is not merely a bound, it is where all
+sixteen strategies land. Shared randomness only mixes them, so it
+cannot help. In game form the best classical win rate is <span class="math notranslate nohighlight">\(3/4\)</span>: agree
+always, and lose only the <span class="math notranslate nohighlight">\((1,1)\)</span> round.</p>
+</section>
+<section id="the-quantum-score-is-an-eigenvalue">
+<h3>The quantum score is an eigenvalue<a class="headerlink" href="#the-quantum-score-is-an-eigenvalue" title="Link to this heading">#</a></h3>
+<p>Replace the fixed answers by measurements on the
+<a class="reference internal" href="tensor-products-entanglement.html"><span class="std std-doc">§9.2</span></a> Bell pair: observables
+<span class="math notranslate nohighlight">\(A_0, A_1\)</span> for Alice and <span class="math notranslate nohighlight">\(B_0, B_1\)</span> for Bob, each with spectrum
+<span class="math notranslate nohighlight">\(\{\pm1\}\)</span>, assembled into the <strong>CHSH operator</strong></p>
+<div class="math notranslate nohighlight" id="equation-eq-ch-operator">
+<span class="eqno">(305)<a class="headerlink" href="#equation-eq-ch-operator" title="Link to this equation">#</a></span>\[C \;=\; A_0 \otimes (B_0 + B_1) \;+\; A_1 \otimes (B_0 - B_1) .\]</div>
+<p>The achievable score with a shared state <span class="math notranslate nohighlight">\(|\psi\rangle\)</span> is
+<span class="math notranslate nohighlight">\(\langle\psi|C|\psi\rangle\)</span>, so the best quantum score for these
+measurements is <span class="math notranslate nohighlight">\(\lambda_{\max}(C)\)</span> — an eigenvalue problem. At the
+standard optimal choice (<span class="math notranslate nohighlight">\(A_0 = \sigma_z\)</span>, <span class="math notranslate nohighlight">\(A_1 = \sigma_x\)</span>, Bob’s pair
+the <span class="math notranslate nohighlight">\(\pm45°\)</span> rotations of Alice’s) the spectrum is
+<span class="math notranslate nohighlight">\(\{2\sqrt2, 0, 0, -2\sqrt2\}\)</span>, and the Bell state is the top
+eigenvector.</p>
+</section>
+<section id="tsirelson-why-2-sqrt2-and-no-further">
+<h3>Tsirelson: why <span class="math notranslate nohighlight">\(2\sqrt2\)</span> and no further<a class="headerlink" href="#tsirelson-why-2-sqrt2-and-no-further" title="Link to this heading">#</a></h3>
+<p>Squaring <a class="reference internal" href="#equation-eq-ch-operator">Eq. 305</a> and using <span class="math notranslate nohighlight">\(A_x^2 = B_y^2 = I\)</span>,</p>
+<div class="math notranslate nohighlight" id="equation-eq-ch-square">
+<span class="eqno">(306)<a class="headerlink" href="#equation-eq-ch-square" title="Link to this equation">#</a></span>\[C^2 \;=\; 4\,I \otimes I \;+\; [A_0, A_1] \otimes [B_1, B_0] ,\]</div>
+<p>so <span class="math notranslate nohighlight">\(\lVert C\rVert^2 \le 4 + \lVert[A_0,A_1]\rVert\,
+\lVert[B_1,B_0]\rVert \le 4 + 2\cdot2 = 8\)</span>: <strong>no</strong> choice of
+measurements and state beats <span class="math notranslate nohighlight">\(2\sqrt2\)</span> <span class="bibtex-citation" id="id4">[<a class="reference internal" href="#id67" title="Boris S. Cirel'son. Quantum generalizations of Bell's inequality. Letters in Mathematical Physics, 4(2):93–100, 1980. doi:10.1007/BF00417500.">Cirelson80</a>]</span>. The
+commutators are the whole story — classical physics has none, and pays
+with the difference between <span class="math notranslate nohighlight">\(2\)</span> and <span class="math notranslate nohighlight">\(2\sqrt2\)</span>.</p>
+</section>
+<section id="the-game-at-the-optimum">
+<h3>The game at the optimum<a class="headerlink" href="#the-game-at-the-optimum" title="Link to this heading">#</a></h3>
+<p>At the optimal measurements each correlation is
+<span class="math notranslate nohighlight">\(\langle A_x \otimes B_y\rangle = \pm1/\sqrt2\)</span> (the sign flipping only
+at <span class="math notranslate nohighlight">\((1,1)\)</span>), and the win rate is</p>
+<div class="math notranslate nohighlight" id="equation-eq-ch-win">
+<span class="eqno">(307)<a class="headerlink" href="#equation-eq-ch-win" title="Link to this equation">#</a></span>\[p_{\text{win}} \;=\; \tfrac12\Bigl(1 + \tfrac{1}{\sqrt2}\Bigr)
+\;=\; \cos^2\tfrac{\pi}{8} \;\approx\; 0.8536 ,\]</div>
+<p>against the classical <span class="math notranslate nohighlight">\(3/4\)</span> — the gap a Bell-test experiment measures.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data and restated instruments only: the Pauli matrices, the Bell state,
+and the four optimal observables as explicit constants. The strategy
+enumeration, the CHSH operator, the Tsirelson identity and the game
+simulator are all built in the exercises, where they are the lesson.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sympy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random draw below comes from this seed</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+
+<span class="c1"># data: the one-qubit cast, restated once more.</span>
+<span class="n">SIGMA_X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+<span class="n">SIGMA_Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="n">j</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.0</span><span class="n">j</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]])</span>
+<span class="n">SIGMA_Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+
+<span class="c1"># data: the Bell state of 9.2, the shared resource of the whole game.</span>
+<span class="n">BELL</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+<span class="n">BELL</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">BELL</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
+
+<span class="c1"># data: the standard optimal measurements — Alice&#39;s axes, and Bob&#39;s pair</span>
+<span class="c1"># rotated 45 degrees between them.</span>
+<span class="n">A_OBS</span> <span class="o">=</span> <span class="p">[</span><span class="n">SIGMA_Z</span><span class="p">,</span> <span class="n">SIGMA_X</span><span class="p">]</span>
+<span class="n">B_OBS</span> <span class="o">=</span> <span class="p">[(</span><span class="n">SIGMA_Z</span> <span class="o">+</span> <span class="n">SIGMA_X</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span><span class="p">),</span>
+         <span class="p">(</span><span class="n">SIGMA_Z</span> <span class="o">-</span> <span class="n">SIGMA_X</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-sixteen-strategies-one-integer-verdict">
+<h2>Exercise 1: Sixteen strategies, one integer verdict<a class="headerlink" href="#exercise-1-sixteen-strategies-one-integer-verdict" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-ch-score">Eq. 304</a> quantifies over every deterministic local strategy —
+and there are only sixteen, so the quantifier is a <code class="docutils literal notranslate"><span class="pre">for</span></code> loop and the
+verdict is exact integer arithmetic.</p>
+<p><strong>Part a)</strong> Enumerate all sixteen assignments <span class="math notranslate nohighlight">\((a_0, a_1, b_0, b_1)
+\in \{\pm1\}^4\)</span> with <code class="docutils literal notranslate"><span class="pre">itertools.product</span></code>, compute each score
+<a class="reference internal" href="#equation-eq-ch-score">Eq. 304</a>, and gate the enumeration’s two facts exactly:
+every score <strong>equals</strong> <span class="math notranslate nohighlight">\(+2\)</span> or <span class="math notranslate nohighlight">\(-2\)</span> (not merely <span class="math notranslate nohighlight">\(|\mathcal{S}| \le 2\)</span>
+— the factored form makes one bracket vanish, so the ceiling is where
+everyone lands), split eight and eight.</p>
+<p><strong>Part b)</strong> Gate the game reading: for each strategy compute the win
+rate over the four equally likely question pairs (win when
+<span class="math notranslate nohighlight">\(a \oplus b = x \wedge y\)</span>, with <span class="math notranslate nohighlight">\(\pm1 \to\)</span> bits), and gate that the
+best deterministic win rate is exactly <span class="math notranslate nohighlight">\(3/4\)</span> — a rational, compared
+with <code class="docutils literal notranslate"><span class="pre">==</span></code> after clearing the denominator of 4.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>scores: [-2, 2] — split 8 at +2, 8 at -2
+best deterministic win count: 3 of 4 (rate 0.75)
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  all sixteen deterministic strategies score exactly +-2 (Eq. 1)   [integer arithmetic, compared exactly: one bracket of the factored form always vanishes, so the classical ceiling is not approached — it is inhabited]
+✓  and the best classical win rate is exactly 3/4   [the always-agree strategies lose only the (1,1) round; nothing deterministic does better, and shared randomness can only mix what is enumerated here]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-the-quantum-score-is-an-eigenvalue">
+<h2>Exercise 2: The quantum score is an eigenvalue<a class="headerlink" href="#exercise-2-the-quantum-score-is-an-eigenvalue" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-ch-operator">Eq. 305</a> compresses the entire quantum strategy space (for
+fixed measurements) into one Hermitian matrix. This exercise builds it
+and reads the score off its spectrum — in both arithmetics.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">chsh_operator(A_pair,</span> <span class="pre">B_pair)</span></code> assembling
+<a class="reference internal" href="#equation-eq-ch-operator">Eq. 305</a> with <code class="docutils literal notranslate"><span class="pre">np.kron</span></code>. On the Setup’s optimal
+measurements, gate: <span class="math notranslate nohighlight">\(C\)</span> Hermitian to <span class="math notranslate nohighlight">\(10^{-15}\)</span>, and its sorted
+spectrum equal to <span class="math notranslate nohighlight">\((-2\sqrt2, 0, 0, 2\sqrt2)\)</span> to <span class="math notranslate nohighlight">\(10^{-14}\)</span> by
+<code class="docutils literal notranslate"><span class="pre">np.linalg.eigvalsh</span></code>.</p>
+<p><strong>Write this one yourself</strong> — it is four Kronecker products and two
+sums, and it is the bridge from game to eigenvalue problem.</p>
+<p><strong>Part b)</strong> The same spectrum, exactly: rebuild <span class="math notranslate nohighlight">\(C\)</span> in SymPy with
+<code class="docutils literal notranslate"><span class="pre">sp.nsimplify(...,</span> <span class="pre">[sp.sqrt(2)])</span></code> and gate that its eigenvalues are
+<strong>exactly</strong> <span class="math notranslate nohighlight">\(\{2\sqrt2, 0, -2\sqrt2\}\)</span> as symbols — the chapter’s
+exact-versus-float thread at its most famous number.</p>
+<p><strong>Part c)</strong> Gate the achiever: <span class="math notranslate nohighlight">\(\langle\mathrm{Bell}|C|\mathrm{Bell}
+\rangle = 2\sqrt2\)</span> to <span class="math notranslate nohighlight">\(10^{-13}\)</span>, and the overlap between the Bell
+state and the top eigenvector has modulus <span class="math notranslate nohighlight">\(1\)</span> to <span class="math notranslate nohighlight">\(10^{-12}\)</span> — the
+maximally entangled state of <a class="reference internal" href="tensor-products-entanglement.html"><span class="std std-doc">§9.2</span></a>
+<em>is</em> the extremal eigenvector, which is why entanglement is the
+resource the game spends.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C Hermitian to 0.0e+00; spectrum [-2.82842712  0.          0.          2.82842712] vs (+-2sqrt2, 0, 0): worst 4.4e-16
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>SymPy eigenvalues: [-2*sqrt(2), 0, 2*sqrt(2)] — exactly (+-2 sqrt 2, 0): True
+&lt;Bell|C|Bell&gt; = 2.828427124746; overlap with the top eigenvector: 1.000000000000
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the CHSH operator&#39;s spectrum is (+-2 sqrt 2, 0, 0) at rounding (Eq. 2)   [eigvalsh lands within 4.4e-16: the whole quantum strategy space for these measurements, spoken as four numbers]
+✓  and SymPy says the eigenvalues are +-2 sqrt 2 and 0 — exactly   [the subject&#39;s most famous number is algebra, not measurement: an exact eigenvalue of a 4x4 matrix over Q(sqrt 2)]
+✓  the Bell state achieves the ceiling as the top eigenvector   [score 2.828427125 with eigenvector overlap 1 to rounding — 9.2&#39;s maximal entanglement, spent as an extremal eigenvector]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-tsirelson-s-ceiling-from-one-identity">
+<h2>Exercise 3: Tsirelson’s ceiling, from one identity<a class="headerlink" href="#exercise-3-tsirelson-s-ceiling-from-one-identity" title="Link to this heading">#</a></h2>
+<p>The eigenvalue said <span class="math notranslate nohighlight">\(2\sqrt2\)</span> for <em>these</em> measurements.
+<a class="reference internal" href="#equation-eq-ch-square">Eq. 306</a> says nothing does better — and it is an identity
+the reader can check with four matrix products.</p>
+<p><strong>Part a)</strong> Verify <a class="reference internal" href="#equation-eq-ch-square">Eq. 306</a> directly on the optimal
+measurements: <span class="math notranslate nohighlight">\(C^2 - \bigl(4I + [A_0,A_1] \otimes [B_1,B_0]\bigr)\)</span>
+entrywise below <span class="math notranslate nohighlight">\(10^{-14}\)</span>. Report the two commutator norms — each
+<span class="math notranslate nohighlight">\(\lVert\cdot\rVert_2 = 2\)</span> to <span class="math notranslate nohighlight">\(10^{-13}\)</span>, the anticommuting maximum —
+so the chain <span class="math notranslate nohighlight">\(\lVert C\rVert^2 \le 4 + 4 = 8\)</span> closes at this
+instance’s exact value.</p>
+<p><strong>Part b)</strong> Sample the ceiling: for 200 seeded measurement quadruples
+— observables <span class="math notranslate nohighlight">\(\mathbf{n}\cdot\boldsymbol{\sigma}\)</span> on seeded random
+axes, spectrum <span class="math notranslate nohighlight">\(\{\pm1\}\)</span> by construction — gate
+<span class="math notranslate nohighlight">\(\lambda_{\max}(C) \le 2\sqrt2 + 10^{-12}\)</span> every time (one-sided:
+sampling cannot prove the bound, but it can lose to it, and it
+never does), and <em>report</em> the largest value found beside the ceiling.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C^2 identity to 8.9e-16; commutator norms 2.000000000000, 2.000000000000 (anticommuting maximum 2)
+200 seeded measurement quadruples: largest lambda_max 2.825731 against the ceiling 2.828427, 0 violations
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  C^2 = 4I + commutator x commutator, verified entrywise (Eq. 3)   [identity at 8.9e-16 with both commutator norms at the anticommuting maximum 2 — the ||C||^2 &lt;= 8 chain closes, and the absent classical commutators are the whole 2 vs 2 sqrt 2 story]
+✓  and no sampled measurement choice beats Tsirelson (one-sided)   [largest of 200 seeded quadruples: 2.8257 &lt;= 2 sqrt 2 — sampling cannot prove the theorem, but it can lose to it, and it lost 200 times]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-the-game-played">
+<h2>Exercise 4: The game, played<a class="headerlink" href="#exercise-4-the-game-played" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-ch-win">Eq. 307</a> prices the quantum advantage as a win rate. Here the
+seeded generator plays a Bell test: the referee’s bits, the Born-rule
+correlations of <a class="reference internal" href="qubits-gates-bloch.html"><span class="std std-doc">§9.1</span></a>, and a pre-stated
+statistical band.</p>
+<p><strong>Part a)</strong> Gate the four correlations first, as identities:
+<span class="math notranslate nohighlight">\(\langle\mathrm{Bell}|A_x \otimes B_y|\mathrm{Bell}\rangle =
+\pm1/\sqrt2\)</span> (positive except at <span class="math notranslate nohighlight">\((x,y) = (1,1)\)</span>) to <span class="math notranslate nohighlight">\(10^{-13}\)</span> —
+the numbers a laboratory tabulates.</p>
+<p><strong>Part b)</strong> Simulate <span class="math notranslate nohighlight">\(N = 4000\)</span> seeded rounds: uniform question bits;
+outcomes drawn with the agreement probability <span class="math notranslate nohighlight">\((1 + E_{xy})/2\)</span>
+implied by Part a’s correlations (marginals vanish for the Bell
+state); win when <span class="math notranslate nohighlight">\(a \oplus b = x \wedge y\)</span>. Gate the win rate inside
+<span class="math notranslate nohighlight">\(\cos^2(\pi/8) \pm 4\sqrt{p(1-p)/N} = 0.8536 \pm 0.0224\)</span>, and gate
+that the classical <span class="math notranslate nohighlight">\(3/4\)</span> lies <strong>outside</strong> the same band — the
+refutation as a seeded statistic with its error bar stated first.
+Draw the running win rate against both rules.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>correlations: {(0, 0): 0.707107, (0, 1): 0.707107, (1, 0): 0.707107, (1, 1): -0.707107}  worst gap 1.1e-16
+win rate 0.8590 against cos^2(pi/8) = 0.8536 (band +-0.0224); classical 3/4 sits 4.6 bands below the target
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the four Bell-pair correlations are +-1/sqrt2 with one flipped sign   [identities before statistics: the (1,1) sign flip is what lets one strategy win rounds that classical agreement must lose [1.11022e-16 &lt; 1e-13]]
+✓  4000 seeded rounds land on cos^2(pi/8), four sigma from classical   [rate 0.8590 inside 0.8536 +- 0.0224, with 3/4 excluded by the same pre-stated band — the Bell-test verdict, as a seeded statistic]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-ch-game">
+<img alt="../../_images/0155f3b4595878361a030a822b61c43ec2dbc8669f4bd76dddf75965954c9900.png" src="../../_images/0155f3b4595878361a030a822b61c43ec2dbc8669f4bd76dddf75965954c9900.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 170 </span><span class="caption-text">The CHSH game over 4000 seeded rounds: the running win rate (ink) settling into the pre-stated four-standard-error band (shading) around the quantum value <span class="math notranslate nohighlight">\(\cos^2(\pi/8) \approx 0.8536\)</span> (amber rule), while the best classical win rate <span class="math notranslate nohighlight">\(3/4\)</span> (grey rule) sits more than four bands below. The early wandering is small-sample noise; the verdict is the separation between the two rules, which no enlargement of <span class="math notranslate nohighlight">\(N\)</span> can blur — it only tightens the band around the quantum line.</span><a class="headerlink" href="#fig-ch-game" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-the-dial-from-classical-to-quantum">
+<h2>Exercise 5: The dial from classical to quantum<a class="headerlink" href="#exercise-5-the-dial-from-classical-to-quantum" title="Link to this heading">#</a></h2>
+<p>How does the advantage switch on? Fix Alice’s observables and the Bell
+state, and let Bob’s measurement pair rotate: <span class="math notranslate nohighlight">\(B_0, B_1\)</span> at angles
+<span class="math notranslate nohighlight">\(\pm\theta\)</span> from <span class="math notranslate nohighlight">\(\sigma_z\)</span> in the <span class="math notranslate nohighlight">\(zx\)</span> plane. The score has a closed
+form, and the dial connects the two ceilings.</p>
+<p><strong>Part a)</strong> Write the swept pair
+<span class="math notranslate nohighlight">\(B_0(\theta) = \cos\theta\,\sigma_z + \sin\theta\,\sigma_x\)</span>,
+<span class="math notranslate nohighlight">\(B_1(\theta) = \cos\theta\,\sigma_z - \sin\theta\,\sigma_x\)</span>, and gate
+the closed form
+<span class="math notranslate nohighlight">\(\langle\mathrm{Bell}|C(\theta)|\mathrm{Bell}\rangle =
+2(\cos\theta + \sin\theta)\)</span> to <span class="math notranslate nohighlight">\(10^{-13}\)</span> on a 300-point sweep of
+<span class="math notranslate nohighlight">\(\theta \in [0, \pi/2]\)</span>.</p>
+<p><strong>Part b)</strong> Gate the dial’s three landmarks: the score at <span class="math notranslate nohighlight">\(\theta = 0\)</span>
+and <span class="math notranslate nohighlight">\(\theta = \pi/2\)</span> equals the classical <span class="math notranslate nohighlight">\(2\)</span> to <span class="math notranslate nohighlight">\(10^{-13}\)</span> (aligned
+or anti-aligned measurement pairs commute — no commutator, no
+advantage); the maximum over the sweep lands within <span class="math notranslate nohighlight">\(10^{-4}\)</span> of
+<span class="math notranslate nohighlight">\(2\sqrt2\)</span> (the summit is quadratic in the grid spacing); and the
+maximiser sits at <span class="math notranslate nohighlight">\(\theta = \pi/4\)</span> within one grid step. Draw the
+curve over the strip of sixteen classical scores.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>closed form 2(cos + sin): worst 8.9e-16
+endpoints vs classical 2: 4.4e-16; peak within 9.8e-06 of 2 sqrt 2, argmax within 0.50 grid steps of pi/4
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the swept score is 2(cos theta + sin theta), exactly the closed form   [300 sweep points: one family of measurements, one trigonometric identity — the dial between the ceilings [8.88178e-16 &lt; 1e-13]]
+✓  and the dial connects 2 (commuting ends) to 2 sqrt 2 (at pi/4)   [endpoints on the classical ceiling to 4.4e-16 — commuting measurements earn no advantage — with the summit at pi/4 within one grid step and 9.8e-06 of Tsirelson]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-ch-dial">
+<img alt="../../_images/461996d387fd5404755c0d28e1866307b2150555a329486c2704de1abaf3cacf.png" src="../../_images/461996d387fd5404755c0d28e1866307b2150555a329486c2704de1abaf3cacf.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 171 </span><span class="caption-text">The quantum score <span class="math notranslate nohighlight">\(\langle\mathrm{Bell}|C(\theta)|\mathrm{Bell}\rangle = 2(\cos\theta + \sin\theta)\)</span> as Bob’s measurement pair opens from <span class="math notranslate nohighlight">\(\theta = 0\)</span> to <span class="math notranslate nohighlight">\(\pi/2\)</span> (ink), over the sixteen classical strategies — all sitting exactly on <span class="math notranslate nohighlight">\(\pm2\)</span>, the eight at <span class="math notranslate nohighlight">\(+2\)</span> collapsing onto the single grey dot on the classical rule (the eight at <span class="math notranslate nohighlight">\(-2\)</span> are off-scale below). At the commuting endpoints the quantum score touches the classical ceiling and no advantage exists; at <span class="math notranslate nohighlight">\(\theta = \pi/4\)</span> it reaches Tsirelson’s <span class="math notranslate nohighlight">\(2\sqrt2\)</span> (amber rule). The distance between the rules is bought entirely by the commutators of Eq. 3.</span><a class="headerlink" href="#fig-ch-dial" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p><strong>The classical ceiling is inhabited, not approached.</strong> All sixteen
+deterministic strategies scored exactly <span class="math notranslate nohighlight">\(\pm2\)</span> (integers, eight each
+way), and the best game win rate was exactly <span class="math notranslate nohighlight">\(3/4\)</span> — the factored form
+of <a class="reference internal" href="#equation-eq-ch-score">Eq. 304</a> kills one bracket every time, and the enumeration
+is the proof.</p>
+<p><strong>The quantum score is an eigenvalue, twice over.</strong> The CHSH operator’s
+spectrum came out <span class="math notranslate nohighlight">\((\pm2\sqrt2, 0, 0)\)</span> at <span class="math notranslate nohighlight">\(10^{-15}\)</span>-scale by
+<code class="docutils literal notranslate"><span class="pre">eigvalsh</span></code> and <strong>exactly</strong> by SymPy over <span class="math notranslate nohighlight">\(\mathbb{Q}(\sqrt2)\)</span>; the Bell
+state achieved <span class="math notranslate nohighlight">\(2\sqrt2\)</span> as the top eigenvector with overlap <span class="math notranslate nohighlight">\(1\)</span> to
+rounding — <a class="reference internal" href="tensor-products-entanglement.html"><span class="std std-doc">§9.2</span></a>’s resource, spent.</p>
+<p><strong>Tsirelson is one identity.</strong> <span class="math notranslate nohighlight">\(C^2 = 4I + [A_0,A_1]\otimes[B_1,B_0]\)</span>
+held entrywise at <span class="math notranslate nohighlight">\(9\times10^{-16}\)</span> with both commutator norms at their
+anticommuting maximum <span class="math notranslate nohighlight">\(2\)</span>, closing <span class="math notranslate nohighlight">\(\lVert C\rVert^2 \le 8\)</span>; 200 seeded
+measurement quadruples never beat the ceiling.</p>
+<p><strong>The laboratory version came out as stated.</strong> The four correlations
+were <span class="math notranslate nohighlight">\(\pm1/\sqrt2\)</span> as identities; 4000 seeded rounds won at a rate
+inside the pre-stated band around <span class="math notranslate nohighlight">\(\cos^2(\pi/8) = 0.8536\)</span>, with the
+classical <span class="math notranslate nohighlight">\(3/4\)</span> more than four bands below. The dial
+<span class="math notranslate nohighlight">\(2(\cos\theta + \sin\theta)\)</span> connected the ceilings: score <span class="math notranslate nohighlight">\(2\)</span> exactly
+at the commuting endpoints, <span class="math notranslate nohighlight">\(2\sqrt2\)</span> at <span class="math notranslate nohighlight">\(\theta = \pi/4\)</span>.</p>
+<p><strong>Methods introduced.</strong> Exhaustive strategy enumeration as a gate,
+<code class="docutils literal notranslate"><span class="pre">chsh_operator</span></code> (correlations to one Hermitian matrix), SymPy exact
+eigenvalues over <span class="math notranslate nohighlight">\(\mathbb{Q}(\sqrt2)\)</span>, the <span class="math notranslate nohighlight">\(C^2\)</span> commutator identity,
+one-sided ceiling sampling, and a Bell test as a seeded statistic with
+its error bar stated in advance.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Device independence.</strong> The score <span class="math notranslate nohighlight">\(2\sqrt2\)</span> certifies the state and
+measurements <em>up to local isometry</em> — a Bell violation is a
+self-test, which is why CHSH underwrites quantum key distribution
+protocols whose security assumes nothing about the hardware.</p></li>
+<li><p><strong>More questions, other games.</strong> Three-player games (GHZ’s home turf,
+with <a class="reference internal" href="tensor-products-entanglement.html"><span class="std std-doc">§9.2</span></a>’s state winning with
+certainty where classical strategies cap at <span class="math notranslate nohighlight">\(3/4\)</span>) and the magic
+square trade the eigenvalue for operator-algebra constraints.</p></li>
+<li><p><strong>The commutator as a resource meter.</strong> <a class="reference internal" href="#equation-eq-ch-square">Eq. 306</a> prices the
+advantage by <span class="math notranslate nohighlight">\(\lVert[A_0,A_1]\rVert\)</span> — the same object
+<a class="reference internal" href="measurement-channels-choi.html"><span class="std std-doc">§9.4</span></a> meets when noise shrinks the
+Bloch ball and drags the achievable score back toward <span class="math notranslate nohighlight">\(2\)</span>.</p></li>
+<li><p><strong>Semidefinite ceilings.</strong> Tsirelson’s bound is the first level of
+the NPA hierarchy: quantum correlation sets characterised by psd
+constraints — the chapter’s Choi story and
+<a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html"><span class="std std-doc">§3.3</span></a>’s
+machinery, scaled up to games.</p></li>
+</ul>
+<div class="docutils container" id="id5">
+<div role="list" class="citation-list">
+<div class="citation" id="id67" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Cirelson80<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id2">1</a>,<a role="doc-backlink" href="#id4">2</a>)</span>
+<p>Boris S. Cirel'son. Quantum generalizations of Bell's inequality. <em>Letters in Mathematical Physics</em>, 4(2):93–100, 1980. <a class="reference external" href="https://doi.org/10.1007/BF00417500">doi:10.1007/BF00417500</a>.</p>
+</div>
+<div class="citation" id="id66" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">CHSH69</a><span class="fn-bracket">]</span></span>
+<p>John F. Clauser, Michael A. Horne, Abner Shimony, and Richard A. Holt. Proposed experiment to test local hidden-variable theories. <em>Physical Review Letters</em>, 23(15):880–884, 1969. <a class="reference external" href="https://doi.org/10.1103/PhysRevLett.23.880">doi:10.1103/PhysRevLett.23.880</a>.</p>
+</div>
+<div class="citation" id="id65" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">NC10</a><span class="fn-bracket">]</span></span>
+<p>Michael A. Nielsen and Isaac L. Chuang. <em>Quantum Computation and Quantum Information</em>. Cambridge University Press, Cambridge, 10th anniversary edition, 2010. <a class="reference external" href="https://doi.org/10.1017/CBO9780511976667">doi:10.1017/CBO9780511976667</a>.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/09-quantum"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="tensor-products-entanglement.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">9.2 Two Qubits: Tensor Products and Entanglement</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="measurement-channels-choi.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">9.4 Measurement, Channels, and the Choi Matrix</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-game-and-the-classical-ceiling">The game, and the classical ceiling</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-quantum-score-is-an-eigenvalue">The quantum score is an eigenvalue</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tsirelson-why-2-sqrt2-and-no-further">Tsirelson: why <span class="math notranslate nohighlight">\(2\sqrt2\)</span> and no further</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-game-at-the-optimum">The game at the optimum</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-sixteen-strategies-one-integer-verdict">Exercise 1: Sixteen strategies, one integer verdict</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-quantum-score-is-an-eigenvalue">Exercise 2: The quantum score is an eigenvalue</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-tsirelson-s-ceiling-from-one-identity">Exercise 3: Tsirelson’s ceiling, from one identity</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-the-game-played">Exercise 4: The game, played</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-the-dial-from-classical-to-quantum">Exercise 5: The dial from classical to quantum</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

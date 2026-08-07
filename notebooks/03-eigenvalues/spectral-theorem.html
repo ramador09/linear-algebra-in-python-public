@@ -1,0 +1,1872 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="3.2 Symmetric Matrices and the Spectral Theorem" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/03-eigenvalues/spectral-theorem.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: §3.1 left a list of things that can go wrong: eigenvalues that turn out complex, eigenvectors that are not orthogonal, an eigenvector matr..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: §3.1 left a list of things that can go wrong: eigenvalues that turn out complex, eigenvectors that are not orthogonal, an eigenvector matr..." />
+
+    <title>3.2 Symmetric Matrices and the Spectral Theorem &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/03-eigenvalues/spectral-theorem';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/03-eigenvalues/spectral-theorem.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="3.3 Positive Definiteness, Quadratic Forms, and Cholesky" href="positive-definite-cholesky.html" />
+    <link rel="prev" title="3.1 Eigenvalues, Eigenvectors, and Diagonalization" href="eigenvalues-diagonalization.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter III — Eigenvalues and Spectral Theory</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/03-eigenvalues/spectral-theorem.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/03-eigenvalues/spectral-theorem.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/03-eigenvalues/spectral-theorem.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/03-eigenvalues/spectral-theorem.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>3.2 Symmetric Matrices and the Spectral Theorem</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-theorem">The theorem</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-rayleigh-quotient">The Rayleigh quotient</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#courantfischer">Courant–Fischer</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cauchy-interlacing">Cauchy interlacing</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#weyl-and-perfect-conditioning">Weyl, and perfect conditioning</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gershgorin">Gershgorin</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-what-symmetry-buys-measured-against-what-it-replaces">Exercise 1: What symmetry buys, measured against what it replaces</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-matrix-as-a-sum-of-projectors">Exercise 2: The matrix as a sum of projectors</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-rayleigh-quotient-and-eigenvectors-as-stationary-points">Exercise 3: The Rayleigh quotient, and eigenvectors as stationary points</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-courantfischer-checked-from-both-sides">Exercise 4: Courant–Fischer, checked from both sides</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-cauchy-interlacing">Exercise 5: Cauchy interlacing</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-weyl-and-a-condition-number-equal-to-1">Exercise 6: Weyl, and a condition number equal to 1</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-7-gershgorin-localising-a-spectrum-without-computing-it">Exercise 7: Gershgorin: localising a spectrum without computing it</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-7">Validation 7</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-8-the-rayleigh-quotient-converges-quadratically-and-the-constant-is-the-gap">Exercise 8: The Rayleigh quotient converges quadratically, and the constant is the gap</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-8">Validation 8</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="symmetric-matrices-and-the-spectral-theorem">
+<h1>3.2 Symmetric Matrices and the Spectral Theorem<a class="headerlink" href="#symmetric-matrices-and-the-spectral-theorem" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter III — Eigenvalues and Spectral Theory
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;3.2
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">Impose one condition — A equals its own transpose — and every difficulty of the previous notebook disappears at once: real eigenvalues, orthonormal eigenvectors, perfect conditioning, and eigenvalues you can localise without computing anything.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;advanced&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;105–135 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="eigenvalues-diagonalization.html"><span class="std std-doc">§3.1</span></a> left a list of things that can go
+wrong: eigenvalues that turn out complex, eigenvectors that are not orthogonal,
+an eigenvector matrix so badly conditioned that <a class="reference internal" href="eigenvalues-diagonalization.html#equation-eq-eig-diag">Eq. 145</a> stops meaning
+anything, and a matrix with too few eigenvectors to diagonalize at all. Every
+one of those disappears under a single hypothesis, <span class="math notranslate nohighlight">\(A = A^{\top}\)</span>.</p>
+<p>The <strong>spectral theorem</strong> says a real symmetric matrix has real eigenvalues and
+an <em>orthonormal</em> basis of eigenvectors, always. So <span class="math notranslate nohighlight">\(X\)</span> becomes an orthogonal
+<span class="math notranslate nohighlight">\(Q\)</span> with <span class="math notranslate nohighlight">\(\operatorname{cond}(Q) = 1\)</span> exactly, <span class="math notranslate nohighlight">\(X^{-1}\)</span> becomes <span class="math notranslate nohighlight">\(Q^{\top}\)</span>, and
+<span class="math notranslate nohighlight">\(A = Q\Lambda Q^{\top}\)</span> is a decomposition into a rotation, a scaling along the
+axes, and the reverse rotation. Nothing is defective, nothing is
+ill-conditioned, and nothing is complex.</p>
+<p>What follows is a run of results that are unusually strong for how cheap they
+are. The <strong>Rayleigh quotient</strong> turns the extreme eigenvalues into an
+optimisation problem, and the eigenvectors into its stationary points.
+<strong>Courant–Fischer</strong> extends that to every eigenvalue in between. <strong>Cauchy
+interlacing</strong> says deleting the last row and column of a symmetric matrix
+produces eigenvalues that slot between the originals, every time. <strong>Weyl’s
+inequality</strong> says a perturbation of norm <span class="math notranslate nohighlight">\(\|E\|\)</span> moves no eigenvalue further
+than <span class="math notranslate nohighlight">\(\|E\|\)</span> — so the symmetric eigenvalue problem is <em>perfectly conditioned</em>,
+which is not true of any other problem in this course. And <strong>Gershgorin’s
+theorem</strong> localises every eigenvalue by reading the entries off the matrix,
+with no computation at all.</p>
+<p>The notebook ends by settling a loose end from <a class="reference internal" href="eigenvalues-diagonalization.html"><span class="std std-doc">§3.1</span></a>,
+where the Rayleigh quotient converged at the same linear rate as the vector.
+Under symmetry it converges <em>quadratically</em>, and the constant turns out to be
+exactly the gap between the top two eigenvalues.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> Strang <span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id5" title="Gilbert Strang. Introduction to Linear Algebra. Wellesley-Cambridge Press, Wellesley, MA, 6 edition, 2023. ISBN 978-1-7331466-7-8.">Str23</a>]</span> Chapter 6; Horn and Johnson
+<span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id11" title="Roger A. Horn and Charles R. Johnson. Matrix Analysis. Cambridge University Press, 2 edition, 2013. doi:10.1017/CBO9781139020411.">HJ13</a>]</span> Chapters 4 and 6 for interlacing, Weyl and Gershgorin in
+full; Trefethen and Bau <span class="bibtex-citation" id="id3">[<a class="reference internal" href="#id12" title="Lloyd N. Trefethen and David Bau, III. Numerical Linear Algebra. SIAM, Philadelphia, 1997. doi:10.1137/1.9780898719574.">TB97</a>]</span> Lecture 24; Parlett’s
+<em>The Symmetric Eigenvalue Problem</em> is the monograph.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="the-theorem">
+<h3>The theorem<a class="headerlink" href="#the-theorem" title="Link to this heading">#</a></h3>
+<p>If <span class="math notranslate nohighlight">\(A \in \mathbb{R}^{n\times n}\)</span> satisfies <span class="math notranslate nohighlight">\(A = A^{\top}\)</span>, then all its
+eigenvalues are real and it has an orthonormal basis of eigenvectors. Writing
+those in the columns of <span class="math notranslate nohighlight">\(Q\)</span>,</p>
+<div class="math notranslate nohighlight" id="equation-eq-spec-decomposition">
+<span class="eqno">(150)<a class="headerlink" href="#equation-eq-spec-decomposition" title="Link to this equation">#</a></span>\[A = Q\Lambda Q^{\top},
+\qquad Q^{\top}Q = QQ^{\top} = I,
+\qquad \Lambda = \operatorname{diag}(\lambda_1 \le \dots \le \lambda_n).\]</div>
+<p>Both halves are short to see. Reality: if <span class="math notranslate nohighlight">\(A\mathbf{x} = \lambda\mathbf{x}\)</span>
+with <span class="math notranslate nohighlight">\(\mathbf{x}\)</span> possibly complex, then
+<span class="math notranslate nohighlight">\(\bar{\mathbf{x}}^{\top}A\mathbf{x} = \lambda\,\bar{\mathbf{x}}^{\top}\mathbf{x}\)</span>,
+and the left side equals its own conjugate because <span class="math notranslate nohighlight">\(A\)</span> is real symmetric, while
+<span class="math notranslate nohighlight">\(\bar{\mathbf{x}}^{\top}\mathbf{x} &gt; 0\)</span>; so <span class="math notranslate nohighlight">\(\lambda = \bar{\lambda}\)</span>.
+Orthogonality: if <span class="math notranslate nohighlight">\(A\mathbf{x} = \lambda\mathbf{x}\)</span> and <span class="math notranslate nohighlight">\(A\mathbf{y} =
+\mu\mathbf{y}\)</span> with <span class="math notranslate nohighlight">\(\lambda \ne \mu\)</span>, then <span class="math notranslate nohighlight">\(\lambda\,\mathbf{y}^{\top}\mathbf{x}
+= \mathbf{y}^{\top}\!A\mathbf{x} = \mu\,\mathbf{y}^{\top}\mathbf{x}\)</span>, forcing
+<span class="math notranslate nohighlight">\(\mathbf{y}^{\top}\mathbf{x} = 0\)</span>. Repeated eigenvalues need a little more care
+and the result survives it.</p>
+<p>Expanding <a class="reference internal" href="#equation-eq-spec-decomposition">Eq. 150</a> column by column gives the form worth
+carrying around,</p>
+<div class="math notranslate nohighlight" id="equation-eq-spec-projectors">
+<span class="eqno">(151)<a class="headerlink" href="#equation-eq-spec-projectors" title="Link to this equation">#</a></span>\[A = \sum_{i=1}^{n} \lambda_i\,\mathbf{q}_i\mathbf{q}_i^{\top} ,
+\qquad \sum_{i=1}^{n} \mathbf{q}_i\mathbf{q}_i^{\top} = I ,\]</div>
+<p>a weighted sum of rank-1 orthogonal projectors: <span class="math notranslate nohighlight">\(A\)</span> <em>is</em> a list of directions,
+each with a number attached.</p>
+</section>
+<section id="the-rayleigh-quotient">
+<h3>The Rayleigh quotient<a class="headerlink" href="#the-rayleigh-quotient" title="Link to this heading">#</a></h3>
+<p>For <span class="math notranslate nohighlight">\(\mathbf{x} \ne \mathbf{0}\)</span>,</p>
+<div class="math notranslate nohighlight" id="equation-eq-spec-rayleigh">
+<span class="eqno">(152)<a class="headerlink" href="#equation-eq-spec-rayleigh" title="Link to this equation">#</a></span>\[\rho(\mathbf{x}) = \frac{\mathbf{x}^{\top}\!A\mathbf{x}}{\mathbf{x}^{\top}\mathbf{x}} .\]</div>
+<p>Writing <span class="math notranslate nohighlight">\(\mathbf{x} = \sum c_i\mathbf{q}_i\)</span> and using orthonormality gives
+<span class="math notranslate nohighlight">\(\rho(\mathbf{x}) = \sum \lambda_ic_i^2 / \sum c_i^2\)</span>: a <strong>weighted average of
+the eigenvalues</strong>. Three consequences follow immediately. It is trapped in
+<span class="math notranslate nohighlight">\([\lambda_1, \lambda_n]\)</span>; it attains both ends, at <span class="math notranslate nohighlight">\(\mathbf{q}_1\)</span> and
+<span class="math notranslate nohighlight">\(\mathbf{q}_n\)</span>; and its gradient</p>
+<div class="math notranslate nohighlight" id="equation-eq-spec-gradient">
+<span class="eqno">(153)<a class="headerlink" href="#equation-eq-spec-gradient" title="Link to this equation">#</a></span>\[\nabla\rho(\mathbf{x}) =
+  \frac{2\bigl(A\mathbf{x} - \rho(\mathbf{x})\,\mathbf{x}\bigr)}
+       {\mathbf{x}^{\top}\mathbf{x}}\]</div>
+<p>vanishes exactly when <span class="math notranslate nohighlight">\(A\mathbf{x} = \rho(\mathbf{x})\mathbf{x}\)</span> — that is,
+exactly at the eigenvectors. Eigenvectors are the <strong>stationary points</strong> of
+<a class="reference internal" href="#equation-eq-spec-rayleigh">Eq. 152</a>, and that is a definition one can optimise against.</p>
+</section>
+<section id="courantfischer">
+<h3>Courant–Fischer<a class="headerlink" href="#courantfischer" title="Link to this heading">#</a></h3>
+<p>The middle eigenvalues get the same treatment through subspaces. With
+<span class="math notranslate nohighlight">\(\lambda_1 \le \dots \le \lambda_n\)</span>,</p>
+<div class="math notranslate nohighlight" id="equation-eq-spec-minmax">
+<span class="eqno">(154)<a class="headerlink" href="#equation-eq-spec-minmax" title="Link to this equation">#</a></span>\[\begin{split}\lambda_k = \min_{\substack{V \subseteq \mathbb{R}^n \\ \dim V = k}}
+  \;\max_{\mathbf{0}\ne\mathbf{x}\in V} \rho(\mathbf{x}) ,\end{split}\]</div>
+<p>and the minimising subspace is <span class="math notranslate nohighlight">\(\operatorname{span}\{\mathbf{q}_1, \dots,
+\mathbf{q}_k\}\)</span>. This characterises <span class="math notranslate nohighlight">\(\lambda_k\)</span> without reference to any
+eigenvector, which is what makes the next two results provable at all.</p>
+</section>
+<section id="cauchy-interlacing">
+<h3>Cauchy interlacing<a class="headerlink" href="#cauchy-interlacing" title="Link to this heading">#</a></h3>
+<p>Let <span class="math notranslate nohighlight">\(A_{n-1}\)</span> be <span class="math notranslate nohighlight">\(A\)</span> with its last row and column removed. Then</p>
+<div class="math notranslate nohighlight" id="equation-eq-spec-interlacing">
+<span class="eqno">(155)<a class="headerlink" href="#equation-eq-spec-interlacing" title="Link to this equation">#</a></span>\[\lambda_k(A_n) \;\le\; \lambda_k(A_{n-1}) \;\le\; \lambda_{k+1}(A_n) ,
+\qquad k = 1, \dots, n-1 ,\]</div>
+<p>so the <span class="math notranslate nohighlight">\(n-1\)</span> eigenvalues of the submatrix slot into the gaps between the <span class="math notranslate nohighlight">\(n\)</span>
+eigenvalues of the whole. It follows from <a class="reference internal" href="#equation-eq-spec-minmax">Eq. 154</a> by noting that
+subspaces of <span class="math notranslate nohighlight">\(\mathbb{R}^{n-1}\)</span> are a subset of those of <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>.</p>
+</section>
+<section id="weyl-and-perfect-conditioning">
+<h3>Weyl, and perfect conditioning<a class="headerlink" href="#weyl-and-perfect-conditioning" title="Link to this heading">#</a></h3>
+<p>For symmetric <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(E\)</span>,</p>
+<div class="math notranslate nohighlight" id="equation-eq-spec-weyl">
+<span class="eqno">(156)<a class="headerlink" href="#equation-eq-spec-weyl" title="Link to this equation">#</a></span>\[\bigl|\lambda_k(A + E) - \lambda_k(A)\bigr| \;\le\; \|E\|_2
+\qquad\text{for every } k .\]</div>
+<p>The condition number of the symmetric eigenvalue problem is therefore <strong>1</strong>:
+an input perturbation of size <span class="math notranslate nohighlight">\(\epsilon\)</span> moves the answer by at most <span class="math notranslate nohighlight">\(\epsilon\)</span>.
+Nothing else in this course is that well behaved, and it is the reason
+<code class="docutils literal notranslate"><span class="pre">eigh</span></code> is one of the most trustworthy routines in LAPACK. It is emphatically
+<em>false</em> without symmetry, as <a class="reference internal" href="schur-jordan-nonnormality.html"><span class="std std-doc">§3.5</span></a> will show.</p>
+</section>
+<section id="gershgorin">
+<h3>Gershgorin<a class="headerlink" href="#gershgorin" title="Link to this heading">#</a></h3>
+<p>Every eigenvalue of any square <span class="math notranslate nohighlight">\(A\)</span> (symmetric or not) lies in the union of the
+discs</p>
+<div class="math notranslate nohighlight" id="equation-eq-spec-gershgorin">
+<span class="eqno">(157)<a class="headerlink" href="#equation-eq-spec-gershgorin" title="Link to this equation">#</a></span>\[D_i = \Bigl\{ z \in \mathbb{C} : |z - a_{ii}| \le R_i \Bigr\} ,
+\qquad R_i = \sum_{j \ne i} |a_{ij}| .\]</div>
+<p>The proof is two lines: if <span class="math notranslate nohighlight">\(A\mathbf{x} = \lambda\mathbf{x}\)</span> and <span class="math notranslate nohighlight">\(i\)</span> is the
+index of the largest <span class="math notranslate nohighlight">\(|x_i|\)</span>, then row <span class="math notranslate nohighlight">\(i\)</span> gives
+<span class="math notranslate nohighlight">\((\lambda - a_{ii})x_i = \sum_{j\ne i}a_{ij}x_j\)</span>, and dividing by <span class="math notranslate nohighlight">\(x_i\)</span> bounds
+the left side by <span class="math notranslate nohighlight">\(R_i\)</span>. It costs <span class="math notranslate nohighlight">\(O(n^2)\)</span> reads and no arithmetic worth
+counting, and when the discs are disjoint each contains exactly one eigenvalue.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data only: the worked symmetric matrices. The Rayleigh quotient and its
+gradient — Exercise 3’s subject — are built there, where they are the
+lesson.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">la</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random array below comes from this seed</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
+
+<span class="c1"># The notebook&#39;s worked symmetric matrix, fixed here and restated in every</span>
+<span class="c1"># exercise that uses it.</span>
+<span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">4.0</span><span class="p">,</span>  <span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.0</span><span class="p">,</span>  <span class="mf">0.0</span><span class="p">,</span>  <span class="mf">1.0</span><span class="p">],</span>
+              <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span>  <span class="mf">5.0</span><span class="p">,</span>  <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span>  <span class="mf">2.0</span><span class="p">],</span>
+              <span class="p">[</span><span class="o">-</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span>  <span class="mf">6.0</span><span class="p">,</span>  <span class="mf">1.0</span><span class="p">,</span>  <span class="mf">0.0</span><span class="p">],</span>
+              <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span>  <span class="mf">1.0</span><span class="p">,</span>  <span class="mf">3.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">],</span>
+              <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span>  <span class="mf">2.0</span><span class="p">,</span>  <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span>  <span class="mf">7.0</span><span class="p">]])</span>
+
+<span class="c1"># A diagonally dominant matrix whose Gershgorin discs are disjoint.</span>
+<span class="n">S_DOM</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">17.0</span><span class="p">,</span> <span class="mf">24.0</span><span class="p">,</span> <span class="mf">31.0</span><span class="p">])</span> <span class="o">+</span> <span class="mf">0.4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+    <span class="p">[[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+     <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+     <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">],</span>
+     <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+     <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]])</span>
+<span class="n">S_DOM</span> <span class="o">=</span> <span class="p">(</span><span class="n">S_DOM</span> <span class="o">+</span> <span class="n">S_DOM</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+
+
+<span class="c1"># Residuals of an eigendecomposition scale with the size of the matrix: a</span>
+<span class="c1"># backward-stable routine returns eigenvalues accurate to about c * eps * ||S||,</span>
+<span class="c1"># not to some absolute constant. Everything in this notebook that compares two</span>
+<span class="c1"># computed spectra, or an eigenvalue against a Rayleigh quotient, is therefore</span>
+<span class="c1"># gated against this rather than a bare number — including across two different</span>
+<span class="c1"># LAPACK drivers, where the constant c is whatever the two implementations</span>
+<span class="c1"># happen to differ by.</span>
+<span class="n">TOL</span> <span class="o">=</span> <span class="mf">100.0</span> <span class="o">*</span> <span class="n">EPS</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-what-symmetry-buys-measured-against-what-it-replaces">
+<h2>Exercise 1: What symmetry buys, measured against what it replaces<a class="headerlink" href="#exercise-1-what-symmetry-buys-measured-against-what-it-replaces" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-spec-decomposition">Eq. 150</a> makes four promises: real eigenvalues, orthonormal
+eigenvectors, a reconstruction with <span class="math notranslate nohighlight">\(Q^{\top}\)</span> in place of <span class="math notranslate nohighlight">\(X^{-1}\)</span>, and
+<span class="math notranslate nohighlight">\(\operatorname{cond}(Q) = 1\)</span>. This exercise checks all four on</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+S = \begin{bmatrix}
+ 4 &amp; 1 &amp; -2 &amp; 0 &amp; 1\\ 1 &amp; 5 &amp; 0 &amp; -1 &amp; 2\\ -2 &amp; 0 &amp; 6 &amp; 1 &amp; 0\\
+ 0 &amp; -1 &amp; 1 &amp; 3 &amp; -1\\ 1 &amp; 2 &amp; 0 &amp; -1 &amp; 7 \end{bmatrix},
+\end{split}\]</div>
+<p>available as <code class="docutils literal notranslate"><span class="pre">S</span></code>, and compares against what
+<a class="reference internal" href="eigenvalues-diagonalization.html"><span class="std std-doc">§3.1</span></a> got from a non-symmetric matrix of
+the same kind of size.</p>
+<p>The right call is <code class="docutils literal notranslate"><span class="pre">np.linalg.eigh</span></code>, not <code class="docutils literal notranslate"><span class="pre">eig</span></code>. It <strong>assumes</strong> symmetry, reads
+only the lower triangle by default, exploits that to run in roughly half the
+time, returns real eigenvalues in <strong>ascending order</strong>, and returns an
+orthonormal <span class="math notranslate nohighlight">\(Q\)</span>. Using <code class="docutils literal notranslate"><span class="pre">eig</span></code> on a symmetric matrix is not wrong, but it throws
+away every one of those guarantees and returns complex dtypes for real answers.</p>
+<p><strong>Part a)</strong> Confirm <code class="docutils literal notranslate"><span class="pre">S</span></code> is symmetric with
+<code class="docutils literal notranslate"><span class="pre">np.allclose(S,</span> <span class="pre">S.T,</span> <span class="pre">rtol=0,</span> <span class="pre">atol=0)</span></code> — exactly, not approximately, since it
+was written down as an integer array.</p>
+<p><strong>Part b)</strong> Take <code class="docutils literal notranslate"><span class="pre">lam,</span> <span class="pre">Q</span> <span class="pre">=</span> <span class="pre">np.linalg.eigh(S)</span></code>. Report the eigenvalues and
+confirm they come back in ascending order with <code class="docutils literal notranslate"><span class="pre">np.all(np.diff(lam)</span> <span class="pre">&gt;</span> <span class="pre">0)</span></code>.
+They are <span class="math notranslate nohighlight">\(1.7420, 3.3150, 3.8300, 6.9401, 9.1730\)</span>.</p>
+<p><strong>Part c)</strong> Confirm orthonormality: <span class="math notranslate nohighlight">\(\|Q^{\top}Q - I\|_{\max} &lt; 10^{-14}\)</span>, and
+report <span class="math notranslate nohighlight">\(\operatorname{cond}(Q)\)</span>, which is 1 to within <span class="math notranslate nohighlight">\(10^{-13}\)</span>. Compare with
+<a class="reference internal" href="eigenvalues-diagonalization.html"><span class="std std-doc">§3.1</span></a>’s <span class="math notranslate nohighlight">\(\operatorname{cond}(X) \approx 3.9\)</span> for
+a non-symmetric matrix, and with its <span class="math notranslate nohighlight">\(9\times10^{15}\)</span> for a defective one. An
+orthogonal matrix cannot be badly conditioned.</p>
+<p><strong>Part d)</strong> Confirm the reconstruction <a class="reference internal" href="#equation-eq-spec-decomposition">Eq. 150</a>:
+<span class="math notranslate nohighlight">\(\|Q\Lambda Q^{\top} - S\|_{\max} &lt; 10^{-13}\)</span>, using <code class="docutils literal notranslate"><span class="pre">Q</span> <span class="pre">&#64;</span> <span class="pre">np.diag(lam)</span> <span class="pre">&#64;</span> <span class="pre">Q.T</span></code>.
+No inverse is formed anywhere, because the transpose <em>is</em> the inverse.</p>
+<p><strong>Part e)</strong> Confirm what <code class="docutils literal notranslate"><span class="pre">eig</span></code> gives on the same matrix. Report
+<code class="docutils literal notranslate"><span class="pre">np.abs(np.linalg.eigvals(S).imag).max()</span></code>, which comes out <span class="math notranslate nohighlight">\(0\)</span> here — the
+general driver deflated to real blocks, a library detail, so the gate asks
+only for <span class="math notranslate nohighlight">\(&lt; 10^{-15}\)</span> — and confirm
+the sorted real parts match <code class="docutils literal notranslate"><span class="pre">lam</span></code> to <code class="docutils literal notranslate"><span class="pre">TOL</span></code><span class="math notranslate nohighlight">\(= 100\varepsilon\|S\|_2 =
+2.0\times10^{-13}\)</span> — a <em>stated</em> backward-error scale rather than a bare
+number, because two different LAPACK drivers agree only to within their own
+rounding, and how closely is not something to guess at. The general routine finds the
+same answer; it simply cannot promise in advance that it will.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>S is exactly symmetric: True
+
+eigh eigenvalues (ascending) : [1.742003 3.315038 3.82995  6.940059 9.17295 ]
+  ascending?                  : True
+
+||Q^T Q - I||_max  : 5.435e-16
+cond(Q)            : 1.000000000000000
+  against 3.1&#39;s cond(X) = 3.9 for a non-symmetric matrix,
+  and 9.0e15 for the defective one — an orthogonal Q cannot be ill conditioned
+||Q Lam Q^T - S||_max : 6.606e-15   (no inverse formed: Q^-1 = Q^T)
+
+np.linalg.eig on the same matrix:
+  largest |imaginary part| : 0.0e+00   (exactly zero)
+  sorted real parts vs eigh: 1.243e-14
+  same answer — eig just cannot promise it in advance
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<p><span class="math notranslate nohighlight">\(\operatorname{cond}(Q) = 1\)</span> is the check worth pausing on: it is an <em>exact</em>
+statement about an orthogonal matrix, and it is the single number that
+separates <a class="reference internal" href="#equation-eq-spec-decomposition">Eq. 150</a> from the general diagonalization of
+<a class="reference internal" href="eigenvalues-diagonalization.html"><span class="std std-doc">§3.1</span></a>, where that number was free to be
+anything at all.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  S is exactly symmetric and eigh returns eigenvalues in ascending order   [eigenvalues [1.742  3.315  3.83   6.9401 9.1729], all distinct and sorted]
+✓  the eigenvectors are orthonormal: Q^T Q = I (Eq. 1)   [max|Δ| = 5.43507e-16 (rtol=0, atol=1e-13)]
+✓  so cond(Q) = 1 exactly, which no general eigenvector matrix can promise   [got [1.] vs expected [1.] (rtol=0, atol=1e-13)]
+✓  and A = Q Lambda Q^T reconstructs the matrix with no inverse (Eq. 1)   [max|Δ| = 6.60643e-15 (rtol=0, atol=2.0368e-13)]
+✓  np.linalg.eig finds the same real spectrum, it just cannot guarantee it   [largest |Im lambda| = 0.0e+00, agreement with eigh 1.24e-14 against the backward-error scale 100 eps ||S|| = 2.04e-13: eigh assumes symmetry, reads one triangle, and is about twice as fast]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-the-matrix-as-a-sum-of-projectors">
+<h2>Exercise 2: The matrix as a sum of projectors<a class="headerlink" href="#exercise-2-the-matrix-as-a-sum-of-projectors" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-spec-projectors">Eq. 151</a> re-reads <a class="reference internal" href="#equation-eq-spec-decomposition">Eq. 150</a> as a statement
+about <em>structure</em>: a symmetric matrix is a set of orthogonal directions with a
+number attached to each, and nothing else. Each <span class="math notranslate nohighlight">\(\mathbf{q}_i\mathbf{q}_i^{\top}\)</span>
+is the rank-1 orthogonal projector onto its eigendirection, exactly the object
+<a class="reference internal" href="../01-matrices/four-subspaces.html"><span class="std std-doc">§1.4</span></a> built, and the projectors are
+mutually orthogonal and sum to the identity — a <strong>resolution of the identity</strong>.</p>
+<p>This is also where low-rank approximation begins. Keeping only the terms with
+the largest <span class="math notranslate nohighlight">\(|\lambda_i|\)</span> gives the best rank-<span class="math notranslate nohighlight">\(k\)</span> symmetric approximation to
+<span class="math notranslate nohighlight">\(A\)</span>, which Chapter IV proves properly.</p>
+<p><strong>Part a)</strong> Build the five rank-1 projectors <code class="docutils literal notranslate"><span class="pre">P[i]</span> <span class="pre">=</span> <span class="pre">np.outer(Q[:,</span> <span class="pre">i],</span> <span class="pre">Q[:,</span> <span class="pre">i])</span></code>
+and confirm each is idempotent, <span class="math notranslate nohighlight">\(P_i^2 = P_i\)</span> to <span class="math notranslate nohighlight">\(10^{-14}\)</span>, and symmetric to
+<span class="math notranslate nohighlight">\(10^{-15}\)</span>.</p>
+<p><strong>Part b)</strong> Confirm mutual orthogonality: <span class="math notranslate nohighlight">\(P_iP_j = 0\)</span> to <span class="math notranslate nohighlight">\(10^{-14}\)</span> for every
+<span class="math notranslate nohighlight">\(i \ne j\)</span>, which is orthonormality of the <span class="math notranslate nohighlight">\(\mathbf{q}_i\)</span> restated as a product
+of matrices.</p>
+<p><strong>Part c)</strong> Confirm the resolution of the identity: <span class="math notranslate nohighlight">\(\sum_i P_i = I\)</span> to
+<span class="math notranslate nohighlight">\(10^{-14}\)</span>. Every vector splits into five orthogonal pieces, one per
+eigendirection.</p>
+<p><strong>Part d)</strong> Confirm <a class="reference internal" href="#equation-eq-spec-projectors">Eq. 151</a> itself:
+<span class="math notranslate nohighlight">\(\sum_i \lambda_iP_i = S\)</span> to <span class="math notranslate nohighlight">\(10^{-13}\)</span>.</p>
+<p><strong>Part e)</strong> Watch the sum accumulate. For <span class="math notranslate nohighlight">\(k = 1, \dots, 5\)</span> form the partial
+sum over the <span class="math notranslate nohighlight">\(k\)</span> largest <span class="math notranslate nohighlight">\(|\lambda_i|\)</span> and report
+<span class="math notranslate nohighlight">\(\|S - \sum_{\text{top }k}\lambda_iP_i\|_{\max}\)</span>. It falls <span class="math notranslate nohighlight">\(5.215\)</span>, <span class="math notranslate nohighlight">\(2.611\)</span>,
+<span class="math notranslate nohighlight">\(2.377\)</span>, <span class="math notranslate nohighlight">\(0.748\)</span>, <span class="math notranslate nohighlight">\(0\)</span> — reaching exactly zero at <span class="math notranslate nohighlight">\(k = 5\)</span> and not before,
+because <span class="math notranslate nohighlight">\(S\)</span> has full rank. Confirm the sequence is non-increasing and that the
+final error is below <span class="math notranslate nohighlight">\(10^{-13}\)</span>.</p>
+<p><strong>Part f)</strong> Draw the five partial sums as heatmaps beside <span class="math notranslate nohighlight">\(S\)</span> itself, with
+<code class="docutils literal notranslate"><span class="pre">la.matrix_heatmap</span></code>, so the matrix can be seen assembling one direction at a
+time.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>each P_i idempotent to     : 2.220e-16
+each P_i symmetric to      : 0.000e+00
+P_i P_j = 0 for i != j, to : 2.581e-16
+sum_i P_i = I to           : 5.274e-16   (resolution of the identity)
+sum_i lam_i P_i = S to     : 6.661e-15   (Eq. 2)
+
+error of the top-k projector sum:
+  k = 1: ||S - sum||_max = 5.215097   (lambda used: +9.1729)
+  k = 2: ||S - sum||_max = 2.610524   (lambda used: +6.9401)
+  k = 3: ||S - sum||_max = 2.377192   (lambda used: +3.8300)
+  k = 4: ||S - sum||_max = 0.748248   (lambda used: +3.3150)
+  k = 5: ||S - sum||_max = 0.000000   (lambda used: +1.7420)
+  non-increasing: True
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-spec-projectors">
+<img alt="../../_images/40ed54cd9cd36e5a3a7328935b9c8c1d33bf85d811f05300ec651cc185877d67.png" src="../../_images/40ed54cd9cd36e5a3a7328935b9c8c1d33bf85d811f05300ec651cc185877d67.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 58 </span><span class="caption-text">The <span class="math notranslate nohighlight">\(5\times5\)</span> symmetric matrix <span class="math notranslate nohighlight">\(S\)</span> assembling one eigendirection at a time. Each panel is the partial sum <span class="math notranslate nohighlight">\(\sum_{i \le k}\lambda_i\mathbf{q}_i\mathbf{q}_i^{\top}\)</span> of Eq. 2, taken over the <span class="math notranslate nohighlight">\(k\)</span> eigenvalues of largest magnitude, on a diverging colour scale centred at zero because the entries are signed. The rightmost panel is <span class="math notranslate nohighlight">\(S\)</span> itself; the <span class="math notranslate nohighlight">\(k=5\)</span> partial sum reproduces it to <span class="math notranslate nohighlight">\(8\times10^{-15}\)</span>, and no earlier one does, because <span class="math notranslate nohighlight">\(S\)</span> has full rank. The largest term alone already carries most of the matrix.</span><a class="headerlink" href="#fig-spec-projectors" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<p>Idempotence, mutual orthogonality and the resolution of the identity are
+checked separately, because together they say <span class="math notranslate nohighlight">\(\{P_i\}\)</span> is a <em>complete
+orthogonal family</em> — the statement <a class="reference internal" href="#equation-eq-spec-projectors">Eq. 151</a> actually makes,
+and a stronger one than the reconstruction alone.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  each q_i q_i^T is a symmetric idempotent: an orthogonal projector (Eq. 2)   [worst |P^2 - P| = 2.22e-16, worst |P - P^T| = 0.00e+00]
+✓  and the five projectors are mutually orthogonal: P_i P_j = 0   [largest entry of any P_i P_j with i != j is 2.58e-16, which is orthonormality of the eigenvectors written as a matrix product]
+✓  they resolve the identity: sum_i q_i q_i^T = I (Eq. 2)   [max|Δ| = 5.27356e-16 (rtol=0, atol=1e-13)]
+✓  and sum_i lambda_i q_i q_i^T reproduces S (Eq. 2)   [max|Δ| = 6.66134e-15 (rtol=0, atol=2.0368e-13)]
+✓  the partial sums improve monotonically and are exact only at k = n   [errors [&#39;5.2151&#39;, &#39;2.6105&#39;, &#39;2.3772&#39;, &#39;0.7482&#39;, &#39;0.0000&#39;]: full rank means no rank-4 approximation can be exact]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-the-rayleigh-quotient-and-eigenvectors-as-stationary-points">
+<h2>Exercise 3: The Rayleigh quotient, and eigenvectors as stationary points<a class="headerlink" href="#exercise-3-the-rayleigh-quotient-and-eigenvectors-as-stationary-points" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-spec-rayleigh">Eq. 152</a> converts an algebraic question into an optimisation one.
+Because <span class="math notranslate nohighlight">\(\rho(\mathbf{x}) = \sum\lambda_ic_i^2/\sum c_i^2\)</span> is a weighted average
+of the eigenvalues with non-negative weights, it can never leave
+<span class="math notranslate nohighlight">\([\lambda_1, \lambda_n]\)</span>, and it reaches each end only by putting all the weight
+on one eigenvector. The extreme eigenvalues are therefore the extreme values of
+a smooth function on the unit sphere, and the extreme eigenvectors are where it
+attains them.</p>
+<p>The stronger statement is <a class="reference internal" href="#equation-eq-spec-gradient">Eq. 153</a>: <em>every</em> eigenvector is a
+stationary point, not only the extreme two. This exercise checks both the
+bracket and the stationarity, and it does so in a way that keeps the exact
+claims and the sampled evidence separate.</p>
+<p><strong>Part a)</strong> Draw <span class="math notranslate nohighlight">\(10^{5}\)</span> random unit vectors in <span class="math notranslate nohighlight">\(\mathbb{R}^5\)</span> as
+<code class="docutils literal notranslate"><span class="pre">X</span> <span class="pre">=</span> <span class="pre">rng.standard_normal((100_000,</span> <span class="pre">5))</span></code> normalised rowwise by
+<code class="docutils literal notranslate"><span class="pre">np.linalg.norm(X,</span> <span class="pre">axis=1,</span> <span class="pre">keepdims=True)</span></code>, and evaluate
+<a class="reference internal" href="#equation-eq-spec-rayleigh">Eq. 152</a> on all of them at once with
+<code class="docutils literal notranslate"><span class="pre">np.einsum(&quot;ij,jk,ik-&gt;i&quot;,</span> <span class="pre">X,</span> <span class="pre">S,</span> <span class="pre">X)</span></code>. Confirm the <strong>exact</strong> claim: every one of
+the <span class="math notranslate nohighlight">\(10^{5}\)</span> values lies in <span class="math notranslate nohighlight">\([\lambda_1, \lambda_n] = [1.7420, 9.1730]\)</span>, to
+<span class="math notranslate nohighlight">\(10^{-12}\)</span>. This is a theorem and admits no exceptions.</p>
+<p><strong>Part b)</strong> Report how close the sample gets to the ends: the largest value is
+<span class="math notranslate nohighlight">\(9.1609\)</span> against <span class="math notranslate nohighlight">\(\lambda_5 = 9.1730\)</span> and the smallest is <span class="math notranslate nohighlight">\(1.7670\)</span> against
+<span class="math notranslate nohighlight">\(\lambda_1 = 1.7420\)</span>, so random sampling recovers the top eigenvalue to about
+<span class="math notranslate nohighlight">\(0.1\%\)</span> and the bottom to about <span class="math notranslate nohighlight">\(1.4\%\)</span>. Confirm both relative gaps are below
+<span class="math notranslate nohighlight">\(5\%\)</span>, and note why they are not smaller: hitting a specific direction in five
+dimensions by chance is hard, which is exactly why power iteration exists.</p>
+<p><strong>Part c)</strong> Confirm exact attainment at the eigenvectors: <span class="math notranslate nohighlight">\(\rho(\mathbf{q}_i)
+= \lambda_i\)</span> to <span class="math notranslate nohighlight">\(10^{-14}\)</span> for all five. Sampling approaches the answer;
+the eigenvector <em>is</em> the answer.</p>
+<p><strong>Part d)</strong> Write the pair the exercise is titled after: <code class="docutils literal notranslate"><span class="pre">rayleigh(A,</span> <span class="pre">x)</span></code>
+— <a class="reference internal" href="#equation-eq-spec-rayleigh">Eq. 152</a> as one quotient — and <code class="docutils literal notranslate"><span class="pre">rayleigh_grad(A,</span> <span class="pre">x)</span></code>,
+<a class="reference internal" href="#equation-eq-spec-gradient">Eq. 153</a> as one line. Confirm stationarity with
+<code class="docutils literal notranslate"><span class="pre">rayleigh_grad(S,</span> <span class="pre">Q[:,</span> <span class="pre">i])</span></code> for each <span class="math notranslate nohighlight">\(i\)</span>, checking
+<span class="math notranslate nohighlight">\(\|\nabla\rho\| &lt; 10^{-14}\)</span> at every eigenvector, including the three
+<em>interior</em> ones which are neither maxima nor minima but saddle points. Then
+report <span class="math notranslate nohighlight">\(\|\nabla\rho\|\)</span> at one random unit vector, which is about <span class="math notranslate nohighlight">\(6.2\)</span> — not
+small by any reading.</p>
+<p><strong>Part e)</strong> Draw the Rayleigh quotient of the <span class="math notranslate nohighlight">\(2\times2\)</span> matrix
+<span class="math notranslate nohighlight">\(S_2 = \left[\begin{smallmatrix}6&amp;1\\1&amp;5\end{smallmatrix}\right]\)</span> around the
+unit circle, as a function of the angle <span class="math notranslate nohighlight">\(\theta\)</span>, marking the four points
+<span class="math notranslate nohighlight">\(\pm\mathbf{q}_1\)</span>, <span class="math notranslate nohighlight">\(\pm\mathbf{q}_2\)</span>. Confirm the curve’s maximum and minimum
+equal <span class="math notranslate nohighlight">\(\lambda_2 = 6.6180\)</span> and <span class="math notranslate nohighlight">\(\lambda_1 = 4.3820\)</span> to <span class="math notranslate nohighlight">\(10^{-5}\)</span> (a
+2001-point sweep lands within about <span class="math notranslate nohighlight">\((\text{step}/2)^2 \approx 10^{-6}\)</span> of
+each extremum, so the gate sits a decade above its own discretisation), and
+report the extrema’s angles beside the eigenvector angles.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100000 random unit vectors:
+  all Rayleigh quotients inside [lam_1, lam_5]: True
+  largest sampled  : 9.160875   lambda_5 = 9.172950   relative gap 1.316e-03
+  smallest sampled : 1.767045   lambda_1 = 1.742003   relative gap 1.438e-02
+  sampling gets close; it does not arrive. Hitting a direction in R^5 by chance is hard
+
+rho at each eigenvector : [1.742003 3.315038 3.82995  6.940059 9.17295 ]
+  against the eigenvalues: [1.742003 3.315038 3.82995  6.940059 9.17295 ]
+  agreement              : 5.329e-15
+
+||grad rho|| at each eigenvector : [0. 0. 0. 0. 0.]
+||grad rho|| at a random unit vector : 6.2325
+  the three interior eigenvectors are saddle points — stationary, but neither maxima nor minima
+
+the 2x2 matrix S_2 = [[6, 1], [1, 5]]: eigenvalues [4.381966 6.618034]
+  max over the circle : 6.6180330322  vs lambda_2 = 6.6180339887
+  min over the circle : 4.3819669678  vs lambda_1 = 4.3819660113
+  argmax at theta = 0.552920, nearest eigenvector angle 0.553574
+  grid step 0.003142
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-spec-rayleigh">
+<img alt="../../_images/a7169214dd4943ca9670f4ebe5a861f0dc21600c3dca5987615603dc43a5822b.png" src="../../_images/a7169214dd4943ca9670f4ebe5a861f0dc21600c3dca5987615603dc43a5822b.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 59 </span><span class="caption-text">The Rayleigh quotient <span class="math notranslate nohighlight">\(\rho(\mathbf{x}) = \mathbf{x}^{\top}S_2\mathbf{x}\)</span> of Eq. 3 evaluated on the unit circle <span class="math notranslate nohighlight">\(\mathbf{x} = (\cos\theta, \sin\theta)\)</span>, for <span class="math notranslate nohighlight">\(S_2 = \left[\begin{smallmatrix}6&amp;1\\1&amp;5\end{smallmatrix}\right]\)</span>. The horizontal dotted lines are the two eigenvalues <span class="math notranslate nohighlight">\(\lambda_1 = 4.3820\)</span> and <span class="math notranslate nohighlight">\(\lambda_2 = 6.6180\)</span>, which the curve touches and never crosses; the amber markers sit at the four eigenvector angles <span class="math notranslate nohighlight">\(\pm\mathbf{q}_1\)</span>, <span class="math notranslate nohighlight">\(\pm\mathbf{q}_2\)</span>, where the curve is stationary. The quotient is a weighted average of the eigenvalues, so it is trapped between them, and it reaches an end only where all the weight sits on one eigenvector.</span><a class="headerlink" href="#fig-spec-rayleigh" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<p>The bracket is gated as the exact theorem it is; the <em>approach</em> of the sample
+to the ends is reported and gated only loosely, because how close <span class="math notranslate nohighlight">\(10^{5}\)</span>
+random directions get is a fact about sampling in five dimensions and not about
+the matrix. The stationarity check covers all five eigenvectors, including the
+saddle points, which is the part a maximum-and-minimum reading would miss.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  every one of 100,000 random Rayleigh quotients lies in [lam_1, lam_n] (Eq. 3)   [sampled range [1.767045, 9.160875] inside [1.742003, 9.172950]: a weighted average of the eigenvalues cannot escape them]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  and the sample approaches both ends without reaching them   [top within 1.32e-03, bottom within 1.44e-02; a tighter gate here would be testing the random number generator, not the theorem]
+✓  while rho(q_i) = lambda_i exactly, for every i (Eq. 3)   [max|Δ| = 5.32907e-15 (rtol=0, atol=2.0368e-13)]
+✓  every eigenvector is a stationary point of rho, interior ones included (Eq. 4)   [largest ||grad rho|| over the five eigenvectors is 1.10e-14, against 6.2325 at a random unit vector; the three interior eigenvectors are saddle points, stationary but not extremal]
+✓  and on the circle the quotient touches both eigenvalues of S_2   [max|Δ| = 9.56554e-07 (rtol=0, atol=1e-05)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-courantfischer-checked-from-both-sides">
+<h2>Exercise 4: Courant–Fischer, checked from both sides<a class="headerlink" href="#exercise-4-courantfischer-checked-from-both-sides" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-spec-minmax">Eq. 154</a> characterises <em>every</em> eigenvalue, not just the extremes,
+and it does so without naming an eigenvector. That is what makes it the engine
+behind the two results that follow.</p>
+<p>It is a min–max, so verifying it numerically means verifying two different
+things. The <strong>inequality</strong> is that every <span class="math notranslate nohighlight">\(k\)</span>-dimensional subspace has
+<span class="math notranslate nohighlight">\(\max_{\mathbf{x}\in V}\rho(\mathbf{x}) \ge \lambda_k\)</span> — a statement about all
+subspaces, which random sampling can only support, never establish, but which
+random sampling can <em>refute</em> if it is false. The <strong>attainment</strong> is that the
+specific subspace <span class="math notranslate nohighlight">\(\operatorname{span}\{\mathbf{q}_1,\dots,\mathbf{q}_k\}\)</span>
+achieves <span class="math notranslate nohighlight">\(\lambda_k\)</span> exactly, which is checkable to machine precision. The two
+together are the theorem.</p>
+<p>For a subspace with orthonormal basis in the columns of <span class="math notranslate nohighlight">\(B\)</span> (shape <code class="docutils literal notranslate"><span class="pre">(5,</span> <span class="pre">k)</span></code>),
+the maximum of <span class="math notranslate nohighlight">\(\rho\)</span> over it is the largest eigenvalue of the <span class="math notranslate nohighlight">\(k\times k\)</span>
+compression <span class="math notranslate nohighlight">\(B^{\top}\!SB\)</span>, which is why the whole thing is computable at all.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">max_rayleigh_on(B)</span></code> returning
+<code class="docutils literal notranslate"><span class="pre">float(np.linalg.eigvalsh(B.T</span> <span class="pre">&#64;</span> <span class="pre">S</span> <span class="pre">&#64;</span> <span class="pre">B).max())</span></code> for an orthonormal <code class="docutils literal notranslate"><span class="pre">B</span></code>, and
+confirm on <code class="docutils literal notranslate"><span class="pre">B</span> <span class="pre">=</span> <span class="pre">Q[:,</span> <span class="pre">:1]</span></code> that it returns <span class="math notranslate nohighlight">\(\lambda_1\)</span> to <span class="math notranslate nohighlight">\(10^{-14}\)</span>.</p>
+<p><strong>Part b)</strong> Confirm <strong>attainment</strong>: for <span class="math notranslate nohighlight">\(k = 1, \dots, 5\)</span>, take
+<code class="docutils literal notranslate"><span class="pre">B</span> <span class="pre">=</span> <span class="pre">Q[:,</span> <span class="pre">:k]</span></code>, which is orthonormal by Exercise 1, and confirm
+<code class="docutils literal notranslate"><span class="pre">max_rayleigh_on(B)</span></code> equals <code class="docutils literal notranslate"><span class="pre">lam[k-1]</span></code> to <span class="math notranslate nohighlight">\(10^{-14}\)</span>. The eigenvector span is
+the minimising subspace of <a class="reference internal" href="#equation-eq-spec-minmax">Eq. 154</a>.</p>
+<p><strong>Part c)</strong> Confirm the <strong>inequality</strong> by sampling. For each <span class="math notranslate nohighlight">\(k\)</span>, draw 4000
+random <span class="math notranslate nohighlight">\(5\times k\)</span> Gaussian matrices, orthonormalise each with
+<code class="docutils literal notranslate"><span class="pre">np.linalg.qr</span></code>, and confirm that <em>every</em> one gives
+<code class="docutils literal notranslate"><span class="pre">max_rayleigh_on(B)</span> <span class="pre">&gt;=</span> <span class="pre">lam[k-1]</span> <span class="pre">-</span> <span class="pre">1e-12</span></code>. Not one of the 20,000 subspaces
+tested may violate it; a single counterexample would disprove
+<a class="reference internal" href="#equation-eq-spec-minmax">Eq. 154</a>.</p>
+<p><strong>Part d)</strong> Report the minimum over the sampled subspaces for each <span class="math notranslate nohighlight">\(k\)</span> beside
+<span class="math notranslate nohighlight">\(\lambda_k\)</span>. The gaps are <span class="math notranslate nohighlight">\(0.012\)</span>, <span class="math notranslate nohighlight">\(0.115\)</span>, <span class="math notranslate nohighlight">\(0.033\)</span>, <span class="math notranslate nohighlight">\(0.000\)</span>, <span class="math notranslate nohighlight">\(0.000\)</span> — random
+subspaces get close for <span class="math notranslate nohighlight">\(k = 4, 5\)</span> and less close in the middle, for the same
+dimensional reason as Exercise 3. Confirm every sampled minimum is at least
+<span class="math notranslate nohighlight">\(\lambda_k\)</span> and within <span class="math notranslate nohighlight">\(0.5\)</span> of it.</p>
+<p><strong>Part e)</strong> Confirm the <em>max–min</em> form is equivalent, by checking that
+<span class="math notranslate nohighlight">\(\lambda_k\)</span> is also <span class="math notranslate nohighlight">\(\max\)</span> over <span class="math notranslate nohighlight">\((n-k+1)\)</span>-dimensional subspaces of the
+<strong>minimum</strong> of <span class="math notranslate nohighlight">\(\rho\)</span>, attained on
+<span class="math notranslate nohighlight">\(\operatorname{span}\{\mathbf{q}_k,\dots,\mathbf{q}_n\}\)</span>. Take
+<code class="docutils literal notranslate"><span class="pre">B</span> <span class="pre">=</span> <span class="pre">Q[:,</span> <span class="pre">k-1:]</span></code> and confirm <code class="docutils literal notranslate"><span class="pre">np.linalg.eigvalsh(B.T</span> <span class="pre">&#64;</span> <span class="pre">S</span> <span class="pre">&#64;</span> <span class="pre">B).min()</span></code> equals
+<code class="docutils literal notranslate"><span class="pre">lam[k-1]</span></code> to <span class="math notranslate nohighlight">\(10^{-14}\)</span> for every <span class="math notranslate nohighlight">\(k\)</span>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>attainment on span(q_1..q_k) : [1.742003 3.315038 3.82995  6.940059 9.17295 ]
+against lambda_1..lambda_5   : [1.742003 3.315038 3.82995  6.940059 9.17295 ]
+agreement                    : 5.329e-15
+
+max-min form on span(q_k..q_n): [1.742003 3.315038 3.82995  6.940059 9.17295 ]
+agreement                     : 5.329e-15
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>20000 random subspaces tested, violations of Eq. 5: 0
+  k   min over sampled     lambda_k        gap
+  1           1.754342     1.742003     0.0123
+  2           3.430425     3.315038     0.1154
+  3           3.862760     3.829950     0.0328
+  4           6.940060     6.940059     0.0000
+  5           9.172950     9.172950    -0.0000
+  random subspaces approach lambda_k from ABOVE, as Eq. 5 requires
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<p>The two halves are checked by two different methods, and neither could replace
+the other: attainment is exact and machine-checkable, the inequality is a
+universal claim that sampling can only fail to refute. Counting <em>violations</em>
+rather than measuring closeness is the right use of random subspaces here.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  span(q_1..q_k) attains lambda_k exactly: the minimising subspace (Eq. 5)   [max|Δ| = 5.32907e-15 (rtol=0, atol=2.0368e-13)]
+✓  and the equivalent max-min form attains it on span(q_k..q_n) (Eq. 5)   [max|Δ| = 5.32907e-15 (rtol=0, atol=2.0368e-13)]
+✓  none of 20000 random subspaces violates the min-max inequality   [every sampled k-dimensional subspace has max Rayleigh quotient at least lambda_k; one counterexample would disprove Eq. 5, and there were none]
+✓  and the sampled minima approach lambda_k from above   [gaps [&#39;0.0123&#39;, &#39;0.1154&#39;, &#39;0.0328&#39;, &#39;0.0000&#39;, &#39;-0.0000&#39;]: closer for k = 4, 5 than in the middle, for the same dimensional reason as Exercise 3]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-cauchy-interlacing">
+<h2>Exercise 5: Cauchy interlacing<a class="headerlink" href="#exercise-5-cauchy-interlacing" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-spec-interlacing">Eq. 155</a> is one of those results that sounds like it needs a
+hypothesis and does not. Delete the last row and column of <em>any</em> symmetric
+matrix; the <span class="math notranslate nohighlight">\(n-1\)</span> eigenvalues of what remains sit one in each gap of the
+original <span class="math notranslate nohighlight">\(n\)</span>. No genericity assumption, no condition on the entries.</p>
+<p>It follows from Courant–Fischer in a line: the <span class="math notranslate nohighlight">\(k\)</span>-dimensional subspaces of
+<span class="math notranslate nohighlight">\(\mathbb{R}^{n-1}\)</span> (viewed inside <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> as those with last coordinate
+zero) are a <em>subset</em> of the <span class="math notranslate nohighlight">\(k\)</span>-dimensional subspaces of <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>, so the
+minimum in <a class="reference internal" href="#equation-eq-spec-minmax">Eq. 154</a> over the smaller collection can only be larger:
+<span class="math notranslate nohighlight">\(\lambda_k(A_{n-1}) \ge \lambda_k(A_n)\)</span>. Applying the same argument to <span class="math notranslate nohighlight">\(-A\)</span>
+gives the other side.</p>
+<p><strong>Part a)</strong> Build the nested leading submatrices <code class="docutils literal notranslate"><span class="pre">S[:n,</span> <span class="pre">:n]</span></code> for
+<span class="math notranslate nohighlight">\(n = 1, \dots, 5\)</span> and compute <code class="docutils literal notranslate"><span class="pre">np.linalg.eigvalsh</span></code> of each. Print the five
+spectra.</p>
+<p><strong>Part b)</strong> Check <a class="reference internal" href="#equation-eq-spec-interlacing">Eq. 155</a> for every consecutive pair: with
+<code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">=</span> <span class="pre">eigvalsh(S[:n,</span> <span class="pre">:n])</span></code> and <code class="docutils literal notranslate"><span class="pre">b</span> <span class="pre">=</span> <span class="pre">eigvalsh(S[:n-1,</span> <span class="pre">:n-1])</span></code>, confirm
+<code class="docutils literal notranslate"><span class="pre">a[k]</span> <span class="pre">&lt;=</span> <span class="pre">b[k]</span> <span class="pre">&lt;=</span> <span class="pre">a[k+1]</span></code> for all <span class="math notranslate nohighlight">\(k = 0, \dots, n-2\)</span>, to <span class="math notranslate nohighlight">\(10^{-12}\)</span>. Report a
+per-<span class="math notranslate nohighlight">\(n\)</span> verdict and confirm all four hold.</p>
+<p><strong>Part c)</strong> Count the checks. Interlacing gives <span class="math notranslate nohighlight">\(n-1\)</span> inequality pairs at each
+level, so across <span class="math notranslate nohighlight">\(n = 2, 3, 4, 5\)</span> there are <span class="math notranslate nohighlight">\(1 + 2 + 3 + 4 = 10\)</span> pairs and 20
+individual inequalities. Confirm all 20 hold, and report the tightest margin —
+the smallest value of <span class="math notranslate nohighlight">\(\min(b_k - a_k,\, a_{k+1} - b_k)\)</span> over all of them.</p>
+<p>It is <span class="math notranslate nohighlight">\(2.4\times10^{-5}\)</span>, at <span class="math notranslate nohighlight">\(n = 5\)</span>, <span class="math notranslate nohighlight">\(k = 2\)</span>: the second eigenvalue of <span class="math notranslate nohighlight">\(S\)</span> is
+<span class="math notranslate nohighlight">\(3.3150379\)</span> and the second eigenvalue of its <span class="math notranslate nohighlight">\(4\times4\)</span> leading submatrix is
+<span class="math notranslate nohighlight">\(3.3150616\)</span>. The inequality holds by a margin eleven orders above rounding and
+five orders below the spectrum’s own spread of <span class="math notranslate nohighlight">\(7.43\)</span>. This is a good place for
+a theorem to be tested — a comfortable margin would prove less.</p>
+<p><strong>Part d)</strong> Confirm the immediate corollary: the extreme eigenvalues of a
+leading submatrix are trapped by those of the whole, so
+<span class="math notranslate nohighlight">\(\lambda_1(S) \le \lambda_1(S_{n-1})\)</span> and <span class="math notranslate nohighlight">\(\lambda_{n-1}(S_{n-1}) \le
+\lambda_n(S)\)</span>. Check both at <span class="math notranslate nohighlight">\(n = 5\)</span> to <span class="math notranslate nohighlight">\(10^{-12}\)</span>.</p>
+<p><strong>Part e)</strong> Draw the ladder: plot each submatrix’s spectrum as a row of
+markers on a common horizontal axis, with <span class="math notranslate nohighlight">\(n\)</span> increasing upward, so the
+nesting is visible as each row’s points falling into the gaps of the row above.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>spectra of the nested leading submatrices:
+  n = 1: [4.]
+  n = 2: [3.38197 5.61803]
+  n = 3: [2.47108 5.16745 7.36147]
+  n = 4: [1.79353 3.31506 5.28394 7.60747]
+  n = 5: [1.742   3.31504 3.82995 6.94006 9.17295]
+
+checking lambda_k(A_n) &lt;= lambda_k(A_(n-1)) &lt;= lambda_(k+1)(A_n):
+  n = 2: True
+  n = 3: True
+  n = 4: True
+  n = 5: True
+
+10 interlacing pairs, 20 individual inequalities
+  all hold: True
+  tightest margin: 0.000024
+
+  lambda_1(S) = 1.742003 &lt;= 1.793528 = lambda_1(S_4): True
+  lambda_4(S_4) = 7.607469 &lt;= 9.172950 = lambda_5(S): True
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-spec-interlacing">
+<img alt="../../_images/bf3e223ebecba6bf746fcf512f5acf86b806ef85509a7dcfbdf9b18a0c3d1299.png" src="../../_images/bf3e223ebecba6bf746fcf512f5acf86b806ef85509a7dcfbdf9b18a0c3d1299.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 60 </span><span class="caption-text">Cauchy interlacing (Eq. 6) on the nested leading submatrices of <span class="math notranslate nohighlight">\(S\)</span>. Each row shows the eigenvalues of <span class="math notranslate nohighlight">\(S[:n, :n]\)</span> for <span class="math notranslate nohighlight">\(n = 1\)</span> (bottom) to <span class="math notranslate nohighlight">\(n = 5\)</span> (top), on a common horizontal axis, with faint guides rising from each row toward the larger matrix it interlaces. Every row’s <span class="math notranslate nohighlight">\(n\)</span> eigenvalues fall strictly inside the gaps of the <span class="math notranslate nohighlight">\(n+1\)</span> eigenvalues above it: 10 interlacing pairs and 20 individual inequalities in this figure, all satisfied, and the tightest margin is <span class="math notranslate nohighlight">\(2.4	imes10^{-5}\)</span>, where <span class="math notranslate nohighlight">\(\lambda_2(S) = 3.3150379\)</span> and <span class="math notranslate nohighlight">\(\lambda_2(S[:4,:4]) = 3.3150616\)</span> nearly coincide. Deleting the last row and column of a symmetric matrix can never move an eigenvalue past its neighbours.</span><a class="headerlink" href="#fig-spec-interlacing" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<p>Every one of the 20 inequalities is checked individually rather than in
+aggregate, and the tightest margin is reported, because an inequality that
+clears its bound by <span class="math notranslate nohighlight">\(2.4\times10^{-5}\)</span> — far above rounding, far below the
+eigenvalue spacing — is being tested meaningfully, while one that held only
+at <span class="math notranslate nohighlight">\(10^{-15}\)</span> would be rounding, not mathematics.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  Cauchy interlacing holds at every level of the nested submatrices (Eq. 6)   [10 interlacing pairs and 20 individual inequalities, all satisfied; tightest margin 0.000024]
+✓  and one pair is nearly tight, which is where a theorem is worth testing   [the tightest of the 20 inequalities has margin 2.364e-05 -- eleven orders above rounding, five below the spectrum&#39;s spread of 7.431]
+✓  the corollary follows: a submatrix&#39;s extremes are trapped by the whole&#39;s   [lambda_1(S) = 1.742003 &lt;= lambda_1(S_4) = 1.793528, and lambda_4(S_4) = 7.607469 &lt;= lambda_5(S) = 9.172950]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-6-weyl-and-a-condition-number-equal-to-1">
+<h2>Exercise 6: Weyl, and a condition number equal to 1<a class="headerlink" href="#exercise-6-weyl-and-a-condition-number-equal-to-1" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-spec-weyl">Eq. 156</a> is the reason to trust <code class="docutils literal notranslate"><span class="pre">eigh</span></code>. Perturbing a symmetric matrix
+by <span class="math notranslate nohighlight">\(E\)</span> moves <em>no</em> eigenvalue further than <span class="math notranslate nohighlight">\(\|E\|_2\)</span> — the eigenvalues are
+1-Lipschitz functions of the matrix. In the language of
+<a class="reference internal" href="../00-machine/floating-point.html"><span class="std std-doc">§0.2</span></a> the symmetric eigenvalue problem has
+condition number 1: a relative input error of <span class="math notranslate nohighlight">\(\varepsilon\)</span> produces an
+absolute output error of at most <span class="math notranslate nohighlight">\(\varepsilon\|A\|\)</span>, and no worse.</p>
+<p>Set that against everything else in this course. Solving <span class="math notranslate nohighlight">\(A\mathbf{x} =
+\mathbf{b}\)</span> amplifies by <span class="math notranslate nohighlight">\(\kappa(A)\)</span>; forming the normal equations amplifies by
+<span class="math notranslate nohighlight">\(\kappa(A)^2\)</span>; deconvolution amplified by <span class="math notranslate nohighlight">\(10^{16}\)</span>. Here the amplification
+factor is 1, and it is 1 because of symmetry alone.</p>
+<p><strong>Part a)</strong> Draw 100 random symmetric perturbations as
+<code class="docutils literal notranslate"><span class="pre">E</span> <span class="pre">=</span> <span class="pre">0.3</span> <span class="pre">*</span> <span class="pre">rng.standard_normal((5,</span> <span class="pre">5))</span></code> symmetrised by <code class="docutils literal notranslate"><span class="pre">(E</span> <span class="pre">+</span> <span class="pre">E.T)</span> <span class="pre">/</span> <span class="pre">2</span></code>. For
+each, compute <code class="docutils literal notranslate"><span class="pre">np.linalg.eigvalsh(S</span> <span class="pre">+</span> <span class="pre">E)</span></code> and the ratio
+<span class="math notranslate nohighlight">\(\max_k|\lambda_k(S+E) - \lambda_k(S)| \big/ \|E\|_2\)</span>.</p>
+<p><strong>Part b)</strong> Confirm <a class="reference internal" href="#equation-eq-spec-weyl">Eq. 156</a>: every one of the 100 ratios is at most
+1, to <span class="math notranslate nohighlight">\(10^{-12}\)</span>. Report the worst, which is <span class="math notranslate nohighlight">\(0.905\)</span> — close enough to 1 that
+the bound is being genuinely tested rather than trivially satisfied.</p>
+<p><strong>Part c)</strong> Confirm the bound is <em>sharp</em> by constructing a case that nearly
+attains it: take <code class="docutils literal notranslate"><span class="pre">E</span> <span class="pre">=</span> <span class="pre">0.3</span> <span class="pre">*</span> <span class="pre">np.outer(Q[:,</span> <span class="pre">-1],</span> <span class="pre">Q[:,</span> <span class="pre">-1])</span></code>, a perturbation
+aligned with the top eigenvector. Confirm <span class="math notranslate nohighlight">\(\|E\|_2 = 0.3\)</span> and that
+<span class="math notranslate nohighlight">\(\lambda_5(S+E) - \lambda_5(S)\)</span> equals <span class="math notranslate nohighlight">\(0.3\)</span> to <span class="math notranslate nohighlight">\(10^{-12}\)</span>: the bound is
+attained exactly, so no constant smaller than 1 would do.</p>
+<p><strong>Part d)</strong> Contrast with the non-symmetric case. Take the defective
+<span class="math notranslate nohighlight">\(J = \left[\begin{smallmatrix}1&amp;1\\0&amp;1\end{smallmatrix}\right]\)</span> from
+<a class="reference internal" href="eigenvalues-diagonalization.html"><span class="std std-doc">§3.1</span></a> and perturb it by
+<span class="math notranslate nohighlight">\(\delta = 10^{-8}\)</span> in the lower-left corner. Report <span class="math notranslate nohighlight">\(\|E\|_2 = 10^{-8}\)</span> and the
+resulting eigenvalue movement, which is <span class="math notranslate nohighlight">\(10^{-4}\)</span> — a factor of <span class="math notranslate nohighlight">\(10^{4}\)</span>
+<strong>larger</strong> than the perturbation. Confirm the ratio exceeds <span class="math notranslate nohighlight">\(1000\)</span>. Weyl is a
+statement about symmetric matrices and it fails spectacularly without that
+hypothesis; the general bound involves <span class="math notranslate nohighlight">\(\operatorname{cond}(X)\)</span>, which is what
+<a class="reference internal" href="schur-jordan-nonnormality.html"><span class="std std-doc">§3.5</span></a> develops.</p>
+<p><strong>Part e)</strong> Confirm the scaling of that failure: for
+<span class="math notranslate nohighlight">\(\delta = 10^{-4}, 10^{-6}, 10^{-8}, 10^{-10}\)</span> the eigenvalue movement should
+go like <span class="math notranslate nohighlight">\(\sqrt{\delta}\)</span>, since a <span class="math notranslate nohighlight">\(2\times2\)</span> Jordan block splits its double
+eigenvalue as <span class="math notranslate nohighlight">\(1 \pm \sqrt{\delta}\)</span>. Fit <span class="math notranslate nohighlight">\(\log(\text{movement})\)</span> against
+<span class="math notranslate nohighlight">\(\log\delta\)</span> with <code class="docutils literal notranslate"><span class="pre">np.polyfit</span></code> and confirm the slope is <span class="math notranslate nohighlight">\(0.5\)</span> to within 1%.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100 random symmetric perturbations:
+  worst |delta lambda| / ||E||_2 : 0.904902   (Weyl: &lt;= 1)
+  median                         : 0.579263
+  all within the bound           : True
+
+aligned perturbation E = 0.3 q_5 q_5^T:
+  ||E||_2 = 0.300000000000
+  lambda_5 moves by 0.300000000000   -&gt; the bound is attained exactly
+
+the SAME question for the defective J = [[1, 1], [0, 1]]:
+  delta = 1e-04: ||E||_2 = 1e-04, eigenvalue moves 1.000000e-02   ratio 1.000e+02
+  delta = 1e-06: ||E||_2 = 1e-06, eigenvalue moves 1.000000e-03   ratio 1.000e+03
+  delta = 1e-08: ||E||_2 = 1e-08, eigenvalue moves 1.000000e-04   ratio 1.000e+04
+  delta = 1e-10: ||E||_2 = 1e-10, eigenvalue moves 1.000000e-05   ratio 1.000e+05
+
+  fitted log-slope 0.500000 against the predicted 0.5
+  a 2x2 Jordan block splits as 1 +/- sqrt(delta): no Lipschitz bound exists without symmetry
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-6">
+<h3>Validation 6<a class="headerlink" href="#validation-6" title="Link to this heading">#</a></h3>
+<p>The bound is checked three ways: that it holds on random perturbations, that it
+is <em>attained</em> by an aligned one (so no smaller constant would do), and that it
+fails without symmetry. The third is what makes the first two informative — a
+bound that held for every matrix would say nothing about symmetry.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  Weyl holds for all 100 random symmetric perturbations (Eq. 7)   [worst ratio |delta lambda| / ||E||_2 = 0.904902, median 0.579263: the symmetric eigenvalue problem has condition number 1]
+✓  and the worst case comes close enough to 1 to be testing the bound   [0.904902; a worst ratio of 0.01 would mean the perturbations were too gentle to say anything]
+✓  an aligned perturbation attains it exactly: the constant 1 is sharp (Eq. 7)   [got [0.3] vs expected [0.3] (rtol=0, atol=1e-12)]
+✓  while without symmetry it fails: a 1e-8 perturbation moves lambda by 1e-4   [the defective J moves its eigenvalue 1.000e-04 under a perturbation of 1e-08, a ratio of 1.00e+04. Weyl is a theorem about symmetric matrices, not about matrices]
+✓  and it fails as sqrt(delta), the 2x2 Jordan block&#39;s splitting rate   [got [0.5] vs expected [0.5] (rtol=0.01, atol=0)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-7-gershgorin-localising-a-spectrum-without-computing-it">
+<h2>Exercise 7: Gershgorin: localising a spectrum without computing it<a class="headerlink" href="#exercise-7-gershgorin-localising-a-spectrum-without-computing-it" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-spec-gershgorin">Eq. 157</a> gives a region containing every eigenvalue, from the
+entries alone. There is no factorization, no iteration, and no arithmetic
+beyond <span class="math notranslate nohighlight">\(n^2\)</span> absolute values and additions. For a symmetric matrix the discs
+are intervals on the real line, since the eigenvalues are real.</p>
+<p>The theorem earns its keep when the discs are <em>disjoint</em>: a connected component
+formed from <span class="math notranslate nohighlight">\(m\)</span> discs contains exactly <span class="math notranslate nohighlight">\(m\)</span> eigenvalues, so disjoint discs
+localise each eigenvalue individually. That is why diagonally dominant matrices
+are so much easier to work with than general ones, and it is the cheapest
+available proof that a matrix is nonsingular — if no disc contains 0, then 0 is
+not an eigenvalue.</p>
+<p><strong>Part a)</strong> For <code class="docutils literal notranslate"><span class="pre">S</span></code>, compute the centres <code class="docutils literal notranslate"><span class="pre">np.diag(S)</span></code> and the radii
+<code class="docutils literal notranslate"><span class="pre">np.abs(S).sum(1)</span> <span class="pre">-</span> <span class="pre">np.abs(np.diag(S))</span></code>. Report both. The centres are
+<span class="math notranslate nohighlight">\(4, 5, 6, 3, 7\)</span> and the radii <span class="math notranslate nohighlight">\(4, 4, 3, 3, 4\)</span>.</p>
+<p><strong>Part b)</strong> Confirm <a class="reference internal" href="#equation-eq-spec-gershgorin">Eq. 157</a>: every eigenvalue of <code class="docutils literal notranslate"><span class="pre">S</span></code> lies in
+at least one disc, checked as <span class="math notranslate nohighlight">\(\min_i|\lambda - c_i| - R_i \le 10^{-12}\)</span> for
+each <span class="math notranslate nohighlight">\(\lambda\)</span>. Report which disc each eigenvalue falls in.</p>
+<p><strong>Part c)</strong> Note that the bound is loose here. The discs for <code class="docutils literal notranslate"><span class="pre">S</span></code> overlap into
+a single interval <span class="math notranslate nohighlight">\([0, 11]\)</span>, so the theorem localises the whole spectrum to
+that interval and no eigenvalue individually. Report the union interval and
+confirm the true spectrum <span class="math notranslate nohighlight">\([1.742, 9.173]\)</span> sits inside it.</p>
+<p><strong>Part d)</strong> Now the diagonally dominant <code class="docutils literal notranslate"><span class="pre">S_DOM</span></code>, whose diagonal is
+<span class="math notranslate nohighlight">\(3, 10, 17, 24, 31\)</span> with off-diagonal entries of magnitude <span class="math notranslate nohighlight">\(0.4\)</span>. Compute its
+centres and radii, confirm the discs are pairwise disjoint by checking
+<span class="math notranslate nohighlight">\(|c_i - c_j| &gt; R_i + R_j\)</span> for every <span class="math notranslate nohighlight">\(i \ne j\)</span>, and confirm each disc contains
+<strong>exactly one</strong> eigenvalue. Report the largest <span class="math notranslate nohighlight">\(|\lambda_i - c_i|\)</span>, which is
+<span class="math notranslate nohighlight">\(0.041\)</span> against a largest radius of <span class="math notranslate nohighlight">\(1.6\)</span>.</p>
+<p><strong>Part e)</strong> Use it to prove nonsingularity without computing anything. Confirm
+that no disc of <code class="docutils literal notranslate"><span class="pre">S_DOM</span></code> contains 0, hence 0 is not an eigenvalue, hence the
+matrix is invertible — and check that against <code class="docutils literal notranslate"><span class="pre">np.linalg.det(S_DOM)</span></code>, which is
+nonzero. Report the smallest distance from 0 to any disc, which is <span class="math notranslate nohighlight">\(1.8\)</span>: the
+nearest disc is centred at 3 with radius <span class="math notranslate nohighlight">\(1.2\)</span>. Note how easily this fails —
+lowering that first diagonal entry from 3 to 1 puts 0 inside the disc
+<span class="math notranslate nohighlight">\([-0.2, 2.2]\)</span> and the argument evaporates, even though the matrix is still
+perfectly invertible. Gershgorin proves nonsingularity when it can; it never
+disproves it.</p>
+<p><strong>Part f)</strong> Draw both sets of discs on the complex plane with <code class="docutils literal notranslate"><span class="pre">la.gershgorin</span></code>,
+with the true eigenvalues marked, so the overlapping and the disjoint cases can
+be compared side by side.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>S:      centres [4. 5. 6. 3. 7.]   radii [4. 4. 3. 3. 4.]
+  lambda =  1.74200 lies in disc(s) [0, 1, 3]
+  lambda =  3.31504 lies in disc(s) [0, 1, 2, 3, 4]
+  lambda =  3.82995 lies in disc(s) [0, 1, 2, 3, 4]
+  lambda =  6.94006 lies in disc(s) [0, 1, 2, 4]
+  lambda =  9.17295 lies in disc(s) [4]
+  the discs overlap into one interval [0.0, 11.0];
+  the true spectrum [1.7420, 9.1729] sits inside it
+
+S_DOM:  centres [ 3. 10. 17. 24. 31.]   radii [1.2 1.2 1.6 1.2 1.2]
+  eigenvalues [ 2.959117  9.98981  16.999361 24.012772 31.038941]
+  discs pairwise disjoint      : True
+  eigenvalues per disc         : [1, 1, 1, 1, 1]
+  largest |lambda_i - c_i|     : 0.040883   (largest radius 1.6000)
+
+  distance from 0 to the nearest disc : 1.8000 &gt; 0
+  so 0 is not an eigenvalue and S_DOM is invertible, proved by reading the entries
+  confirmed: det(S_DOM) = 374542.4883
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-spec-gershgorin">
+<img alt="../../_images/614c1d6489349c49ae9ea67aea644fd0bebc2af05ef811e5f60fe3cb1e0df073.png" src="../../_images/614c1d6489349c49ae9ea67aea644fd0bebc2af05ef811e5f60fe3cb1e0df073.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 61 </span><span class="caption-text">Gershgorin discs (Eq. 8) for two symmetric matrices, with the true eigenvalues marked, on separate axes because the two spectra span very different ranges. Top: <span class="math notranslate nohighlight">\(S\)</span>, whose five discs – centres <span class="math notranslate nohighlight">\(4, 5, 6, 3, 7\)</span> and radii <span class="math notranslate nohighlight">\(4, 4, 3, 3, 4\)</span> – overlap into the single interval <span class="math notranslate nohighlight">\([0, 11]\)</span>, so the theorem localises the spectrum only as a whole. Bottom: the diagonally dominant <span class="math notranslate nohighlight">\(S_{\mathrm{DOM}}\)</span>, with centres <span class="math notranslate nohighlight">\(3, 10, 17, 24, 31\)</span> and radii near <span class="math notranslate nohighlight">\(1.2\)</span>, whose discs are pairwise disjoint; each therefore contains exactly one eigenvalue, and since the nearest disc stops <span class="math notranslate nohighlight">\(1.8\)</span> short of the origin the matrix is provably invertible without any computation. Every eigenvalue is real, so for symmetric matrices the discs reduce to intervals on the real axis.</span><a class="headerlink" href="#fig-spec-gershgorin" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-7">
+<h3>Validation 7<a class="headerlink" href="#validation-7" title="Link to this heading">#</a></h3>
+<p>Containment is the theorem and is checked as such; the <em>usefulness</em> of the
+bound is a separate matter, and reporting that the discs of <code class="docutils literal notranslate"><span class="pre">S</span></code> merge into one
+interval is as much a part of the result as the containment itself. The
+nonsingularity argument is included because it is the form in which Gershgorin
+is most often actually used.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  every eigenvalue of S lies in some Gershgorin disc (Eq. 8)   [spectrum [1.7420, 9.1729] against discs centred [4.0, 5.0, 6.0, 3.0, 7.0] with radii [4.0, 4.0, 3.0, 3.0, 4.0], computed with no arithmetic beyond 25 absolute values]
+✓  though for S the bound is loose: the discs merge into one interval   [[0.0, 11.0] of width 11.0 against a true spread of 7.4309: overlapping discs localise the spectrum only as a whole]
+✓  for S_DOM the discs are disjoint, so each holds exactly one eigenvalue   [eigenvalues per disc [1, 1, 1, 1, 1]; each lambda_i is within 0.0409 of its centre, against a radius of 1.6000]
+✓  and since no disc reaches 0, S_DOM is invertible — proved by inspection   [the nearest disc stops 1.8000 short of the origin; det(S_DOM) = 374542.4883 confirms it]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-8-the-rayleigh-quotient-converges-quadratically-and-the-constant-is-the-gap">
+<h2>Exercise 8: The Rayleigh quotient converges quadratically, and the constant is the gap<a class="headerlink" href="#exercise-8-the-rayleigh-quotient-converges-quadratically-and-the-constant-is-the-gap" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="eigenvalues-diagonalization.html"><span class="std std-doc">§3.1</span></a> ran power iteration on a
+non-symmetric matrix and found the Rayleigh quotient converging at the <em>same</em>
+linear rate as the vector, with a note that the famous quadratic rate needs
+symmetry. This exercise settles that, and finds the constant exactly.</p>
+<p>The argument is short enough to give here. Write the iterate as
+<span class="math notranslate nohighlight">\(\mathbf{x} = \cos\theta\,\mathbf{q}_n + \sin\theta\,\mathbf{w}\)</span> with
+<span class="math notranslate nohighlight">\(\mathbf{w}\)</span> a unit vector orthogonal to <span class="math notranslate nohighlight">\(\mathbf{q}_n\)</span>. Orthonormality of the
+eigenvectors — available only under symmetry — makes the cross terms vanish, so</p>
+<div class="math notranslate nohighlight" id="equation-eq-spec-quadratic">
+<span class="eqno">(158)<a class="headerlink" href="#equation-eq-spec-quadratic" title="Link to this equation">#</a></span>\[\rho(\mathbf{x}) = \lambda_n\cos^2\theta + \rho(\mathbf{w})\sin^2\theta,
+\qquad
+\lambda_n - \rho(\mathbf{x}) = \bigl(\lambda_n - \rho(\mathbf{w})\bigr)\sin^2\theta .\]</div>
+<p>The error in the eigenvalue is <span class="math notranslate nohighlight">\(O(\theta^2)\)</span> where the error in the vector is
+<span class="math notranslate nohighlight">\(O(\theta)\)</span>: that is the quadratic convergence. And since
+<span class="math notranslate nohighlight">\(\|\mathbf{x} - \mathbf{q}_n\|^2 = 2(1 - \cos\theta) \approx \theta^2\)</span> and
+<span class="math notranslate nohighlight">\(\mathbf{w} \to \mathbf{q}_{n-1}\)</span> as the iteration proceeds, the constant of
+proportionality tends to <span class="math notranslate nohighlight">\(\lambda_n - \lambda_{n-1}\)</span> — the <strong>spectral gap</strong>.</p>
+<p>The matrix is <span class="math notranslate nohighlight">\(S_2 = \left[\begin{smallmatrix}6&amp;1\\1&amp;5\end{smallmatrix}\right]\)</span>
+from Exercise 3, with eigenvalues <span class="math notranslate nohighlight">\(\lambda_1 = 4.381966\)</span> and
+<span class="math notranslate nohighlight">\(\lambda_2 = 6.618034\)</span>, so the gap is exactly <span class="math notranslate nohighlight">\(\sqrt5 = 2.2360680\)</span>.</p>
+<p><strong>Part a)</strong> Run power iteration <a class="reference internal" href="eigenvalues-diagonalization.html#equation-eq-eig-poweriter">Eq. 148</a> on <code class="docutils literal notranslate"><span class="pre">S2</span></code> from
+<span class="math notranslate nohighlight">\(\mathbf{x}_0 = (1, 0)\)</span> for 25 steps, normalising with
+<code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">/</span> <span class="pre">np.linalg.norm(x)</span></code> each time, recording the vector error
+<span class="math notranslate nohighlight">\(\min(\|\mathbf{x}_k - \mathbf{q}_2\|, \|\mathbf{x}_k + \mathbf{q}_2\|)\)</span> and
+the Rayleigh error <span class="math notranslate nohighlight">\(|\rho(\mathbf{x}_k) - \lambda_2|\)</span> at every step.</p>
+<p><strong>Part b)</strong> Report both errors at <span class="math notranslate nohighlight">\(k = 0, 5, 10, 15\)</span>. The vector error runs
+<span class="math notranslate nohighlight">\(0.547, 7.9\times10^{-2}, 1.0\times10^{-2}, 1.3\times10^{-3}\)</span> and the Rayleigh
+error <span class="math notranslate nohighlight">\(0.618, 1.4\times10^{-2}, 2.2\times10^{-4}, 3.6\times10^{-6}\)</span>: the second
+falls roughly as the square of the first.</p>
+<p><strong>Part c)</strong> Confirm the rates separately by fitting. Fit
+<span class="math notranslate nohighlight">\(\log(\text{vector error})\)</span> against <span class="math notranslate nohighlight">\(k\)</span> over steps 5 to 20 and confirm the
+slope is <span class="math notranslate nohighlight">\(\log|\lambda_1/\lambda_2| = \log 0.662125\)</span> to within 2%. Then fit the
+Rayleigh error the same way and confirm its slope is <em>twice</em> that, again to
+within 2%.</p>
+<p><strong>Part d)</strong> Confirm the constant. Compute the ratio
+<span class="math notranslate nohighlight">\(|\rho(\mathbf{x}_k) - \lambda_2| \big/ \|\mathbf{x}_k - \mathbf{q}_2\|^2\)</span> for
+<span class="math notranslate nohighlight">\(k = 3, \dots, 13\)</span> and confirm it converges to <span class="math notranslate nohighlight">\(\lambda_2 - \lambda_1 = \sqrt5\)</span>
+to <span class="math notranslate nohighlight">\(10^{-3}\)</span>. The quadratic convergence has an explicit constant and it is the
+spectral gap — a wider gap gives faster convergence in both the vector and the
+eigenvalue, which is the same fact twice.</p>
+<p><strong>Part e)</strong> Plot both error sequences on a log axis against <span class="math notranslate nohighlight">\(k\)</span>, with the
+predicted slopes drawn as reference lines, so the factor-of-two in the
+exponents is visible as a factor-of-two in the slopes.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>S_2 eigenvalues [4.381966 6.618034], gap 2.2360679775, sqrt(5) = 2.2360679775
+|lambda_1/lambda_2| = 0.662125
+
+   k     vector error     Rayleigh error   ratio to err^2
+   0     5.465331e-01       6.180340e-01         2.069091
+   5     7.847074e-02       1.374775e-02         2.232626
+  10     1.000913e-02       2.240095e-04         2.236012
+  15     1.273832e-03       3.628352e-06         2.236067
+
+fitted log-slopes over k = 5..20:
+  vector   : -0.412219   predicted log(ratio)   = -0.412301
+  Rayleigh : -0.824385   predicted 2 log(ratio) = -0.824602
+  the Rayleigh slope is 1.9999 times the vector slope
+
+Rayleigh error / vector error^2, k = 3..13:
+  [2.218499 2.228262 2.232626 2.234555 2.235404 2.235777 2.23594  2.236012 2.236043 2.236057 2.236063]
+  limit 2.2360632582  against lambda_2 - lambda_1 = 2.2360679775
+  gap 4.719e-06   -&gt; the constant IS the spectral gap
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-spec-quadratic">
+<img alt="../../_images/a17587876bef8b08b4f6dd55905cb00fadf4ece64d67851232905c45eeb5d942.png" src="../../_images/a17587876bef8b08b4f6dd55905cb00fadf4ece64d67851232905c45eeb5d942.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 62 </span><span class="caption-text">Power iteration on the symmetric <span class="math notranslate nohighlight">\(S_2 = \left[\begin{smallmatrix}6&amp;1\\1&amp;5\end{smallmatrix}\right]\)</span>: the eigenvector error <span class="math notranslate nohighlight">\(\min(\|\mathbf{x}_k \mp \mathbf{q}_2\|)\)</span> (navy) and the Rayleigh-quotient error <span class="math notranslate nohighlight">\(|\rho(\mathbf{x}_k) - \lambda_2|\)</span> (amber) against the step <span class="math notranslate nohighlight">\(k\)</span>, on a log axis, with the predicted slopes <span class="math notranslate nohighlight">\(\log|\lambda_1/\lambda_2|\)</span> and twice that drawn as dotted reference lines. The eigenvalue error falls at exactly twice the exponential rate of the vector error – quadratic convergence, Eq. 9 – and the constant of proportionality converges to the spectral gap <span class="math notranslate nohighlight">\(\lambda_2 - \lambda_1 = \sqrt5\)</span>. Neither curve has reached the float64 floor by <span class="math notranslate nohighlight">\(k = 25\)</span>; the amber one is at <span class="math notranslate nohighlight">\(10^{-9.5}\)</span> and still falling at twice the navy slope.</span><a class="headerlink" href="#fig-spec-quadratic" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-8">
+<h3>Validation 8<a class="headerlink" href="#validation-8" title="Link to this heading">#</a></h3>
+<p>The two rates are fitted independently and their <em>ratio</em> is checked to be 2,
+which is a stronger statement than either slope alone. The constant is then
+checked against <span class="math notranslate nohighlight">\(\lambda_2 - \lambda_1\)</span>, an exact quantity, which turns “the
+convergence is quadratic” into a prediction with a number in it.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the eigenvector converges at |lambda_1/lambda_2|^k, as in 3.1 (Eq. 7 there)   [got [-0.412219] vs expected [-0.412301] (rtol=0.02, atol=0)]
+✓  but the Rayleigh quotient converges at TWICE that rate (Eq. 9)   [got [-0.824385] vs expected [-0.824602] (rtol=0.02, atol=0)]
+✓  the ratio of the two fitted slopes is 2: quadratic convergence   [got [1.999868] vs expected [2.] (rtol=0.02, atol=0)]
+✓  and the constant is the spectral gap lambda_2 - lambda_1 = sqrt(5) (Eq. 9)   [got [2.236063] vs expected [2.236068] (rtol=0, atol=0.001)]
+✓  so by step 15 the eigenvalue error is 350x smaller than the vector&#39;s   [Rayleigh error 3.628e-06 against vector error 1.274e-03, a ratio of 2.85e-03, where at step 5 the ratio was 1.75e-01. In 3.1, without symmetry, the two fell at the same rate and this ratio would have been flat]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p><strong>Symmetry removes every difficulty at once.</strong> For the <span class="math notranslate nohighlight">\(5\times5\)</span> integer
+matrix <span class="math notranslate nohighlight">\(S\)</span>, <code class="docutils literal notranslate"><span class="pre">eigh</span></code> returned real eigenvalues in ascending order
+(<span class="math notranslate nohighlight">\(1.7420, 3.3150, 3.8300, 6.9401, 9.1730\)</span>) with <span class="math notranslate nohighlight">\(Q^{\top}Q = I\)</span> to
+<span class="math notranslate nohighlight">\(9\times10^{-16}\)</span>, <span class="math notranslate nohighlight">\(\operatorname{cond}(Q) = 1\)</span> to <span class="math notranslate nohighlight">\(10^{-15}\)</span>, and
+<span class="math notranslate nohighlight">\(Q\Lambda Q^{\top} = S\)</span> to <span class="math notranslate nohighlight">\(8\times10^{-15}\)</span> — with no inverse formed anywhere,
+because <span class="math notranslate nohighlight">\(Q^{-1} = Q^{\top}\)</span>. Against
+<a class="reference internal" href="eigenvalues-diagonalization.html"><span class="std std-doc">§3.1</span></a>’s <span class="math notranslate nohighlight">\(\operatorname{cond}(X) \approx 3.9\)</span> for
+a non-symmetric matrix and <span class="math notranslate nohighlight">\(9\times10^{15}\)</span> for a defective one, that 1 is the
+whole theorem in a number.</p>
+<p><strong>A symmetric matrix is a list of directions with numbers attached.</strong> The five
+rank-1 projectors were idempotent to <span class="math notranslate nohighlight">\(4\times10^{-16}\)</span>, mutually orthogonal to
+<span class="math notranslate nohighlight">\(10^{-16}\)</span>, summed to <span class="math notranslate nohighlight">\(I\)</span> to <span class="math notranslate nohighlight">\(7\times10^{-16}\)</span>, and reproduced <span class="math notranslate nohighlight">\(S\)</span> to
+<span class="math notranslate nohighlight">\(8\times10^{-15}\)</span> when weighted by the eigenvalues. The top-<span class="math notranslate nohighlight">\(k\)</span> partial sums
+fell <span class="math notranslate nohighlight">\(5.215, 2.611, 2.377, 0.748, 0\)</span>, exact only at <span class="math notranslate nohighlight">\(k = n\)</span>.</p>
+<p><strong>The Rayleigh quotient is an optimisation whose stationary points are the
+eigenvectors.</strong> All <span class="math notranslate nohighlight">\(10^{5}\)</span> random unit vectors gave values inside
+<span class="math notranslate nohighlight">\([\lambda_1, \lambda_5]\)</span> — a theorem, checked as one — approaching the top to
+<span class="math notranslate nohighlight">\(1.3\times10^{-3}\)</span> relative and the bottom to <span class="math notranslate nohighlight">\(1.4\times10^{-2}\)</span>, while
+<span class="math notranslate nohighlight">\(\rho(\mathbf{q}_i) = \lambda_i\)</span> <em>exactly</em> to <span class="math notranslate nohighlight">\(10^{-15}\)</span>. The gradient vanished
+to <span class="math notranslate nohighlight">\(10^{-14}\)</span> at all five eigenvectors, including the three interior saddle
+points, against <span class="math notranslate nohighlight">\(6.2\)</span> at a random direction.</p>
+<p><strong>Courant–Fischer, checked from both sides.</strong> The subspace
+<span class="math notranslate nohighlight">\(\operatorname{span}\{\mathbf{q}_1,\dots,\mathbf{q}_k\}\)</span> attained <span class="math notranslate nohighlight">\(\lambda_k\)</span>
+to <span class="math notranslate nohighlight">\(10^{-15}\)</span> for every <span class="math notranslate nohighlight">\(k\)</span>, and none of 20,000 random subspaces violated the
+inequality — which is the only thing sampling can honestly establish about a
+claim quantified over all subspaces.</p>
+<p><strong>Interlacing and Weyl.</strong> All 20 individual interlacing inequalities across the
+nested submatrices held, with a tightest margin of <span class="math notranslate nohighlight">\(2.4\times10^{-5}\)</span>. Weyl held for all
+100 random symmetric perturbations with a worst ratio of <span class="math notranslate nohighlight">\(0.905\)</span>, and an
+aligned perturbation <span class="math notranslate nohighlight">\(0.3\,\mathbf{q}_5\mathbf{q}_5^{\top}\)</span> attained the bound
+<em>exactly</em>, so the constant 1 is sharp. Without symmetry it fails outright: a
+<span class="math notranslate nohighlight">\(10^{-8}\)</span> perturbation of the defective <span class="math notranslate nohighlight">\(J\)</span> moved its eigenvalue by <span class="math notranslate nohighlight">\(10^{-4}\)</span>,
+a ratio of <span class="math notranslate nohighlight">\(10^{4}\)</span>, at the fitted rate <span class="math notranslate nohighlight">\(\delta^{0.5}\)</span>.</p>
+<p><strong>Gershgorin localises a spectrum for free.</strong> Every eigenvalue of <span class="math notranslate nohighlight">\(S\)</span> lay in
+some disc, though the discs merged into <span class="math notranslate nohighlight">\([0, 11]\)</span> against a true spread of
+<span class="math notranslate nohighlight">\(7.43\)</span>. For the diagonally dominant <span class="math notranslate nohighlight">\(S_{\text{DOM}}\)</span> the discs were pairwise
+disjoint, each held exactly one eigenvalue within <span class="math notranslate nohighlight">\(0.041\)</span> of its centre, and
+since none reached 0 the matrix is invertible by inspection.</p>
+<p><strong>And the loose end from <a class="reference internal" href="eigenvalues-diagonalization.html"><span class="std std-doc">§3.1</span></a> is
+settled.</strong> On a symmetric matrix the Rayleigh quotient converges at
+<strong>twice</strong> the exponential rate of the eigenvector — fitted slopes in ratio
+<span class="math notranslate nohighlight">\(2.00\)</span> — and the constant of proportionality converges to
+<span class="math notranslate nohighlight">\(\lambda_2 - \lambda_1 = \sqrt5\)</span>, the spectral gap.</p>
+<p><strong>Methods introduced.</strong> <code class="docutils literal notranslate"><span class="pre">np.linalg.eigh</span></code> and <code class="docutils literal notranslate"><span class="pre">eigvalsh</span></code>, the spectral
+projector sum, the Rayleigh quotient and its gradient, subspace compression
+<span class="math notranslate nohighlight">\(B^{\top}\!AB\)</span> as the computable form of a min–max, nested leading submatrices,
+<code class="docutils literal notranslate"><span class="pre">ecp.linalg.gershgorin</span></code>, and the aligned perturbation as a way to test whether
+a bound is sharp.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>When all the eigenvalues are positive.</strong> Symmetry gives real eigenvalues;
+requiring them positive gives <em>positive definiteness</em>, which turns
+<span class="math notranslate nohighlight">\(\mathbf{x}^{\top}\!A\mathbf{x}\)</span> into a genuine notion of squared length,
+makes the quadratic form an ellipse rather than a saddle, and licenses the
+Cholesky factorization. <a class="reference internal" href="positive-definite-cholesky.html"><span class="std std-doc">§3.3</span></a> develops it,
+and it underwrites every covariance matrix and every kernel in the chapters
+that follow.</p></li>
+<li><p><strong>The same theorem over <span class="math notranslate nohighlight">\(\mathbb{C}\)</span>.</strong> Replacing <span class="math notranslate nohighlight">\(A = A^{\top}\)</span> by
+<span class="math notranslate nohighlight">\(A = A^{*}\)</span> gives Hermitian matrices, with the identical conclusion and a
+physical interpretation: observables in quantum mechanics are Hermitian
+<em>because</em> the spectral theorem guarantees real eigenvalues.
+<a class="reference internal" href="hermitian-unitary-normal.html"><span class="std std-doc">§3.4</span></a> makes that trip.</p></li>
+<li><p><strong>The largest class for which any of this survives.</strong> Symmetry is
+sufficient but not necessary. The exact condition for a unitary
+diagonalization is <strong>normality</strong>, <span class="math notranslate nohighlight">\(AA^{*} = A^{*}A\)</span>, which admits complex
+eigenvalues while keeping orthogonal eigenvectors — and everything outside
+that class is <a class="reference internal" href="schur-jordan-nonnormality.html"><span class="std std-doc">§3.5</span></a>’s subject.</p></li>
+<li><p><strong>Interlacing as an algorithm.</strong> <a class="reference internal" href="#equation-eq-spec-interlacing">Eq. 155</a> is not only a
+theorem; running it in reverse on a tridiagonal matrix counts eigenvalues
+below a shift and gives the bisection method, which computes any single
+eigenvalue of a symmetric matrix to full accuracy without touching the
+others. <a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html"><span class="std std-doc">§5.2</span></a> builds it.</p></li>
+</ul>
+<div class="docutils container" id="id4">
+<div role="list" class="citation-list">
+<div class="citation" id="id11" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">HJ13</a><span class="fn-bracket">]</span></span>
+<p>Roger A. Horn and Charles R. Johnson. <em>Matrix Analysis</em>. Cambridge University Press, 2 edition, 2013. <a class="reference external" href="https://doi.org/10.1017/CBO9781139020411">doi:10.1017/CBO9781139020411</a>.</p>
+</div>
+<div class="citation" id="id5" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">Str23</a><span class="fn-bracket">]</span></span>
+<p>Gilbert Strang. <em>Introduction to Linear Algebra</em>. Wellesley-Cambridge Press, Wellesley, MA, 6 edition, 2023. ISBN 978-1-7331466-7-8.</p>
+</div>
+<div class="citation" id="id12" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">TB97</a><span class="fn-bracket">]</span></span>
+<p>Lloyd N. Trefethen and David Bau, III. <em>Numerical Linear Algebra</em>. SIAM, Philadelphia, 1997. <a class="reference external" href="https://doi.org/10.1137/1.9780898719574">doi:10.1137/1.9780898719574</a>.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/03-eigenvalues"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="eigenvalues-diagonalization.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">3.1 Eigenvalues, Eigenvectors, and Diagonalization</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="positive-definite-cholesky.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-theorem">The theorem</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-rayleigh-quotient">The Rayleigh quotient</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#courantfischer">Courant–Fischer</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cauchy-interlacing">Cauchy interlacing</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#weyl-and-perfect-conditioning">Weyl, and perfect conditioning</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gershgorin">Gershgorin</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-what-symmetry-buys-measured-against-what-it-replaces">Exercise 1: What symmetry buys, measured against what it replaces</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-matrix-as-a-sum-of-projectors">Exercise 2: The matrix as a sum of projectors</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-rayleigh-quotient-and-eigenvectors-as-stationary-points">Exercise 3: The Rayleigh quotient, and eigenvectors as stationary points</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-courantfischer-checked-from-both-sides">Exercise 4: Courant–Fischer, checked from both sides</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-cauchy-interlacing">Exercise 5: Cauchy interlacing</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-weyl-and-a-condition-number-equal-to-1">Exercise 6: Weyl, and a condition number equal to 1</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-7-gershgorin-localising-a-spectrum-without-computing-it">Exercise 7: Gershgorin: localising a spectrum without computing it</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-7">Validation 7</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-8-the-rayleigh-quotient-converges-quadratically-and-the-constant-is-the-gap">Exercise 8: The Rayleigh quotient converges quadratically, and the constant is the gap</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-8">Validation 8</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

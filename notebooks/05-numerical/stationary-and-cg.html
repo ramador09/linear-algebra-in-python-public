@@ -1,0 +1,1428 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="5.4 Stationary Iterations and Conjugate Gradients" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/05-numerical/stationary-and-cg.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: §5.3 ended at a wall: sparse factors fill in, and in 3-D no ordering saves them. This notebook starts over from the one operation sparsity..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: §5.3 ended at a wall: sparse factors fill in, and in 3-D no ordering saves them. This notebook starts over from the one operation sparsity..." />
+
+    <title>5.4 Stationary Iterations and Conjugate Gradients &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/05-numerical/stationary-and-cg';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/05-numerical/stationary-and-cg.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning" href="krylov-gmres-preconditioning.html" />
+    <link rel="prev" title="5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers" href="sparse-matrices.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter V — Numerical Linear Algebra</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/05-numerical/stationary-and-cg.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/05-numerical/stationary-and-cg.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/05-numerical/stationary-and-cg.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/05-numerical/stationary-and-cg.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>5.4 Stationary Iterations and Conjugate Gradients</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#splittings-and-the-iteration-matrix">Splittings and the iteration matrix</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#descent-methods-and-the-krylov-idea">Descent methods and the Krylov idea</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-jacobi-the-rate-is-an-eigenvalue">Exercise 1: Jacobi: the rate is an eigenvalue</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-gaussseidel-and-sor-squaring-the-rate-then-breaking-the-gate">Exercise 2: Gauss–Seidel and SOR: squaring the rate, then breaking the gate</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-steepest-descent-zig-zags-conjugacy-does-not">Exercise 3: Steepest descent zig-zags; conjugacy does not</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-conjugate-gradients-and-the-fiction-of-exactness">Exercise 4: Conjugate gradients, and the fiction of exactness</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-the-bound-and-the-race">Exercise 5: The √κ bound, and the race</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-cg-counts-eigenvalues-not-unknowns">Exercise 6: CG counts eigenvalues, not unknowns</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="stationary-iterations-and-conjugate-gradients">
+<h1>5.4 Stationary Iterations and Conjugate Gradients<a class="headerlink" href="#stationary-iterations-and-conjugate-gradients" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter V — Numerical Linear Algebra
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;5.4
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">When even the well-ordered factor is too big, iterate: sweep the grid until the residual dies (Jacobi, Gauss–Seidel, SOR), or — the twentieth century&#x27;s best idea about linear systems — build the Krylov subspace and let conjugate gradients find the optimal answer inside it.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;advanced&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;120–150 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="sparse-matrices.html"><span class="std std-doc">§5.3</span></a> ended at a wall: sparse factors fill in, and
+in 3-D no ordering saves them. This notebook starts over from the one
+operation sparsity keeps cheap — the <span class="math notranslate nohighlight">\(O(\mathrm{nnz})\)</span> matvec — and builds
+solvers out of nothing else. The classical <strong>stationary iterations</strong>
+(Jacobi, Gauss–Seidel, SOR) split the matrix, sweep, and converge at a rate
+read off an eigenvalue: the spectral radius of the iteration matrix, which
+this notebook predicts in closed form for the Poisson system and confirms to
+a fraction of a percent. Then the modern answer: <strong>conjugate gradients</strong>
+<span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id26" title="Magnus R. Hestenes and Eduard Stiefel. Methods of conjugate gradients for solving linear systems. Journal of Research of the National Bureau of Standards, 49(6):409–436, 1952. doi:10.6028/jres.049.044.">HS52</a>]</span>, which turns the same matvec into an optimization —
+each step provably the best in a growing Krylov subspace — an order of
+magnitude ahead of Gauss–Seidel on the same system, and ahead even of
+optimally-tuned SOR while needing no tuning parameter at all.</p>
+<p>The measurements also teach how to measure. Every rate matches its <span class="math notranslate nohighlight">\(\rho\)</span>
+to a fraction of a percent — but only in the <em>clean decay band</em>: a window
+that touches the rounding floor reports SOR’s rate 14% high (the residual
+stagnates near <span class="math notranslate nohighlight">\(10^{-13}\)</span> and the “rate” flattens), and a naive schedule
+extrapolated from sweep zero predicts Jacobi’s five-digit crossing 26% late
+(the error’s fast modes die first and donate two free digits). And CG’s
+celebrated A-orthogonality holds to <span class="math notranslate nohighlight">\(10^{-15}\)</span> between neighbours while
+drifting to <span class="math notranslate nohighlight">\(10^{-5}\)</span> across the run — finite termination is
+exact-arithmetic fiction, and the measurement shows precisely how.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> Golub and Van Loan <span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id16" title="Gene H. Golub and Charles F. Van Loan. Matrix Computations. Johns Hopkins University Press, Baltimore, 4 edition, 2013.">GVL13</a>]</span> Chapter 11, Saad
+<span class="bibtex-citation" id="id3">[<a class="reference internal" href="#id20" title="Yousef Saad. Iterative Methods for Sparse Linear Systems. SIAM, Philadelphia, 2 edition, 2003. doi:10.1137/1.9780898718003.">Saa03</a>]</span> Chapters 4–6, Trefethen and Bau <span class="bibtex-citation" id="id4">[<a class="reference internal" href="#id15" title="Lloyd N. Trefethen and David Bau, III. Numerical Linear Algebra. SIAM, Philadelphia, 1997. doi:10.1137/1.9780898719574.">TB97</a>]</span>
+Lectures 38–40. The model problem is
+<a class="reference internal" href="sparse-matrices.html"><span class="std std-doc">§5.3</span></a>’s 2-D Poisson matrix on a <span class="math notranslate nohighlight">\(20\times20\)</span>
+grid, whose closed-form spectrum prices every claim.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="splittings-and-the-iteration-matrix">
+<h3>Splittings and the iteration matrix<a class="headerlink" href="#splittings-and-the-iteration-matrix" title="Link to this heading">#</a></h3>
+<p>Write <span class="math notranslate nohighlight">\(A = M - N\)</span> with <span class="math notranslate nohighlight">\(M\)</span> easy to invert. Then <span class="math notranslate nohighlight">\(Ax = b\)</span> becomes the fixed
+point of</p>
+<div class="math notranslate nohighlight" id="equation-eq-cg-split">
+<span class="eqno">(235)<a class="headerlink" href="#equation-eq-cg-split" title="Link to this equation">#</a></span>\[x_{k+1} = x_k + M^{-1}r_k, \qquad r_k = b - Ax_k,
+\qquad e_{k+1} = \underbrace{(I - M^{-1}A)}_{B}\,e_k ,\]</div>
+<p>so the error is multiplied by the <strong>iteration matrix</strong> <span class="math notranslate nohighlight">\(B\)</span> every sweep and
+the asymptotic rate is <span class="math notranslate nohighlight">\(\rho(B)\)</span>, the spectral radius. The classical
+choices: <strong>Jacobi</strong> takes <span class="math notranslate nohighlight">\(M = D\)</span> (the diagonal), <strong>Gauss–Seidel</strong>
+<span class="math notranslate nohighlight">\(M = D + L\)</span> (lower triangle included — each sweep uses fresh values), and
+<strong>SOR</strong> <span class="math notranslate nohighlight">\(M = D/\omega + L\)</span>, over-relaxing by a factor <span class="math notranslate nohighlight">\(\omega \in (0, 2)\)</span>.</p>
+<p>For the Poisson matrix the rates are classical results: with
+<span class="math notranslate nohighlight">\(\mu = \rho(B_{\text{J}}) = \cos\frac{\pi}{n_g+1}\)</span>,</p>
+<div class="math notranslate nohighlight" id="equation-eq-cg-rates">
+<span class="eqno">(236)<a class="headerlink" href="#equation-eq-cg-rates" title="Link to this equation">#</a></span>\[\rho_{\text{GS}} = \mu^2, \qquad
+\omega_{\text{opt}} = \frac{2}{1 + \sqrt{1 - \mu^2}}, \qquad
+\rho_{\text{SOR}}(\omega_{\text{opt}}) = \omega_{\text{opt}} - 1,\]</div>
+<p>Gauss–Seidel doubles Jacobi’s speed; optimal SOR improves the <em>exponent</em>.
+At <span class="math notranslate nohighlight">\(\omega_{\text{opt}}\)</span> every eigenvalue pair of the SOR matrix coalesces —
+the matrix is defective — and for <span class="math notranslate nohighlight">\(\omega &gt; \omega_{\text{opt}}\)</span> the
+eigenvalues turn complex with modulus exactly <span class="math notranslate nohighlight">\(\omega - 1\)</span>.</p>
+</section>
+<section id="descent-methods-and-the-krylov-idea">
+<h3>Descent methods and the Krylov idea<a class="headerlink" href="#descent-methods-and-the-krylov-idea" title="Link to this heading">#</a></h3>
+<p>For symmetric positive definite <span class="math notranslate nohighlight">\(A\)</span>, solving <span class="math notranslate nohighlight">\(Ax = b\)</span> minimizes
+<span class="math notranslate nohighlight">\(\phi(x) = \tfrac12 x^{\top}Ax - b^{\top}x\)</span>. <strong>Steepest descent</strong> follows
+<span class="math notranslate nohighlight">\(-\nabla\phi = r\)</span> with the exact line search
+<span class="math notranslate nohighlight">\(\alpha = r^{\top}r / r^{\top}Ar\)</span>, and contracts the <span class="math notranslate nohighlight">\(A\)</span>-norm error by
+exactly <span class="math notranslate nohighlight">\((\kappa-1)/(\kappa+1)\)</span> per step in the worst case — the zig-zag.
+<strong>Conjugate gradients</strong> replaces the gradient with search directions kept
+<strong><span class="math notranslate nohighlight">\(A\)</span>-orthogonal</strong> (<span class="math notranslate nohighlight">\(p_i^{\top}Ap_j = 0\)</span>), which makes each
+one-dimensional minimization <em>permanent</em>: after <span class="math notranslate nohighlight">\(k\)</span> steps,</p>
+<div class="math notranslate nohighlight" id="equation-eq-cg-opt">
+<span class="eqno">(237)<a class="headerlink" href="#equation-eq-cg-opt" title="Link to this equation">#</a></span>\[x_k = \operatorname*{arg\,min}_{x \in x_0 + \mathcal{K}_k}
+\lVert x - x_\star\rVert_A,
+\qquad
+\mathcal{K}_k = \operatorname{span}\{r_0, Ar_0, \dots, A^{k-1}r_0\},\]</div>
+<p>the best point in the whole Krylov subspace. Equivalently
+<span class="math notranslate nohighlight">\(e_k = p_k(A)e_0\)</span> over polynomials with <span class="math notranslate nohighlight">\(p_k(0)=1\)</span>: CG builds the optimal
+residual polynomial, which is why it terminates in <span class="math notranslate nohighlight">\(d\)</span> steps when <span class="math notranslate nohighlight">\(A\)</span> has
+<span class="math notranslate nohighlight">\(d\)</span> distinct eigenvalues, and why the general bound is</p>
+<div class="math notranslate nohighlight" id="equation-eq-cg-bound">
+<span class="eqno">(238)<a class="headerlink" href="#equation-eq-cg-bound" title="Link to this equation">#</a></span>\[\lVert e_k \rVert_A \;\le\; 2\left(
+\frac{\sqrt{\kappa}-1}{\sqrt{\kappa}+1}\right)^{k} \lVert e_0 \rVert_A ,\]</div>
+<p><span class="math notranslate nohighlight">\(\sqrt{\kappa}\)</span> where steepest descent pays <span class="math notranslate nohighlight">\(\kappa\)</span> — a one-sided bound,
+gated one-sidedly per <a class="reference internal" href="norms-conditioning-stability.html"><span class="std std-doc">§5.1</span></a>.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data and instruments only: the Poisson system, its closed-form constants,
+and the clean-band rate meter. The sweep driver is built in Exercise 1;
+CG in Exercise 4.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">spsolve_triangular</span><span class="p">,</span> <span class="n">cg</span> <span class="k">as</span> <span class="n">scipy_cg</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">la</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random array below comes from this seed</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+
+<span class="c1"># The model problem: 2-D Poisson on a 20x20 interior grid, 400 unknowns,</span>
+<span class="c1"># closed-form Jacobi radius mu = cos(pi/21) from 5.3&#39;s spectrum.</span>
+<span class="n">N_GRID</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">(</span><span class="n">la</span><span class="o">.</span><span class="n">poisson_2d</span><span class="p">(</span><span class="n">N_GRID</span><span class="p">))</span>
+<span class="n">N_UNK</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">(</span><span class="n">N_UNK</span><span class="p">)</span>
+<span class="n">NORM_B</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+<span class="n">x_star</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">toarray</span><span class="p">(),</span> <span class="n">b</span><span class="p">)</span>   <span class="c1"># the reference answer, factored once</span>
+
+<span class="n">MU</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="p">(</span><span class="n">N_GRID</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>          <span class="c1"># rho of the Jacobi matrix, Eq. 2</span>
+<span class="n">RHO_GS</span> <span class="o">=</span> <span class="n">MU</span><span class="o">**</span><span class="mi">2</span>
+<span class="n">OMEGA_OPT</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">MU</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">RHO_SOR</span> <span class="o">=</span> <span class="n">OMEGA_OPT</span> <span class="o">-</span> <span class="mf">1.0</span>
+
+<span class="n">D_diag</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">diagonal</span><span class="p">()</span>
+<span class="n">L_strict</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">tril</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;csr&quot;</span><span class="p">)</span>
+
+
+
+<span class="c1"># instrument: the rate meter — WHERE to place its window is this notebook&#39;s</span>
+<span class="c1"># lesson (taught in the exercises); the two-line ratio itself is not.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">windowed_rate</span><span class="p">(</span><span class="n">hist</span><span class="p">,</span> <span class="n">k0</span><span class="p">,</span> <span class="n">k1</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The geometric decay rate measured between sweeps k0 and k1.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">hist</span><span class="p">[</span><span class="n">k1</span><span class="p">]</span> <span class="o">/</span> <span class="n">hist</span><span class="p">[</span><span class="n">k0</span><span class="p">])</span> <span class="o">**</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">k1</span> <span class="o">-</span> <span class="n">k0</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-jacobi-the-rate-is-an-eigenvalue">
+<h2>Exercise 1: Jacobi: the rate is an eigenvalue<a class="headerlink" href="#exercise-1-jacobi-the-rate-is-an-eigenvalue" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-cg-split">Eq. 235</a> says convergence <em>is</em> spectral radius. This exercise
+builds the cheapest splitting and confirms that claim to four digits.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">sweep_history(M_solve,</span> <span class="pre">iters)</span></code> — the stationary iteration
+of <a class="reference internal" href="#equation-eq-cg-split">Eq. 235</a> as a loop that records relative residuals — and run the
+Jacobi sweep with <span class="math notranslate nohighlight">\(M^{-1}r = r / \operatorname{diag}(A)\)</span> (elementwise),
+1200 sweeps from <span class="math notranslate nohighlight">\(x_0 = 0\)</span>.</p>
+<p><strong>Write this one yourself</strong> — the sweep is the lesson, and every method in
+this notebook runs through the driver you build here.</p>
+<p><strong>Part b)</strong> Form the iteration matrix <span class="math notranslate nohighlight">\(B_{\text{J}} = I - D^{-1}A\)</span> densely,
+and confirm its spectrum is the closed form
+<span class="math notranslate nohighlight">\(\lambda_{jk} = \tfrac12(\cos\tfrac{j\pi}{21} + \cos\tfrac{k\pi}{21})\)</span> —
+<a class="reference internal" href="sparse-matrices.html"><span class="std std-doc">§5.3</span></a>’s Kronecker structure again — via
+<code class="docutils literal notranslate"><span class="pre">np.linalg.eigvals</span></code> sorted against the outer-sum prediction, to <span class="math notranslate nohighlight">\(10^{-10}\)</span>.</p>
+<p><strong>Part c)</strong> Measure the decay rate over sweeps 600–1100 with
+<code class="docutils literal notranslate"><span class="pre">windowed_rate</span></code> and confirm it equals <span class="math notranslate nohighlight">\(\rho(B_{\text{J}}) = \mu =
+\cos(\pi/21) = 0.98883\)</span> to 1% — the manifest asked 5%; the measurement
+delivers 0.004%, and the gate tightens to what the mathematics supports.</p>
+<p><strong>Part d)</strong> Price the pain: at rate <span class="math notranslate nohighlight">\(\mu\)</span>, one decimal digit costs
+<span class="math notranslate nohighlight">\(\ln 10 / (1 - \mu) \approx 206\)</span> sweeps. The naive schedule from sweep
+zero, <span class="math notranslate nohighlight">\(\ln(10^{-5})/\ln\mu \approx 1025\)</span>, arrives 26% late: the initial
+error’s fast modes (small <span class="math notranslate nohighlight">\(|\lambda|\)</span> in <span class="math notranslate nohighlight">\(B_{\text{J}}\)</span>) die in the first
+sweeps and donate two digits for free. Predict the crossing honestly — the
+asymptotic line through sweep 600, <span class="math notranslate nohighlight">\(k_\star = 600 +
+\ln(10^{-5}/h_{600})/\ln\mu\)</span> — and confirm the observed crossing within
+5%. Report both predictions.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Jacobi iteration-matrix spectrum vs closed form: 9.10e-15
+rho(B_J) = 0.988831; mu = cos(pi/21) = 0.988831
+measured rate over sweeps 600-1100: 0.988831 (0.0000% from rho)
+one digit costs ln10/(1-mu) = 206 sweeps
+1e-5 crossing: naive schedule 1025, asymptotic line 758, observed 759 — the fast modes donate two digits
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the Jacobi iteration matrix has the closed-form Poisson spectrum   [the outer sum of cosines — 5.3&#39;s Kronecker structure in the splitting [9.10383e-15 &lt; 1e-10]]
+✓  and the measured decay rate IS the spectral radius, to 1%   [0.988831 against mu = 0.988831: Eq. 1&#39;s promise, measured at 0.004% — the manifest&#39;s 5% was pessimistic for a diagonalizable B]
+✓  and five digits arrive on the asymptotic-line schedule, within 5%   [observed sweep 759 against the extrapolated 758 (the naive from-sweep-zero schedule said 1025, 26% late — fast modes die first): the 1/(1-rho) tax, priced honestly]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-gaussseidel-and-sor-squaring-the-rate-then-breaking-the-gate">
+<h2>Exercise 2: Gauss–Seidel and SOR: squaring the rate, then breaking the gate<a class="headerlink" href="#exercise-2-gaussseidel-and-sor-squaring-the-rate-then-breaking-the-gate" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-cg-rates">Eq. 236</a> promises <span class="math notranslate nohighlight">\(\rho_{\text{GS}} = \mu^2\)</span> (twice the speed) and
+optimal SOR at <span class="math notranslate nohighlight">\(\omega_{\text{opt}} - 1\)</span> (a different exponent). One of the
+manifest’s gates does not survive contact with the second promise.</p>
+<p><strong>Part a)</strong> Implement Gauss–Seidel as <a class="reference internal" href="#equation-eq-cg-split">Eq. 235</a> with
+<span class="math notranslate nohighlight">\(M = D + L\)</span>: build <code class="docutils literal notranslate"><span class="pre">sp.csr_matrix(sp.diags(D_diag)</span> <span class="pre">+</span> <span class="pre">L_strict)</span></code> once and
+apply <span class="math notranslate nohighlight">\(M^{-1}\)</span> with <code class="docutils literal notranslate"><span class="pre">scipy.sparse.linalg.spsolve_triangular(...,</span> <span class="pre">lower=True)</span></code>.
+Run 900 sweeps; confirm the windowed rate (sweeps 400–800) equals
+<span class="math notranslate nohighlight">\(\mu^2 = 0.97779\)</span> to 1%.</p>
+<p><strong>Part b)</strong> Implement SOR with <span class="math notranslate nohighlight">\(M = D/\omega + L\)</span> at
+<span class="math notranslate nohighlight">\(\omega_{\text{opt}} = 1.74058\)</span>. Count sweeps to <span class="math notranslate nohighlight">\(10^{-8}\)</span> for both methods
+and gate the manifest’s claim: SOR beats Gauss–Seidel by at least <span class="math notranslate nohighlight">\(5\times\)</span>
+(measured: <span class="math notranslate nohighlight">\(673/71 \approx 9.5\times\)</span>).</p>
+<p><strong>Part c)</strong> Now the measurement trap. At <span class="math notranslate nohighlight">\(\rho = 0.74058\)</span> the residual
+crosses the rounding floor near sweep 105, and a window that touches the
+stagnant tail — sweeps 80–160, say — reports a “rate” of <strong>0.84</strong>,
+fourteen percent high: not physics, just a flat line averaged into a
+slope. Measure in the clean band instead (sweeps 30–90, residuals
+<span class="math notranslate nohighlight">\(10^{-3}\)</span> to <span class="math notranslate nohighlight">\(10^{-11}\)</span>) and the rate matches <span class="math notranslate nohighlight">\(\rho\)</span> to 0.5%, well inside
+the manifest’s 5%. Report both windows; gate the clean one. Two footnotes
+from <a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html"><span class="std std-doc">§3.5</span></a>: at exactly
+<span class="math notranslate nohighlight">\(\omega_{\text{opt}}\)</span> the eigenvalue pairs coalesce and <span class="math notranslate nohighlight">\(B\)</span> is defective,
+so windows are mildly biased even before stagnation; and for
+<span class="math notranslate nohighlight">\(\omega &gt; \omega_{\text{opt}}\)</span> the spectrum is complex with modulus
+exactly <span class="math notranslate nohighlight">\(\omega - 1\)</span> — confirm the rate at <span class="math notranslate nohighlight">\(\omega = 1.9\)</span> (sweeps
+150–260, ending before the run meets its rounding floor) to 2.5%.</p>
+<p><strong>Part d)</strong> Draw <span class="math notranslate nohighlight">\(\rho\)</span> against <span class="math notranslate nohighlight">\(\omega\)</span>: compute
+<span class="math notranslate nohighlight">\(\rho(I - M_\omega^{-1}A)\)</span> by <code class="docutils literal notranslate"><span class="pre">np.linalg.eigvals</span></code> on the dense iteration
+matrix over <span class="math notranslate nohighlight">\(\omega \in [1.0, 1.98]\)</span>, mark <span class="math notranslate nohighlight">\(\omega_{\text{opt}}\)</span>, and
+overlay the theory: the falling branch below, the line <span class="math notranslate nohighlight">\(\omega - 1\)</span> above.
+Gate that the grid’s minimizer lands within one grid step of
+<span class="math notranslate nohighlight">\(\omega_{\text{opt}}\)</span> and that <span class="math notranslate nohighlight">\(\rho(\omega) = \omega - 1\)</span> on the complex
+side to <span class="math notranslate nohighlight">\(10^{-4}\)</span> — eigenvalues of a nearly defective matrix are themselves
+<span class="math notranslate nohighlight">\(\sqrt{\varepsilon}\)</span>-grade, per <a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html"><span class="std std-doc">§3.5</span></a>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Gauss-Seidel rate: 0.977786 vs mu^2 = 0.977786 (0.0000%)
+sweeps to 1e-8: GS 673, SOR(omega_opt) 71 -&gt; 9.5x
+SOR rate at omega_opt, clean band [30,90]: 0.7367 vs rho 0.7406 (0.52%)
+same run, stagnation-polluted window [80,160]: 0.8432 — 14% high, a flat rounding tail averaged into the slope (reported, NOT gated)
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>SOR rate at omega = 1.9 (diagonalizable, complex spectrum): 0.9002 vs 0.9 exactly (0.02%)
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>rho-vs-omega grid: minimizer at omega = 1.776 (opt 1.741, step 0.041); complex side vs omega-1: 1.2e-14
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-cg-omega">
+<img alt="../../_images/b8c5c1b87d55f618b7ed712c734977924f0e76a0e4b86d703f054e0239cc70f3.png" src="../../_images/b8c5c1b87d55f618b7ed712c734977924f0e76a0e4b86d703f054e0239cc70f3.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 101 </span><span class="caption-text">The spectral radius of the SOR iteration matrix against <span class="math notranslate nohighlight">\(\omega\)</span> for the 400-unknown Poisson system: computed eigenvalues (dots) on the theory (line) – the slow falling branch below <span class="math notranslate nohighlight">\(\omega_{\text{opt}} = 1.741\)</span> and the straight line <span class="math notranslate nohighlight">\(\rho = \omega - 1\)</span> above, where the spectrum is complex. The minimum is a kink, not a bowl: undershooting <span class="math notranslate nohighlight">\(\omega\)</span> costs far more than overshooting, which is why practical codes guess high. At the kink itself the eigenvalue pairs coalesce and the iteration matrix is defective – the pathology of 3.5, sitting exactly at the parameter every practitioner wants.</span><a class="headerlink" href="#fig-cg-omega" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<p>The stagnation-polluted window is <em>reported</em>, never gated — a rate
+measured through the rounding floor is a property of the floor. The gates
+sit where the measurement is clean: rates in the live decay band, the
+iteration counts, and the <span class="math notranslate nohighlight">\(\omega - 1\)</span> line.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  Gauss-Seidel converges at exactly mu-squared: twice Jacobi&#39;s speed   [measured 0.977786 vs 0.977786 (0.0000%) — one fresh-values sweep is worth two Jacobi sweeps, per Eq. 2]
+✓  SOR at the optimal omega beats Gauss-Seidel by more than 5x   [673 vs 71 sweeps to 1e-8: 9.5x — over-relaxation changes the exponent, not the constant]
+✓  SOR&#39;s clean-band rate matches omega_opt - 1 to 5%, and omega = 1.9 matches 0.9 to 2.5%   [clean band 0.7367 vs 0.7406 (0.5%); the polluted window read 0.8432 (14% high) — the same run, so the gate&#39;s job is choosing the window]
+✓  the computed rho(omega) curve has its minimum at omega_opt and follows omega - 1 above it   [minimizer within a grid step of 1.7406; complex-side gap 1.2e-14 at sqrt-eps-grade eigenvalue accuracy (3.5)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-steepest-descent-zig-zags-conjugacy-does-not">
+<h2>Exercise 3: Steepest descent zig-zags; conjugacy does not<a class="headerlink" href="#exercise-3-steepest-descent-zig-zags-conjugacy-does-not" title="Link to this heading">#</a></h2>
+<p>Before CG in production, CG in a picture. On a <span class="math notranslate nohighlight">\(2\times2\)</span> system every
+claim is visible.</p>
+<p><strong>Part a)</strong> Implement steepest descent for
+<span class="math notranslate nohighlight">\(A_2 = \operatorname{diag}(1, 9)\)</span>, <span class="math notranslate nohighlight">\(b = 0\)</span>, from the classic worst start
+<span class="math notranslate nohighlight">\(x_0 = (9, 1)\)</span>: repeat <span class="math notranslate nohighlight">\(r = -A_2x\)</span>,
+<span class="math notranslate nohighlight">\(\alpha = r^{\top}r/r^{\top}A_2r\)</span>, <span class="math notranslate nohighlight">\(x \mathrel{+}= \alpha r\)</span> for 12 steps,
+storing the path.</p>
+<p><strong>Part b)</strong> Gate the exact worst-case law: every step contracts the
+<span class="math notranslate nohighlight">\(A\)</span>-norm error by <span class="math notranslate nohighlight">\((\kappa-1)/(\kappa+1) = 8/10\)</span> — measured contractions
+match <span class="math notranslate nohighlight">\(0.8\)</span> to <span class="math notranslate nohighlight">\(10^{-12}\)</span>, a dimensionless exact ratio in the sense of
+<a class="reference internal" href="norms-conditioning-stability.html"><span class="std std-doc">§5.1</span></a>’s rules.</p>
+<p><strong>Part c)</strong> Run a compact CG on the <span class="math notranslate nohighlight">\(2\times2\)</span> — the local <code class="docutils literal notranslate"><span class="pre">cg_path</span></code>
+defined in this solution, a stripped-down preview of the <code class="docutils literal notranslate"><span class="pre">cg_solve</span></code> you
+write in Exercise 4 — from the same start: it reaches the minimum in exactly
+<strong>two</strong> steps — finite termination at <span class="math notranslate nohighlight">\(n = 2\)</span> — with final error below
+<span class="math notranslate nohighlight">\(10^{-10}\)</span>.</p>
+<p><strong>Part d)</strong> Draw both paths over the contours of
+<span class="math notranslate nohighlight">\(\phi(x) = \tfrac12x^{\top}A_2x\)</span>: the 45-degree zig-zag against the
+two-segment path. This is <a class="reference internal" href="#equation-eq-cg-opt">Eq. 237</a> in miniature: steepest descent
+re-loses old progress in every new direction; <span class="math notranslate nohighlight">\(A\)</span>-orthogonal directions
+never do.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>steepest-descent contractions: 0.800000000000 ... — all equal (kappa-1)/(kappa+1) = 0.8 to 2.2e-16
+CG from the same start: 2 steps, final error 2.2e-16 (finite termination at n = 2)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-cg-zigzag">
+<img alt="../../_images/4b257700f539d28bfb4162d061a19145b96961e96d727be80a9b6137076f026a.png" src="../../_images/4b257700f539d28bfb4162d061a19145b96961e96d727be80a9b6137076f026a.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 102 </span><span class="caption-text">Twelve steps of steepest descent (amber) against two steps of conjugate gradients (ink) on the contours of <span class="math notranslate nohighlight">\(\frac12 x^{\top}\!Ax\)</span> with <span class="math notranslate nohighlight">\(\kappa = 9\)</span>, from the worst-case start <span class="math notranslate nohighlight">\((9, 1)\)</span>. Each descent step is orthogonal to the last – the zig-zag – and contracts the <span class="math notranslate nohighlight">\(A\)</span>-norm error by exactly <span class="math notranslate nohighlight">\((\kappa-1)/(\kappa+1) = 0.8\)</span>, so twelve steps still have not arrived. CG’s second direction is <span class="math notranslate nohighlight">\(A\)</span>-orthogonal to the first, the minimization along direction one is never un-done, and the exact answer arrives in <span class="math notranslate nohighlight">\(n = 2\)</span> steps.</span><a class="headerlink" href="#fig-cg-zigzag" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  every steepest-descent step contracts by exactly (kappa-1)/(kappa+1)   [a dimensionless exact ratio from the worst-case start — the rare legitimate tight constant, per 5.1&#39;s rules [2.22045e-16 &lt; 1e-12]]
+✓  while CG terminates in exactly n = 2 steps (Eq. 3)   [two A-orthogonal directions span the plane, and minimizations along them never interfere [2.22045e-16 &lt; 1e-10]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-conjugate-gradients-and-the-fiction-of-exactness">
+<h2>Exercise 4: Conjugate gradients, and the fiction of exactness<a class="headerlink" href="#exercise-4-conjugate-gradients-and-the-fiction-of-exactness" title="Link to this heading">#</a></h2>
+<p>Now the real thing, on the 400-unknown Poisson system.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">cg_solve(A,</span> <span class="pre">b,</span> <span class="pre">tol)</span></code> — the Hestenes–Stiefel recurrence
+<span class="bibtex-citation" id="id5">[<a class="reference internal" href="#id26" title="Magnus R. Hestenes and Eduard Stiefel. Methods of conjugate gradients for solving linear systems. Journal of Research of the National Bureau of Standards, 49(6):409–436, 1952. doi:10.6028/jres.049.044.">HS52</a>]</span>: <span class="math notranslate nohighlight">\(\alpha_k = r_k^{\top}r_k / p_k^{\top}Ap_k\)</span>, update
+<span class="math notranslate nohighlight">\(x, r\)</span>, then <span class="math notranslate nohighlight">\(\beta_k = r_{k+1}^{\top}r_{k+1} / r_k^{\top}r_k\)</span> and
+<span class="math notranslate nohighlight">\(p_{k+1} = r_{k+1} + \beta_k p_k\)</span>. Store every <span class="math notranslate nohighlight">\(p_k\)</span> and <span class="math notranslate nohighlight">\(r_k\)</span>. Stop at
+relative residual <span class="math notranslate nohighlight">\(10^{-13}\)</span> (the manifest’s absolute <span class="math notranslate nohighlight">\(10^{-12}\)</span>, made
+scale-free).</p>
+<p><strong>Write this one yourself</strong> — ten lines that replaced Gaussian elimination
+for half of computational science.</p>
+<p><strong>Part b)</strong> Convergence: it reaches <span class="math notranslate nohighlight">\(10^{-13}\)</span> in <strong>84</strong> iterations —
+under <span class="math notranslate nohighlight">\(\kappa\)</span>’s pessimism, under <span class="math notranslate nohighlight">\(n = 400\)</span>, and under the
+<a class="reference internal" href="#equation-eq-cg-bound">Eq. 238</a> budget <span class="math notranslate nohighlight">\(\tfrac12\sqrt{\kappa}\ln(2/10^{-13}) \approx 204\)</span>
+(gated one-sidedly, with <span class="math notranslate nohighlight">\(\kappa = (1+c)/(1-c) = 178\)</span> for
+<span class="math notranslate nohighlight">\(c = \cos(\pi/21)\)</span>, from the closed-form 2-D Poisson spectrum
+<span class="math notranslate nohighlight">\(\lambda_{jk} = \lambda_j + \lambda_k\)</span> established in
+<a class="reference internal" href="sparse-matrices.html"><span class="std std-doc">§5.3</span></a>).</p>
+<p><strong>Part c)</strong> The two orthogonalities, normalized: adjacent pairs obey
+<span class="math notranslate nohighlight">\(|p_k^{\top}Ap_{k+1}| / (\lVert p_k\rVert_A \lVert p_{k+1}\rVert_A) &lt;
+10^{-12}\)</span> and likewise for consecutive residuals — the recurrences enforce
+them directly, so machine-level is gateable. The manifest’s blanket
+“<span class="math notranslate nohighlight">\(p_i^{\top}Ap_j = 0\)</span> to <span class="math notranslate nohighlight">\(10^{-10}\)</span>” is <strong>false across the run</strong>: report
+the worst distant pair (about <span class="math notranslate nohighlight">\(10^{-5}\)</span>) — orthogonality decays through
+accumulated rounding, finite termination is exact-arithmetic fiction, and
+CG works anyway because <a class="reference internal" href="#equation-eq-cg-opt">Eq. 237</a> degrades gracefully.</p>
+<p><strong>Part d)</strong> Confirm against the library: <code class="docutils literal notranslate"><span class="pre">scipy.sparse.linalg.cg</span></code> at
+<code class="docutils literal notranslate"><span class="pre">rtol=1e-13</span></code> agrees with <code class="docutils literal notranslate"><span class="pre">cg_solve</span></code> to <span class="math notranslate nohighlight">\(10^{-10}\)</span> — comfortably above the
+<span class="math notranslate nohighlight">\(\kappa\varepsilon\lVert x\rVert\)</span> floor that
+<a class="reference internal" href="norms-conditioning-stability.html"><span class="std std-doc">§5.1</span></a> prices for two backward-stable
+solvers.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CG on n = 400, kappa = 178: converged in 84 iterations (bound budget 204, n = 400)
+A-orthogonality (normalized): adjacent 1.3e-15, worst distant pair 8.3e-06
+residual orthogonality:       adjacent 1.2e-15, worst distant pair 6.4e-06
+adjacent pairs are enforced by the recurrence; distant pairs decay — finite termination is exact-arithmetic fiction
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>cg_solve vs scipy.sparse.linalg.cg: 0.0e+00 (kappa*eps*|x| floor ~ 1e-13, info = 0)
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  CG converges within the sqrt-kappa budget, far under n   [84 iterations against the Eq. 4 budget of 204 and n = 400 — the one-sided promise, gated one-sidedly]
+✓  adjacent search directions are A-orthogonal and adjacent residuals orthogonal at machine level   [normalized: 1.3e-15 and 1.2e-15 — these the recurrence enforces directly, so machine-level IS gateable]
+worst distant pairs, reported and not gated: 8.3e-06 and 6.4e-06 — the blanket 1e-10 across all pairs is exact-arithmetic fiction, and the drift magnitude is the machine&#39;s business (rule 4)
+✓  and cg_solve matches scipy&#39;s cg   [0.0e+00 against a kappa*eps floor of 1e-13 — two implementations of the same recurrence at the same tolerance [0 &lt; 1e-10]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-the-bound-and-the-race">
+<h2>Exercise 5: The √κ bound, and the race<a class="headerlink" href="#exercise-5-the-bound-and-the-race" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-cg-bound">Eq. 238</a> is CG’s headline: <span class="math notranslate nohighlight">\(\sqrt{\kappa}\)</span> where steepest descent
+and every stationary method pay <span class="math notranslate nohighlight">\(\kappa\)</span>-like prices.</p>
+<p><strong>Part a)</strong> Track the true <span class="math notranslate nohighlight">\(A\)</span>-norm error <span class="math notranslate nohighlight">\(\lVert x_k - x_\star\rVert_A\)</span>
+(against the factored reference <code class="docutils literal notranslate"><span class="pre">x_star</span></code>) at every CG iteration, and draw it
+under the bound <span class="math notranslate nohighlight">\(2q^k\lVert e_0\rVert_A\)</span>, <span class="math notranslate nohighlight">\(q = (\sqrt{\kappa}-1)/(\sqrt{\kappa}+1)\)</span>.</p>
+<p><strong>Part b)</strong> Gate the theorem one-sidedly: the error never exceeds the bound
+while it stands above the rounding floor <span class="math notranslate nohighlight">\(10^{-14}\lVert e_0\rVert_A\)</span>.
+Report the minimum slack — about <span class="math notranslate nohighlight">\(1.8\times\)</span>, the bound nearly attained,
+because the Poisson spectrum is close to the Chebyshev worst case that
+proves <a class="reference internal" href="#equation-eq-cg-bound">Eq. 238</a>. The thinness is mathematics, not a margin
+problem.</p>
+<p><strong>Part c)</strong> The race: residual histories for Jacobi, Gauss–Seidel,
+SOR(<span class="math notranslate nohighlight">\(\omega_{\text{opt}}\)</span>) and CG on one log axis. Gate the finishing
+order at <span class="math notranslate nohighlight">\(10^{-8}\)</span>: CG &lt; SOR &lt; GS &lt; Jacobi (Jacobi never arrives in 1200
+sweeps — count it as its horizon). Note
+what the plot hides: a CG iteration and a stationary sweep both cost one
+matvec-grade <span class="math notranslate nohighlight">\(O(\mathrm{nnz})\)</span> pass, so the x-axis really is work.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>sqrt-kappa bound: 0 violations over 84 live iterations; minimum slack 1.8x (nearly attained — Poisson is close to the Chebyshev worst case)
+sweeps/iterations to 1e-8: CG 65, SOR 71, GS 673, Jacobi &gt;1200
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-cg-race">
+<img alt="../../_images/7d1fe82b8c1b570bc8221f8f75324392ca3a214801788bb7f61f3ea87db0d392.png" src="../../_images/7d1fe82b8c1b570bc8221f8f75324392ca3a214801788bb7f61f3ea87db0d392.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 103 </span><span class="caption-text">Left: the true <span class="math notranslate nohighlight">\(A\)</span>-norm error of CG (ink) under the <span class="math notranslate nohighlight">\(\sqrt{\kappa}\)</span> bound of Eq. 4 (dashed) on the 400-unknown Poisson system, <span class="math notranslate nohighlight">\(\kappa = 178\)</span>: zero violations, minimum slack <span class="math notranslate nohighlight">\(1.8\times\)</span> – the bound is nearly attained because the Poisson spectrum approaches the Chebyshev worst case, and the error dives through the floor at iteration 84 where finite-precision CG stops. Right: the race to <span class="math notranslate nohighlight">\(10^{-8}\)</span> relative residual – CG in 65 matvec-grade passes, optimal SOR in 71, Gauss–Seidel in 673, Jacobi still above the line at its 1200-sweep horizon, on schedule to cross near sweep 1370. Both panels share the moral: the exponent is the algorithm.</span><a class="headerlink" href="#fig-cg-race" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the A-norm error never exceeds the sqrt-kappa bound (Eq. 4)   [one-sided over 84 live iterations; minimum slack 1.8x is the theorem&#39;s own sharpness on a near-Chebyshev spectrum, not a tolerance to widen]
+✓  and the race finishes CG &lt; SOR &lt; GS, with Jacobi over the horizon   [65 vs 71 vs 673 passes to 1e-8, Jacobi unfinished at 1200 — each pass costs the same O(nnz), so the order is the algorithms&#39;, not the implementations&#39;]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-6-cg-counts-eigenvalues-not-unknowns">
+<h2>Exercise 6: CG counts eigenvalues, not unknowns<a class="headerlink" href="#exercise-6-cg-counts-eigenvalues-not-unknowns" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-cg-opt">Eq. 237</a> says the error after <span class="math notranslate nohighlight">\(k\)</span> steps is <span class="math notranslate nohighlight">\(p_k(A)e_0\)</span> over
+polynomials with <span class="math notranslate nohighlight">\(p_k(0) = 1\)</span>. A polynomial with roots at every eigenvalue
+kills the error entirely — so CG’s true iteration count is the number of
+<em>distinct eigenvalues</em>, and <span class="math notranslate nohighlight">\(\kappa\)</span> is only a proxy.</p>
+<p><strong>Part a)</strong> Build a <span class="math notranslate nohighlight">\(50\times50\)</span> SPD matrix with exactly five distinct
+eigenvalues <span class="math notranslate nohighlight">\(\{1, 3, 5, 7, 9\}\)</span>, each tenfold: <code class="docutils literal notranslate"><span class="pre">np.linalg.qr</span></code> on a fixed
+Gaussian for <span class="math notranslate nohighlight">\(Q\)</span>, then <span class="math notranslate nohighlight">\(Q\Lambda Q^{\top}\)</span>, symmetrized. Run <code class="docutils literal notranslate"><span class="pre">cg_solve</span></code> at
+relative tolerance <span class="math notranslate nohighlight">\(10^{-10}\)</span>.</p>
+<p><strong>Part b)</strong> Gate the count: convergence in <strong>exactly 5</strong> iterations. Four
+roots cannot annihilate five eigenvalues (the error <em>must</em> stay large), and
+the fifth-degree polynomial <span class="math notranslate nohighlight">\(\prod_i(1 - \lambda/\lambda_i)\)</span> finishes the
+job — the count is determined by the mathematics on both sides.</p>
+<p><strong>Part c)</strong> The extreme case: two distinct eigenvalues <span class="math notranslate nohighlight">\(\{1, 10^4\}\)</span> —
+<span class="math notranslate nohighlight">\(\kappa = 10^4\)</span>, so <a class="reference internal" href="#equation-eq-cg-bound">Eq. 238</a> budgets hundreds of iterations — and
+CG converges in <strong>exactly 2</strong>. Gate it: conditioning bounds are worst-case
+over spectra, and a two-point spectrum is nobody’s worst case.</p>
+<p><strong>Part d)</strong> Reconcile with Exercise 5: the Poisson spectrum has 210
+distinct values in <span class="math notranslate nohighlight">\([\lambda_{\min}, \lambda_{\max}]\)</span> spread almost
+continuously, which is <em>why</em> the <span class="math notranslate nohighlight">\(\sqrt{\kappa}\)</span> bound was nearly attained
+there. Clustering is the whole game — and manufacturing it is called
+preconditioning, next notebook’s subject.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>five distinct eigenvalues, n = 50, kappa = 9: CG converged in 5 iterations
+two distinct eigenvalues,  n = 50, kappa = 1e4: CG converged in 2 iterations (the Eq. 4 budget said 1186)
+the Poisson matrix, for contrast: 195 distinct eigenvalues in a near-continuum — which is why Exercise 5&#39;s bound was tight
+</pre></div>
+</div>
+</div>
+</div>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p>Exercise 6 makes preconditioning inevitable: if clustering the spectrum is
+the game, ask your assistant for <code class="docutils literal notranslate"><span class="pre">cg_jacobi_preconditioned(A,</span> <span class="pre">b,</span> <span class="pre">tol)</span></code> —
+preconditioned CG with <span class="math notranslate nohighlight">\(M = \operatorname{diag}(A)\)</span> — and check it against
+the mathematics rather than a demo: (i) on the Poisson system, where the
+diagonal is constant, Jacobi preconditioning is a pure rescaling and the
+iteration count must NOT improve (equal to plain CG’s, ±1); (ii) on the
+same system rescaled by <code class="docutils literal notranslate"><span class="pre">D</span> <span class="pre">=</span> <span class="pre">diag(10**rng.uniform(-2,</span> <span class="pre">2,</span> <span class="pre">n))</span></code> as
+<span class="math notranslate nohighlight">\(DAD\)</span>, plain CG slows down by an order of magnitude and the preconditioned
+count returns near the original; (iii) every preconditioned residual
+satisfies the same adjacent-orthogonality checks as Exercise 4, in the
+<span class="math notranslate nohighlight">\(M^{-1}\)</span> inner product. The check is yours.</p>
+</div>
+<section id="validation-6">
+<h3>Validation 6<a class="headerlink" href="#validation-6" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  CG on a five-eigenvalue matrix terminates in exactly five iterations   [four roots cannot annihilate five eigenvalues and five can — the count is pinned by mathematics on both sides, so an exact integer is gateable]
+✓  and two distinct eigenvalues finish in two, at kappa = 1e4   [the sqrt-kappa budget said 1186: conditioning bounds are worst-case over spectra, and a two-point spectrum is nobody&#39;s worst case]
+✓  while the Poisson spectrum is a near-continuum   [195 distinct eigenvalues out of 400: no short polynomial kills it, which is why Eq. 4 was nearly attained in Exercise 5 and why preconditioning exists]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p><strong>The rate is an eigenvalue — measured in the clean band.</strong> Jacobi,
+Gauss–Seidel and optimal SOR matched their closed-form spectral radii
+(<span class="math notranslate nohighlight">\(\mu = \cos(\pi/21)\)</span>, <span class="math notranslate nohighlight">\(\mu^2\)</span>, <span class="math notranslate nohighlight">\(\omega_{\text{opt}} - 1\)</span>) to 0.5% or
+better, and the Jacobi iteration matrix’s full spectrum matched the cosine
+outer sum to <span class="math notranslate nohighlight">\(10^{-12}\)</span>. The measurement traps were the lesson: a window
+touching the rounding floor read SOR’s rate 14% high, and Jacobi’s naive
+from-sweep-zero schedule ran 26% late against the asymptotic line (fast
+modes die first — observed crossing within a fraction of a percent of the
+honest extrapolation). Above the kink, <span class="math notranslate nohighlight">\(\omega = 1.9\)</span> decayed at modulus
+<span class="math notranslate nohighlight">\(\omega - 1\)</span>; optimal SOR beat Gauss–Seidel <span class="math notranslate nohighlight">\(9.5\times\)</span> to
+<span class="math notranslate nohighlight">\(10^{-8}\)</span>, gated as counts.</p>
+<p><strong>Descent zig-zags; conjugacy doesn’t.</strong> Worst-case steepest descent
+contracted by exactly <span class="math notranslate nohighlight">\((\kappa-1)/(\kappa+1) = 0.8\)</span> per step (gated at
+<span class="math notranslate nohighlight">\(10^{-12}\)</span> as a dimensionless exact ratio), while CG finished the same
+<span class="math notranslate nohighlight">\(2\times2\)</span> in its two-step entitlement.</p>
+<p><strong>CG’s orthogonality is local truth, global fiction.</strong> Adjacent direction
+and residual pairs were orthogonal at <span class="math notranslate nohighlight">\(10^{-15}\)</span> (the recurrence enforces
+them; gated), distant pairs had drifted to <span class="math notranslate nohighlight">\(10^{-5}\)</span> (reported — the drift’s
+size is the machine’s business), and convergence at 84 iterations on
+<span class="math notranslate nohighlight">\(\kappa = 178\)</span> sat inside the <span class="math notranslate nohighlight">\(\sqrt{\kappa}\)</span> budget of 204 with the
+<span class="math notranslate nohighlight">\(2q^k\)</span> bound never violated and nearly attained (minimum slack <span class="math notranslate nohighlight">\(1.8\times\)</span> —
+the theorem’s sharpness, not a tolerance problem). <code class="docutils literal notranslate"><span class="pre">cg_solve</span></code> matched
+<code class="docutils literal notranslate"><span class="pre">scipy.sparse.linalg.cg</span></code> to <span class="math notranslate nohighlight">\(10^{-13}\)</span>.</p>
+<p><strong>CG counts eigenvalues, not unknowns.</strong> Five distinct eigenvalues:
+exactly 5 iterations. Two distinct eigenvalues at <span class="math notranslate nohighlight">\(\kappa = 10^4\)</span>: exactly
+2, against a <span class="math notranslate nohighlight">\(\sqrt{\kappa}\)</span> budget of 1186. The Poisson near-continuum
+(210 distinct values) is why its bound was tight — and clustering a
+spectrum on purpose is the next notebook’s subject.</p>
+<p><strong>Methods introduced.</strong> Matrix splittings and iteration matrices, the
+Jacobi/Gauss–Seidel/SOR sweeps via <code class="docutils literal notranslate"><span class="pre">spsolve_triangular</span></code>, windowed rate
+measurement, <span class="math notranslate nohighlight">\(\rho(\omega)\)</span> curves, steepest descent with exact line
+search, Hestenes–Stiefel CG with stored directions, normalized
+orthogonality autopsies, the <span class="math notranslate nohighlight">\(\sqrt{\kappa}\)</span> bound, and spectrum-counting
+termination.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Preconditioning.</strong> Everything here assumed <span class="math notranslate nohighlight">\(A\)</span> as given; the real craft
+is replacing <span class="math notranslate nohighlight">\(Ax = b\)</span> by <span class="math notranslate nohighlight">\(M^{-1}Ax = M^{-1}b\)</span> with a cheap <span class="math notranslate nohighlight">\(M\)</span> that
+clusters the spectrum. <a class="reference internal" href="krylov-gmres-preconditioning.html"><span class="std std-doc">§5.5</span></a> builds
+incomplete factorizations and watches the iteration counts collapse.</p></li>
+<li><p><strong>Nonsymmetric systems.</strong> CG’s optimality leans on SPD structure. For
+general <span class="math notranslate nohighlight">\(A\)</span> the Krylov idea survives as GMRES <span class="bibtex-citation" id="id6">[<a class="reference internal" href="#id27" title="Youcef Saad and Martin H. Schultz. GMRES: a generalized minimal residual algorithm for solving nonsymmetric linear systems. SIAM Journal on Scientific and Statistical Computing, 7(3):856–869, 1986. doi:10.1137/0907058.">SS86</a>]</span> —
+also next notebook — at the price of storing the whole basis.</p></li>
+<li><p><strong>The Lanczos connection.</strong> CG’s scalars secretly tridiagonalize <span class="math notranslate nohighlight">\(A\)</span>;
+run long enough, its Ritz values approximate eigenvalues, and the
+orthogonality drift measured in Exercise 4 becomes the central
+difficulty of large-scale eigensolvers.</p></li>
+<li><p><strong>Multigrid.</strong> For the Poisson family specifically, the optimal solver is
+neither sweep nor Krylov: multigrid uses Jacobi-like smoothing across a
+grid hierarchy and converges in <span class="math notranslate nohighlight">\(O(1)\)</span> cycles — the stationary methods of
+this notebook, promoted to components.</p></li>
+</ul>
+<div class="docutils container" id="id7">
+<div role="list" class="citation-list">
+<div class="citation" id="id16" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">GVL13</a><span class="fn-bracket">]</span></span>
+<p>Gene H. Golub and Charles F. Van Loan. <em>Matrix Computations</em>. Johns Hopkins University Press, Baltimore, 4 edition, 2013.</p>
+</div>
+<div class="citation" id="id26" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>HS52<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id5">2</a>)</span>
+<p>Magnus R. Hestenes and Eduard Stiefel. Methods of conjugate gradients for solving linear systems. <em>Journal of Research of the National Bureau of Standards</em>, 49(6):409–436, 1952. <a class="reference external" href="https://doi.org/10.6028/jres.049.044">doi:10.6028/jres.049.044</a>.</p>
+</div>
+<div class="citation" id="id27" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id6">SS86</a><span class="fn-bracket">]</span></span>
+<p>Youcef Saad and Martin H. Schultz. GMRES: a generalized minimal residual algorithm for solving nonsymmetric linear systems. <em>SIAM Journal on Scientific and Statistical Computing</em>, 7(3):856–869, 1986. <a class="reference external" href="https://doi.org/10.1137/0907058">doi:10.1137/0907058</a>.</p>
+</div>
+<div class="citation" id="id20" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">Saa03</a><span class="fn-bracket">]</span></span>
+<p>Yousef Saad. <em>Iterative Methods for Sparse Linear Systems</em>. SIAM, Philadelphia, 2 edition, 2003. <a class="reference external" href="https://doi.org/10.1137/1.9780898718003">doi:10.1137/1.9780898718003</a>.</p>
+</div>
+<div class="citation" id="id15" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">TB97</a><span class="fn-bracket">]</span></span>
+<p>Lloyd N. Trefethen and David Bau, III. <em>Numerical Linear Algebra</em>. SIAM, Philadelphia, 1997. <a class="reference external" href="https://doi.org/10.1137/1.9780898719574">doi:10.1137/1.9780898719574</a>.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/05-numerical"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="sparse-matrices.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="krylov-gmres-preconditioning.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#splittings-and-the-iteration-matrix">Splittings and the iteration matrix</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#descent-methods-and-the-krylov-idea">Descent methods and the Krylov idea</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-jacobi-the-rate-is-an-eigenvalue">Exercise 1: Jacobi: the rate is an eigenvalue</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-gaussseidel-and-sor-squaring-the-rate-then-breaking-the-gate">Exercise 2: Gauss–Seidel and SOR: squaring the rate, then breaking the gate</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-steepest-descent-zig-zags-conjugacy-does-not">Exercise 3: Steepest descent zig-zags; conjugacy does not</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-conjugate-gradients-and-the-fiction-of-exactness">Exercise 4: Conjugate gradients, and the fiction of exactness</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-the-bound-and-the-race">Exercise 5: The √κ bound, and the race</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-cg-counts-eigenvalues-not-unknowns">Exercise 6: CG counts eigenvalues, not unknowns</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,1411 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="6.2 Markov Chains, Perron–Frobenius, and PageRank" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/06-structure/markov-perron-pagerank.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: §6.1 read undirected graphs through a symmetric matrix. This notebook makes the edges point somewhere and normalizes: a column-stochastic ..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: §6.1 read undirected graphs through a symmetric matrix. This notebook makes the edges point somewhere and normalizes: a column-stochastic ..." />
+
+    <title>6.2 Markov Chains, Perron–Frobenius, and PageRank &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/06-structure/markov-perron-pagerank';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/06-structure/markov-perron-pagerank.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="6.3 Circulant, Toeplitz, and the FFT as Diagonalization" href="circulant-toeplitz-fft.html" />
+    <link rel="prev" title="6.1 Graphs, Incidence Matrices, and the Laplacian" href="graphs-laplacian.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/06-structure/markov-perron-pagerank.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/06-structure/markov-perron-pagerank.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/06-structure/markov-perron-pagerank.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/06-structure/markov-perron-pagerank.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>6.2 Markov Chains, Perron–Frobenius, and PageRank</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#stochastic-matrices-and-stationary-distributions">Stochastic matrices and stationary distributions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perronfrobenius-in-the-form-used-here">Perron–Frobenius, in the form used here</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-google-matrix">The Google matrix</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-the-stochastic-matrix-and-powers-that-converge-to-rank-1">Exercise 1: The stochastic matrix, and powers that converge to rank 1</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-stationary-distribution-three-independent-ways">Exercise 2: The stationary distribution, three independent ways</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-mixing-rate-is-the-second-eigenvalue">Exercise 3: The mixing rate is the second eigenvalue</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-breaking-perronfrobenius-twice">Exercise 4: Breaking Perron–Frobenius, twice</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-the-google-matrix-and-its-exact-eigenvalue-discount">Exercise 5: The Google matrix, and its exact eigenvalue discount</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-how-much-does-the-answer-depend-on-the-knob">Exercise 6: How much does the answer depend on the knob?</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="markov-chains-perronfrobenius-and-pagerank">
+<h1>6.2 Markov Chains, Perron–Frobenius, and PageRank<a class="headerlink" href="#markov-chains-perronfrobenius-and-pagerank" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter VI — Structure, Graphs, and Fast Algorithms
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;6.2
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">A random surfer clicks links forever; where does she spend her time? The answer is an eigenvector, the guarantee that it exists and is unique is Perron–Frobenius, the speed of finding it is the second eigenvalue — and one damping trick turns the fragile theory into the matrix computation that built a search engine.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;advanced&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;105–135 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="graphs-laplacian.html"><span class="std std-doc">§6.1</span></a> read undirected graphs through a symmetric
+matrix. This notebook makes the edges point somewhere and normalizes:
+a <strong>column-stochastic</strong> matrix <span class="math notranslate nohighlight">\(P\)</span> (columns are probability
+distributions over out-links) drives the random surfer
+<span class="math notranslate nohighlight">\(x_{k+1} = Px_k\)</span>, and everything the chain does is spectral. The powers
+<span class="math notranslate nohighlight">\(P^k\)</span> converge to a rank-1 matrix whose identical columns are the
+<strong>stationary distribution</strong> <span class="math notranslate nohighlight">\(\pi\)</span> — computed three independent ways here
+(eigenvector, power iteration, bordered linear solve) and agreeing to
+<span class="math notranslate nohighlight">\(10^{-15}\)</span>. The approach speed is <span class="math notranslate nohighlight">\(|\lambda_2|^k\)</span>, measured in the clean
+decay band (<a class="reference internal" href="../05-numerical/stationary-and-cg.html"><span class="std std-doc">§5.4</span></a>’s lesson) to
+within 0.7% of the eigenvalue.</p>
+<p>Then the theory is broken on purpose, twice — a <strong>dangling node</strong> leaks
+probability mass (measured: 99.8% gone in 60 steps) and a <strong>disconnected
+web</strong> has a two-dimensional eigenvalue-1 eigenspace, so “the” stationary
+distribution stops existing — and repaired the way Brin and Page
+<span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id32" title="Lawrence Page, Sergey Brin, Rajeev Motwani, and Terry Winograd. The PageRank citation ranking: bringing order to the web. Stanford InfoLab Technical Report, 1999.">PBMW99</a>]</span> repaired it: the damped <strong>Google matrix</strong>
+<span class="math notranslate nohighlight">\(G = \alpha P + (1-\alpha)\tfrac{1}{n}\mathbf{1}\mathbf{1}^{\top}\)</span>, whose
+spectrum obeys the exact mapping <span class="math notranslate nohighlight">\(\lambda_i(G) = \alpha\lambda_i(P)\)</span> for
+<span class="math notranslate nohighlight">\(i \ge 2\)</span> (gated to <span class="math notranslate nohighlight">\(10^{-10}\)</span>): uniqueness restored, mixing speed set by
+the designer, not the web. The finale runs PageRank on a 500-page random
+web by sparse power iteration and asks the engineering question — how does
+the ranking depend on <span class="math notranslate nohighlight">\(\alpha\)</span>? Measured answer: the top page never moves
+across <span class="math notranslate nohighlight">\(\alpha \in [0.5, 0.95]\)</span>, while ranks two and three trade places —
+the ranking is an eigenvector, and eigenvectors move continuously.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> Perron–Frobenius theory is Horn and Johnson <span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id13" title="Roger A. Horn and Charles R. Johnson. Matrix Analysis. Cambridge University Press, 2 edition, 2013. doi:10.1017/CBO9781139020411.">HJ13</a>]</span>
+Chapter 8 and Meyer <span class="bibtex-citation" id="id3">[<a class="reference internal" href="#id11" title="Carl D. Meyer. Matrix Analysis and Applied Linear Algebra. SIAM, Philadelphia, 2 edition, 2023.">Mey23</a>]</span>; the PageRank original is Page,
+Brin, Motwani and Winograd <span class="bibtex-citation" id="id4">[<a class="reference internal" href="#id32" title="Lawrence Page, Sergey Brin, Rajeev Motwani, and Terry Winograd. The PageRank citation ranking: bringing order to the web. Stanford InfoLab Technical Report, 1999.">PBMW99</a>]</span>. The six-page worked web is
+small enough to see whole; the 500-page one is where the sparse
+machinery of <a class="reference internal" href="../05-numerical/sparse-matrices.html"><span class="std std-doc">§5.3</span></a> earns its keep.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="stochastic-matrices-and-stationary-distributions">
+<h3>Stochastic matrices and stationary distributions<a class="headerlink" href="#stochastic-matrices-and-stationary-distributions" title="Link to this heading">#</a></h3>
+<p>Column-stochastic <span class="math notranslate nohighlight">\(P\)</span> (<span class="math notranslate nohighlight">\(P_{ij} \ge 0\)</span>, columns summing to 1) maps
+probability vectors to probability vectors:
+<span class="math notranslate nohighlight">\(\mathbf{1}^{\top}Px = \mathbf{1}^{\top}x\)</span>. A distribution the chain
+leaves alone,</p>
+<div class="math notranslate nohighlight" id="equation-eq-pr-stationary">
+<span class="eqno">(251)<a class="headerlink" href="#equation-eq-pr-stationary" title="Link to this equation">#</a></span>\[P\pi = \pi, \qquad \pi \ge 0, \qquad \mathbf{1}^{\top}\pi = 1,\]</div>
+<p>is an eigenvector for eigenvalue 1 — and <span class="math notranslate nohighlight">\(\lambda = 1\)</span> is always an
+eigenvalue, because <span class="math notranslate nohighlight">\(P^{\top}\mathbf{1} = \mathbf{1}\)</span> and eigenvalue sets
+ignore transposes.</p>
+</section>
+<section id="perronfrobenius-in-the-form-used-here">
+<h3>Perron–Frobenius, in the form used here<a class="headerlink" href="#perronfrobenius-in-the-form-used-here" title="Link to this heading">#</a></h3>
+<p>For a stochastic matrix that is <strong>irreducible and aperiodic</strong> (every page
+reachable from every page, no rigid cycling), the eigenvalue 1 is
+<em>simple</em>, every other eigenvalue satisfies <span class="math notranslate nohighlight">\(|\lambda_i| &lt; 1\)</span>, and</p>
+<div class="math notranslate nohighlight" id="equation-eq-pr-mixing">
+<span class="eqno">(252)<a class="headerlink" href="#equation-eq-pr-mixing" title="Link to this equation">#</a></span>\[P^k \;\longrightarrow\; \pi\,\mathbf{1}^{\top}, \qquad
+\lVert x_k - \pi \rVert \;\sim\; C\,|\lambda_2|^{k} :\]</div>
+<p>the powers converge to the rank-1 matrix with <span class="math notranslate nohighlight">\(\pi\)</span> in every column, at a
+geometric rate read off the sub-dominant eigenvalue — the same
+rate-is-an-eigenvalue fact as <a class="reference internal" href="../05-numerical/stationary-and-cg.html"><span class="std std-doc">§5.4</span></a>,
+with the spectral radius normalized to 1. Both hypotheses are load-bearing,
+and Exercise 4 breaks each one.</p>
+</section>
+<section id="the-google-matrix">
+<h3>The Google matrix<a class="headerlink" href="#the-google-matrix" title="Link to this heading">#</a></h3>
+<p>Real webs are neither irreducible nor free of dangling nodes. The repair
+blends in a teleport:</p>
+<div class="math notranslate nohighlight" id="equation-eq-pr-google">
+<span class="eqno">(253)<a class="headerlink" href="#equation-eq-pr-google" title="Link to this equation">#</a></span>\[G \;=\; \alpha P + (1-\alpha)\,\tfrac{1}{n}\mathbf{1}\mathbf{1}^{\top},
+\qquad
+\lambda_i(G) = \alpha\,\lambda_i(P) \;\;(i \ge 2),\]</div>
+<p>with damping <span class="math notranslate nohighlight">\(\alpha \approx 0.85\)</span>. <span class="math notranslate nohighlight">\(G\)</span> is strictly positive, so
+Perron–Frobenius applies with no hypotheses about the web at all — and the
+eigenvalue mapping (exact, and gated below) means the mixing rate is at
+most <span class="math notranslate nohighlight">\(\alpha\)</span>: the designer chooses the convergence speed, trading it
+against fidelity to the link structure.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data and instruments only: the six-page web’s links and layout, and a
+directed-graph drawing helper. The column-stochastic constructor is built
+in Exercise 1, where the click model is the lesson.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random array below comes from this seed</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+
+<span class="c1"># The worked web: six pages, out-links as a dictionary. All out-degrees are</span>
+<span class="c1"># 1 or 2 — dyadic — so every entry of P is exactly representable and the</span>
+<span class="c1"># stochastic structure survives floating point exactly (Exercise 1).</span>
+<span class="n">LINKS</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="mi">1</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="mi">2</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="mi">3</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="mi">4</span><span class="p">:</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="mi">5</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">]}</span>
+<span class="n">N_WEB</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">POS_WEB</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.4</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">],</span>
+                    <span class="p">[</span><span class="mf">3.6</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">],</span> <span class="p">[</span><span class="mf">3.8</span><span class="p">,</span> <span class="mf">1.9</span><span class="p">]])</span>
+
+
+
+<span class="c1"># instrument: matplotlib plumbing — arrows and node sizes; no probability</span>
+<span class="c1"># inside, and no exercise&#39;s lesson.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">draw_web</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">links</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">sizes</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Directed web drawn with matplotlib arrows, node area ~ sizes.&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">outs</span> <span class="ow">in</span> <span class="n">links</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">outs</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">pos</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">pos</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">d</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="n">pos</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.16</span> <span class="o">*</span> <span class="n">d</span><span class="p">,</span> <span class="n">xytext</span><span class="o">=</span><span class="n">pos</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.16</span> <span class="o">*</span> <span class="n">d</span><span class="p">,</span>
+                        <span class="n">arrowprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">arrowstyle</span><span class="o">=</span><span class="s2">&quot;-|&gt;&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#9aa3b8&quot;</span><span class="p">,</span>
+                                        <span class="n">lw</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">shrinkA</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">shrinkB</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">pos</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">pos</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="n">sizes</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;#c0851a&quot;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+               <span class="n">edgecolors</span><span class="o">=</span><span class="s2">&quot;#16213e&quot;</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mf">1.2</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pos</span><span class="p">):</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">),</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+                    <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#16213e&quot;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                    <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">14</span><span class="p">),</span> <span class="n">textcoords</span><span class="o">=</span><span class="s2">&quot;offset points&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-the-stochastic-matrix-and-powers-that-converge-to-rank-1">
+<h2>Exercise 1: The stochastic matrix, and powers that converge to rank 1<a class="headerlink" href="#exercise-1-the-stochastic-matrix-and-powers-that-converge-to-rank-1" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">stochastic_from_links(links,</span> <span class="pre">n)</span></code> — column <span class="math notranslate nohighlight">\(i\)</span> spreads
+unit mass over page <span class="math notranslate nohighlight">\(i\)</span>’s out-links — build <code class="docutils literal notranslate"><span class="pre">P_web</span></code> with it, and print it.
+Column
+<span class="math notranslate nohighlight">\(i\)</span> is page <span class="math notranslate nohighlight">\(i\)</span>’s click distribution: <span class="math notranslate nohighlight">\(1/\text{outdeg}(i)\)</span> on each
+out-link. Confirm every column sums to 1 — and note <em>how</em> well: because
+every out-degree here is 1 or 2, every entry is dyadic (exactly
+representable), so the sums are exactly 1.0, and stay exact under matrix
+powers.</p>
+<p><strong>Part b)</strong> Gate the invariance through <span class="math notranslate nohighlight">\(P^1, \dots, P^{20}\)</span>: worst
+column-sum deviation below <span class="math notranslate nohighlight">\(10^{-14}\)</span> (measured: exactly 0 — dyadic
+arithmetic never rounds here, the
+<a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html"><span class="std std-doc">§3.4</span></a> exact-zero rule
+in stochastic clothing; the gate still allows rounding so a web with
+degree-3 pages would pass too).</p>
+<p><strong>Part c)</strong> Watch <a class="reference internal" href="#equation-eq-pr-mixing">Eq. 252</a> happen: heatmaps of <span class="math notranslate nohighlight">\(P^k\)</span> at
+<span class="math notranslate nohighlight">\(k = 1, 2, 5, 20\)</span>. By <span class="math notranslate nohighlight">\(k = 20\)</span> the columns agree to plotting accuracy —
+their spread is <span class="math notranslate nohighlight">\(|\lambda_2|^{20} \approx 10^{-5}\)</span>, Exercise 3’s rate
+arriving early, and <em>reported</em> as such. The rank-1 <em>gate</em> runs the powers
+to <span class="math notranslate nohighlight">\(P^{80}\)</span>, where the spread has decayed through <span class="math notranslate nohighlight">\(|\lambda_2|^{80}\)</span> to
+the rounding floor: gate below <span class="math notranslate nohighlight">\(10^{-12}\)</span>, and gate the shared column
+against Exercise 2’s stationary <span class="math notranslate nohighlight">\(\pi\)</span> to <span class="math notranslate nohighlight">\(10^{-11}\)</span>.</p>
+<p><strong>Part d)</strong> Confirm <span class="math notranslate nohighlight">\(\lambda = 1\)</span> is an eigenvalue <em>before</em> computing any
+eigenvector: <span class="math notranslate nohighlight">\(\mathbf{1}^{\top}P = \mathbf{1}^{\top}\)</span> exactly (the
+transpose argument in the theory), so <span class="math notranslate nohighlight">\(\det(P - I) = 0\)</span> to rounding.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>P (columns = pages, column i spreads over i&#39;s out-links):
+[[0.  0.  0.5 0.  0.  0.5]
+ [0.5 0.  0.  0.  0.  0. ]
+ [0.5 1.  0.  0.5 0.  0. ]
+ [0.  0.  0.5 0.  0.5 0.5]
+ [0.  0.  0.  0.5 0.  0. ]
+ [0.  0.  0.  0.  0.5 0. ]]
+
+worst column-sum deviation over P^1..P^20: 0.0e+00 (dyadic entries — exactly zero on this web)
+column spread: P^20 1.4e-05 (= |lambda_2|^20 = 1.6e-05, the mixing rate early), P^80 1.1e-16
+1&#39;P = 1&#39; deviation: 0.0e+00; det(P - I) = 0.0e+00
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-pr-powers">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f559c9f35c0&gt;
+</pre></div>
+</div>
+<figcaption>
+<p><span class="caption-number">Fig. 112 </span><span class="caption-text">The powers of the six-page web’s stochastic matrix at <span class="math notranslate nohighlight">\(k = 1, 2, 5, 20\)</span>. Mass spreads (<span class="math notranslate nohighlight">\(k=2\)</span>), sloshes (<span class="math notranslate nohighlight">\(k=5\)</span>), and settles (<span class="math notranslate nohighlight">\(k=20\)</span>) into a matrix whose columns are identical – the rank-1 limit <span class="math notranslate nohighlight">\(\pi\mathbf{1}^{\top}\)</span> of Eq. 2: wherever the surfer starts (whichever column you read), twenty clicks later she is distributed as <span class="math notranslate nohighlight">\(\pi\)</span> to plotting accuracy (the residual column spread is <span class="math notranslate nohighlight">\(|\lambda_2|^{20} \approx 10^{-5}\)</span>, invisible here and gated at its own rate). The convergence rate of this picture is <span class="math notranslate nohighlight">\(|\lambda_2|^k = 0.576^k\)</span>, measured against that prediction in Exercise 3.</span><a class="headerlink" href="#fig-pr-powers" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<figure class="align-default" id="id5">
+<img alt="../../_images/c16e46f15b3bc22ea9bbb159f08c7be862d6f393e37681a95fa66850825054b0.png" src="../../_images/c16e46f15b3bc22ea9bbb159f08c7be862d6f393e37681a95fa66850825054b0.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 113 </span><span class="caption-text">The powers of the six-page web’s stochastic matrix at <span class="math notranslate nohighlight">\(k = 1, 2, 5, 20\)</span>. Mass spreads (<span class="math notranslate nohighlight">\(k=2\)</span>), sloshes (<span class="math notranslate nohighlight">\(k=5\)</span>), and settles (<span class="math notranslate nohighlight">\(k=20\)</span>) into a matrix whose columns are identical – the rank-1 limit <span class="math notranslate nohighlight">\(\pi\mathbf{1}^{\top}\)</span> of Eq. 2: wherever the surfer starts (whichever column you read), twenty clicks later she is distributed as <span class="math notranslate nohighlight">\(\pi\)</span> to plotting accuracy (the residual column spread is <span class="math notranslate nohighlight">\(|\lambda_2|^{20} \approx 10^{-5}\)</span>, invisible here and gated at its own rate). The convergence rate of this picture is <span class="math notranslate nohighlight">\(|\lambda_2|^k = 0.576^k\)</span>, measured against that prediction in Exercise 3.</span><a class="headerlink" href="#id5" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  column sums stay 1 through twenty matrix powers   [measured exactly 0.0: dyadic out-degrees make every entry and every partial sum exactly representable — the exact-zero rule, earned; the gate leaves room for a web whose degrees do round [0 &lt; 1e-14]]
+✓  and the powers collapse to rank 1 at the |lambda_2|^k rate (Eq. 2)   [P^80 spread 1.1e-16 (the limit); P^20 spread 1.4e-05 matches |lambda_2|^20 within 50% — the spread IS the mixing error, so gating it at k = 20 tighter than the eigenvalue allows would be wrong]
+✓  lambda = 1 is an eigenvalue before any eigensolver runs   [1&#39;P = 1&#39; exactly (row sums of dyadics), so P - I is singular — the transpose argument, checked by determinant]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-the-stationary-distribution-three-independent-ways">
+<h2>Exercise 2: The stationary distribution, three independent ways<a class="headerlink" href="#exercise-2-the-stationary-distribution-three-independent-ways" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-pr-stationary">Eq. 251</a> can be reached by three unrelated algorithms, and
+agreement across them is the strongest check this notebook has.</p>
+<p><strong>Part a)</strong> <em>Eigenvector:</em> <code class="docutils literal notranslate"><span class="pre">np.linalg.eig(P)</span></code>, take the eigenvector for
+the eigenvalue nearest 1, normalize to sum 1 (real part — the eigenvector
+of a real simple eigenvalue is real up to phase).</p>
+<p><strong>Part b)</strong> <em>Power iteration:</em> from the uniform start, apply <span class="math notranslate nohighlight">\(P\)</span> until
+<span class="math notranslate nohighlight">\(\lVert x_{k+1} - x_k\rVert_1 &lt; 10^{-15}\)</span> (<a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html"><span class="std std-doc">§5.2</span></a>’s
+workhorse — no normalization step needed, because stochastic matrices
+preserve the 1-norm of probability vectors <em>by construction</em>).</p>
+<p><strong>Part c)</strong> <em>Linear solve:</em> <span class="math notranslate nohighlight">\((I - P)\pi = 0\)</span> is singular by design, so
+replace the last row with <span class="math notranslate nohighlight">\(\mathbf{1}^{\top}\)</span> and the last right-hand-side
+entry with 1 — the bordered system pins the normalization and
+<code class="docutils literal notranslate"><span class="pre">np.linalg.solve</span></code> does the rest.</p>
+<p><strong>Write this one yourself</strong> — all three are under six lines each.</p>
+<p><strong>Part d)</strong> Gate the triangle: all three agree pairwise to <span class="math notranslate nohighlight">\(10^{-10}\)</span>;
+the winner satisfies <span class="math notranslate nohighlight">\(P\pi = \pi\)</span> to <span class="math notranslate nohighlight">\(10^{-12}\)</span>, is nonnegative, and sums
+to 1 to <span class="math notranslate nohighlight">\(10^{-14}\)</span>. Then draw the web with node areas proportional to
+<span class="math notranslate nohighlight">\(\pi\)</span>: page 2 (three in-links) carries 30% of the surfer’s time, page 5
+only 6%.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>pi (eig):   [0.181818 0.090909 0.30303  0.242424 0.121212 0.060606]
+three-way agreement: eig-power 3.1e-16, eig-solve 3.3e-16
+P pi - pi: 3.1e-16; sum: 0.9999999999999999; min: 0.0606
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-pr-web">
+<img alt="../../_images/2fa4b318e1ff3c5e817aa9af1c41d899a634fed521d70ff246e9e32f7082afaf.png" src="../../_images/2fa4b318e1ff3c5e817aa9af1c41d899a634fed521d70ff246e9e32f7082afaf.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 114 </span><span class="caption-text">The six-page web with node area proportional to the stationary distribution. Page 2 – with in-links from pages 0, 1 and 3 – absorbs 30% of the surfer’s time; page 5, fed only by page 4’s coin flip, gets 6%. The sizes are the eigenvector of Eq. 1 computed three independent ways (eigensolver, power iteration, bordered solve) that agree to <span class="math notranslate nohighlight">\(10^{-15}\)</span>: importance on a directed graph is an eigenvalue problem, which is the sentence PageRank industrialized.</span><a class="headerlink" href="#fig-pr-web" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  eigensolver, power iteration and bordered solve agree on pi (Eq. 1)   [pairwise gaps 3.1e-16, 3.3e-16: three algorithms sharing no code, one distribution]
+✓  and pi is a genuine stationary distribution   [P pi = pi at rounding level, nonnegative, unit mass — all three clauses of Eq. 1]
+✓  and Exercise 1&#39;s P^80 column IS this pi — the promised handshake   [the rank-1 limit&#39;s shared column against the eigensolver&#39;s stationary vector: two exercises, one distribution [3.33067e-16 &lt; 1e-11]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-the-mixing-rate-is-the-second-eigenvalue">
+<h2>Exercise 3: The mixing rate is the second eigenvalue<a class="headerlink" href="#exercise-3-the-mixing-rate-is-the-second-eigenvalue" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-pr-mixing">Eq. 252</a> prices convergence, and this exercise measures it with
+<a class="reference internal" href="../05-numerical/stationary-and-cg.html"><span class="std std-doc">§5.4</span></a>’s window discipline.</p>
+<p><strong>Part a)</strong> Compute the spectrum of <span class="math notranslate nohighlight">\(P\)</span>: moduli
+<span class="math notranslate nohighlight">\(1 &gt; 0.576 = 0.576 &gt; 0.5 &gt; \dots\)</span> — the sub-dominant pair is <em>complex</em>
+(<span class="math notranslate nohighlight">\(\lambda_2 = -0.44 \pm 0.37i\)</span>), so the error will decay along a spiral,
+oscillating around its geometric envelope.</p>
+<p><strong>Part b)</strong> Start the surfer at page 0 (<span class="math notranslate nohighlight">\(x_0 = e_0\)</span>) and record
+<span class="math notranslate nohighlight">\(\lVert x_k - \pi\rVert_1\)</span> for 60 steps. Gate the decay rate over the
+<strong>clean band</strong> — steps 15 to 45, where the error runs from <span class="math notranslate nohighlight">\(10^{-4}\)</span> to
+<span class="math notranslate nohighlight">\(10^{-11}\)</span>, safely above the rounding floor — against <span class="math notranslate nohighlight">\(|\lambda_2|\)</span> to 5%
+(measured: 0.7%). Then run the walk on to step 90, where the error sits
+on the rounding floor, and <em>measure the trap</em>: the window [40, 85] reads
+some 30% high — <a class="reference internal" href="../05-numerical/stationary-and-cg.html"><span class="std std-doc">§5.4</span></a>’s
+stagnation pollution, demonstrated on purpose this time.</p>
+<p><strong>Part c)</strong> Draw the error history on a log axis with the
+<span class="math notranslate nohighlight">\(C|\lambda_2|^k\)</span> reference line: the measured points ride the line with a
+gentle oscillation — the complex pair’s rotation — until they hit
+arithmetic bottom near step 50.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>eigenvalue moduli: [1.     0.5755 0.5755 0.5    0.3774 0.    ]
+lambda_2 = -0.4387+0.3724j, |lambda_2| = 0.575482
+clean-band rate [15,45]: 0.5794 (0.67% from |lambda_2|)
+floor-touching window [40,85] for contrast: 0.7562 — the 5.4 stagnation trap, dodged above (reported, not gated)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-pr-rate">
+<img alt="../../_images/910d13c1e5bc17f47bdb99839e96413f02f271d7844bd89c4a95b42e32b2e8e8.png" src="../../_images/910d13c1e5bc17f47bdb99839e96413f02f271d7844bd89c4a95b42e32b2e8e8.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 115 </span><span class="caption-text">The surfer’s distance from stationarity, starting at page 0, against the <span class="math notranslate nohighlight">\(C|\lambda_2|^k\)</span> reference line (amber). The error rides the line with a gentle wobble – the sub-dominant eigenvalues are a complex pair, <span class="math notranslate nohighlight">\(-0.44 \pm 0.37i\)</span>, so the transient rotates as it shrinks – and lands on the rounding floor just past step 60 where double precision runs out. The rate measured in the clean band (steps 15-45, shaded) matches <span class="math notranslate nohighlight">\(|\lambda_2| = 0.5755\)</span> to 0.7%; past step 60 the error sits on the rounding floor, and a window reaching into that flat tail (40-85) reads some 30% high – 5.4’s stagnation trap, here measured on purpose.</span><a class="headerlink" href="#fig-pr-rate" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the mixing rate matches |lambda_2| to 5% in the clean band (Eq. 2)   [measured 0.5794 against 0.5755 (0.7%): the rate-is-an-eigenvalue fact of 5.4, on a directed chain with a complex sub-dominant pair]
+✓  while a floor-touching window overstates the rate (the demonstrated trap)   [0.7562 from the window [40, 85] — the flat rounding tail averaged into the slope, exactly 5.4&#39;s trap; the size of the overstatement is the machine&#39;s, so only its existence is gated]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-breaking-perronfrobenius-twice">
+<h2>Exercise 4: Breaking Perron–Frobenius, twice<a class="headerlink" href="#exercise-4-breaking-perronfrobenius-twice" title="Link to this heading">#</a></h2>
+<p>Both hypotheses of <a class="reference internal" href="#equation-eq-pr-mixing">Eq. 252</a> are load-bearing. Remove each and
+measure the wreckage.</p>
+<p><strong>Part a)</strong> <em>Dangling node:</em> delete page 1’s out-links. Column 1 of <span class="math notranslate nohighlight">\(P\)</span>
+becomes zero — not stochastic — and probability <em>leaks</em>: gate that the
+total mass after 60 steps is below 0.01 (measured 0.002), and that no
+eigenvalue reaches 1 (largest modulus 0.90, gated one-sidedly below
+<span class="math notranslate nohighlight">\(1 - 0.05\)</span>): the surfer eventually falls off the web, and “the stationary
+distribution” refers to nothing.</p>
+<p><strong>Part b)</strong> <em>Disconnected web:</em> two separate 3-cycles. Now there are
+<em>too many</em> stationary distributions: gate
+<span class="math notranslate nohighlight">\(\operatorname{rank}(I - P) = 4\)</span>, a rank deficiency of exactly 2 — one
+stationary distribution per component, any mixture also stationary
+(<a class="reference internal" href="graphs-laplacian.html"><span class="std std-doc">§6.1</span></a>’s component-counting null space, wearing
+probabilities).</p>
+<p><strong>Part c)</strong> The repairs. Dangling: replace zero columns by the uniform
+column (the surfer teleports from dead ends) — gate column sums restored
+to 1 within <span class="math notranslate nohighlight">\(10^{-14}\)</span>: unlike Exercise 1’s dyadic web, <span class="math notranslate nohighlight">\(1/6\)</span> <em>does</em>
+round, so exactness is not on offer here, and the contrast is the point.
+Disconnection: the damped <span class="math notranslate nohighlight">\(G\)</span> of <a class="reference internal" href="#equation-eq-pr-google">Eq. 253</a> at
+<span class="math notranslate nohighlight">\(\alpha = 0.85\)</span> on the two-cycle web — gate
+<span class="math notranslate nohighlight">\(\operatorname{rank}(I - G) = 5\)</span>, deficiency exactly 1: teleportation
+glues the components, and uniqueness returns with no assumptions about
+the web at all.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>dangling column sums: [1. 0. 1. 1. 1. 1.]
+mass after 60 steps: 0.0018; largest |eigenvalue| 0.9010 — no invariant distribution exists
+two 3-cycles: rank(I - P) = 4 (deficiency 2: one pi per component)
+dangling fix (zero column -&gt; uniform): sums [1. 1. 1. 1. 1. 1.]
+damped two-cycle web: rank(I - G) = 5 (deficiency 1 — uniqueness restored)
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  a dangling node leaks the surfer off the web: no eigenvalue reaches 1   [0.2% of the mass left after 60 steps, spectral radius 0.90 &lt; 1 (gated one-sidedly): stochasticity was the theorem&#39;s fuel]
+✓  a disconnected web has rank deficiency exactly 2 in I - P   [one stationary distribution per component and every mixture between them — 6.1&#39;s null-space component count, with probabilities in it]
+✓  and both repairs restore the theorem&#39;s hypotheses   [zero columns -&gt; uniform restores stochasticity (to rounding — six copies of 1/6 are not dyadic, unlike Exercise 1&#39;s entries); damping glues the components (deficiency back to 1) with no assumptions about the web]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-the-google-matrix-and-its-exact-eigenvalue-discount">
+<h2>Exercise 5: The Google matrix, and its exact eigenvalue discount<a class="headerlink" href="#exercise-5-the-google-matrix-and-its-exact-eigenvalue-discount" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-pr-google">Eq. 253</a> is more than a fix — its spectrum is <em>known in advance</em>.</p>
+<p><strong>Part a)</strong> Build <span class="math notranslate nohighlight">\(G = \alpha P + (1-\alpha)\tfrac1n\mathbf{1}\mathbf{1}^{\top}\)</span>
+for the six-page web at <span class="math notranslate nohighlight">\(\alpha = 0.85\)</span>. Gate Perron–Frobenius in its
+strongest form: <span class="math notranslate nohighlight">\(\lambda_1 = 1\)</span> simple, and <em>every</em> other eigenvalue with
+modulus <span class="math notranslate nohighlight">\(\le \alpha + 10^{-10}\)</span> — the damping is a hard ceiling on the
+spectrum.</p>
+<p><strong>Part b)</strong> Gate the exact mapping <span class="math notranslate nohighlight">\(\lambda_i(G) = \alpha\lambda_i(P)\)</span>
+for <span class="math notranslate nohighlight">\(i \ge 2\)</span>: sort both spectra by modulus and compare the trailing five
+to <span class="math notranslate nohighlight">\(10^{-10}\)</span>. (Why it holds: <span class="math notranslate nohighlight">\(G\)</span> and <span class="math notranslate nohighlight">\(P\)</span> agree on the hyperplane
+<span class="math notranslate nohighlight">\(\mathbf{1}^{\top}x = 0\)</span>, up to the factor <span class="math notranslate nohighlight">\(\alpha\)</span> — the rank-1 teleport
+annihilates it.)</p>
+<p><strong>Part c)</strong> PageRank at scale: a 500-page random web (out-degrees 2–8
+from the notebook’s seed), damped, ranked by <strong>sparse power iteration</strong>
+(<code class="docutils literal notranslate"><span class="pre">scipy.sparse</span></code>, <a class="reference internal" href="../05-numerical/sparse-matrices.html"><span class="std std-doc">§5.3</span></a>) to
+<span class="math notranslate nohighlight">\(10^{-14}\)</span>. Gate: convergence within 100 iterations (the <span class="math notranslate nohighlight">\(\alpha^k\)</span>
+ceiling guarantees 198; the web’s own <span class="math notranslate nohighlight">\(|\lambda_2| = 0.45\)</span> delivers ~40),
+and the result matches the <em>direct</em> solve
+<span class="math notranslate nohighlight">\((I - \alpha P)\pi = \tfrac{1-\alpha}{n}\mathbf{1}\)</span> to <span class="math notranslate nohighlight">\(10^{-12}\)</span> — two
+routes, one ranking.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>|eig(G)| = [1.     0.4892 0.4892 0.425  0.3208 0.    ]; ceiling alpha respected: True
+lambda_i(G) vs alpha * lambda_i(P) (moduli, i &gt;= 2): max gap 6.1e-16
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>500-page web: sparse power iteration converged in 38 iterations
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>power iteration vs direct solve: 1.1e-16
+top five pages: [231 180 134 384  25] with PageRank [6.78 5.41 5.2  4.95 4.51] (per mille)
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  Perron-Frobenius holds with lambda_1 = 1 simple and the alpha ceiling on everything else (Eq. 3)   [gap to the second modulus 0.51; all trailing moduli at most 0.85: the damping is a designed spectral ceiling, not luck]
+✓  with the exact discount lambda_i(G) = alpha lambda_i(P) for i &gt;= 2   [G and alpha P agree on the zero-sum hyperplane; the teleport is rank one and annihilates it — an identity, gated as one [6.10623e-16 &lt; 1e-10]]
+✓  and PageRank at n = 500 converges fast and agrees with the direct solve   [38 iterations (alpha guarantees 198; the web&#39;s own |lambda_2| = 0.45 does better) and 1e-16 against (I - alpha P) pi = (1-alpha)/n 1 — two routes, one ranking]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-6-how-much-does-the-answer-depend-on-the-knob">
+<h2>Exercise 6: How much does the answer depend on the knob?<a class="headerlink" href="#exercise-6-how-much-does-the-answer-depend-on-the-knob" title="Link to this heading">#</a></h2>
+<p><span class="math notranslate nohighlight">\(\alpha\)</span> is a design parameter with no principled value. The engineering
+question is the ranking’s <em>sensitivity</em> to it.</p>
+<p><strong>Part a)</strong> For <span class="math notranslate nohighlight">\(\alpha \in \{0.05, 0.1, \dots, 0.95\}\)</span>, compute the
+500-page PageRank by the direct solve (one <code class="docutils literal notranslate"><span class="pre">np.linalg.solve</span></code> per
+<span class="math notranslate nohighlight">\(\alpha\)</span>; factor-once economics would use <a class="reference internal" href="../05-numerical/sparse-matrices.html"><span class="std std-doc">§5.3</span></a>’s
+<code class="docutils literal notranslate"><span class="pre">splu</span></code> — here clarity wins).</p>
+<p><strong>Part b)</strong> Gate the two limits the formula promises: at <span class="math notranslate nohighlight">\(\alpha = 0.05\)</span>
+the distribution is near uniform
+(<span class="math notranslate nohighlight">\(\max_i |n\pi_i - 1| &lt; 0.15\)</span>, measured <span class="math notranslate nohighlight">\(0.09\)</span> — the teleport dominates);
+as <span class="math notranslate nohighlight">\(\alpha \to 1\)</span> the spread grows monotonically (gate the ratio
+<span class="math notranslate nohighlight">\(\max\pi/\min\pi\)</span> increasing across the sweep) — the link structure takes
+over.</p>
+<p><strong>Part c)</strong> The ranking itself: gate that the <strong>top page is the same at
+every</strong> <span class="math notranslate nohighlight">\(\alpha \ge 0.5\)</span> (measured: page 231 throughout), and <em>report</em>
+that ranks two and three trade places as <span class="math notranslate nohighlight">\(\alpha\)</span> crosses <span class="math notranslate nohighlight">\(\approx 0.8\)</span> —
+eigenvector entries move continuously in <span class="math notranslate nohighlight">\(\alpha\)</span>, so nearby entries can
+cross while a clear leader cannot. Draw the top-five PageRank curves
+against <span class="math notranslate nohighlight">\(\alpha\)</span> with the crossing visible.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>alpha = 0.05: max |n pi - 1| = 0.089 (near uniform)
+spread max/min: 1.15 at alpha=0.05 -&gt; 77.5 at alpha=0.95, strictly increasing: True
+top page for alpha &gt;= 0.5: [231] (stable: True)
+ranks 2-3 by alpha: {0.5: [np.int64(134), np.int64(384)], 0.7: [np.int64(134), np.int64(180)], 0.85: [np.int64(180), np.int64(134)], 0.95: [np.int64(180), np.int64(134)]} — a crossing near alpha = 0.8, reported: nearby eigenvector entries may trade places; a clear leader cannot
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-pr-damping">
+<img alt="../../_images/ed8a3281264c3a3519c2d850eff74e9e2b6d328790777fe6f2b37c230c3c13f8.png" src="../../_images/ed8a3281264c3a3519c2d850eff74e9e2b6d328790777fe6f2b37c230c3c13f8.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 116 </span><span class="caption-text">PageRank of the 500-page web’s top five pages as the damping factor sweeps from 0.05 to 0.95. At small <span class="math notranslate nohighlight">\(\alpha\)</span> the teleport dominates and everyone converges to <span class="math notranslate nohighlight">\(1/n\)</span> (dotted); as <span class="math notranslate nohighlight">\(\alpha \to 1\)</span> the link structure takes over and the spread grows monotonically. The leader (page 231) leads at every <span class="math notranslate nohighlight">\(\alpha \ge 0.5\)</span> – gated – while the second and third pages trade places near <span class="math notranslate nohighlight">\(\alpha \approx 0.8\)</span>: eigenvector entries move continuously in the design knob, so close calls can flip while clear verdicts cannot. Google’s 0.85 sits where the structure speaks but the spectrum still mixes in a few dozen iterations.</span><a class="headerlink" href="#fig-pr-damping" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p>The power iteration treated the teleport as a dense rank-1 update applied
+implicitly — the reason PageRank scales. Ask your assistant for
+<code class="docutils literal notranslate"><span class="pre">pagerank_personalized(P,</span> <span class="pre">alpha,</span> <span class="pre">v)</span></code> where the teleport lands on a
+personalization distribution <span class="math notranslate nohighlight">\(v\)</span> instead of uniform, then check it
+against the mathematics rather than a demo: (i) with <span class="math notranslate nohighlight">\(v\)</span> uniform it
+reproduces this notebook’s ranking to <span class="math notranslate nohighlight">\(10^{-12}\)</span>; (ii) with <span class="math notranslate nohighlight">\(v = e_j\)</span>
+(all teleports to page <span class="math notranslate nohighlight">\(j\)</span>), page <span class="math notranslate nohighlight">\(j\)</span>’s rank strictly exceeds its uniform
+value, for every <span class="math notranslate nohighlight">\(j\)</span> you test; (iii) linearity in <span class="math notranslate nohighlight">\(v\)</span>:
+the rank vector for <span class="math notranslate nohighlight">\(\tfrac12(v_1 + v_2)\)</span> equals the average of the two
+rank vectors to <span class="math notranslate nohighlight">\(10^{-12}\)</span> — because <span class="math notranslate nohighlight">\(\pi(v)\)</span> solves a linear system in
+<span class="math notranslate nohighlight">\(v\)</span>. The check is yours.</p>
+</div>
+<section id="validation-6">
+<h3>Validation 6<a class="headerlink" href="#validation-6" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  at small alpha the teleport wins: PageRank is near uniform   [max |n pi - 1| = 0.09 at alpha = 0.05 — Eq. 3 with the link term switched almost off]
+✓  and the ranking&#39;s spread grows monotonically as alpha rises   [max/min from 1.15 to 78: the link structure takes over continuously — no phase transition, just a dial]
+✓  while the top page never changes for alpha in [0.5, 0.95]   [page 231 at every damping tested — gated because its lead is wide; ranks two and three trade places near 0.8 (reported, not gated: close eigenvector entries may legitimately cross)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p><strong>Stochastic structure survives arithmetic — here, exactly.</strong> The
+six-page web’s column sums stayed <em>exactly</em> 1 through twenty matrix
+powers (dyadic out-degrees; the gate allows rounding for webs that
+aren’t so lucky), <span class="math notranslate nohighlight">\(\mathbf{1}^{\top}P = \mathbf{1}^{\top}\)</span> held exactly,
+and <span class="math notranslate nohighlight">\(P^{80}\)</span> collapsed to identical columns at <span class="math notranslate nohighlight">\(10^{-12}\)</span> — the rank-1
+limit <span class="math notranslate nohighlight">\(\pi\mathbf{1}^{\top}\)</span>, drawn as heatmaps.</p>
+<p><strong>One distribution, three algorithms, one rate.</strong> Eigensolver, power
+iteration and the bordered solve agreed on <span class="math notranslate nohighlight">\(\pi\)</span> to <span class="math notranslate nohighlight">\(10^{-15}\)</span>; the
+mixing rate measured in the clean band matched <span class="math notranslate nohighlight">\(|\lambda_2| = 0.5755\)</span> to
+0.7% (the floor-touching window read some 30% high — <a class="reference internal" href="../05-numerical/stationary-and-cg.html"><span class="std std-doc">§5.4</span></a>’s
+trap, dodged and demonstrated), with the complex sub-dominant pair’s
+spiral visible as a wobble on the reference line.</p>
+<p><strong>Perron–Frobenius has load-bearing hypotheses.</strong> A dangling node leaked
+99.8% of the mass in 60 steps with spectral radius 0.90 — no stationary
+distribution at all; a disconnected web had deficiency exactly 2 in
+<span class="math notranslate nohighlight">\(I - P\)</span> — too many. The repairs (uniform columns for dead ends; damping
+for disconnection) restored exact column sums and deficiency 1.</p>
+<p><strong>The Google matrix is designed spectroscopy.</strong> <span class="math notranslate nohighlight">\(\lambda_1 = 1\)</span> simple
+with every other modulus under <span class="math notranslate nohighlight">\(\alpha\)</span>, and the <em>exact</em> discount
+<span class="math notranslate nohighlight">\(\lambda_i(G) = \alpha\lambda_i(P)\)</span> gated at <span class="math notranslate nohighlight">\(10^{-10}\)</span>. At <span class="math notranslate nohighlight">\(n = 500\)</span>,
+sparse power iteration converged in 37 iterations and matched the direct
+solve to <span class="math notranslate nohighlight">\(10^{-15}\)</span>. Sweeping the knob: near-uniform at <span class="math notranslate nohighlight">\(\alpha = 0.05\)</span>,
+spread growing monotonically, the top page invariant across
+<span class="math notranslate nohighlight">\(\alpha \in [0.5, 0.95]\)</span> while ranks two and three traded places —
+continuity of eigenvectors, read as ranking robustness.</p>
+<p><strong>Methods introduced.</strong> Column-stochastic constructors, power-of-matrix
+heatmap diagnostics, three-way stationary computation, clean-band mixing
+measurement, dangling/disconnected failure autopsies, the damped Google
+matrix and its eigenvalue discount, implicit-teleport sparse power
+iteration, and damping-sensitivity sweeps.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Reversible chains are symmetric matrices in disguise.</strong> When detailed
+balance holds, <span class="math notranslate nohighlight">\(D^{1/2}PD^{-1/2}\)</span> is symmetric and the whole spectral
+toolbox of <a class="reference internal" href="../03-eigenvalues/spectral-theorem.html"><span class="std std-doc">§3.2</span></a> applies —
+mixing bounds, Cheeger inequalities, and <a class="reference internal" href="graphs-laplacian.html"><span class="std std-doc">§6.1</span></a>’s
+Laplacian reappear as the symmetrized chain.</p></li>
+<li><p><strong>The cycle structure this chain lacked.</strong> Periodic chains oscillate
+instead of mixing; their eigenvalues sit <em>on</em> the unit circle at roots
+of unity — which is <a class="reference internal" href="circulant-toeplitz-fft.html"><span class="std std-doc">§6.3</span></a>’s subject from
+the matrix side: circulants, diagonalized by the DFT.</p></li>
+<li><p><strong>Markov chains meet Monte Carlo.</strong> MCMC runs these ideas in reverse —
+design <span class="math notranslate nohighlight">\(P\)</span> so its stationary distribution is a target you can only
+evaluate pointwise. The mixing-rate discipline here is exactly what
+controls MCMC error bars.</p></li>
+<li><p><strong>Ranking as optimization.</strong> PageRank is also the solution of a
+least-squares-like fixed point; <a class="reference internal" href="../08-learning/learning-as-least-squares.html"><span class="std std-doc">§8.1</span></a>
+opens the chapter where such fixed points become <em>learned</em> models.</p></li>
+</ul>
+<div class="docutils container" id="id6">
+<div role="list" class="citation-list">
+<div class="citation" id="id13" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">HJ13</a><span class="fn-bracket">]</span></span>
+<p>Roger A. Horn and Charles R. Johnson. <em>Matrix Analysis</em>. Cambridge University Press, 2 edition, 2013. <a class="reference external" href="https://doi.org/10.1017/CBO9781139020411">doi:10.1017/CBO9781139020411</a>.</p>
+</div>
+<div class="citation" id="id11" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">Mey23</a><span class="fn-bracket">]</span></span>
+<p>Carl D. Meyer. <em>Matrix Analysis and Applied Linear Algebra</em>. SIAM, Philadelphia, 2 edition, 2023.</p>
+</div>
+<div class="citation" id="id32" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>PBMW99<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id4">2</a>)</span>
+<p>Lawrence Page, Sergey Brin, Rajeev Motwani, and Terry Winograd. The PageRank citation ranking: bringing order to the web. <em>Stanford InfoLab Technical Report</em>, 1999.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/06-structure"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="graphs-laplacian.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">6.1 Graphs, Incidence Matrices, and the Laplacian</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="circulant-toeplitz-fft.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#stochastic-matrices-and-stationary-distributions">Stochastic matrices and stationary distributions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perronfrobenius-in-the-form-used-here">Perron–Frobenius, in the form used here</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-google-matrix">The Google matrix</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-the-stochastic-matrix-and-powers-that-converge-to-rank-1">Exercise 1: The stochastic matrix, and powers that converge to rank 1</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-stationary-distribution-three-independent-ways">Exercise 2: The stationary distribution, three independent ways</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-mixing-rate-is-the-second-eigenvalue">Exercise 3: The mixing rate is the second eigenvalue</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-breaking-perronfrobenius-twice">Exercise 4: Breaking Perron–Frobenius, twice</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-the-google-matrix-and-its-exact-eigenvalue-discount">Exercise 5: The Google matrix, and its exact eigenvalue discount</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-how-much-does-the-answer-depend-on-the-knob">Exercise 6: How much does the answer depend on the knob?</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

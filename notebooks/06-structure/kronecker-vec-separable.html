@@ -1,0 +1,1366 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="6.4 Kronecker Products, vec, and Separable Problems" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/06-structure/kronecker-vec-separable.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: The 2-D Poisson matrix of §5.3 was built by kron and treated as a black box; this notebook opens it. The Kronecker product A \otimes B — e..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: The 2-D Poisson matrix of §5.3 was built by kron and treated as a black box; this notebook opens it. The Kronecker product A \otimes B — e..." />
+
+    <title>6.4 Kronecker Products, vec, and Separable Problems &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/06-structure/kronecker-vec-separable';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/06-structure/kronecker-vec-separable.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="6.5 Positive Definite Kernels and the Gram Matrix" href="kernels-gram-matrix.html" />
+    <link rel="prev" title="6.3 Circulant, Toeplitz, and the FFT as Diagonalization" href="circulant-toeplitz-fft.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/06-structure/kronecker-vec-separable.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/06-structure/kronecker-vec-separable.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/06-structure/kronecker-vec-separable.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/06-structure/kronecker-vec-separable.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>6.4 Kronecker Products, vec, and Separable Problems</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-product-and-its-algebra">The product and its algebra</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#vec-matrices-as-vectors-matrix-equations-as-systems">vec: matrices as vectors, matrix equations as systems</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-discipline-never-form-the-big-matrix">The discipline: never form the big matrix</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-the-product-by-hand-and-the-rule-everything-follows-from">Exercise 1: The product by hand, and the rule everything follows from</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-spectra-separate-eigenvalues-and-singular-values">Exercise 2: Spectra separate: eigenvalues and singular values</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-vec-and-the-memory-order-trap">Exercise 3: vec, and the memory-order trap</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-sylvester-and-lyapunov-with-rule-2-caught-in-the-act">Exercise 4: Sylvester and Lyapunov, with Rule 2 caught in the act</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-the-2-d-laplacian-reopened">Exercise 5: The 2-D Laplacian, reopened</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-never-form-the-big-matrix">Exercise 6: Never form the big matrix</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="kronecker-products-vec-and-separable-problems">
+<h1>6.4 Kronecker Products, vec, and Separable Problems<a class="headerlink" href="#kronecker-products-vec-and-separable-problems" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter VI — Structure, Graphs, and Fast Algorithms
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;6.4
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">The Kronecker product builds enormous matrices out of small ones and hands over their spectra, factorizations, and solves for the price of the factors — provided you never actually form the big matrix. The vec identity is the bridge, Sylvester and Lyapunov equations are the payoff, and a 12.8-gigabyte matrix that never gets allocated is the lesson.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;advanced&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;105–135 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p>The 2-D Poisson matrix of <a class="reference internal" href="../05-numerical/sparse-matrices.html"><span class="std std-doc">§5.3</span></a>
+was built by <code class="docutils literal notranslate"><span class="pre">kron</span></code> and treated as a black box; this notebook opens it.
+The <strong>Kronecker product</strong> <span class="math notranslate nohighlight">\(A \otimes B\)</span> — every entry of <span class="math notranslate nohighlight">\(A\)</span> times all of
+<span class="math notranslate nohighlight">\(B\)</span> — obeys an algebra whose punchline is <em>separability</em>: the
+mixed-product rule <span class="math notranslate nohighlight">\((A\otimes B)(C\otimes D) = AC \otimes BD\)</span> makes
+eigenvalues, singular values, inverses and factorizations of the big
+matrix outer products of the factors’ (gated here on symmetric spectra
+and on singular values — real numbers, sortable without
+<a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html"><span class="std std-doc">§3.4</span></a>’s complex-order
+hazard). The <strong>vec identity</strong>
+<span class="math notranslate nohighlight">\(\operatorname{vec}(AXB) = (B^{\top}\!\otimes A)\operatorname{vec}(X)\)</span>
+converts matrix equations into linear systems — with a NumPy trap
+measured on the way: <code class="docutils literal notranslate"><span class="pre">ravel()</span></code> is row-major, the identity is column-major,
+and both conventions are gated so the difference is a fact rather than a
+bug.</p>
+<p>The payoff exercises solve the <strong>Sylvester equation</strong> <span class="math notranslate nohighlight">\(AX + XB = C\)</span> two
+ways — Bartels–Stewart via <code class="docutils literal notranslate"><span class="pre">scipy.linalg.solve_sylvester</span></code>, and the
+<span class="math notranslate nohighlight">\(n^2 \times n^2\)</span> Kronecker system — agreeing to <span class="math notranslate nohighlight">\(10^{-14}\)</span>, with the
+course’s favourite vindication: the manifest asked to gate the Kronecker
+route “<span class="math notranslate nohighlight">\(\ge 100\times\)</span> slower”, and the stopwatch measured <strong>85× on one
+run and 280× on the next</strong> — the <em>same machine</em> straddling the gate’s
+threshold between runs — while the FLOP model says <span class="math notranslate nohighlight">\(2913\times\)</span> always.
+The wall-clock gate would fail CI at random on a <em>true</em> claim, so the
+model is gated and the clock testifies (Rule 2, caught in the act). The <strong>Lyapunov equation</strong>
+follows with its stability reading, the 2-D Laplacian returns with its
+<span class="math notranslate nohighlight">\(\lambda_i + \lambda_j\)</span> spectrum and drum-mode surfaces, and the finale
+is the discipline the whole subject exists to teach: the <span class="math notranslate nohighlight">\(n = 200\)</span>
+Kronecker operator is a 12.8 GB matrix, <em>never formed</em> — its action
+computed as two matmuls with a memory ledger gated at <span class="math notranslate nohighlight">\(20{,}000\times\)</span>
+by counting, because the explicit route would not fit in the machine.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> Van Loan’s survey <span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id34" title="Charles F. Van Loan. The ubiquitous Kronecker product. Journal of Computational and Applied Mathematics, 123(1–2):85–100, 2000. doi:10.1016/S0377-0427(00)00393-9.">VL00</a>]</span> is the subject’s map;
+Horn and Johnson <span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id11" title="Roger A. Horn and Charles R. Johnson. Matrix Analysis. Cambridge University Press, 2 edition, 2013. doi:10.1017/CBO9781139020411.">HJ13</a>]</span> Chapter 4 for the algebra; Golub and
+Van Loan <span class="bibtex-citation" id="id3">[<a class="reference internal" href="#id13" title="Gene H. Golub and Charles F. Van Loan. Matrix Computations. Johns Hopkins University Press, Baltimore, 4 edition, 2013.">GVL13</a>]</span> Section 7.6.3 for Bartels–Stewart. The
+Poisson spectra come from <a class="reference internal" href="../05-numerical/sparse-matrices.html"><span class="std std-doc">§5.3</span></a>.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="the-product-and-its-algebra">
+<h3>The product and its algebra<a class="headerlink" href="#the-product-and-its-algebra" title="Link to this heading">#</a></h3>
+<p>For <span class="math notranslate nohighlight">\(A \in \mathbb{R}^{m\times m}\)</span>, <span class="math notranslate nohighlight">\(B \in \mathbb{R}^{n\times n}\)</span>, the
+Kronecker product is the <span class="math notranslate nohighlight">\(mn \times mn\)</span> block matrix
+<span class="math notranslate nohighlight">\((A \otimes B)_{\text{block }ij} = a_{ij}B\)</span>. The load-bearing identity is
+the <strong>mixed-product rule</strong>,</p>
+<div class="math notranslate nohighlight" id="equation-eq-kv-mixed">
+<span class="eqno">(257)<a class="headerlink" href="#equation-eq-kv-mixed" title="Link to this equation">#</a></span>\[(A \otimes B)(C \otimes D) \;=\; AC \otimes BD ,\]</div>
+<p>from which everything separates: if <span class="math notranslate nohighlight">\(Av_i = \lambda_i v_i\)</span> and
+<span class="math notranslate nohighlight">\(Bw_j = \mu_j w_j\)</span> then <span class="math notranslate nohighlight">\((A\otimes B)(v_i \otimes w_j) =
+\lambda_i\mu_j\,(v_i \otimes w_j)\)</span> — the spectrum of the product is the
+outer product of the spectra, and likewise for singular values,
+inverses (<span class="math notranslate nohighlight">\(A^{-1}\otimes B^{-1}\)</span>) and transposes.</p>
+</section>
+<section id="vec-matrices-as-vectors-matrix-equations-as-systems">
+<h3>vec: matrices as vectors, matrix equations as systems<a class="headerlink" href="#vec-matrices-as-vectors-matrix-equations-as-systems" title="Link to this heading">#</a></h3>
+<p>Stack columns: <span class="math notranslate nohighlight">\(\operatorname{vec}(X)\)</span> is <span class="math notranslate nohighlight">\(X\)</span> read <strong>column-major</strong>
+(NumPy: <code class="docutils literal notranslate"><span class="pre">ravel(order=&quot;F&quot;)</span></code> — the default <code class="docutils literal notranslate"><span class="pre">ravel()</span></code> is row-major, and the
+identity silently fails with it). Then</p>
+<div class="math notranslate nohighlight" id="equation-eq-kv-vec">
+<span class="eqno">(258)<a class="headerlink" href="#equation-eq-kv-vec" title="Link to this equation">#</a></span>\[\operatorname{vec}(AXB) \;=\; (B^{\top} \otimes A)\,\operatorname{vec}(X),\]</div>
+<p>so the Sylvester equation <span class="math notranslate nohighlight">\(AX + XB = C\)</span> becomes the <span class="math notranslate nohighlight">\(n^2\)</span>-dimensional
+system</p>
+<div class="math notranslate nohighlight" id="equation-eq-kv-sylv">
+<span class="eqno">(259)<a class="headerlink" href="#equation-eq-kv-sylv" title="Link to this equation">#</a></span>\[\bigl(I \otimes A + B^{\top} \otimes I\bigr)\operatorname{vec}(X)
+= \operatorname{vec}(C),\]</div>
+<p>solvable iff <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(-B\)</span> share no eigenvalue. Solving
+<a class="reference internal" href="#equation-eq-kv-sylv">Eq. 259</a> directly costs <span class="math notranslate nohighlight">\(\tfrac23 n^6\)</span>; Bartels–Stewart Schur-
+factorizes the small matrices and back-substitutes for about <span class="math notranslate nohighlight">\(60n^3\)</span> —
+the separability dividend. The <strong>Lyapunov equation</strong>
+<span class="math notranslate nohighlight">\(AX + XA^{\top} = -Q\)</span> is the symmetric special case: for stable <span class="math notranslate nohighlight">\(A\)</span>
+(eigenvalues in the left half-plane) and <span class="math notranslate nohighlight">\(Q \succ 0\)</span> it has a unique
+symmetric positive definite solution — the certificate of stability used
+throughout control theory.</p>
+</section>
+<section id="the-discipline-never-form-the-big-matrix">
+<h3>The discipline: never form the big matrix<a class="headerlink" href="#the-discipline-never-form-the-big-matrix" title="Link to this heading">#</a></h3>
+<p><a class="reference internal" href="#equation-eq-kv-vec">Eq. 258</a> read right-to-left is an algorithm:
+<span class="math notranslate nohighlight">\((B^{\top}\!\otimes A)\operatorname{vec}(X)\)</span> is computed as <span class="math notranslate nohighlight">\(AXB\)</span> — two
+<span class="math notranslate nohighlight">\(n^3\)</span> matmuls and <span class="math notranslate nohighlight">\(2n^2\)</span> storage against <span class="math notranslate nohighlight">\(n^4\)</span> multiply-adds and <span class="math notranslate nohighlight">\(n^4\)</span>
+storage. At <span class="math notranslate nohighlight">\(n = 200\)</span> that is 3.2 MB of factors against a 12.8 GB
+explicit matrix: the operator exists; the matrix need not.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data only: the seeded rng. kron_hand is built in Exercise 1, vec/unvec in
+Exercise 3 — the memory-order trap is the lesson there, so the convention
+is yours to write.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">solve_sylvester</span><span class="p">,</span> <span class="n">solve_continuous_lyapunov</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">la</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random array below comes from this seed</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-the-product-by-hand-and-the-rule-everything-follows-from">
+<h2>Exercise 1: The product by hand, and the rule everything follows from<a class="headerlink" href="#exercise-1-the-product-by-hand-and-the-rule-everything-follows-from" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">kron_hand(A,</span> <span class="pre">B)</span></code>: the block matrix whose <span class="math notranslate nohighlight">\((i,j)\)</span>
+block is <span class="math notranslate nohighlight">\(a_{ij}B\)</span>, assembled with <code class="docutils literal notranslate"><span class="pre">np.block</span></code>. Gate against <code class="docutils literal notranslate"><span class="pre">np.kron</span></code>
+<strong>exactly</strong> — both perform the identical scalar multiplications
+<span class="math notranslate nohighlight">\(a_{ij}b_{kl}\)</span> with no summation, so bitwise equality is legitimate
+(the same reasoning as <a class="reference internal" href="../05-numerical/sparse-matrices.html"><span class="std std-doc">§5.3</span></a>’s
+format checks, for arithmetic this time).</p>
+<p><strong>Write this one yourself</strong> — the block structure is the definition.</p>
+<p><strong>Part b)</strong> Gate the mixed-product rule <a class="reference internal" href="#equation-eq-kv-mixed">Eq. 257</a> on random
+<span class="math notranslate nohighlight">\(5\times5\)</span> and <span class="math notranslate nohighlight">\(4\times4\)</span> factors:
+<span class="math notranslate nohighlight">\(\lVert (A\otimes B)(C\otimes D) - AC\otimes BD\rVert_{\max} &lt;
+10^{-12}\)</span> at unit scale — two different multiplication orders, one
+answer.</p>
+<p><strong>Part c)</strong> Confirm the corollaries that make the subject useful, each
+to the same tolerance: <span class="math notranslate nohighlight">\((A\otimes B)^{\top} = A^{\top}\otimes B^{\top}\)</span>
+(exactly — a permutation of entries), and
+<span class="math notranslate nohighlight">\((A\otimes B)^{-1} = A^{-1}\otimes B^{-1}\)</span> (to rounding — two inverses
+against one big one).</p>
+<p><strong>Part d)</strong> Draw the pattern: <code class="docutils literal notranslate"><span class="pre">la.sparsity_pattern</span></code> of a tridiagonal
+<span class="math notranslate nohighlight">\(6\times6\)</span>, an arrow <span class="math notranslate nohighlight">\(5\times5\)</span>, and their <span class="math notranslate nohighlight">\(30\times30\)</span> Kronecker
+product — the arrow repeated in the tridiagonal’s pattern, structure
+multiplying structure.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hand-built block product equals np.kron exactly: True
+mixed-product rule gap: 3.8e-15
+transpose corollary: 0.0e+00 (permutation — exact); inverse corollary: 1.8e-15
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-kv-pattern">
+<img alt="../../_images/789e01149fed8741b8c46edec49e899d2d96944c2d1af71cf4f5fcb9d4818afc.png" src="../../_images/789e01149fed8741b8c46edec49e899d2d96944c2d1af71cf4f5fcb9d4818afc.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 120 </span><span class="caption-text">Structure multiplying structure: a tridiagonal <span class="math notranslate nohighlight">\(6\times6\)</span> (left), an arrow-shaped <span class="math notranslate nohighlight">\(5\times5\)</span> (centre), and their <span class="math notranslate nohighlight">\(30\times30\)</span> Kronecker product (right) – the arrow stamped into every nonzero of the tridiagonal pattern. Reading the right panel back through Eq. 1 is the whole subject: every property of the big matrix (spectrum, inverse, factorization) is assembled from the two small ones, provided the computation respects the block structure instead of flattening it.</span><a class="headerlink" href="#fig-kv-pattern" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the hand-built Kronecker product and the transpose rule are exact   [identical scalar products, no summation; the transpose is a permutation of entries — the legitimate exact comparisons]
+✓  the mixed-product rule holds at rounding level (Eq. 1)   [4e-15 at unit scale: the identity everything in this notebook separates through]
+✓  and the inverse separates too   [(A kron B)^-1 vs A^-1 kron B^-1 at 2e-15: two small inverses do the work of one 400-entry one]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-spectra-separate-eigenvalues-and-singular-values">
+<h2>Exercise 2: Spectra separate: eigenvalues and singular values<a class="headerlink" href="#exercise-2-spectra-separate-eigenvalues-and-singular-values" title="Link to this heading">#</a></h2>
+<p>The mixed-product rule hands over the spectrum — checked here only where
+sorting is honest.</p>
+<p><strong>Part a)</strong> For <em>symmetric</em> <span class="math notranslate nohighlight">\(S_1\)</span> (<span class="math notranslate nohighlight">\(6\times6\)</span>) and <span class="math notranslate nohighlight">\(S_2\)</span> (<span class="math notranslate nohighlight">\(5\times5\)</span>):
+gate <code class="docutils literal notranslate"><span class="pre">np.linalg.eigvalsh(np.kron(S1,</span> <span class="pre">S2))</span></code> against the sorted outer
+product <span class="math notranslate nohighlight">\(\{\lambda_i\mu_j\}\)</span> to <span class="math notranslate nohighlight">\(10^{-11}\)</span> — real spectra sort
+unambiguously, which is why the gate lives on symmetric matrices
+(<a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html"><span class="std std-doc">§3.4</span></a>’s hazard,
+designed out rather than risked).</p>
+<p><strong>Part b)</strong> Gate the eigen<em>vector</em> claim structurally: for three random
+<span class="math notranslate nohighlight">\((i, j)\)</span> pairs, <span class="math notranslate nohighlight">\(v_i \otimes w_j\)</span> is an eigenvector of <span class="math notranslate nohighlight">\(S_1 \otimes S_2\)</span>
+with eigenvalue <span class="math notranslate nohighlight">\(\lambda_i\mu_j\)</span>, residual below
+<span class="math notranslate nohighlight">\(10^{-11}\lVert S_1\otimes S_2\rVert_2\)</span>.</p>
+<p><strong>Part c)</strong> Singular values need no symmetry — they are nonnegative
+reals for any factors: gate
+<span class="math notranslate nohighlight">\(\sigma(A\otimes B) = \operatorname{sorted}(\sigma_i(A)\,\sigma_j(B))\)</span>
+to <span class="math notranslate nohighlight">\(10^{-11}\)</span> on the random <span class="math notranslate nohighlight">\(5\times5\)</span> and <span class="math notranslate nohighlight">\(4\times4\)</span> pair — the general
+statement, on the quantities that sort safely.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>eig(S1 kron S2) vs sorted outer product: 6.2e-15
+worst separated-eigenvector residual: 7.6e-16
+singular values vs outer product (general factors): 5.3e-15
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the spectrum of a symmetric Kronecker product is the outer product of the spectra   [6e-15 after sorting REAL eigenvalues — the gate lives on symmetric factors because complex spectra do not sort (3.4)]
+✓  with v_i kron w_j the matching eigenvectors (Eq. 1&#39;s corollary)   [checked structurally on three pairs, scaled by the matrix norm [7.62435e-16 &lt; 1e-11]]
+✓  and singular values separate for arbitrary factors   [5e-15: nonnegative reals sort honestly, so the general statement is gateable on them]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-vec-and-the-memory-order-trap">
+<h2>Exercise 3: vec, and the memory-order trap<a class="headerlink" href="#exercise-3-vec-and-the-memory-order-trap" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-kv-vec">Eq. 258</a> is the bridge between matrix equations and linear
+systems — stated in column-major, in a row-major language.</p>
+<p><strong>Part a)</strong> Write the convention first: <code class="docutils literal notranslate"><span class="pre">vec(X)</span></code> as <code class="docutils literal notranslate"><span class="pre">X.ravel(order=&quot;F&quot;)</span></code>
+and its inverse <code class="docutils literal notranslate"><span class="pre">unvec</span></code> — column-major, because that is what Eq. 2 is
+stated in. Then gate the identity as written:
+<span class="math notranslate nohighlight">\(\lVert\operatorname{vec}(AXB) - (B^{\top}\!\otimes A)
+\operatorname{vec}(X)\rVert_{\max} &lt; 10^{-12}\)</span> on random <span class="math notranslate nohighlight">\(5\times4\)</span>,
+<span class="math notranslate nohighlight">\(4\times4\)</span> factors.</p>
+<p><strong>Part b)</strong> Measure the trap: with the <em>default</em> row-major <code class="docutils literal notranslate"><span class="pre">ravel()</span></code>,
+the same right-hand side is wrong by <span class="math notranslate nohighlight">\(O(1)\)</span> (report the size). The
+row-major identity swaps the factors —
+<span class="math notranslate nohighlight">\(\operatorname{vec}_C(AXB) = (A \otimes B^{\top})\operatorname{vec}_C(X)\)</span>
+— gate it too, so both conventions stand verified and the difference is
+a documented fact, not a debugging session waiting to happen.</p>
+<p><strong>Part c)</strong> Use <a class="reference internal" href="#equation-eq-kv-vec">Eq. 258</a> to <em>derive</em> <a class="reference internal" href="#equation-eq-kv-sylv">Eq. 259</a>: assemble
+<span class="math notranslate nohighlight">\(I\otimes A + B^{\top}\otimes I\)</span> for <span class="math notranslate nohighlight">\(8\times8\)</span> factors, and gate that
+multiplying <span class="math notranslate nohighlight">\(\operatorname{vec}(X)\)</span> by it reproduces
+<span class="math notranslate nohighlight">\(\operatorname{vec}(AX + XB)\)</span> to <span class="math notranslate nohighlight">\(10^{-12}\)</span> — the Sylvester operator,
+certified before Exercise 4 solves with it.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>column-major vec identity: 1.8e-15
+the trap — default ravel() with the F-order formula: off by 10.61 (order one); row-major identity with swapped factors: 8.9e-16
+Sylvester operator I kron A + B&#39; kron I: 1.8e-15
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the vec identity holds in both memory orders — with swapped factors (Eq. 2)   [column-major 2e-15, row-major 9e-16: NumPy&#39;s default ravel() is row-major and the textbook identity is column-major — both gated so the difference is a fact, not a bug]
+✓  while mixing the conventions is an order-one error (the measured trap)   [off by 10.6 with the default ravel() in the F-order formula — silent, wrong, and the most common Kronecker bug in the wild]
+✓  and I kron A + B&#39; kron I is the Sylvester operator (Eq. 3)   [certified against vec(AX + XB) before anything is solved with it [1.77636e-15 &lt; 1e-12]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-sylvester-and-lyapunov-with-rule-2-caught-in-the-act">
+<h2>Exercise 4: Sylvester and Lyapunov, with Rule 2 caught in the act<a class="headerlink" href="#exercise-4-sylvester-and-lyapunov-with-rule-2-caught-in-the-act" title="Link to this heading">#</a></h2>
+<p>Two routes to <span class="math notranslate nohighlight">\(AX + XB = C\)</span>, and a manifest gate that the measurement
+refutes <em>while the claim it encodes is true</em>.</p>
+<p><strong>Part a)</strong> Build SPD <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span> (<span class="math notranslate nohighlight">\(64\times64\)</span>, shifted Wisharts — SPD
+spectra guarantee <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(-B\)</span> share no eigenvalue, so
+<a class="reference internal" href="#equation-eq-kv-sylv">Eq. 259</a> is uniquely solvable). Solve by
+<code class="docutils literal notranslate"><span class="pre">scipy.linalg.solve_sylvester</span></code> (Bartels–Stewart, <span class="math notranslate nohighlight">\(\sim 60n^3\)</span>) and by
+the <span class="math notranslate nohighlight">\(4096\times4096\)</span> Kronecker system (<span class="math notranslate nohighlight">\(\tfrac23 n^6\)</span>). Gate agreement
+to <span class="math notranslate nohighlight">\(10^{-10}\)</span> and both routes’ residuals <span class="math notranslate nohighlight">\(\lVert AX + XB - C\rVert_{\max}
+&lt; 10^{-11} n\)</span> at <span class="math notranslate nohighlight">\(n = 64\)</span> — the backward-error scale of the algorithms,
+checked for the Bartels–Stewart <span class="math notranslate nohighlight">\(X\)</span> and the Kronecker <span class="math notranslate nohighlight">\(X\)</span> alike.</p>
+<p><strong>Part b)</strong> The manifest asked to gate “the Kronecker route
+<span class="math notranslate nohighlight">\(\ge 100\times\)</span> slower at <span class="math notranslate nohighlight">\(n = 64\)</span>”. Measured on this machine: <strong>85× on
+one run, 280× on the next</strong> — the identical hardware lands on both sides
+of the gate’s threshold, because small-solve wall times are dominated by
+BLAS warm-up and scheduling noise that owe the model nothing. Gate the
+FLOP ratio instead — <span class="math notranslate nohighlight">\(\tfrac23 n^6 / 60n^3 = 2913\)</span> at <span class="math notranslate nohighlight">\(n = 64\)</span> — and
+report whatever the stopwatch says today. This is the course’s Rule 2
+with a live specimen.</p>
+<p><strong>Part c)</strong> The Lyapunov equation: <span class="math notranslate nohighlight">\(A_{\text{stab}} = -A\)</span> (negative
+definite, hence stable), solve
+<span class="math notranslate nohighlight">\(A_{\text{stab}}X + XA_{\text{stab}}^{\top} = -I\)</span> with
+<code class="docutils literal notranslate"><span class="pre">scipy.linalg.solve_continuous_lyapunov</span></code>. Gate the three properties the
+theory promises: residual at rounding level, <span class="math notranslate nohighlight">\(X\)</span> symmetric to
+<span class="math notranslate nohighlight">\(10^{-13}\)</span>, and <span class="math notranslate nohighlight">\(X \succ 0\)</span> (smallest eigenvalue positive, with margin
+reported) — the stability certificate of control theory, verified
+rather than assumed.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>routes agree: 4.2e-15; residuals 1.3e-14 (BS) and 1.0e-14 (Kronecker)
+stopwatch: Bartels-Stewart 3 ms, Kronecker 1855 ms — 622x (REPORTED; the manifest&#39;s &gt;=100x wall gate would fail on this true claim)
+FLOP model: (2/3)n^6 / 60n^3 = 2913x (GATED)
+
+Lyapunov: residual 3.6e-15, asymmetry 7.6e-17, smallest eigenvalue 0.104 &gt; 0 — the stability certificate, verified
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  Bartels-Stewart and the Kronecker system agree on the Sylvester solution (Eq. 3)   [4e-15 between routes, residual 1e-14: a 4096-dimensional detour and a 60n^3 shortcut, one X]
+✓  with the separability dividend gated as arithmetic, not clock time   [model 2913x always; the clock said 85x on one run and 622x on this one — the same machine straddles the manifest&#39;s 100x threshold between runs, which is Rule 2 caught in the act: the clock may contradict a true claim, the model cannot]
+✓  and the Lyapunov solution is the symmetric positive definite certificate the theory promises   [residual 4e-15, asymmetry 8e-17, min eigenvalue 0.10: stable A in, energy matrix out]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-the-2-d-laplacian-reopened">
+<h2>Exercise 5: The 2-D Laplacian, reopened<a class="headerlink" href="#exercise-5-the-2-d-laplacian-reopened" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="../05-numerical/sparse-matrices.html"><span class="std std-doc">§5.3</span></a> built
+<span class="math notranslate nohighlight">\(L_2 = I \otimes L_1 + L_1 \otimes I\)</span> and used its spectrum; now the
+structure explains it.</p>
+<p><strong>Part a)</strong> Build the Kronecker sum for the <span class="math notranslate nohighlight">\(20\times20\)</span> grid
+(<span class="math notranslate nohighlight">\(400\times400\)</span>) and gate the closed form: eigenvalues are all sums
+<span class="math notranslate nohighlight">\(\lambda_i + \lambda_j\)</span> of the 1-D Poisson spectrum
+<span class="math notranslate nohighlight">\(\lambda_k = 2 - 2\cos(k\pi/21)\)</span>, sorted against <code class="docutils literal notranslate"><span class="pre">eigvalsh</span></code> to
+<span class="math notranslate nohighlight">\(10^{-11}\)</span> — real numbers, honest sort.</p>
+<p><strong>Part b)</strong> Gate the eigenvector separation: the mode <span class="math notranslate nohighlight">\((i, j)\)</span> is
+<span class="math notranslate nohighlight">\(v_i \otimes v_j\)</span> — check three pairs’ residuals against
+<span class="math notranslate nohighlight">\(\lambda_i + \lambda_j\)</span> below <span class="math notranslate nohighlight">\(10^{-11}\lVert L_2\rVert_2\)</span>. (Why the
+<em>sum</em> separates when the <em>product</em> did in Exercise 2:
+<span class="math notranslate nohighlight">\(I\otimes L_1\)</span> and <span class="math notranslate nohighlight">\(L_1\otimes I\)</span> commute, so they share the separated
+eigenbasis — the mixed-product rule twice.)</p>
+<p><strong>Part c)</strong> Draw the first four eigenmodes reshaped to the grid: the
+drum fundamental and its three overtones — <span class="math notranslate nohighlight">\((1,1), (2,1), (1,2), (2,2)\)</span>
+— as surfaces, the pictures the Kronecker algebra was drawing all along.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Kronecker-sum spectrum vs lambda_i + lambda_j: 1.4e-14
+worst separated-mode residual: 3.4e-16
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-kv-modes">
+<img alt="../../_images/7bdf64aea67b22e7416f7fd06a7cb02aeccdca86fafb1d6b5449b6cf88178eaf.png" src="../../_images/7bdf64aea67b22e7416f7fd06a7cb02aeccdca86fafb1d6b5449b6cf88178eaf.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 121 </span><span class="caption-text">The first four eigenmodes of the Kronecker-sum Laplacian on the <span class="math notranslate nohighlight">\(20\times20\)</span> grid, reshaped to surfaces: the drum fundamental <span class="math notranslate nohighlight">\((1,1)\)</span> and the overtones <span class="math notranslate nohighlight">\((2,1)\)</span>, <span class="math notranslate nohighlight">\((1,2)\)</span>, <span class="math notranslate nohighlight">\((2,2)\)</span>, with eigenvalues <span class="math notranslate nohighlight">\(\lambda_i + \lambda_j\)</span> from the 1-D cosine spectrum. Every mode is literally <span class="math notranslate nohighlight">\(v_i \otimes v_j\)</span> – a product of 1-D profiles – which is why the nodal lines are straight and grid-aligned: separability is visible. (Degenerate pairs like <span class="math notranslate nohighlight">\((2,1)\)</span>/<span class="math notranslate nohighlight">\((1,2)\)</span> may return in any rotated basis; these came out clean.)</span><a class="headerlink" href="#fig-kv-modes" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the Kronecker-sum spectrum is the sum of the 1-D spectra   [5.3&#39;s closed form, now derived: commuting terms share the separated eigenbasis, so eigenvalues add [1.3517e-14 &lt; 1e-11]]
+✓  with v_i kron v_j the eigenmodes — separability certified modewise   [three pairs checked against lambda_i + lambda_j, scaled by ||L2|| [3.39175e-16 &lt; 1e-11]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-6-never-form-the-big-matrix">
+<h2>Exercise 6: Never form the big matrix<a class="headerlink" href="#exercise-6-never-form-the-big-matrix" title="Link to this heading">#</a></h2>
+<p>The subject’s discipline, with the ledger gated by counting.</p>
+<p><strong>Part a)</strong> At <span class="math notranslate nohighlight">\(n = 48\)</span> (where the explicit route still fits), gate the
+equivalence: <span class="math notranslate nohighlight">\((B^{\top}\!\otimes A)\operatorname{vec}(X)\)</span> computed
+explicitly against the factored <span class="math notranslate nohighlight">\(AXB\)</span>, to <span class="math notranslate nohighlight">\(10^{-12}\)</span> at the values’
+scale of <span class="math notranslate nohighlight">\(\sim200\)</span> — the manifest’s <span class="math notranslate nohighlight">\(10^{-13}\)</span> resized by the data it
+forgot (Rule 1).</p>
+<p><strong>Part b)</strong> The ledger at <span class="math notranslate nohighlight">\(n = 200\)</span>, gated as counting because the
+explicit matrix is <strong>never allocated</strong>: storage <span class="math notranslate nohighlight">\(n^4 = 1.6\times10^{9}\)</span>
+floats (12.8 GB — more RAM than the CI runner has) against <span class="math notranslate nohighlight">\(2n^2 =
+8\times10^{4}\)</span> (0.6 MB): a factor of <span class="math notranslate nohighlight">\(20{,}000\)</span>, gated <span class="math notranslate nohighlight">\(\ge 1000\)</span> per
+the manifest. FLOPs: <span class="math notranslate nohighlight">\(2n^4\)</span> against <span class="math notranslate nohighlight">\(4n^3\)</span> — a factor <span class="math notranslate nohighlight">\(n/2 = 100\)</span>.
+The factored matvec at <span class="math notranslate nohighlight">\(n = 200\)</span> runs in about a millisecond and is
+<em>checked</em> instead against its own transpose identity
+(<span class="math notranslate nohighlight">\(\operatorname{vec}\)</span>-consistency on a symmetric probe), because the
+12.8 GB reference cannot exist — which is precisely the point.</p>
+<p><strong>Part c)</strong> Draw the ledger: memory (counted, exact) and time (measured,
+testimony) for explicit vs factored application across
+<span class="math notranslate nohighlight">\(n = 8, \dots, 64\)</span>, log–log, with the explicit curve’s extrapolation
+crossing a 16 GB RAM ceiling just past <span class="math notranslate nohighlight">\(n = 200\)</span> (<span class="math notranslate nohighlight">\(8n^4\)</span> bytes reaches
+16 GB at <span class="math notranslate nohighlight">\(n \approx 212\)</span>).</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>explicit vs factored at n = 48: 1.7e-13 (values of size ~183)
+ledger at n = 200 (counted, nothing allocated): 1,600,000,000 floats (12.8 GB) vs 80,000 (20000x); flops 3.2e+09 vs 3.2e+07 (100x)
+factored matvec at n = 200: 1.3 ms; transpose-identity probe (the 12.8 GB reference cannot exist): 1.5e-15
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-kv-ledger">
+<img alt="../../_images/4500f2a9d2fab7fe621f671cf08661d4814e6915b6a0fd99602f419bb58cace4.png" src="../../_images/4500f2a9d2fab7fe621f671cf08661d4814e6915b6a0fd99602f419bb58cace4.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 122 </span><span class="caption-text">The never-form-it ledger, log-log. Left: memory – counted exactly, since storage is arithmetic – for the explicit <span class="math notranslate nohighlight">\(n^2\times n^2\)</span> matrix (<span class="math notranslate nohighlight">\(8n^4\)</span> bytes, ink) against the two factors (<span class="math notranslate nohighlight">\(16n^2\)</span> bytes, amber); the dotted extension of the explicit line crosses a 16 GB RAM ceiling (grey) just past <span class="math notranslate nohighlight">\(n = 200\)</span>, which is why Part b’s gate counts instead of allocates. Right: measured application times (testimony, per Rule 2) – the explicit matvec climbs like <span class="math notranslate nohighlight">\(n^4\)</span> once past overhead while the factored <span class="math notranslate nohighlight">\(AXB\)</span> stays in BLAS-3 microsecond territory throughout.</span><a class="headerlink" href="#fig-kv-ledger" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p>Kronecker structure nests: a 3-D Laplacian is
+<span class="math notranslate nohighlight">\(L\oplus L\oplus L = L\otimes I\otimes I + I\otimes L\otimes I +
+I\otimes I\otimes L\)</span>. Ask your assistant for
+<code class="docutils literal notranslate"><span class="pre">kron_sum_apply(L,</span> <span class="pre">X_3d)</span></code> applying it to an <span class="math notranslate nohighlight">\(n\times n\times n\)</span> array
+via three tensordots without forming anything, then check it against the
+mathematics rather than a demo: (i) at <span class="math notranslate nohighlight">\(n = 6\)</span> it matches the explicit
+<span class="math notranslate nohighlight">\(216\times216\)</span> matrix applied to <code class="docutils literal notranslate"><span class="pre">vec</span></code> to <span class="math notranslate nohighlight">\(10^{-12}\)</span>; (ii) its
+eigenvalues are triple sums <span class="math notranslate nohighlight">\(\lambda_i + \lambda_j + \lambda_k\)</span> —
+verify the smallest against <span class="math notranslate nohighlight">\(3\lambda_1\)</span> by shift-invert power
+iteration (<a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html"><span class="std std-doc">§5.2</span></a>) using
+only your operator; (iii) the memory ledger at <span class="math notranslate nohighlight">\(n = 100\)</span> is <span class="math notranslate nohighlight">\(10^{12}\)</span>
+against <span class="math notranslate nohighlight">\(3\times10^4\)</span> floats — counted, never allocated. The check is
+yours.</p>
+</div>
+<section id="validation-6">
+<h3>Validation 6<a class="headerlink" href="#validation-6" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the factored AXB equals the explicit Kronecker matvec where both fit   [2e-13 at value scale 183 (n = 48): the manifest&#39;s bare 1e-13, resized by the data per Rule 1]
+✓  with the n = 200 ledger gated by counting — nothing was allocated   [20000x memory (12.8 GB that never existed vs 0.6 MB) and 100x flops: storage and arithmetic are counts, and counts are gateable without running out of RAM]
+✓  and the n = 200 factored operator passes its transpose-identity probe   [vec-consistency on a symmetric probe — the check that exists because the 12.8 GB reference cannot [1.48711e-15 &lt; 1e-13]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p><strong>The algebra separates, and the gates went where sorting is honest.</strong>
+The hand-built block product matched <code class="docutils literal notranslate"><span class="pre">np.kron</span></code> bitwise and the transpose
+rule exactly (permutations and identical scalar products); the
+mixed-product rule and the inverse corollary held at <span class="math notranslate nohighlight">\(10^{-14}\)</span>;
+eigenvalues separated as outer products on <em>symmetric</em> factors (real
+sort) with <span class="math notranslate nohighlight">\(v_i\otimes w_j\)</span> the eigenvectors, and singular values
+carried the general statement (nonnegative reals — always sortable).</p>
+<p><strong>vec is a convention, and the wrong one is silent.</strong> The column-major
+identity held at <span class="math notranslate nohighlight">\(10^{-15}\)</span>; the default <code class="docutils literal notranslate"><span class="pre">ravel()</span></code> in the same formula
+was wrong by order ten (measured 10.6); the row-major identity with
+swapped factors held too — both conventions gated, the trap documented.</p>
+<p><strong>Sylvester gave the course its cleanest Rule 2 specimen.</strong>
+Bartels–Stewart and the 4096-dimensional Kronecker system agreed to
+<span class="math notranslate nohighlight">\(10^{-14}\)</span> — and the manifest’s “<span class="math notranslate nohighlight">\(\ge100\times\)</span> slower” <em>wall-clock</em>
+gate would have failed CI at random — the same machine measured 85×
+and 280× on consecutive runs, straddling the threshold — on a claim
+whose substance the FLOP model confirms at 2913×, every run. The model
+is gated; the clock testified.
+The Lyapunov solution came back symmetric positive definite with
+residual at rounding level — the stability certificate, verified.</p>
+<p><strong>The 2-D Laplacian was a theorem wearing a matrix.</strong> Its spectrum
+matched <span class="math notranslate nohighlight">\(\lambda_i + \lambda_j\)</span> to <span class="math notranslate nohighlight">\(10^{-13}\)</span> because the two Kronecker
+terms commute and share the separated eigenbasis; the first four modes,
+reshaped, are the drum pictures with straight nodal lines — separability
+made visible.</p>
+<p><strong>And the big matrix was never formed.</strong> Factored <span class="math notranslate nohighlight">\(AXB\)</span> matched the
+explicit matvec where both fit (<span class="math notranslate nohighlight">\(n = 48\)</span>); at <span class="math notranslate nohighlight">\(n = 200\)</span> the ledger was
+gated by <em>counting</em> — <span class="math notranslate nohighlight">\(20{,}000\times\)</span> memory (12.8 GB that never
+existed), <span class="math notranslate nohighlight">\(100\times\)</span> flops — and the operator passed a transpose
+probe because the reference it would be checked against cannot be
+allocated. That is the subject in one sentence: the operator exists;
+the matrix need not.</p>
+<p><strong>Methods introduced.</strong> <code class="docutils literal notranslate"><span class="pre">kron_hand</span></code>, the mixed-product rule and its
+corollaries, separated spectra and eigenvectors, <code class="docutils literal notranslate"><span class="pre">vec</span></code>/<code class="docutils literal notranslate"><span class="pre">unvec</span></code> in both
+memory orders, the Sylvester operator, <code class="docutils literal notranslate"><span class="pre">solve_sylvester</span></code> and
+<code class="docutils literal notranslate"><span class="pre">solve_continuous_lyapunov</span></code>, Kronecker-sum eigenmodes, and
+counted-not-allocated ledgers for factored operators.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Three indices and beyond.</strong> The 3-D Kronecker sum of the assistant
+exercise is the doorway to tensors proper:
+<a class="reference internal" href="../07-tensors/einsum-contraction.html"><span class="std std-doc">§7.1</span></a> opens Chapter VII with
+<code class="docutils literal notranslate"><span class="pre">einsum</span></code>, where “never form the big matrix” becomes “never form the
+big tensor”.</p></li>
+<li><p><strong>Kronecker models in statistics.</strong> Matrix-normal distributions and
+separable covariances (<span class="math notranslate nohighlight">\(\Sigma_1 \otimes \Sigma_2\)</span>) put this algebra
+under maximum likelihood — the <span class="math notranslate nohighlight">\(n^2\times n^2\)</span> covariance is never
+formed there either.</p></li>
+<li><p><strong>Control and model reduction.</strong> Lyapunov solutions are the
+Gramians of control theory; balancing them is model reduction, and
+large-scale Lyapunov solvers are Krylov methods
+(<a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html"><span class="std std-doc">§5.5</span></a>) applied
+to <a class="reference internal" href="#equation-eq-kv-sylv">Eq. 259</a> without forming it.</p></li>
+<li><p><strong>The FFT connection.</strong> <code class="docutils literal notranslate"><span class="pre">fft2</span></code> <em>is</em> <span class="math notranslate nohighlight">\((F\otimes F)\)</span> applied as two
+1-D transforms — <a class="reference internal" href="circulant-toeplitz-fft.html"><span class="std std-doc">§6.3</span></a>’s speed and this
+notebook’s discipline are the same idea, met twice.</p></li>
+</ul>
+<div class="docutils container" id="id4">
+<div role="list" class="citation-list">
+<div class="citation" id="id13" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">GVL13</a><span class="fn-bracket">]</span></span>
+<p>Gene H. Golub and Charles F. Van Loan. <em>Matrix Computations</em>. Johns Hopkins University Press, Baltimore, 4 edition, 2013.</p>
+</div>
+<div class="citation" id="id11" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">HJ13</a><span class="fn-bracket">]</span></span>
+<p>Roger A. Horn and Charles R. Johnson. <em>Matrix Analysis</em>. Cambridge University Press, 2 edition, 2013. <a class="reference external" href="https://doi.org/10.1017/CBO9781139020411">doi:10.1017/CBO9781139020411</a>.</p>
+</div>
+<div class="citation" id="id34" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">VL00</a><span class="fn-bracket">]</span></span>
+<p>Charles F. Van Loan. The ubiquitous Kronecker product. <em>Journal of Computational and Applied Mathematics</em>, 123(1–2):85–100, 2000. <a class="reference external" href="https://doi.org/10.1016/S0377-0427(00)00393-9">doi:10.1016/S0377-0427(00)00393-9</a>.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/06-structure"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="circulant-toeplitz-fft.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="kernels-gram-matrix.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">6.5 Positive Definite Kernels and the Gram Matrix</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-product-and-its-algebra">The product and its algebra</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#vec-matrices-as-vectors-matrix-equations-as-systems">vec: matrices as vectors, matrix equations as systems</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-discipline-never-form-the-big-matrix">The discipline: never form the big matrix</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-the-product-by-hand-and-the-rule-everything-follows-from">Exercise 1: The product by hand, and the rule everything follows from</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-spectra-separate-eigenvalues-and-singular-values">Exercise 2: Spectra separate: eigenvalues and singular values</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-vec-and-the-memory-order-trap">Exercise 3: vec, and the memory-order trap</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-sylvester-and-lyapunov-with-rule-2-caught-in-the-act">Exercise 4: Sylvester and Lyapunov, with Rule 2 caught in the act</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-the-2-d-laplacian-reopened">Exercise 5: The 2-D Laplacian, reopened</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-never-form-the-big-matrix">Exercise 6: Never form the big matrix</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,1296 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="E.1 Five Factorizations, One Idea" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/epilogue/five-factorizations-one-idea.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: The Prologue took one 4\times4 matrix apart five ways and left one question standing: after a 10^{-12} perturbation, is the rank three or ..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: The Prologue took one 4\times4 matrix apart five ways and left one question standing: after a 10^{-12} perturbation, is the rank three or ..." />
+
+    <title>E.1 Five Factorizations, One Idea &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/epilogue/five-factorizations-one-idea';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/epilogue/five-factorizations-one-idea.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Afterword" href="afterword.html" />
+    <link rel="prev" title="9.5 The Quantum Fourier Transform is the DFT Matrix" href="../09-quantum/quantum-fourier-transform.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/epilogue/five-factorizations-one-idea.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/epilogue/five-factorizations-one-idea.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/epilogue/five-factorizations-one-idea.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/epilogue/five-factorizations-one-idea.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>E.1 Five Factorizations, One Idea</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-one-idea">The one idea</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-tool-that-answers-the-prologue">The tool that answers the Prologue</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-the-prologue-s-question-answered-in-four-lines">Exercise 1: The Prologue’s question, answered in four lines</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-decision-procedure-applied-eight-times">Exercise 2: The decision procedure, applied eight times</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-accuracy-hierarchy-on-the-lauchli-ladder">Exercise 3: The accuracy hierarchy, on the Läuchli ladder</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-the-capstone-five-ways">Exercise 4: The capstone, five ways</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-the-price-list-and-the-course-s-last-rule">Exercise 5: The price list, and the course’s last rule</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="e-1-five-factorizations-one-idea">
+<h1>E.1 Five Factorizations, One Idea<a class="headerlink" href="#e-1-five-factorizations-one-idea" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Epilogue
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;E.1
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">The Prologue ended on a question about rank that no factorization could settle; fifty-three notebooks later, the answer takes four lines and a theorem. The course closes by answering it, choosing methods for eight problems by procedure instead of habit, running one capstone five ways, and pricing every algorithm it taught on a single axis.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;advanced&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;90–120 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p>The <a class="reference internal" href="../prologue/one-matrix-five-factorizations.html"><span class="std std-doc">Prologue</span></a> took
+one <span class="math notranslate nohighlight">\(4\times4\)</span> matrix apart five ways and left one question standing:
+after a <span class="math notranslate nohighlight">\(10^{-12}\)</span> perturbation, is the rank three or four? Every
+answer was defensible then. Now it is a <em>derivation</em>: the perturbation
+has a known operator norm, <strong>Weyl’s inequality</strong> (proved by Chapter
+IV’s machinery) says no singular value can move farther than that
+norm, so any singular value <em>below</em> <span class="math notranslate nohighlight">\(3\lVert E\rVert_2\)</span> is
+indistinguishable from noise — and at that derived tolerance the rank
+is <strong>three</strong>, gated, with the third singular value eleven orders above
+the line and the fourth an order below it. The staircase from the
+Prologue’s final figure returns with the derived tolerance drawn on
+it: the step the course now knows how to choose.</p>
+<p>The rest is consolidation, all of it gated. A <strong>decision procedure</strong>
+— five questions about a problem, in order — is encoded as a function
+and applied to eight named problems drawn from the solver chapters; its
+choices match the canonical answers eight for eight. The
+<strong>Läuchli ladder</strong> shows the accuracy hierarchy conditioning theory
+predicts: normal equations track <span class="math notranslate nohighlight">\(\kappa^2\varepsilon\)</span> through three
+rungs (losing everything at <span class="math notranslate nohighlight">\(\kappa = 10^{8}\)</span>) while QR and SVD sit
+at machine precision throughout. The <strong>capstone</strong> — a structured,
+numerically rank-deficient least-squares problem — is solved five
+ways, and the verdict is <a class="reference internal" href="../05-numerical/norms-conditioning-stability.html"><span class="std std-doc">§5.1</span></a>’s
+deepest lesson reprised: every route’s <em>predictions</em> agree at the
+noise level (residuals are blind), while solution norms differ by
+<span class="math notranslate nohighlight">\(10^{5}\)</span> and noise-sensitivity by <span class="math notranslate nohighlight">\(10^{7}\)</span> — the methods differ not
+in fit but in what they silently add from the null space. And the
+<strong>cost table</strong>: measured times for matvec, solve, QR and SVD across
+a size sweep, with the FLOP-model exponents gated as arithmetic and
+the <em>fitted</em> timing exponents reported inside wide bands — the
+manifest asked for 0.2-tight timing gates, and <a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html"><span class="std std-doc">§5.2</span></a>’s
+own measurement of a “cubic” 1.71 is why the course declines, one
+final time, to gate a clock.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> Everything here was built earlier; the only new content
+is the assembly. Strang <span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id8" title="Gilbert Strang. Introduction to Linear Algebra. Wellesley-Cambridge Press, Wellesley, MA, 6 edition, 2023. ISBN 978-1-7331466-7-8.">Str23</a>]</span>, Trefethen and Bau
+<span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id15" title="Lloyd N. Trefethen and David Bau, III. Numerical Linear Algebra. SIAM, Philadelphia, 1997. doi:10.1137/1.9780898719574.">TB97</a>]</span>, Golub and Van Loan <span class="bibtex-citation" id="id3">[<a class="reference internal" href="#id16" title="Gene H. Golub and Charles F. Van Loan. Matrix Computations. Johns Hopkins University Press, Baltimore, 4 edition, 2013.">GVL13</a>]</span> — the
+course’s three companions, one last citation each.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="the-one-idea">
+<h3>The one idea<a class="headerlink" href="#the-one-idea" title="Link to this heading">#</a></h3>
+<p>Every factorization the course taught is the same move: <strong>rewrite the
+matrix as structured factors, then answer questions at the structure’s
+price.</strong></p>
+<div class="math notranslate nohighlight" id="equation-eq-ep-five">
+<span class="eqno">(316)<a class="headerlink" href="#equation-eq-ep-five" title="Link to this equation">#</a></span>\[A = CR = LU = QR = Q\Lambda Q^{\top} = U\Sigma V^{\top},\]</div>
+<p>rank and column space from <span class="math notranslate nohighlight">\(CR\)</span>; solves from <span class="math notranslate nohighlight">\(LU\)</span>; least squares and
+orthonormal bases from <span class="math notranslate nohighlight">\(QR\)</span>; symmetric dynamics and quadratic forms
+from the spectral theorem; and everything metric — norms, angles,
+rank decisions, low-rank truth — from the SVD. The course’s second
+idea rode alongside: <em>what the mathematics determines, gate; what the
+machine chooses, report</em> — and this notebook’s gates are its final
+demonstration.</p>
+</section>
+<section id="the-tool-that-answers-the-prologue">
+<h3>The tool that answers the Prologue<a class="headerlink" href="#the-tool-that-answers-the-prologue" title="Link to this heading">#</a></h3>
+<p>Weyl’s perturbation inequality for singular values:</p>
+<div class="math notranslate nohighlight" id="equation-eq-ep-weyl">
+<span class="eqno">(317)<a class="headerlink" href="#equation-eq-ep-weyl" title="Link to this equation">#</a></span>\[\bigl|\sigma_i(A + E) - \sigma_i(A)\bigr| \;\le\; \lVert E\rVert_2
+\qquad \text{for every } i,\]</div>
+<p>so a singular value below the perturbation’s norm certifies nothing —
+it may be exactly zero wearing noise — while one far above it is
+real. A rank tolerance is therefore not a convention but an <em>estimate
+of</em> <span class="math notranslate nohighlight">\(\lVert E\rVert_2\)</span>, and choosing it is a statement about the
+data’s noise, exactly as the Prologue said — now with the theorem
+that makes the statement precise.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data only: the Prologue’s matrix and its perturbation, rebuilt exactly.
+The decision procedure and the five routes are written in the exercises —
+they are the course, condensed.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.polynomial</span><span class="w"> </span><span class="kn">import</span> <span class="n">legendre</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">la</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random array below comes from this seed</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+
+<span class="c1"># The Prologue&#39;s matrix and its perturbation, rebuilt exactly.</span>
+<span class="n">A_PRO</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+                  <span class="p">[</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+                  <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">],</span>
+                  <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">]])</span>
+<span class="n">G_PRO</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">E_PRO</span> <span class="o">=</span> <span class="mf">1e-12</span> <span class="o">*</span> <span class="n">G_PRO</span>
+<span class="n">A_TILDE</span> <span class="o">=</span> <span class="n">A_PRO</span> <span class="o">+</span> <span class="n">E_PRO</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-the-prologue-s-question-answered-in-four-lines">
+<h2>Exercise 1: The Prologue’s question, answered in four lines<a class="headerlink" href="#exercise-1-the-prologue-s-question-answered-in-four-lines" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> Rebuild <span class="math notranslate nohighlight">\(\tilde A = A + 10^{-12}G\)</span> exactly as the
+Prologue did, and gate <a class="reference internal" href="#equation-eq-ep-weyl">Eq. 317</a> on it: every singular value of
+<span class="math notranslate nohighlight">\(\tilde A\)</span> sits within <span class="math notranslate nohighlight">\(\lVert E\rVert_2 = 3.0\times10^{-12}\)</span> of the
+corresponding singular value of <span class="math notranslate nohighlight">\(A\)</span> — the theorem, checked on the
+matrix that motivated it.</p>
+<p><strong>Part b)</strong> Derive the tolerance the Prologue could not: the noise is
+<em>known</em> here (<span class="math notranslate nohighlight">\(\lVert E\rVert_2\)</span>), so any singular value below
+<span class="math notranslate nohighlight">\(\tau = 3\lVert E\rVert_2 \approx 9\times10^{-12}\)</span> is
+indistinguishable from a perturbed zero. Gate the resolution:
+<span class="math notranslate nohighlight">\(\sigma_3 = 1.16 \gg \tau &gt; \sigma_4 = 4.7\times10^{-13}\)</span>, and
+<code class="docutils literal notranslate"><span class="pre">matrix_rank</span></code> at <span class="math notranslate nohighlight">\(\tau\)</span> returns <strong>3</strong> — the answer, derived rather
+than chosen.</p>
+<p><strong>Part c)</strong> Re-draw the Prologue’s staircase with <span class="math notranslate nohighlight">\(\tau\)</span> marked: the
+figure that ended the course’s first notebook, now with the step the
+course’s last notebook knows how to select.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Weyl: max shift 4.74e-13 &lt;= ||E||_2 = 3.03e-12
+derived tolerance tau = 3||E||_2 = 9.1e-12
+sigma_3 = 1.162, sigma_4 = 4.74e-13, rank at tau = 3
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-ep-staircase">
+<img alt="../../_images/20ad22502db44c773ce42c355377d035b7294df06edb69e58a30ee3d9c038c91.png" src="../../_images/20ad22502db44c773ce42c355377d035b7294df06edb69e58a30ee3d9c038c91.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 175 </span><span class="caption-text">The Prologue’s final figure, answered: numerical rank of <span class="math notranslate nohighlight">\(\tilde{A}\)</span> against the tolerance, with the four singular values as dotted rules – and the DERIVED tolerance <span class="math notranslate nohighlight">\(\tau = 3\|E\|_2\)</span> in amber, sitting an order above <span class="math notranslate nohighlight">\(\sigma_4\)</span> and twelve below <span class="math notranslate nohighlight">\(\sigma_3\)</span>. The Prologue said choosing a step is a statement about the noise in the matrix; the course’s answer is that when the noise is known (or estimated), Weyl’s inequality converts it into the tolerance, and the staircase stops being a dilemma. Rank 3 – derived, gated, and closed.</span><a class="headerlink" href="#fig-ep-staircase" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  Weyl&#39;s inequality holds on the Prologue&#39;s perturbation (Eq. 2)   [every singular value moved at most 4.7e-13 against the bound 3.0e-12 — the theorem that turns noise into tolerance]
+✓  and at the derived tolerance the Prologue&#39;s rank is three, closed   [sigma_3 sits 1e+11x above tau and sigma_4 19x below — the answer is a derivation now, not a choice]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-the-decision-procedure-applied-eight-times">
+<h2>Exercise 2: The decision procedure, applied eight times<a class="headerlink" href="#exercise-2-the-decision-procedure-applied-eight-times" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> Encode the course’s method-selection procedure as a
+function of five problem attributes — square/rectangular?
+symmetric? positive definite? sparse/structured? rank or spectrum
+wanted? — returning one of the course’s methods.</p>
+<p><strong>Part b)</strong> Apply it to eight named problems and gate the choices
+against the canonical answers, eight for eight:</p>
+<ol class="arabic simple">
+<li><p>dense square nonsymmetric solve → <strong>LU</strong> (<a class="reference internal" href="../01-matrices/elimination-lu.html"><span class="std std-doc">§1.2</span></a>)</p></li>
+<li><p>SPD solve → <strong>Cholesky</strong> (<a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html"><span class="std std-doc">§3.3</span></a>)</p></li>
+<li><p>overdetermined least squares → <strong>QR</strong> (<a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html"><span class="std std-doc">§2.3</span></a>)</p></li>
+<li><p>rank-deficient least squares → <strong>SVD</strong> (<a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html"><span class="std std-doc">§2.4</span></a>)</p></li>
+<li><p>few eigenpairs of a large sparse symmetric matrix →
+<strong>Lanczos</strong> (<a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html"><span class="std std-doc">§5.5</span></a>)</p></li>
+<li><p>huge sparse SPD solve → <strong>CG</strong> (<a class="reference internal" href="../05-numerical/stationary-and-cg.html"><span class="std std-doc">§5.4</span></a>)</p></li>
+<li><p>huge sparse nonsymmetric solve → <strong>GMRES</strong> (<a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html"><span class="std std-doc">§5.5</span></a>)</p></li>
+<li><p>best rank-<span class="math notranslate nohighlight">\(k\)</span> approximation → <strong>truncated SVD</strong>
+(<a class="reference internal" href="../04-svd/low-rank-eckart-young.html"><span class="std std-doc">§4.2</span></a>)</p></li>
+</ol>
+<p>The gate is modest by design — a lookup agreeing with a list — but it
+is the notebook’s real deliverable: the procedure <em>is</em> the course,
+compressed to one function.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>dense square nonsymmetric solve            -&gt; LU             (canonical: LU)
+SPD solve                                  -&gt; Cholesky       (canonical: Cholesky)
+overdetermined full-rank least squares     -&gt; QR             (canonical: QR)
+rank-deficient least squares               -&gt; SVD            (canonical: SVD)
+few eigenpairs, large sparse symmetric     -&gt; Lanczos        (canonical: Lanczos)
+huge sparse SPD solve                      -&gt; CG             (canonical: CG)
+huge sparse nonsymmetric solve             -&gt; GMRES          (canonical: GMRES)
+best rank-k approximation                  -&gt; truncated SVD  (canonical: truncated SVD)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-ep-shapes">
+<img alt="../../_images/c47fdd3a3635db8aab6ae57b24d3692c182ed31eca8d097408c5c01ba5cbdeaf.png" src="../../_images/c47fdd3a3635db8aab6ae57b24d3692c182ed31eca8d097408c5c01ba5cbdeaf.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 176 </span><span class="caption-text">The course’s signature schematic, one last time: the five factorizations of Eq. 1 as shapes. <span class="math notranslate nohighlight">\(CR\)</span> exposes rank by column selection; <span class="math notranslate nohighlight">\(LU\)</span> triangulates for solves; <span class="math notranslate nohighlight">\(QR\)</span> orthogonalizes for least squares; the spectral theorem diagonalizes the symmetric world; the SVD diagonalizes everything, at the price of two orthogonal factors. Every algorithm the course taught is one of these shapes plus a discipline about what the arithmetic may claim – five costumes, one idea.</span><a class="headerlink" href="#fig-ep-shapes" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the decision procedure matches the canonical choice, eight for eight   [square/symmetric/definite/sparse/goal in, method out — the course compressed to one function, and the function audited against its source]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-the-accuracy-hierarchy-on-the-lauchli-ladder">
+<h2>Exercise 3: The accuracy hierarchy, on the Läuchli ladder<a class="headerlink" href="#exercise-3-the-accuracy-hierarchy-on-the-lauchli-ladder" title="Link to this heading">#</a></h2>
+<p>Conditioning theory ranks the least-squares routes:
+normal equations square <span class="math notranslate nohighlight">\(\kappa\)</span>, orthogonal methods do not. The
+Läuchli matrix — a row of ones over <span class="math notranslate nohighlight">\(\varepsilon I\)</span> — makes the
+ranking measurable at three rungs.</p>
+<p><strong>Part a)</strong> For <span class="math notranslate nohighlight">\(\varepsilon = 10^{-4}, 10^{-6}, 10^{-8}\)</span>
+(<span class="math notranslate nohighlight">\(\kappa \approx 2.4\times10^{4}, 10^{6}, 10^{8}\)</span>), solve the
+consistent system by normal equations, Householder QR, and SVD;
+record coefficient errors against the known solution.</p>
+<p><strong>Part b)</strong> Gate the hierarchy: QR and SVD below <span class="math notranslate nohighlight">\(10^{-14}\)</span> at every
+rung (backward stability pays no <span class="math notranslate nohighlight">\(\kappa^2\)</span>), while the
+normal-equations error lands within a factor 100 of
+<span class="math notranslate nohighlight">\(\kappa^2\varepsilon_{\text{mach}}\)</span> at every rung — <span class="math notranslate nohighlight">\(10^{-8}\)</span>, then
+<span class="math notranslate nohighlight">\(10^{-4}\)</span>, then <strong>0.44</strong>: at the last rung the Gram matrix has
+numerically lost the information QR still holds, and the answer is
+garbage from a routine that raised no error. The ordering the theory
+predicts, measured across four orders of failure.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>eps 1e-04 (kappa 2.4e+04): NE 7.3e-08 | QR 2.9e-16 | SVD 1.3e-15 | kappa^2 eps_mach = 1.3e-07
+eps 1e-06 (kappa 2.4e+06): NE 2.1e-04 | QR 5.3e-16 | SVD 4.5e-16 | kappa^2 eps_mach = 1.3e-03
+eps 1e-08 (kappa 2.4e+08): NE 4.4e-01 | QR 4.7e-16 | SVD 1.4e-15 | kappa^2 eps_mach = 1.3e+01
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  QR and SVD stay under the kappa-epsilon ceiling on every rung   [backward stability pays kappa once, so c*kappa*eps is what the theorem promises; today both routes measure 1e-15, far below it — structure&#39;s gift, not the theorem&#39;s, so only the ceiling is gated]
+✓  while normal equations track kappa-squared-epsilon through four orders of failure   [errors [&#39;7e-08&#39;, &#39;2e-04&#39;, &#39;4e-01&#39;] within 100x of kappa^2 eps at each rung — ending in 44% error from a routine that raised no warning: the course&#39;s case against the Gram matrix, closed]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-the-capstone-five-ways">
+<h2>Exercise 4: The capstone, five ways<a class="headerlink" href="#exercise-4-the-capstone-five-ways" title="Link to this heading">#</a></h2>
+<p>One structured, numerically rank-deficient least-squares problem —
+scaled Legendre features, 300 samples, 40 columns whose trailing ten
+decay to <span class="math notranslate nohighlight">\(10^{-13}\)</span>, noise <span class="math notranslate nohighlight">\(10^{-6}\)</span> — solved by:
+<strong>truncated SVD</strong> at the derived tolerance, <strong><code class="docutils literal notranslate"><span class="pre">lstsq</span></code></strong> with matching
+<code class="docutils literal notranslate"><span class="pre">rcond</span></code>, <strong>ridge</strong>, <strong>CG</strong> on regularized normal equations, and
+unpivoted <strong>QR</strong> (the cautionary entry).</p>
+<p><strong>Part a)</strong> Gate the <a class="reference internal" href="../05-numerical/norms-conditioning-stability.html"><span class="std std-doc">§5.1</span></a>
+reprise: all five routes’ <em>training predictions</em> agree with the clean
+signal at the noise level (relative error below <span class="math notranslate nohighlight">\(10^{-5}\)</span>, within
+<span class="math notranslate nohighlight">\(3\times\)</span> of each other) — residuals cannot tell the methods apart,
+which is the whole danger.</p>
+<p><strong>Part b)</strong> Gate what <em>does</em> tell them apart: the solution norms —
+regularized routes <span class="math notranslate nohighlight">\(O(1)\)</span>, QR five orders larger (junk coefficients
+in the numerically dead directions, one-sidedly gated as exceeding
+<span class="math notranslate nohighlight">\(10^{3}\times\)</span>) — and the <strong>noise sensitivity</strong>: refit under a second
+noise draw and compare; the truncated-SVD solution moves <span class="math notranslate nohighlight">\(O(1)\)</span>
+while QR’s moves by <span class="math notranslate nohighlight">\(10^{7}\)</span> (ratio gated above <span class="math notranslate nohighlight">\(10^{3}\)</span>). Print the
+full accuracy/norm/sensitivity table: the course’s habits, in
+one grid.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>capstone: kappa = 8.8e+13, numerical rank at the derived tolerance = 35 of 40
+
+route              pred err      ||w||  sensitivity
+truncated SVD      3.65e-07   4.90e+00     8.26e-01
+lstsq(rcond)       3.65e-07   4.90e+00     8.26e-01
+ridge              3.54e-07   4.71e+00     4.34e-01
+CG-regularized     3.51e-07   4.65e+00     1.46e-01
+QR (unpivoted)     3.87e-07   6.72e+05     1.36e+06
+
+norm ratio QR/TSVD: 1.4e+05; sensitivity ratio: 1.6e+06
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  all five routes predict identically at the noise level — residuals are blind (5.1, reprised as the finale)   [prediction errors within [3.5e-07, 3.9e-07]: the fit cannot distinguish a careful method from a careless one, which is why the next two gates exist]
+✓  while solution norms and noise sensitivity separate them by orders of magnitude   [QR carries 1e+05x the coefficient norm and 2e+06x the noise sensitivity of truncated SVD — what the methods add from the numerically dead subspace is the entire difference, and only the spectrum sees it]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-the-price-list-and-the-course-s-last-rule">
+<h2>Exercise 5: The price list, and the course’s last rule<a class="headerlink" href="#exercise-5-the-price-list-and-the-course-s-last-rule" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> The FLOP models for the course’s operations — matvec
+<span class="math notranslate nohighlight">\(2n^2\)</span>, LU solve <span class="math notranslate nohighlight">\(\tfrac23n^3\)</span>, QR <span class="math notranslate nohighlight">\(2mn^2 - \tfrac23n^3\)</span>, SVD
+<span class="math notranslate nohighlight">\(14mn^2 + 8n^3\)</span> — are arithmetic and gated as such: their exponents
+in <span class="math notranslate nohighlight">\(n\)</span> (square case) are exactly <span class="math notranslate nohighlight">\(2, 3, 3, 3\)</span>.</p>
+<p><strong>Part b)</strong> Measure wall times across <span class="math notranslate nohighlight">\(n = 512 \dots 4096\)</span> and <em>fit</em>
+exponents. The manifest asked to gate them within 0.2 of the models;
+<a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html"><span class="std std-doc">§5.2</span></a> measured a “cubic”
+at 1.71 in exactly this size range and <a class="reference internal" href="../06-structure/kronecker-vec-separable.html"><span class="std std-doc">§6.4</span></a>
+watched one machine straddle a timing gate between two runs — so the
+course declines, one final time, to gate a clock: fitted exponents
+are <strong>reported</strong>, and the only clock fact gated is the coarsest one
+the sweep offers — every operation’s total time grows by more than
+<span class="math notranslate nohighlight">\(4\times\)</span> from <span class="math notranslate nohighlight">\(n = 512\)</span> to <span class="math notranslate nohighlight">\(4096\)</span>, against models of <span class="math notranslate nohighlight">\(64\times\)</span>
+for the matvec and <span class="math notranslate nohighlight">\(512\times\)</span> for the cubics. Even the <em>ordering</em>
+of fitted exponents is testimony, not a gate: a threaded BLAS hands
+the cubics more of the machine as <span class="math notranslate nohighlight">\(n\)</span> grows and deflates their
+fitted slopes toward the matvec’s — one CI runner fitted this very
+cell’s solve at 2.41 while its matvec read 2.16. Draw the sweep —
+one axis, every solver the course taught.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>model exponents (square case, gated as arithmetic): {&#39;matvec&#39;: 2, &#39;solve&#39;: 3, &#39;qr&#39;: 3, &#39;svd&#39;: 3}
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>matvec : fitted exponent 2.08 (model 2)
+solve  : fitted exponent 2.80 (model 3)
+qr     : fitted exponent 2.78 (model 3)
+svd    : fitted exponent 2.87 (model 3)
+fitted-exponent ordering (reported, not gated): matvec &lt; qr &lt; solve &lt; svd
+total growth 512 -&gt; 4096: {&#39;matvec&#39;: &#39;76x&#39;, &#39;solve&#39;: &#39;340x&#39;, &#39;qr&#39;: &#39;327x&#39;, &#39;svd&#39;: &#39;389x&#39;}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-ep-costs">
+<img alt="../../_images/9ec6315ac26cdd032693f0f91ce2b5b3eccb7f6ad7536f5e57fea8c55f4aa6e6.png" src="../../_images/9ec6315ac26cdd032693f0f91ce2b5b3eccb7f6ad7536f5e57fea8c55f4aa6e6.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 177 </span><span class="caption-text">The course’s price list, measured: wall time against size for the matvec and the three cubic factorizations, log-log, <span class="math notranslate nohighlight">\(n = 512\)</span> to <span class="math notranslate nohighlight">\(4096\)</span>. The cubics rise visibly steeper than the matvec, and the fitted exponents are printed but NOT gated – 5.2 measured a ‘cubic’ at 1.71 in this very size range, 6.4 watched one machine straddle a timing gate between consecutive runs, and a CI runner once fitted this cell’s solve at 2.41 while its matvec read 2.16, a threaded BLAS handing the cubics more of the machine as <span class="math notranslate nohighlight">\(n\)</span> grew. The models’ exponents (2, 3, 3, 3) are arithmetic and gated as such; the only gated clock fact is the coarsest the sweep offers, every curve climbing more than 4x end to end. The clocks, one final time, are testimony.</span><a class="headerlink" href="#fig-ep-costs" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p>The decision procedure of Exercise 2 is eight rows deep; a course is
+not a career. Ask your assistant to stress it: invent five problems
+that FALL BETWEEN the rows (sparse and rank-deficient; symmetric but
+indefinite; structured Toeplitz least squares; a spectrum wanted to
+machine precision; a matrix too large to hold), ask the procedure for
+its answer, and then check each answer against the course’s own
+notebooks rather than accepting it: (i) does the recommended method’s
+home notebook list the problem’s structure among its assumptions?
+(ii) does a gate from that notebook transfer to the new problem and
+pass? (iii) where the procedure has no good row, say so — the honest
+output of a decision procedure is sometimes ‘this course has not
+earned an answer’, and finding those edges is the check. The check —
+as it has been fifty-three times before — is yours.</p>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the FLOP models&#39; exponents are 2, 3, 3, 3 — arithmetic, gated   [doubling n multiplies ecp.linalg.flops by 4x for the matvec and 8x for the cubics — the price list&#39;s structure is mathematics; only its constants belong to the machine]
+✓  and the clocks are gated only at their coarsest: every operation grows across the full sweep   [total growth 512 -&gt; 4096 of matvec 76x, solve 340x, qr 327x, svd 389x against models of 64x and 512x; fitted exponents {&#39;matvec&#39;: 2.08, &#39;solve&#39;: 2.8, &#39;qr&#39;: 2.78, &#39;svd&#39;: 2.87} and their ordering are reported, not gated — a threaded BLAS hands the cubics more cores as n grows and deflates their fitted slopes, which is a property of the machine, not the mathematics: the course&#39;s last gate is about what gates may claim]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p><strong>The Prologue’s question is closed.</strong> Weyl’s inequality held on the
+perturbed matrix (every singular value within
+<span class="math notranslate nohighlight">\(3\times10^{-12}\)</span> of its original), the tolerance
+<span class="math notranslate nohighlight">\(\tau = 3\lVert E\rVert_2\)</span> was <em>derived</em> from the known noise, and at
+<span class="math notranslate nohighlight">\(\tau\)</span> the rank is three — with <span class="math notranslate nohighlight">\(\sigma_3\)</span> eleven orders above the
+line and <span class="math notranslate nohighlight">\(\sigma_4\)</span> an order below. The staircase’s step is chosen,
+and choosing it took a theorem, not a convention.</p>
+<p><strong>The course compresses to a procedure that survives audit.</strong> Eight
+problems, eight canonical methods, eight matches — LU to Cholesky to
+QR to SVD to Lanczos to CG to GMRES to truncated SVD — with the five
+shapes drawn one last time above them.</p>
+<p><strong>The hierarchy and the blindness both measured true.</strong> Läuchli’s
+ladder had normal equations tracking <span class="math notranslate nohighlight">\(\kappa^2\varepsilon\)</span> into 44%
+error while QR and SVD held machine precision; the capstone’s five
+routes fit identically at the noise level while their solution norms
+and noise sensitivities differed by <span class="math notranslate nohighlight">\(10^{5}\)</span> and <span class="math notranslate nohighlight">\(10^{7}\)</span> —
+residuals are blind, spectra are not, and that pair of sentences is
+Chapter V compressed.</p>
+<p><strong>And the last gate was about gating.</strong> The price list’s exponents
+(2, 3, 3, 3) were gated as arithmetic; the measured clocks were
+reported inside wide bands with their ordering gated — because the
+course’s deepest habit is not a factorization but a question: <em>is
+this number determined by the mathematics, or by the machine?</em> Five
+factorizations, one idea — and one rule for telling the truth about
+both.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>The course ends; the ledger stays open.</strong> Every notebook’s gates
+run in CI on hardware the author never touched — the honest form
+of “the code works”, and the habit most worth keeping.</p></li>
+<li><p><strong>Where to go deeper.</strong> Trefethen and Bau <span class="bibtex-citation" id="id4">[<a class="reference internal" href="#id15" title="Lloyd N. Trefethen and David Bau, III. Numerical Linear Algebra. SIAM, Philadelphia, 1997. doi:10.1137/1.9780898719574.">TB97</a>]</span>
+for the numerical spine; Golub and Van Loan <span class="bibtex-citation" id="id5">[<a class="reference internal" href="#id16" title="Gene H. Golub and Charles F. Van Loan. Matrix Computations. Johns Hopkins University Press, Baltimore, 4 edition, 2013.">GVL13</a>]</span> as
+the reference shelf; Strang <span class="bibtex-citation" id="id6">[<a class="reference internal" href="#id8" title="Gilbert Strang. Introduction to Linear Algebra. Wellesley-Cambridge Press, Wellesley, MA, 6 edition, 2023. ISBN 978-1-7331466-7-8.">Str23</a>]</span> for the view from
+the four subspaces, where this course began.</p></li>
+<li><p><strong>What was not covered.</strong> Randomized algorithms beyond
+<a class="reference internal" href="../04-svd/randomized-svd-sketching.html"><span class="std std-doc">§4.4</span></a>, tensor methods
+beyond Chapter VII’s chain, optimization beyond quadratics,
+and everything genuinely nonlinear — each one a course, and each
+one reachable from here.</p></li>
+<li><p><strong>The one idea, one last time.</strong> Factor first; then ask. And gate
+what the mathematics determines, report what the machine chooses —
+on every matrix you ever touch.</p></li>
+</ul>
+<div class="docutils container" id="id7">
+<div role="list" class="citation-list">
+<div class="citation" id="id16" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>GVL13<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id3">1</a>,<a role="doc-backlink" href="#id5">2</a>)</span>
+<p>Gene H. Golub and Charles F. Van Loan. <em>Matrix Computations</em>. Johns Hopkins University Press, Baltimore, 4 edition, 2013.</p>
+</div>
+<div class="citation" id="id8" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Str23<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id6">2</a>)</span>
+<p>Gilbert Strang. <em>Introduction to Linear Algebra</em>. Wellesley-Cambridge Press, Wellesley, MA, 6 edition, 2023. ISBN 978-1-7331466-7-8.</p>
+</div>
+<div class="citation" id="id15" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>TB97<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id2">1</a>,<a role="doc-backlink" href="#id4">2</a>)</span>
+<p>Lloyd N. Trefethen and David Bau, III. <em>Numerical Linear Algebra</em>. SIAM, Philadelphia, 1997. <a class="reference external" href="https://doi.org/10.1137/1.9780898719574">doi:10.1137/1.9780898719574</a>.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/epilogue"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../09-quantum/quantum-fourier-transform.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">9.5 The Quantum Fourier Transform is the DFT Matrix</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="afterword.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Afterword</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-one-idea">The one idea</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-tool-that-answers-the-prologue">The tool that answers the Prologue</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-the-prologue-s-question-answered-in-four-lines">Exercise 1: The Prologue’s question, answered in four lines</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-decision-procedure-applied-eight-times">Exercise 2: The decision procedure, applied eight times</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-accuracy-hierarchy-on-the-lauchli-ladder">Exercise 3: The accuracy hierarchy, on the Läuchli ladder</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-the-capstone-five-ways">Exercise 4: The capstone, five ways</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-the-price-list-and-the-course-s-last-rule">Exercise 5: The price list, and the course’s last rule</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

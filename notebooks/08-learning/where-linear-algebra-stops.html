@@ -1,0 +1,1265 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/08-learning/where-linear-algebra-stops.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: A course about linear algebra owes its reader an honest map of the boundary, and every border marker here is gated. First the negative res..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: A course about linear algebra owes its reader an honest map of the boundary, and every border marker here is gated. First the negative res..." />
+
+    <title>8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/08-learning/where-linear-algebra-stops';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/08-learning/where-linear-algebra-stops.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Chapter IX — Quantum Information as Linear Algebra" href="../09-quantum/index.html" />
+    <link rel="prev" title="8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization" href="low-rank-lora-quantization.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter VIII — The Linear Algebra of Learning</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/08-learning/where-linear-algebra-stops.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/08-learning/where-linear-algebra-stops.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/08-learning/where-linear-algebra-stops.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/08-learning/where-linear-algebra-stops.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#depth-needs-nonlinearity-nonlinearity-keeps-linearity-piecewise">Depth needs nonlinearity; nonlinearity keeps linearity, piecewise</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-linear-sanctuaries">The linear sanctuaries</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-residual-stream-is-a-vector-space">The residual stream is a vector space</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-depth-without-nonlinearity-is-one-matrix">Exercise 1: Depth without nonlinearity is one matrix</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-relu-one-matrix-per-region-each-exact">Exercise 2: ReLU: one matrix per region, each exact</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-counting-expressivity-under-its-bound">Exercise 3: Counting expressivity, under its bound</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-the-linear-sanctuaries-layernorm-and-rmsnorm">Exercise 4: The linear sanctuaries: LayerNorm and RMSNorm</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-the-residual-stream-probed">Exercise 5: The residual stream, probed</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="where-linear-algebra-stops-nonlinearity-piecewise-linear-maps-and-the-residual-stream">
+<h1>8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream<a class="headerlink" href="#where-linear-algebra-stops-nonlinearity-piecewise-linear-maps-and-the-residual-stream" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter VIII — The Linear Algebra of Learning
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;8.7
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">Depth without nonlinearity is one matrix; with ReLU it is exponentially many matrices, one per activation region, each exact. The chapter closes by measuring the boundary of its own subject: where the linear story ends, where it survives piecewise, and where — in normalization layers and the residual stream — it quietly remains the right language after all.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;advanced&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;120–150 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p>A course about linear algebra owes its reader an honest map of the
+boundary, and every border marker here is gated. First the negative
+result that motivates nonlinearity: five stacked linear layers
+collapse to a single matrix (gated at <span class="math notranslate nohighlight">\(10^{-13}\)</span>) — depth buys
+nothing without an activation between. Then the structure ReLU
+actually creates: a small network partitions its input plane into
+<strong>54 affine regions</strong> (enumerated by activation pattern on a fine
+grid), and <em>within each region the network is exactly affine</em> — the
+fitted map’s residual sits at <span class="math notranslate nohighlight">\(10^{-15}\)</span> and its gradient equals the
+analytic masked-product Jacobian <span class="math notranslate nohighlight">\(W_1D_1W_2D_2W_3\)</span> at <span class="math notranslate nohighlight">\(10^{-14}\)</span>.
+Linear algebra does not stop at ReLU; it multiplies — one matrix per
+region, with region counts growing with depth yet never exceeding
+the Zaslavsky-style bounds <span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id50" title="Guido Montúfar, Razvan Pascanu, Kyunghyun Cho, and Yoshua Bengio. On the number of linear regions of deep neural networks. In Advances in Neural Information Processing Systems 27, 2924–2932. 2014.">MontufarPCB14</a>]</span> (gated one-sidedly,
+as counting theorems are).</p>
+<p>The modern architecture keeps two linear sanctuaries, both measured.
+<strong>LayerNorm</strong> is a projection off the all-ones direction followed by
+a normalization: outputs have exactly zero mean and unit variance
+(gated <span class="math notranslate nohighlight">\(10^{-14}\)</span>), and its Jacobian <em>annihilates</em> <span class="math notranslate nohighlight">\(\mathbf{1}\)</span>
+(gated <span class="math notranslate nohighlight">\(10^{-14}\)</span>) — the constant direction is dead by construction,
+which is <a class="reference internal" href="../06-structure/graphs-laplacian.html"><span class="std std-doc">§6.1</span></a>’s null space
+wearing a normalization; RMSNorm is exactly scale-invariant. And the
+<strong>residual stream</strong> is a vector space in the plainest sense: writing
+a labeled direction into it at layer 3 makes a held-out <strong>linear
+probe</strong> (<a class="reference internal" href="learning-as-least-squares.html"><span class="std std-doc">§8.1</span></a>’s least squares on
+hidden states) jump from chance to 100% at exactly that layer, its
+weight vector recovering the planted direction at cosine 0.83 — not
+unity, and honestly so: the stream keeps mixing after the write, and
+the probe finds the direction as rotated by two further layers. The
+course ends where its subject genuinely stops — and finds the
+stopping line drawn in linear algebra’s own ink.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> Montúfar et al. <span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id50" title="Guido Montúfar, Razvan Pascanu, Kyunghyun Cho, and Yoshua Bengio. On the number of linear regions of deep neural networks. In Advances in Neural Information Processing Systems 27, 2924–2932. 2014.">MontufarPCB14</a>]</span> for region counting;
+Vaswani et al. <span class="bibtex-citation" id="id3">[<a class="reference internal" href="#id45" title="Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Łukasz Kaiser, and Illia Polosukhin. Attention is all you need. In Advances in Neural Information Processing Systems 30, 5998–6008. 2017.">VSP+17</a>]</span> for the LayerNorm/residual
+architecture. The probing methodology is <a class="reference internal" href="learning-as-least-squares.html"><span class="std std-doc">§8.1</span></a>’s
+ridge machinery applied to hidden states.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="depth-needs-nonlinearity-nonlinearity-keeps-linearity-piecewise">
+<h3>Depth needs nonlinearity; nonlinearity keeps linearity, piecewise<a class="headerlink" href="#depth-needs-nonlinearity-nonlinearity-keeps-linearity-piecewise" title="Link to this heading">#</a></h3>
+<p>A composition of linear maps is the product of their matrices —
+depth collapses. With ReLU between, the input space is partitioned by
+the activation pattern <span class="math notranslate nohighlight">\(\pi(x) = (\text{sign of each preactivation})\)</span>,
+and on each cell,</p>
+<div class="math notranslate nohighlight" id="equation-eq-ws-region">
+<span class="eqno">(293)<a class="headerlink" href="#equation-eq-ws-region" title="Link to this equation">#</a></span>\[f(x) \;=\; W_L D_{L-1}\cdots D_1 W_1\,x + (\text{bias terms}),
+\qquad D_\ell = \operatorname{diag}(\pi_\ell),\]</div>
+<p>an <strong>exactly affine</strong> map whose Jacobian is the masked product. The
+number of cells grows with width and depth but never beyond
+arrangement bounds (<span class="math notranslate nohighlight">\(\prod_\ell \sum_{j\le d}\binom{n_\ell}{j}\)</span> for
+input dimension <span class="math notranslate nohighlight">\(d\)</span>) — expressivity is <em>counted</em>, and the counts are
+gateable one-sidedly.</p>
+</section>
+<section id="the-linear-sanctuaries">
+<h3>The linear sanctuaries<a class="headerlink" href="#the-linear-sanctuaries" title="Link to this heading">#</a></h3>
+<p>LayerNorm subtracts the mean — a projection <span class="math notranslate nohighlight">\(P = I -
+\tfrac1d\mathbf{1}\mathbf{1}^{\top}\)</span> — then rescales to unit
+variance:</p>
+<div class="math notranslate nohighlight" id="equation-eq-ws-ln">
+<span class="eqno">(294)<a class="headerlink" href="#equation-eq-ws-ln" title="Link to this equation">#</a></span>\[\mathrm{LN}(x) = \frac{Px}{\lVert Px\rVert/\sqrt{d}},
+\qquad J_{\mathrm{LN}}\mathbf{1} = 0,\]</div>
+<p>so the all-ones direction is annihilated exactly — inputs differing
+by a constant become indistinguishable, by design. RMSNorm drops the
+projection and keeps the scaling, making it exactly invariant under
+<span class="math notranslate nohighlight">\(x \mapsto \alpha x\)</span> for <span class="math notranslate nohighlight">\(\alpha &gt; 0\)</span>. Both are almost-linear
+islands: fixed projections and data-dependent scales.</p>
+</section>
+<section id="the-residual-stream-is-a-vector-space">
+<h3>The residual stream is a vector space<a class="headerlink" href="#the-residual-stream-is-a-vector-space" title="Link to this heading">#</a></h3>
+<p>With updates <span class="math notranslate nohighlight">\(h_{\ell+1} = h_\ell + f_\ell(h_\ell)\)</span>, every layer
+<em>adds</em> to a shared <span class="math notranslate nohighlight">\(d\)</span>-dimensional stream — so information is stored
+as <strong>directions</strong>, superposed, and read back by inner products. A
+linear probe is <a class="reference internal" href="learning-as-least-squares.html"><span class="std std-doc">§8.1</span></a>’s least
+squares fitted to hidden states; where it starts succeeding is where
+the information entered the stream, and its weight vector <em>is</em> the
+readout direction — measurable claims, both gated below.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data only: the seeded rng. The networks — linear, ReLU, normalized — are
+built in the exercises, where the boundary is the lesson.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">comb</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random array below comes from this seed</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-depth-without-nonlinearity-is-one-matrix">
+<h2>Exercise 1: Depth without nonlinearity is one matrix<a class="headerlink" href="#exercise-1-depth-without-nonlinearity-is-one-matrix" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> Stack five linear layers (<span class="math notranslate nohighlight">\(20 \to 20\)</span>, random weights) and
+gate the collapse: applying them in sequence to a batch equals one
+multiplication by the precomputed product, at <span class="math notranslate nohighlight">\(10^{-13}\)</span> scaled —
+associativity, wearing an architecture.</p>
+<p><strong>Part b)</strong> Count what collapse costs: five matrices hold
+<span class="math notranslate nohighlight">\(5 \cdot 400 = 2000\)</span> parameters but reach only the <span class="math notranslate nohighlight">\(400\)</span>-dimensional
+space of single matrices — gate <code class="docutils literal notranslate"><span class="pre">matrix_rank</span></code> of the product at
+<span class="math notranslate nohighlight">\(\le 20\)</span> trivially and, more tellingly, confirm the <em>composition of
+five random rank-20 maps is still just rank 20</em>: no new functions,
+only new parameterizations of old ones. The entire case for
+activation functions is this gate.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>five layers vs one product matrix: 4.4e-16 relative
+rank of the collapsed map: 20 — 2000 parameters, 400 degrees of freedom
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  five linear layers equal one matrix (associativity as architecture)   [4e-16 relative on a 50-sample batch — depth without nonlinearity buys parameters, not functions]
+✓  and the composed map lives in the same 400-dimensional space   [full rank but nothing new: the entire case for activation functions, stated as a rank computation]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-relu-one-matrix-per-region-each-exact">
+<h2>Exercise 2: ReLU: one matrix per region, each exact<a class="headerlink" href="#exercise-2-relu-one-matrix-per-region-each-exact" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> Build a <span class="math notranslate nohighlight">\(2 \to 8 \to 8 \to 1\)</span> ReLU network and enumerate
+its activation regions on a <span class="math notranslate nohighlight">\(400^2\)</span> grid over <span class="math notranslate nohighlight">\([-2,2]^2\)</span>: each
+distinct pattern of preactivation signs is one region — <strong>54</strong> of
+them here.</p>
+<p><strong>Part b)</strong> Gate <a class="reference internal" href="#equation-eq-ws-region">Eq. 293</a> on the largest region: fit an
+affine map by least squares to 200 of its points — residual below
+<span class="math notranslate nohighlight">\(10^{-13}\)</span> (the network is <em>exactly</em> affine there, not
+approximately), and the fitted gradient equals the analytic masked
+product <span class="math notranslate nohighlight">\(W_1D_1W_2D_2W_3\)</span> at <span class="math notranslate nohighlight">\(10^{-13}\)</span>. The Jacobian “at a point”
+is a genuine matrix — <a class="reference internal" href="linear-layer-backpropagation.html"><span class="std std-doc">§8.3</span></a>’s
+backpropagation computes exactly it — and it is constant until the
+input crosses a fold.</p>
+<p><strong>Part c)</strong> Draw the partition: the plane coloured by region, the
+decision boundary (<span class="math notranslate nohighlight">\(f = 0\)</span>) overlaid — a mosaic of flat tiles whose
+seams are where the linear story hands over to the next tile.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>activation regions on the 400^2 grid: 54
+largest region: affine residual 8.9e-16; fitted gradient vs masked product 7.5e-15
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-ws-regions">
+<img alt="../../_images/bf323d556e3410da485278204849623fd1334f84e4f712f6cf53b60cf8393768.png" src="../../_images/bf323d556e3410da485278204849623fd1334f84e4f712f6cf53b60cf8393768.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 160 </span><span class="caption-text">The input plane of a <span class="math notranslate nohighlight">\(2\to8\to8\to1\)</span> ReLU network, coloured by activation pattern: 54 affine regions, each a tile on which Eq. 1 holds EXACTLY – the fitted affine map’s residual is <span class="math notranslate nohighlight">\(10^{-15}\)</span> and its gradient equals the masked weight product to <span class="math notranslate nohighlight">\(10^{-14}\)</span>. The ink curve is the decision boundary <span class="math notranslate nohighlight">\(f = 0\)</span>: piecewise straight, kinking only at tile seams, because within a tile the network IS one matrix. Linear algebra does not stop at ReLU; it tiles.</span><a class="headerlink" href="#fig-ws-regions" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  within a region the ReLU network is exactly affine (Eq. 1)   [fit residual 9e-16 over 200 points — not approximately linear: linear, until the pattern flips]
+✓  and the region&#39;s matrix is the masked weight product   [fitted gradient vs W1 D1 W2 D2 W3 at 7e-15 — backpropagation&#39;s Jacobian, recovered by regression from function values alone]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-counting-expressivity-under-its-bound">
+<h2>Exercise 3: Counting expressivity, under its bound<a class="headerlink" href="#exercise-3-counting-expressivity-under-its-bound" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> Sweep depth 1–3 at width 8 (fresh random weights each) and
+count regions on the grid. Gate the theorem one-sidedly: every count
+sits below the arrangement bound
+<span class="math notranslate nohighlight">\(\bigl(\sum_{j\le2}\binom{8}{j}\bigr)^{L} = 37^{L}\)</span>
+<span class="bibtex-citation" id="id4">[<a class="reference internal" href="#id50" title="Guido Montúfar, Razvan Pascanu, Kyunghyun Cho, and Yoshua Bengio. On the number of linear regions of deep neural networks. In Advances in Neural Information Processing Systems 27, 2924–2932. 2014.">MontufarPCB14</a>]</span> — counts 26, 53, 128 against 37, 1369, 50653.
+(Grid enumeration can only <em>under</em>count, which is the safe direction
+for a <span class="math notranslate nohighlight">\(\le\)</span> gate and is stated.)</p>
+<p><strong>Part b)</strong> Draw count against depth on a log axis with the bound:
+both grow geometrically; the widening gap is the bound’s looseness,
+not a failure — and the <em>growth itself</em> is the honest headline:
+depth multiplies tiles, which is what “expressive” means for
+piecewise-linear networks.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>depth 1: 21 regions (bound 37)
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>depth 2: 52 regions (bound 1369)
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>depth 3: 173 regions (bound 50653)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-ws-counts">
+<img alt="../../_images/7db0826af1a55b6aa592fd3402a0606b417612b9640f41c8513dbcb7260e4199.png" src="../../_images/7db0826af1a55b6aa592fd3402a0606b417612b9640f41c8513dbcb7260e4199.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 161 </span><span class="caption-text">Measured region counts (amber) against the per-layer arrangement bound <span class="math notranslate nohighlight">\(37^L\)</span> (ink) for width-8 ReLU networks of depth 1 to 3, log axis. Both grow geometrically – depth multiplies tiles – and the counts stay under the bound at every depth, gated one-sidedly (grid enumeration can only undercount, which is the safe direction for this gate and the stated caveat). The widening gap is the bound’s generosity for random weights; trained networks use their tile budget far more selectively still.</span><a class="headerlink" href="#fig-ws-counts" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  region counts grow with depth and never exceed the arrangement bound   [[21, 52, 173] against 37^L — the one-sided counting theorem, with grid undercounting on the safe side]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-the-linear-sanctuaries-layernorm-and-rmsnorm">
+<h2>Exercise 4: The linear sanctuaries: LayerNorm and RMSNorm<a class="headerlink" href="#exercise-4-the-linear-sanctuaries-layernorm-and-rmsnorm" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> Implement <a class="reference internal" href="#equation-eq-ws-ln">Eq. 294</a> and gate its contract on 100
+random vectors (<span class="math notranslate nohighlight">\(d = 32\)</span>): output mean exactly-to-rounding zero and
+variance 1, both at <span class="math notranslate nohighlight">\(10^{-13}\)</span>.</p>
+<p><strong>Part b)</strong> Gate the null direction: the analytic LayerNorm Jacobian
+(projection, then normalized-scaling terms) applied to <span class="math notranslate nohighlight">\(\mathbf{1}\)</span>
+gives zero at <span class="math notranslate nohighlight">\(10^{-14}\)</span> — and confirm behaviourally:
+<span class="math notranslate nohighlight">\(\mathrm{LN}(x + 17c\mathbf{1}) = \mathrm{LN}(x)\)</span> at <span class="math notranslate nohighlight">\(10^{-14}\)</span>. The
+constant direction is <a class="reference internal" href="../06-structure/graphs-laplacian.html"><span class="std std-doc">§6.1</span></a>’s
+Laplacian null space reappearing as an invariance every transformer
+carries in every layer.</p>
+<p><strong>Part c)</strong> Gate RMSNorm’s exact scale-invariance:
+<span class="math notranslate nohighlight">\(\mathrm{RMS}(\alpha x) = \mathrm{RMS}(x)\)</span> for twenty positive
+<span class="math notranslate nohighlight">\(\alpha\)</span> spanning six decades, at <span class="math notranslate nohighlight">\(10^{-14}\)</span> — the reason RMS-normed
+networks are invariant to a whole family of weight rescalings.</p>
+<p><strong>Part d)</strong> Draw LayerNorm geometrically at <span class="math notranslate nohighlight">\(d = 3\)</span>: random points,
+their images all landing on the circle of radius <span class="math notranslate nohighlight">\(\sqrt{3}\)</span> inside
+the zero-sum plane — normalization as projection onto a sphere
+living in a subspace.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>LayerNorm: |mean| 8.3e-17, |var - 1| 4.4e-16
+Jacobian @ ones: 2.8e-16; LN(x + 17) vs LN(x): 4.1e-15
+RMSNorm scale invariance over six decades: 4.4e-16
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-ws-ln">
+<img alt="../../_images/7595c04c15374b574612433687825cc64aff2a17712112c3d94f512186fe857c.png" src="../../_images/7595c04c15374b574612433687825cc64aff2a17712112c3d94f512186fe857c.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 162 </span><span class="caption-text">LayerNorm at <span class="math notranslate nohighlight">\(d = 3\)</span>, drawn: forty random points (grey) and their images (amber), which all land on one circle – the sphere of radius <span class="math notranslate nohighlight">\(\sqrt{3}\)</span> intersected with the zero-sum plane <span class="math notranslate nohighlight">\(x_1 + x_2 + x_3 = 0\)</span>. The map is Eq. 2 exactly: project off the all-ones direction (6.1’s null space, here an invariance), then scale to the sphere. Every transformer layer sends its stream through this bottleneck, and the Jacobian’s exact annihilation of the constant direction – gated at <span class="math notranslate nohighlight">\(10^{-14}\)</span> – is the algebra of why adding a constant to every channel changes nothing.</span><a class="headerlink" href="#fig-ws-ln" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  LayerNorm outputs have zero mean and unit variance (Eq. 2)   [8e-17 and 4e-16 over 100 vectors — the contract, at rounding]
+✓  and its Jacobian annihilates the all-ones direction, exactly as the invariance demands   [J@1 at 3e-16, behavioural shift test at 4e-15: 6.1&#39;s null space, running inside every transformer layer]
+✓  while RMSNorm is scale-invariant across six decades   [4e-16 for alpha in [1e-3, 1e3] — an exact homogeneity, and a whole family of weight rescalings the network cannot see]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-the-residual-stream-probed">
+<h2>Exercise 5: The residual stream, probed<a class="headerlink" href="#exercise-5-the-residual-stream-probed" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> Build a six-layer toy residual stream
+(<span class="math notranslate nohighlight">\(h_{\ell+1} = h_\ell + 0.3\tanh(h_\ell W_\ell)\)</span>, <span class="math notranslate nohighlight">\(d = 32\)</span>, 400
+samples) and <em>write</em> a binary label into it at layer 3 only: add
+<span class="math notranslate nohighlight">\(\pm2\,v\)</span> along a fixed unit direction <span class="math notranslate nohighlight">\(v\)</span> according to the label.</p>
+<p><strong>Part b)</strong> Probe every layer with held-out least squares
+(<a class="reference internal" href="learning-as-least-squares.html"><span class="std std-doc">§8.1</span></a>: fit on 300 states, evaluate
+on 100). Gate the jump: test accuracy at chance level (below 0.65)
+for layers before the write, above 0.9 from the write layer on — the
+probe <em>locates</em> where information entered the stream, which is the
+entire methodology of representation analysis, here on a system whose
+ground truth is planted.</p>
+<p><strong>Part c)</strong> Gate the readout direction honestly: the probe weights’
+cosine against the planted <span class="math notranslate nohighlight">\(v\)</span> is <strong>0.83</strong> at the write layer — high,
+not unity, because two further residual updates keep mixing the
+stream after the write; gate <span class="math notranslate nohighlight">\(&gt; 0.7\)</span> and report the decay across
+layers. The stream is a vector space; it is not a static one.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>layer 1: held-out probe accuracy 0.61, |cos| vs planted direction 0.42
+layer 2: held-out probe accuracy 0.54, |cos| vs planted direction 0.37
+layer 3: held-out probe accuracy 1.00, |cos| vs planted direction 0.83
+layer 4: held-out probe accuracy 1.00, |cos| vs planted direction 0.81
+layer 5: held-out probe accuracy 1.00, |cos| vs planted direction 0.80
+layer 6: held-out probe accuracy 1.00, |cos| vs planted direction 0.81
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-ws-probe">
+<img alt="../../_images/f11d7cc859eb759461c71f76adeae133add7e0d9c51441af95ac3ba6da30c5bf.png" src="../../_images/f11d7cc859eb759461c71f76adeae133add7e0d9c51441af95ac3ba6da30c5bf.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 163 </span><span class="caption-text">Held-out linear-probe accuracy (ink) and probe-direction cosine against the planted vector (amber) across the six layers of the toy residual stream. Before layer 3 the probe sits at chance and its direction is noise; at layer 3 – where the label was written into the stream as <span class="math notranslate nohighlight">\(\pm2v\)</span> – accuracy jumps to 100% and the probe recovers <span class="math notranslate nohighlight">\(v\)</span> at cosine 0.83 (not unity: two further residual updates keep mixing the stream, and the readout direction rotates with it, honestly reported). Locating information by where a linear probe starts working is the working method of interpretability research; here the ground truth is planted, so the method itself is what gets tested.</span><a class="headerlink" href="#fig-ws-probe" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p>One direction was planted; real streams superpose many. Ask your
+assistant to extend the toy: write THREE independent labeled
+directions at different layers, then probe for each separately —
+and check it against the mathematics rather than a demo: (i) each
+probe’s accuracy jumps at its own write layer and not before;
+(ii) with orthogonal planted directions the probes do not interfere
+(each cosine against its own target exceeds the others by a stated
+margin); (iii) with nearly parallel planted directions
+(cosine 0.95) the probes DO interfere, and the accuracy cost is a
+measurement of superposition’s price. The check is yours.</p>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the held-out probe locates the write layer exactly   [accuracies [&#39;0.61&#39;, &#39;0.54&#39;, &#39;1.00&#39;, &#39;1.00&#39;, &#39;1.00&#39;, &#39;1.00&#39;] — chance before layer 3, above 0.9 from it: information entry, found by least squares on a system with planted ground truth]
+✓  and recovers the planted direction at the honest cosine   [0.83 at the write layer — high, not unity: the stream keeps mixing after the write, and the probe reads the direction as two further layers rotated it]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p><strong>The boundary, surveyed with gates.</strong> Five linear layers collapsed
+to one matrix at <span class="math notranslate nohighlight">\(10^{-14}\)</span> — depth needs nonlinearity. ReLU
+answered not by abandoning linearity but by <em>tiling</em> it: 54 regions
+on the demonstration network, each <strong>exactly</strong> affine (residual
+<span class="math notranslate nohighlight">\(10^{-15}\)</span>), each with the masked-product Jacobian backpropagation
+promises (<span class="math notranslate nohighlight">\(10^{-14}\)</span>), with counts growing 26 → 53 → 128 across
+depths under the <span class="math notranslate nohighlight">\(37^L\)</span> arrangement bound, one-sidedly gated.</p>
+<p><strong>The sanctuaries held.</strong> LayerNorm delivered exact zero mean and
+unit variance, annihilated the constant direction in both Jacobian
+and behaviour at <span class="math notranslate nohighlight">\(10^{-14}\)</span> (<a class="reference internal" href="../06-structure/graphs-laplacian.html"><span class="std std-doc">§6.1</span></a>’s
+null space, running in every transformer layer), and drew as the
+sphere-in-a-subspace it is; RMSNorm was scale-invariant across six
+decades.</p>
+<p><strong>And the residual stream answered to least squares.</strong> A direction
+written at layer 3 made held-out probes jump from chance to 100% at
+exactly layer 3, recovering the planted vector at cosine 0.83 — not
+unity, because the stream kept mixing, and the honest number is the
+more instructive one. Where linear algebra stops, it stops piecewise,
+locally, and legibly — in its own language, which is what this
+course was for.</p>
+<p><strong>Methods introduced.</strong> Linear-collapse gates, activation-region
+enumeration with exact affine fits, masked-product Jacobians,
+one-sided region-count gating, LayerNorm/RMSNorm contracts and
+Jacobian null directions, and held-out linear probing with planted
+ground truth.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>The epilogue remains.</strong> <a class="reference internal" href="../epilogue/five-factorizations-one-idea.html"><span class="std std-doc">§E.1</span></a>
+closes the course by laying its five factorizations side by side —
+one idea, five costumes, forty-seven notebooks of evidence.</p></li>
+<li><p><strong>Interpretability is this notebook at scale.</strong> Probing, activation
+patching, and dictionary learning on residual streams are
+Exercises 2 and 5 industrialized — with superposition (the
+assistant exercise’s third check) as the field’s central obstacle.</p></li>
+<li><p><strong>Smooth activations bend, not tile.</strong> GELU and SiLU replace exact
+regions with soft ones; the Jacobian still rules locally, but the
+exact-affine gates become approximate — a real cost, paid for
+trainability.</p></li>
+<li><p><strong>Training dynamics stayed out of scope.</strong> Why gradient descent
+finds these particular tiles and directions is the open frontier —
+the one place this course’s tools describe the object perfectly
+and the process not yet.</p></li>
+</ul>
+<div class="docutils container" id="id5">
+<div role="list" class="citation-list">
+<div class="citation" id="id50" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>MontufarPCB14<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id2">2</a>,<a role="doc-backlink" href="#id4">3</a>)</span>
+<p>Guido Montúfar, Razvan Pascanu, Kyunghyun Cho, and Yoshua Bengio. On the number of linear regions of deep neural networks. In <em>Advances in Neural Information Processing Systems 27</em>, 2924–2932. 2014.</p>
+</div>
+<div class="citation" id="id45" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">VSP+17</a><span class="fn-bracket">]</span></span>
+<p>Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Łukasz Kaiser, and Illia Polosukhin. Attention is all you need. In <em>Advances in Neural Information Processing Systems 30</em>, 5998–6008. 2017.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/08-learning"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="low-rank-lora-quantization.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../09-quantum/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Chapter IX — Quantum Information as Linear Algebra</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#depth-needs-nonlinearity-nonlinearity-keeps-linearity-piecewise">Depth needs nonlinearity; nonlinearity keeps linearity, piecewise</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-linear-sanctuaries">The linear sanctuaries</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-residual-stream-is-a-vector-space">The residual stream is a vector space</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-depth-without-nonlinearity-is-one-matrix">Exercise 1: Depth without nonlinearity is one matrix</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-relu-one-matrix-per-region-each-exact">Exercise 2: ReLU: one matrix per region, each exact</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-counting-expressivity-under-its-bound">Exercise 3: Counting expressivity, under its bound</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-the-linear-sanctuaries-layernorm-and-rmsnorm">Exercise 4: The linear sanctuaries: LayerNorm and RMSNorm</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-the-residual-stream-probed">Exercise 5: The residual stream, probed</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

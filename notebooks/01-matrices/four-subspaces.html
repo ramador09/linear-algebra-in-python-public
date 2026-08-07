@@ -1,0 +1,1610 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="1.4 The Four Fundamental Subspaces" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/01-matrices/four-subspaces.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: A matrix A of shape m\times n carries\mathbb{R}^n to\mathbb{R}^m, and it does so by dividing each of those spaces cleanly in two. On the i..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: A matrix A of shape m\times n carries\mathbb{R}^n to\mathbb{R}^m, and it does so by dividing each of those spaces cleanly in two. On the i..." />
+
+    <title>1.4 The Four Fundamental Subspaces &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/01-matrices/four-subspaces';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/01-matrices/four-subspaces.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="1.5 Vector Spaces, Bases, and Coordinates" href="vector-spaces-coordinates.html" />
+    <link rel="prev" title="1.3 Inverses, Rank, and A = CR" href="inverses-rank-cr.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/01-matrices/four-subspaces.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/01-matrices/four-subspaces.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/01-matrices/four-subspaces.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/01-matrices/four-subspaces.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>1.4 The Four Fundamental Subspaces</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-four-spaces">The four spaces</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-orthogonality-in-one-line-each">The orthogonality, in one line each</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-the-matrix-does">What the matrix does</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-fredholm-alternative">The Fredholm alternative</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computing-them">Computing them</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-all-four-from-one-svd">Exercise 1: All four, from one SVD</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-same-four-exactly-and-why-the-bases-differ">Exercise 2: The same four, exactly, and why the bases differ</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-right-angles-and-the-big-picture">Exercise 3: The right angles, and the Big Picture</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-what-the-matrix-actually-does">Exercise 4: What the matrix actually does</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-the-fredholm-alternative">Exercise 5: The Fredholm alternative</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-the-picture-in-three-dimensions">Exercise 6: The picture in three dimensions</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="the-four-fundamental-subspaces">
+<h1>1.4 The Four Fundamental Subspaces<a class="headerlink" href="#the-four-fundamental-subspaces" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter I — Matrices, Elimination, and Subspaces
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;1.4
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">Every matrix splits its input space and its output space into two orthogonal pieces each. Four subspaces, two dimensions, one right angle, and the complete answer to when Ax = b has a solution.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;intermediate&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;90–120 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p>A matrix <span class="math notranslate nohighlight">\(A\)</span> of shape <span class="math notranslate nohighlight">\(m\times n\)</span> carries <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> to <span class="math notranslate nohighlight">\(\mathbb{R}^m\)</span>, and
+it does so by dividing each of those spaces cleanly in two.</p>
+<p>On the input side, some vectors are annihilated — <span class="math notranslate nohighlight">\(A\mathbf{x} = \mathbf{0}\)</span> —
+and they form the <strong>null space</strong>. Everything else is carried somewhere useful,
+and the vectors that do the carrying form the <strong>row space</strong>. On the output
+side, some vectors are reachable, forming the <strong>column space</strong>, and the rest
+are not, forming the <strong>left null space</strong>. Four subspaces. Two of them live in
+<span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> and two in <span class="math notranslate nohighlight">\(\mathbb{R}^m\)</span>, and in each pair the two are
+<strong>orthogonal complements</strong>: perpendicular, and together spanning everything.</p>
+<p>That structure answers the questions Chapter I has been circling. When does
+<span class="math notranslate nohighlight">\(A\mathbf{x} = \mathbf{b}\)</span> have a solution? Exactly when <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> lies in
+the column space, which — because the column space and left null space are
+complements — is exactly when <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> is <em>perpendicular to every solution
+of</em> <span class="math notranslate nohighlight">\(A^{\top}\mathbf{y} = \mathbf{0}\)</span>. That reformulation is the <strong>Fredholm
+alternative</strong>, and it turns an existence question into an orthogonality test
+you can run. When is the solution unique? Exactly when the null space is
+<span class="math notranslate nohighlight">\(\{\mathbf{0}\}\)</span>. And what does <span class="math notranslate nohighlight">\(A\)</span> actually <em>do</em>? It throws away the null
+space and maps the row space one-to-one onto the column space, which is why
+both have the same dimension <span class="math notranslate nohighlight">\(r\)</span> and why row rank equals column rank —
+<a class="reference internal" href="inverses-rank-cr.html"><span class="std std-doc">§1.3</span></a> proved that from <span class="math notranslate nohighlight">\(A = CR\)</span>, and here it becomes
+geometry.</p>
+<p>There is a methodological point running through the notebook. We compute the
+four subspaces twice, once from the SVD in floating point and once exactly with
+SymPy, and the two give <strong>completely different bases</strong>. That is not an error.
+A subspace does not have a preferred basis, and the SVD is entitled to return
+any orthonormal one. So every comparison here is made between <strong>projectors</strong>,
+which are basis-independent, rather than between basis vectors — the discipline
+<a class="reference internal" href="../00-machine/floating-point.html"><span class="std std-doc">§0.2</span></a> Rule 4 insists on.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> The four-subspace picture and the name are Strang’s
+<span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id4" title="Gilbert Strang. Introduction to Linear Algebra. Wellesley-Cambridge Press, Wellesley, MA, 6 edition, 2023. ISBN 978-1-7331466-7-8.">Str23</a>]</span>, Chapter 3; the orthogonality is his Chapter 4. For the
+numerical construction from the SVD, Trefethen and Bau
+<span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id11" title="Lloyd N. Trefethen and David Bau, III. Numerical Linear Algebra. SIAM, Philadelphia, 1997. doi:10.1137/1.9780898719574.">TB97</a>]</span>, Lecture 5.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="the-four-spaces">
+<h3>The four spaces<a class="headerlink" href="#the-four-spaces" title="Link to this heading">#</a></h3>
+<p>For <span class="math notranslate nohighlight">\(A \in \mathbb{R}^{m\times n}\)</span> of rank <span class="math notranslate nohighlight">\(r\)</span>:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>subspace</p></th>
+<th class="head"><p>definition</p></th>
+<th class="head"><p>lives in</p></th>
+<th class="head"><p>dimension</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>column space <span class="math notranslate nohighlight">\(C(A)\)</span></p></td>
+<td><p>all <span class="math notranslate nohighlight">\(A\mathbf{x}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\mathbb{R}^m\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(r\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>left null space <span class="math notranslate nohighlight">\(N(A^{\top})\)</span></p></td>
+<td><p>all <span class="math notranslate nohighlight">\(\mathbf{y}\)</span> with <span class="math notranslate nohighlight">\(A^{\top}\mathbf{y} = \mathbf{0}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\mathbb{R}^m\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(m - r\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p>row space <span class="math notranslate nohighlight">\(C(A^{\top})\)</span></p></td>
+<td><p>all <span class="math notranslate nohighlight">\(A^{\top}\mathbf{y}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(r\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>null space <span class="math notranslate nohighlight">\(N(A)\)</span></p></td>
+<td><p>all <span class="math notranslate nohighlight">\(\mathbf{x}\)</span> with <span class="math notranslate nohighlight">\(A\mathbf{x} = \mathbf{0}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(n - r\)</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The dimension statement for the input side is the <strong>rank–nullity theorem</strong>,</p>
+<div class="math notranslate nohighlight" id="equation-eq-subspaces-rank-nullity">
+<span class="eqno">(72)<a class="headerlink" href="#equation-eq-subspaces-rank-nullity" title="Link to this equation">#</a></span>\[\dim C(A^{\top}) + \dim N(A) \;=\; r + (n - r) \;=\; n ,\]</div>
+<p>and the output side says the same about <span class="math notranslate nohighlight">\(m\)</span>.</p>
+</section>
+<section id="the-orthogonality-in-one-line-each">
+<h3>The orthogonality, in one line each<a class="headerlink" href="#the-orthogonality-in-one-line-each" title="Link to this heading">#</a></h3>
+<p>If <span class="math notranslate nohighlight">\(\mathbf{x} \in N(A)\)</span> then <span class="math notranslate nohighlight">\(A\mathbf{x} = \mathbf{0}\)</span>, so every row of <span class="math notranslate nohighlight">\(A\)</span>
+has zero inner product with <span class="math notranslate nohighlight">\(\mathbf{x}\)</span> — the rows <em>are</em> the components of
+<span class="math notranslate nohighlight">\(A\mathbf{x}\)</span>. Hence</p>
+<div class="math notranslate nohighlight" id="equation-eq-subspaces-orthogonality">
+<span class="eqno">(73)<a class="headerlink" href="#equation-eq-subspaces-orthogonality" title="Link to this equation">#</a></span>\[N(A) \perp C(A^{\top}) \quad\text{in } \mathbb{R}^n,
+\qquad
+N(A^{\top}) \perp C(A) \quad\text{in } \mathbb{R}^m ,\]</div>
+<p>the second being the first applied to <span class="math notranslate nohighlight">\(A^{\top}\)</span>. Combined with the dimension
+count <a class="reference internal" href="#equation-eq-subspaces-rank-nullity">Eq. 72</a>, perpendicular subspaces whose dimensions
+add to the whole are <strong>orthogonal complements</strong>: every vector splits uniquely
+into one piece from each.</p>
+</section>
+<section id="what-the-matrix-does">
+<h3>What the matrix does<a class="headerlink" href="#what-the-matrix-does" title="Link to this heading">#</a></h3>
+<p>Take any <span class="math notranslate nohighlight">\(\mathbf{x} \in \mathbb{R}^n\)</span> and split it as</p>
+<div class="math notranslate nohighlight" id="equation-eq-subspaces-split">
+<span class="eqno">(74)<a class="headerlink" href="#equation-eq-subspaces-split" title="Link to this equation">#</a></span>\[\mathbf{x} = \mathbf{x}_{\text{row}} + \mathbf{x}_{\text{null}},
+\qquad \mathbf{x}_{\text{row}} \in C(A^{\top}),\;
+\mathbf{x}_{\text{null}} \in N(A) .\]</div>
+<p>Then <span class="math notranslate nohighlight">\(A\mathbf{x} = A\mathbf{x}_{\text{row}}\)</span>: the null-space part contributes
+nothing. And no two different row-space vectors can give the same output, since
+their difference would be in the null space <em>and</em> the row space, hence zero.
+So <strong><span class="math notranslate nohighlight">\(A\)</span> is a bijection from the row space onto the column space</strong>. That is the
+whole of what a matrix does, and it forces <span class="math notranslate nohighlight">\(\dim C(A^{\top}) = \dim C(A)\)</span>,
+which is row rank <span class="math notranslate nohighlight">\(=\)</span> column rank again.</p>
+</section>
+<section id="the-fredholm-alternative">
+<h3>The Fredholm alternative<a class="headerlink" href="#the-fredholm-alternative" title="Link to this heading">#</a></h3>
+<p><span class="math notranslate nohighlight">\(A\mathbf{x} = \mathbf{b}\)</span> is solvable exactly when <span class="math notranslate nohighlight">\(\mathbf{b} \in C(A)\)</span>.
+Because <span class="math notranslate nohighlight">\(C(A)\)</span> and <span class="math notranslate nohighlight">\(N(A^{\top})\)</span> are orthogonal complements in <span class="math notranslate nohighlight">\(\mathbb{R}^m\)</span>,
+that is equivalent to</p>
+<div class="math notranslate nohighlight" id="equation-eq-subspaces-fredholm">
+<span class="eqno">(75)<a class="headerlink" href="#equation-eq-subspaces-fredholm" title="Link to this equation">#</a></span>\[A\mathbf{x} = \mathbf{b} \text{ is solvable}
+\iff \mathbf{y}^{\top}\mathbf{b} = 0 \text{ for every } \mathbf{y}
+\text{ with } A^{\top}\mathbf{y} = \mathbf{0}.\]</div>
+<p>Exactly one of two things happens: either <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> is reachable, or there
+is a vector <span class="math notranslate nohighlight">\(\mathbf{y}\)</span> certifying that it is not. The version of this
+statement for differential operators is the reason solvability conditions
+appear all over applied mathematics.</p>
+</section>
+<section id="computing-them">
+<h3>Computing them<a class="headerlink" href="#computing-them" title="Link to this heading">#</a></h3>
+<p>From the SVD <span class="math notranslate nohighlight">\(A = U\Sigma V^{\top}\)</span> with <span class="math notranslate nohighlight">\(r\)</span> nonzero singular values, split the
+orthogonal factors at <span class="math notranslate nohighlight">\(r\)</span>:</p>
+<div class="math notranslate nohighlight" id="equation-eq-subspaces-from-svd">
+<span class="eqno">(76)<a class="headerlink" href="#equation-eq-subspaces-from-svd" title="Link to this equation">#</a></span>\[C(A) = \operatorname{span}(U_{:,1:r}), \quad
+N(A^{\top}) = \operatorname{span}(U_{:,r+1:m}), \quad
+C(A^{\top}) = \operatorname{span}(V_{:,1:r}), \quad
+N(A) = \operatorname{span}(V_{:,r+1:n}).\]</div>
+<p>This gives <strong>orthonormal</strong> bases for all four at once, which is why the SVD is
+the tool of choice. Elimination gives bases too — the pivot columns span
+<span class="math notranslate nohighlight">\(C(A)\)</span>, the echelon rows span <span class="math notranslate nohighlight">\(C(A^{\top})\)</span>, and the special solutions span
+<span class="math notranslate nohighlight">\(N(A)\)</span> — but they are not orthonormal, and in floating point they are less
+reliable. Exercise 2 compares them properly.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data and instruments only: the worked matrix and a projector-from-basis
+one-liner used as the subspaces’ measuring device. Building projectors
+properly is the lesson of
+<a class="reference internal" href="../02-orthogonality/projections-normal-equations.html"><span class="std std-doc">§2.1</span></a>; here they
+only take readings.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sympy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">la</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random vector below comes from this seed</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">110</span><span class="p">)</span>
+
+<span class="c1"># The worked matrix: 3x4 of rank 2, small enough that the column space is a</span>
+<span class="c1"># PLANE in R^3 and can be drawn. It is built with a dependency in each</span>
+<span class="c1"># direction:  row 3 = row 1 + row 2,  and  column 2 = 2 * column 1.</span>
+<span class="n">A34</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+
+
+<span class="c1"># instrument: the measuring device, not the lesson — building projectors from</span>
+<span class="c1"># scratch is the subject of §2.1; this one-liner (Q Q^T on an orthonormal</span>
+<span class="c1"># basis) only takes readings of the subspaces the exercises construct.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">projector</span><span class="p">(</span><span class="n">basis</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Orthogonal projector onto the span of a set of orthonormal columns.</span>
+
+<span class="sd">    The basis-independent representative of a subspace. Two different orthonormal</span>
+<span class="sd">    bases of the same subspace give the SAME projector, which is why every</span>
+<span class="sd">    comparison in this notebook is made between projectors rather than between</span>
+<span class="sd">    basis vectors: the SVD is free to return any orthonormal basis it likes, and</span>
+<span class="sd">    gating on its particular choice would be gating on a LAPACK implementation</span>
+<span class="sd">    detail (section 0.2, Rule 4).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    basis : numpy.ndarray, shape (n, k)</span>
+<span class="sd">        Columns spanning the subspace. Orthonormalised internally, so a</span>
+<span class="sd">        non-orthonormal spanning set is acceptable.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    numpy.ndarray, shape (n, n)</span>
+<span class="sd">        The symmetric idempotent projector onto that span. Its trace is the</span>
+<span class="sd">        dimension of the subspace.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">basis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">basis</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">basis</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">basis</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">Q</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="n">basis</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Q</span> <span class="o">@</span> <span class="n">Q</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-all-four-from-one-svd">
+<h2>Exercise 1: All four, from one SVD<a class="headerlink" href="#exercise-1-all-four-from-one-svd" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-subspaces-from-svd">Eq. 76</a> extracts every one of the four subspaces from a
+single decomposition, with orthonormal bases throughout. That is a remarkable
+amount of information from one call, and it is the reason
+<a class="reference internal" href="../04-svd/svd-geometry.html"><span class="std std-doc">§4.1</span></a> calls the SVD the factorization with no
+hypotheses.</p>
+<p>Work with the <span class="math notranslate nohighlight">\(3\times4\)</span> matrix of the setup cell,</p>
+<div class="math notranslate nohighlight" id="equation-eq-subspaces-a34">
+<span class="eqno">(77)<a class="headerlink" href="#equation-eq-subspaces-a34" title="Link to this equation">#</a></span>\[\begin{split}A = \begin{bmatrix} 1 &amp; 2 &amp; 3 &amp; 1\\ 2 &amp; 4 &amp; 5 &amp; 0\\ 3 &amp; 6 &amp; 8 &amp; 1 \end{bmatrix},\end{split}\]</div>
+<p>built so that <span class="math notranslate nohighlight">\(\mathbf{a}_2 = 2\mathbf{a}_1\)</span> (a column dependency, so the null
+space is non-trivial) and row 3 <span class="math notranslate nohighlight">\(=\)</span> row 1 <span class="math notranslate nohighlight">\(+\)</span> row 2 (a row dependency, so the
+left null space is non-trivial too). Its rank is 2, so the dimensions are
+<span class="math notranslate nohighlight">\(\dim C(A) = \dim C(A^{\top}) = 2\)</span>, <span class="math notranslate nohighlight">\(\dim N(A) = 4 - 2 = 2\)</span>, and
+<span class="math notranslate nohighlight">\(\dim N(A^{\top}) = 3 - 2 = 1\)</span>.</p>
+<p><strong>Part a)</strong> Confirm the two stated dependencies of <a class="reference internal" href="#equation-eq-subspaces-a34">Eq. 77</a> hold
+exactly (the entries are small integers, so use no tolerance), and that
+<code class="docutils literal notranslate"><span class="pre">np.linalg.matrix_rank(A)</span></code> is 2.</p>
+<p><strong>Part b)</strong> Compute the full SVD with <code class="docutils literal notranslate"><span class="pre">np.linalg.svd(A)</span></code> (note: <em>not</em>
+<code class="docutils literal notranslate"><span class="pre">full_matrices=False</span></code>, since the left null space lives in the columns of <span class="math notranslate nohighlight">\(U\)</span>
+beyond <span class="math notranslate nohighlight">\(r\)</span>), split <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span> at <span class="math notranslate nohighlight">\(r = 2\)</span> per <a class="reference internal" href="#equation-eq-subspaces-from-svd">Eq. 76</a>, and
+report the shape of each of the four bases.</p>
+<p><strong>Part c)</strong> Confirm each basis is orthonormal to <span class="math notranslate nohighlight">\(10^{-14}\)</span>, and that each does
+what its definition requires: <span class="math notranslate nohighlight">\(A\mathbf{v} = \mathbf{0}\)</span> for every null-space
+basis vector, and <span class="math notranslate nohighlight">\(A^{\top}\mathbf{u} = \mathbf{0}\)</span> for every left-null-space
+one. Confirm the four dimensions are <span class="math notranslate nohighlight">\((2, 1, 2, 2)\)</span> and check rank–nullity
+<a class="reference internal" href="#equation-eq-subspaces-rank-nullity">Eq. 72</a> on both sides.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>column dependency  a2 - 2*a1 = [0. 0. 0.]   exactly zero: True
+row dependency  r3 - r1 - r2 = [0. 0. 0. 0.]   exactly zero: True
+
+rank r = 2;  singular values [13.0043  0.9418  0.    ]
+  C(A)      basis (3, 2)   dim 2
+  N(A^T)    basis (3, 1)   dim 1
+  C(A^T)    basis (4, 2)   dim 2
+  N(A)      basis (4, 2)   dim 2
+
+rank-nullity in R^n: 2 + 2 = 4 = n = 4
+rank-nullity in R^m: 2 + 1 = 3 = m = 3
+
+max |A v| over the null-space basis      : 6.661e-16
+max |A^T u| over the left-null-space basis: 8.882e-16
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<p>The defining properties are checked, never the particular basis vectors the
+SVD chose. Note especially the annihilation checks: they confirm the <em>bases</em>
+are what <a class="reference internal" href="#equation-eq-subspaces-from-svd">Eq. 76</a> claims, using only the definition of a
+null space, which the decomposition was never asked about.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  column 2 is exactly twice column 1   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  row 3 is exactly row 1 plus row 2   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  the four dimensions are (r, m-r, r, n-r) = (2, 1, 2, 2)   [two subspaces in R^3 and two in R^4]
+✓  A annihilates its null-space basis   [max|Δ| = 6.66134e-16 (rtol=0, atol=1e-13)]
+✓  A^T annihilates its left-null-space basis   [max|Δ| = 8.88178e-16 (rtol=0, atol=1e-13)]
+✓  the C(A) basis is orthonormal   [max|Δ| = 4.44089e-16 (rtol=0, atol=1e-14)]
+✓  the N(A^T) basis is orthonormal   [got [[1.]] vs expected [[1.]] (rtol=0, atol=1e-14)]
+✓  the C(A^T) basis is orthonormal   [max|Δ| = 4.44089e-16 (rtol=0, atol=1e-14)]
+✓  the N(A) basis is orthonormal   [max|Δ| = 2.22045e-16 (rtol=0, atol=1e-14)]
+✓  rank-nullity holds on both sides (Eq. 1)   [2 + 2 = 4 and 2 + 1 = 3]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-the-same-four-exactly-and-why-the-bases-differ">
+<h2>Exercise 2: The same four, exactly, and why the bases differ<a class="headerlink" href="#exercise-2-the-same-four-exactly-and-why-the-bases-differ" title="Link to this heading">#</a></h2>
+<p>Elimination over the rationals produces the four subspaces too, with no
+floating point anywhere. SymPy gives <code class="docutils literal notranslate"><span class="pre">rref()</span></code> for the row space and pivot
+columns, <code class="docutils literal notranslate"><span class="pre">nullspace()</span></code> for <span class="math notranslate nohighlight">\(N(A)\)</span>, and the same applied to <span class="math notranslate nohighlight">\(A^{\top}\)</span> for the
+other two.</p>
+<p>The bases will look nothing like the SVD’s. SymPy returns the <strong>special
+solutions</strong> — set one free variable to 1 and the rest to 0, then solve — which
+are integer vectors, not orthonormal ones. For <a class="reference internal" href="#equation-eq-subspaces-a34">Eq. 77</a> they come
+out as <span class="math notranslate nohighlight">\((-2,1,0,0)^{\top}\)</span> and <span class="math notranslate nohighlight">\((5,0,-2,1)^{\top}\)</span>, which are neither unit
+length nor perpendicular to each other.</p>
+<p><strong>Both are correct.</strong> A subspace has no preferred basis, and any two bases of
+it span the same set. The way to compare them is therefore not to compare
+vectors — which would be comparing arbitrary choices — but to compare the
+<strong>orthogonal projectors</strong> onto the spans, which are unique to the subspace.
+This is exactly the discipline <a class="reference internal" href="../00-machine/floating-point.html"><span class="std std-doc">§0.2</span></a>
+Rule 4 demands and the Prologue’s Exercise 4 already used: never gate on
+something the library was free to choose.</p>
+<p><strong>Part a)</strong> Compute exact bases for all four subspaces of
+<a class="reference internal" href="#equation-eq-subspaces-a34">Eq. 77</a> with SymPy: <code class="docutils literal notranslate"><span class="pre">nullspace()</span></code> for <span class="math notranslate nohighlight">\(N(A)\)</span>, the same on
+<span class="math notranslate nohighlight">\(A^{\top}\)</span> for <span class="math notranslate nohighlight">\(N(A^{\top})\)</span>, the pivot columns of <span class="math notranslate nohighlight">\(A\)</span> for <span class="math notranslate nohighlight">\(C(A)\)</span>, and the
+nonzero rref rows for <span class="math notranslate nohighlight">\(C(A^{\top})\)</span>. Print them and observe they are integer
+vectors.</p>
+<p><strong>Part b)</strong> Confirm they are genuinely <em>different</em> from the SVD bases, by
+showing the SymPy null-space basis is not orthonormal.</p>
+<p><strong>Part c)</strong> Confirm they describe the <em>same</em> subspaces, by building the
+projector onto each span with the <code class="docutils literal notranslate"><span class="pre">projector</span></code> helper and comparing against the
+SVD projectors to <span class="math notranslate nohighlight">\(10^{-12}\)</span>. Confirm each projector’s trace equals the
+dimension of its subspace, which is a basis-independent integer.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  N(A)    exact basis (columns):
+[[-2.  5.]
+ [ 1.  0.]
+ [ 0. -2.]
+ [ 0.  1.]]
+  N(A^T)  exact basis (columns):
+[[-1.]
+ [-1.]
+ [ 1.]]
+  C(A)    exact basis (columns):
+[[1. 3.]
+ [2. 5.]
+ [3. 8.]]
+  C(A^T)  exact basis (columns):
+[[ 1.  0.]
+ [ 2.  0.]
+ [ 0.  1.]
+ [-5.  2.]]
+
+SymPy&#39;s N(A) basis has Gram matrix
+[[  5. -10.]
+ [-10.  30.]]
+  orthonormal? False   (the SVD&#39;s is, this one is not — both are valid bases)
+
+subspace      |P_exact - P_svd|    trace P   dim
+N(A)                  6.661e-16   2.000000     2
+N(A^T)                5.551e-16   1.000000     1
+C(A)                  2.998e-15   2.000000     2
+C(A^T)                9.576e-16   2.000000     2
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<p>The two computations are checked to agree as <strong>subspaces</strong> and to disagree as
+<strong>bases</strong>, which is the whole point. The trace check is the cleanest
+basis-independent statement available: a projector’s trace is the dimension of
+what it projects onto, and it comes out an integer.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  exact and SVD constructions give the same subspace N(A)   [max|Δ| = 6.66134e-16 (rtol=0, atol=1e-12)]
+✓  exact and SVD constructions give the same subspace N(A^T)   [max|Δ| = 5.55112e-16 (rtol=0, atol=1e-12)]
+✓  exact and SVD constructions give the same subspace C(A)   [max|Δ| = 2.9976e-15 (rtol=0, atol=1e-12)]
+✓  exact and SVD constructions give the same subspace C(A^T)   [max|Δ| = 9.57567e-16 (rtol=0, atol=1e-12)]
+✓  and they give genuinely DIFFERENT bases (SymPy&#39;s is not orthonormal)   [a subspace has no preferred basis, so only the projector may be compared]
+✓  each projector&#39;s trace equals the dimension of its subspace   [max|Δ| = 4.44089e-16 (rtol=0, atol=1e-10)]
+✓  the N(A) projector is idempotent   [max|Δ| = 3.33067e-16 (rtol=0, atol=1e-12)]
+✓  the N(A^T) projector is idempotent   [max|Δ| = 0 (rtol=0, atol=1e-12)]
+✓  the C(A) projector is idempotent   [max|Δ| = 3.33067e-16 (rtol=0, atol=1e-12)]
+✓  the C(A^T) projector is idempotent   [max|Δ| = 1.11022e-16 (rtol=0, atol=1e-12)]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-the-right-angles-and-the-big-picture">
+<h2>Exercise 3: The right angles, and the Big Picture<a class="headerlink" href="#exercise-3-the-right-angles-and-the-big-picture" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-subspaces-orthogonality">Eq. 73</a> claims two perpendicularity relations, each
+with a one-line proof. This exercise verifies them and then draws the diagram
+that has organised the subject since Strang put it on a blackboard.</p>
+<p>The proof of the first is worth rehearsing because it is so short. If
+<span class="math notranslate nohighlight">\(A\mathbf{x} = \mathbf{0}\)</span> then every component of <span class="math notranslate nohighlight">\(A\mathbf{x}\)</span> is zero; but
+component <span class="math notranslate nohighlight">\(i\)</span> <em>is</em> the inner product of row <span class="math notranslate nohighlight">\(i\)</span> of <span class="math notranslate nohighlight">\(A\)</span> with <span class="math notranslate nohighlight">\(\mathbf{x}\)</span>. So
+<span class="math notranslate nohighlight">\(\mathbf{x}\)</span> is perpendicular to every row, hence to every combination of rows,
+hence to the whole row space. Applying that to <span class="math notranslate nohighlight">\(A^{\top}\)</span> gives the second
+relation.</p>
+<p>Perpendicular is not by itself enough to make the four spaces fit together. Two
+subspaces can be perpendicular and still leave a gap — a line and another line
+in <span class="math notranslate nohighlight">\(\mathbb{R}^3\)</span>, for instance. What closes the gap is the dimension count
+<a class="reference internal" href="#equation-eq-subspaces-rank-nullity">Eq. 72</a>: perpendicular <em>and</em> dimensions summing to the
+whole space means <strong>orthogonal complements</strong>, so</p>
+<div class="math notranslate nohighlight" id="equation-eq-subspaces-complement">
+<span class="eqno">(78)<a class="headerlink" href="#equation-eq-subspaces-complement" title="Link to this equation">#</a></span>\[P_{C(A^{\top})} + P_{N(A)} = I_n,
+\qquad
+P_{C(A)} + P_{N(A^{\top})} = I_m ,\]</div>
+<p>where <span class="math notranslate nohighlight">\(P_S\)</span> is the orthogonal projector onto <span class="math notranslate nohighlight">\(S\)</span>. That single identity encodes
+perpendicularity and completeness at once, and it is the cleanest thing to
+check.</p>
+<p><strong>Part a)</strong> Verify both relations of <a class="reference internal" href="#equation-eq-subspaces-orthogonality">Eq. 73</a> directly
+on <a class="reference internal" href="#equation-eq-subspaces-a34">Eq. 77</a>, by computing the cross-Gram matrices
+<span class="math notranslate nohighlight">\(V_{\text{row}}^{\top}V_{\text{null}}\)</span> and <span class="math notranslate nohighlight">\(U_{\text{col}}^{\top}U_{\text{left}}\)</span>
+and confirming both vanish to <span class="math notranslate nohighlight">\(10^{-14}\)</span>.</p>
+<p><strong>Part b)</strong> Verify the stronger statement <a class="reference internal" href="#equation-eq-subspaces-complement">Eq. 78</a>: the
+two projectors in each space sum to the identity, to <span class="math notranslate nohighlight">\(10^{-13}\)</span>.</p>
+<p><strong>Part c)</strong> Draw the four-subspace diagram with
+<code class="docutils literal notranslate"><span class="pre">ecp.linalg.big_picture(ax,</span> <span class="pre">m,</span> <span class="pre">n,</span> <span class="pre">r)</span></code> for this matrix’s <span class="math notranslate nohighlight">\(m = 3\)</span>, <span class="math notranslate nohighlight">\(n = 4\)</span>,
+<span class="math notranslate nohighlight">\(r = 2\)</span>, and confirm the dimensions it labels match those computed in
+Exercise 1.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C(A^T) . N(A)   cross-Gram, max |entry| = 2.818e-16
+C(A) . N(A^T)   cross-Gram, max |entry| = 5.551e-17
+
+|P_row + P_null - I_4| = 4.441e-16
+|P_col + P_left - I_3| = 2.776e-16
+
+traces: row 2.0000  null 2.0000  (sum 4.0000 = n = 4)
+        col 2.0000  left 1.0000  (sum 3.0000 = m = 3)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-subspaces-big-picture">
+<img alt="../../_images/55edb405810c2f770f3cabe1965bf7368e6e3b46f72d0caf6c2374c282e7fadd.png" src="../../_images/55edb405810c2f770f3cabe1965bf7368e6e3b46f72d0caf6c2374c282e7fadd.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 29 </span><span class="caption-text">The four fundamental subspaces of the <span class="math notranslate nohighlight">\(3\times4\)</span> rank-2 matrix of Eq. 6. The row space and null space partition the input space <span class="math notranslate nohighlight">\(\mathbb{R}^4\)</span> into orthogonal complements of dimensions <span class="math notranslate nohighlight">\(r = 2\)</span> and <span class="math notranslate nohighlight">\(n - r = 2\)</span>; the column space and left null space partition the output space <span class="math notranslate nohighlight">\(\mathbb{R}^3\)</span> into dimensions <span class="math notranslate nohighlight">\(r = 2\)</span> and <span class="math notranslate nohighlight">\(m - r = 1\)</span>. The solid arrow is the bijection <span class="math notranslate nohighlight">\(A\)</span> makes from the row space onto the column space, and the dotted one is everything in the null space collapsing to <span class="math notranslate nohighlight">\(\mathbf{0}\)</span>.</span><a class="headerlink" href="#fig-subspaces-big-picture" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<p>The cross-Gram matrices test perpendicularity between the two bases directly.
+The projector identity <a class="reference internal" href="#equation-eq-subspaces-complement">Eq. 78</a> is the stronger check,
+since it fails if the subspaces are perpendicular but do not fill the space —
+and it is basis-independent, so it says something about the geometry rather
+than about the SVD’s choices.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the row space is orthogonal to the null space (Eq. 2)   [max|Δ| = 2.81799e-16 (rtol=0, atol=1e-14)]
+✓  the column space is orthogonal to the left null space   [max|Δ| = 5.55112e-17 (rtol=0, atol=1e-14)]
+✓  and they are complements: P_row + P_null = I_4 (Eq. 7)   [max|Δ| = 4.44089e-16 (rtol=0, atol=1e-13)]
+✓  likewise P_col + P_left = I_3   [max|Δ| = 2.77556e-16 (rtol=0, atol=1e-13)]
+✓  the four traces are the four dimensions (2, 2, 2, 1)   [max|Δ| = 8.88178e-16 (rtol=0, atol=1e-10)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-what-the-matrix-actually-does">
+<h2>Exercise 4: What the matrix actually does<a class="headerlink" href="#exercise-4-what-the-matrix-actually-does" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-subspaces-split">Eq. 74</a> says every input vector has a part that matters and a
+part that does not. This exercise makes that concrete and then verifies the
+claim that gives the whole picture its point: <span class="math notranslate nohighlight">\(A\)</span> is a <strong>bijection from the row
+space onto the column space</strong>.</p>
+<p>Three consequences follow, each checkable:</p>
+<ol class="arabic simple">
+<li><p><span class="math notranslate nohighlight">\(A\mathbf{x} = A\mathbf{x}_{\text{row}}\)</span> for every <span class="math notranslate nohighlight">\(\mathbf{x}\)</span> — the null
+part is invisible on the output.</p></li>
+<li><p><span class="math notranslate nohighlight">\(\|\mathbf{x}\|^2 = \|\mathbf{x}_{\text{row}}\|^2 +
+\|\mathbf{x}_{\text{null}}\|^2\)</span> — Pythagoras, because the two parts are
+perpendicular, exactly as in <a class="reference internal" href="../00-machine/vectors-norms-inner-products.html"><span class="std std-doc">§0.3</span></a>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(\mathbf{x}_{\text{row}}\)</span> is the <strong>minimum-norm</strong> solution among all
+<span class="math notranslate nohighlight">\(\mathbf{x}\)</span> giving the same output, since adding any null-space component
+can only increase the length by (2). That is the vector the pseudoinverse
+returns, and <a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html"><span class="std std-doc">§2.4</span></a>
+builds it properly.</p></li>
+</ol>
+<p><strong>Part a)</strong> For 200 random <span class="math notranslate nohighlight">\(\mathbf{x} \in \mathbb{R}^4\)</span> from
+<code class="docutils literal notranslate"><span class="pre">rng.standard_normal((200,</span> <span class="pre">4))</span></code>, split each by <a class="reference internal" href="#equation-eq-subspaces-split">Eq. 74</a> using
+the projectors of Exercise 3, and confirm the split reassembles to <span class="math notranslate nohighlight">\(10^{-14}\)</span>,
+that <span class="math notranslate nohighlight">\(A\mathbf{x} = A\mathbf{x}_{\text{row}}\)</span> to <span class="math notranslate nohighlight">\(10^{-13}\)</span>, and that
+Pythagoras holds to <span class="math notranslate nohighlight">\(10^{-13}\)</span>.</p>
+<p><strong>Part b)</strong> Confirm injectivity on the row space: for 200 random <em>pairs</em> of
+row-space vectors, check that distinct inputs give distinct outputs, by
+confirming <span class="math notranslate nohighlight">\(\|A(\mathbf{p} - \mathbf{q})\| \ge c\|\mathbf{p} - \mathbf{q}\|\)</span>
+with <span class="math notranslate nohighlight">\(c = \sigma_r\)</span>, the smallest nonzero singular value. This is the
+quantitative form of “one-to-one”, and <span class="math notranslate nohighlight">\(\sigma_r\)</span> is exactly the constant.</p>
+<p><strong>Part c)</strong> Confirm minimum-norm: for the specific
+<span class="math notranslate nohighlight">\(\mathbf{x}_0 = (1, 1, 1, 1)^{\top}\)</span>, compare
+<span class="math notranslate nohighlight">\(\|\mathbf{x}_{0,\text{row}}\|\)</span> against <span class="math notranslate nohighlight">\(\|\mathbf{x}_{0,\text{row}} +
+\mathbf{z}\|\)</span> for 1000 random <span class="math notranslate nohighlight">\(\mathbf{z}\)</span> in the null space, and confirm the
+row-space vector is shortest every time.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>over 200 random x in R^4:
+  |x - (x_row + x_null)|          : 2.665e-15
+  |A x - A x_row|                 : 1.421e-14
+  Pythagoras defect               : 1.488e-14
+  mean |x_null| / |x|             : 0.6535   (half the input is thrown away, as dim N(A)/n = 2/4 suggests)
+
+injectivity on the row space: ||A d|| / ||d|| over 200 pairs
+  smallest observed  : 0.948628
+  sigma_r            : 0.941797   (the exact lower bound)
+  all above sigma_r  : True
+
+minimum norm: ||x0_row|| = 1.843909
+  shortest competitor among 1000 = 1.844345
+  x0_row is shortest             : True
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<p>The injectivity check is the interesting one: it does not merely assert that
+<span class="math notranslate nohighlight">\(A\)</span> is one-to-one on the row space, it measures <em>how</em> one-to-one, and finds the
+constant is exactly <span class="math notranslate nohighlight">\(\sigma_r\)</span>. That is a sharp statement, and it is where the
+smallest nonzero singular value first shows what it means.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  every x splits into row-space and null-space parts (Eq. 3)   [max|Δ| = 2.66454e-15 (rtol=0, atol=1e-13)]
+✓  A x = A x_row: the null-space part is invisible on the output   [max|Δ| = 1.42109e-14 (rtol=0, atol=1e-12)]
+✓  and Pythagoras holds, because the two parts are perpendicular   [largest defect 1.49e-14 over 200 vectors]
+✓  A is injective on the row space, with sharp constant sigma_r   [smallest measured stretch 0.948628 against sigma_r = 0.941797]
+✓  and x_row is the shortest vector with its output (1000 competitors)   [which is the minimum-norm solution the pseudoinverse returns]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-the-fredholm-alternative">
+<h2>Exercise 5: The Fredholm alternative<a class="headerlink" href="#exercise-5-the-fredholm-alternative" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-subspaces-fredholm">Eq. 75</a> converts an existence question into an
+orthogonality test, and the practical value is that the test is <em>constructive</em>:
+when no solution exists, it hands you a specific vector proving it.</p>
+<p>For <a class="reference internal" href="#equation-eq-subspaces-a34">Eq. 77</a> the left null space is one-dimensional, spanned by
+<span class="math notranslate nohighlight">\(\mathbf{y} = (-1, -1, 1)^{\top}\)</span> — which is just the row dependency
+<span class="math notranslate nohighlight">\(\mathbf{r}_3 = \mathbf{r}_1 + \mathbf{r}_2\)</span> written as a vector. So
+<span class="math notranslate nohighlight">\(A\mathbf{x} = \mathbf{b}\)</span> is solvable exactly when
+<span class="math notranslate nohighlight">\(-b_1 - b_2 + b_3 = 0\)</span>, that is when <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> satisfies the same linear
+relation its rows do. If your data violates that relation, no <span class="math notranslate nohighlight">\(\mathbf{x}\)</span> can
+fix it, and <span class="math notranslate nohighlight">\(\mathbf{y}\)</span> is the certificate.</p>
+<p>This is more than bookkeeping. Least squares
+(<a class="reference internal" href="../02-orthogonality/projections-normal-equations.html"><span class="std std-doc">§2.1</span></a>) exists
+precisely because real right-hand sides usually violate such conditions, and
+what it returns is the solution for the <em>projected</em> <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> — the
+component in <span class="math notranslate nohighlight">\(C(A)\)</span> — with the <span class="math notranslate nohighlight">\(N(A^{\top})\)</span> component left over as the
+residual. The residual is not a nuisance; it is the part of the data the model
+structurally cannot explain.</p>
+<p><strong>Part a)</strong> Confirm the left null space of <a class="reference internal" href="#equation-eq-subspaces-a34">Eq. 77</a> is spanned by
+<span class="math notranslate nohighlight">\(\mathbf{y} = (-1,-1,1)^{\top}\)</span>, by checking <span class="math notranslate nohighlight">\(A^{\top}\mathbf{y} = \mathbf{0}\)</span>
+exactly and that <span class="math notranslate nohighlight">\(\mathbf{y}\)</span> lies in the span of the SVD’s <code class="docutils literal notranslate"><span class="pre">left_null</span></code> basis
+(compare projectors, not vectors).</p>
+<p><strong>Part b)</strong> Build a <strong>consistent</strong> right-hand side as
+<span class="math notranslate nohighlight">\(\mathbf{b}_{\text{ok}} = A(1,0,1,0)^{\top}\)</span> and an <strong>inconsistent</strong> one as
+<span class="math notranslate nohighlight">\(\mathbf{b}_{\text{bad}} = \mathbf{b}_{\text{ok}} + \mathbf{u}\)</span> where
+<span class="math notranslate nohighlight">\(\mathbf{u}\)</span> is the unit left-null vector. For each, report
+<span class="math notranslate nohighlight">\(\|P_{N(A^{\top})}\mathbf{b}\|\)</span> and the residual norm from
+<code class="docutils literal notranslate"><span class="pre">np.linalg.lstsq(A,</span> <span class="pre">b,</span> <span class="pre">rcond=None)</span></code>, and confirm the two agree: the residual of
+the best possible fit <em>is</em> the left-null component.</p>
+<p><strong>Part c)</strong> Confirm the certificate works as advertised: for the inconsistent
+case, <span class="math notranslate nohighlight">\(\mathbf{y}^{\top}\mathbf{b}_{\text{bad}} \neq 0\)</span>, and for the consistent
+case it vanishes to <span class="math notranslate nohighlight">\(10^{-13}\)</span>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>A^T y = [0. 0. 0. 0.]   exactly zero: True
+y in span(left_null)? projector gap = 5.551e-16
+
+right-hand side     |P_left b|   lstsq residual        y . b
+consistent           2.801e-15        2.512e-15    0.000e+00
+inconsistent         1.000e+00        1.000e+00    1.732e+00
+
+the residual IS the left-null component: |1.000000 - 1.000000| = 3.33e-15
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<p>The sharp check is the last one: the residual of the least-squares fit is
+required to <em>equal</em> the norm of the left-null component of <span class="math notranslate nohighlight">\(\mathbf{b}\)</span>, not
+merely to be similar. Those are computed by completely different routes — one
+by <code class="docutils literal notranslate"><span class="pre">lstsq</span></code>, one by projecting with the SVD basis — so their agreement is real
+evidence for <a class="reference internal" href="#equation-eq-subspaces-fredholm">Eq. 75</a>.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  y = (-1, -1, 1) is exactly in the left null space   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  and it spans the same one-dimensional subspace the SVD found   [max|Δ| = 5.55112e-16 (rtol=0, atol=1e-13)]
+✓  for the consistent b the certificate gives y . b = 0   [got 0 vs expected 0 (rtol=0, atol=1e-13)]
+✓  for the inconsistent b it does not, which is the proof of unsolvability   [y . b = 1.7321]
+✓  the least-squares residual equals the left-null component of b   [got 1 vs expected 1 (rtol=0, atol=1e-10)]
+✓  and the consistent system is solved exactly, with zero residual   [got 2.51215e-15 vs expected 0 (rtol=0, atol=1e-13)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-6-the-picture-in-three-dimensions">
+<h2>Exercise 6: The picture in three dimensions<a class="headerlink" href="#exercise-6-the-picture-in-three-dimensions" title="Link to this heading">#</a></h2>
+<p>For this matrix the output space is <span class="math notranslate nohighlight">\(\mathbb{R}^3\)</span>, small enough to draw. The
+column space is a <strong>plane</strong> through the origin (dimension 2) and the left null
+space is the <strong>line</strong> perpendicular to it (dimension 1). Every right-hand side
+<span class="math notranslate nohighlight">\(\mathbf{b}\)</span> decomposes into a piece in the plane, which is reachable, and a
+piece along the line, which is not — and the second piece is exactly the
+least-squares residual of Exercise 5.</p>
+<p>Seeing it once removes most of the mystery from Chapter II. Least squares is not
+an algebraic trick; it is dropping a perpendicular from <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> to a plane.</p>
+<p><strong>Part a)</strong> Draw the column-space plane and the left-null line in
+<span class="math notranslate nohighlight">\(\mathbb{R}^3\)</span> with <code class="docutils literal notranslate"><span class="pre">ecp.linalg.subspace_plane</span></code>, using the SVD bases from
+Exercise 1.</p>
+<p><strong>Part b)</strong> Place on the figure the explicit vector
+<span class="math notranslate nohighlight">\(\mathbf{b}_{\text{draw}} = 1.5\,\mathbf{u}_1 + 0.9\,\mathbf{u}_3\)</span>, where
+<span class="math notranslate nohighlight">\(\mathbf{u}_1\)</span> is the first column-space basis vector and <span class="math notranslate nohighlight">\(\mathbf{u}_3\)</span> the
+left-null one, together with its projection into the plane and the residual
+joining them. The coefficients are chosen so both components are of comparable
+size and the geometry is legible; Exercise 5’s <span class="math notranslate nohighlight">\(\mathbf{b}_{\text{bad}}\)</span> has
+the same structure but a column-space part ten times the residual, which draws
+as an almost invisible correction.</p>
+<p><strong>Part c)</strong> Confirm numerically what the figure asserts: the residual is
+parallel to the left-null line (their normalised vectors agree up to sign, so
+compare <span class="math notranslate nohighlight">\(|\cos|\)</span>), and the projection lies in the plane
+(<span class="math notranslate nohighlight">\(P_{N(A^{\top})}\)</span> annihilates it to <span class="math notranslate nohighlight">\(10^{-13}\)</span>).</p>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p>Ask for a routine <code class="docutils literal notranslate"><span class="pre">subspace_angles(B1,</span> <span class="pre">B2)</span></code> returning the principal angles
+between two subspaces given spanning matrices, via the singular values of
+<span class="math notranslate nohighlight">\(Q_1^{\top}Q_2\)</span> for orthonormalised <span class="math notranslate nohighlight">\(Q_i\)</span>. Then check it yourself on this
+notebook’s bases: the angles between <span class="math notranslate nohighlight">\(C(A^{\top})\)</span> and <span class="math notranslate nohighlight">\(N(A)\)</span> must all be
+<span class="math notranslate nohighlight">\(\pi/2\)</span> to <span class="math notranslate nohighlight">\(10^{-8}\)</span>, the angles between the SymPy and SVD constructions of the
+<em>same</em> subspace must all be <span class="math notranslate nohighlight">\(0\)</span> to <span class="math notranslate nohighlight">\(10^{-8}\)</span>, and the number of angles returned
+must equal <span class="math notranslate nohighlight">\(\min(\dim_1, \dim_2)\)</span>. The check is yours.</p>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-subspaces-3d">
+<img alt="../../_images/9476a230660406eabe5fe786146b4af984c389a187ab581fec463c202ef19e1f.png" src="../../_images/9476a230660406eabe5fe786146b4af984c389a187ab581fec463c202ef19e1f.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 30 </span><span class="caption-text">The output space <span class="math notranslate nohighlight">\(\mathbb{R}^3\)</span> of the <span class="math notranslate nohighlight">\(3\times4\)</span> rank-2 matrix of Eq. 6, split into orthogonal complements: the column space <span class="math notranslate nohighlight">\(C(A)\)</span> is the amber plane through the origin, and the left null space <span class="math notranslate nohighlight">\(N(A^{\top})\)</span> is the ink line perpendicular to it, spanned by <span class="math notranslate nohighlight">\(\mathbf{y} = (-1,-1,1)^{\top}\)</span>. The unreachable vector <span class="math notranslate nohighlight">\(\mathbf{b} = 1.5\,\mathbf{u}_1 + 0.9\,\mathbf{u}_3\)</span> is drawn with its projection into the plane, which is the closest reachable vector, and the residual joining them, which lies along the line and is the part of <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> that no choice of <span class="math notranslate nohighlight">\(\mathbf{x}\)</span> can produce.</span><a class="headerlink" href="#fig-subspaces-3d" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>|cos| between the residual and the left-null line : 1.000000000000
+|P_left applied to the projection|                : 9.610e-17
+|P_col  applied to the residual|                  : 3.606e-16
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-6">
+<h3>Validation 6<a class="headerlink" href="#validation-6" title="Link to this heading">#</a></h3>
+<p>The figure asserts three geometric facts and all three are checked: the
+residual is parallel to the left-null line, the projection lies in the plane,
+and the residual has no component in the plane. The parallelism is checked
+through <span class="math notranslate nohighlight">\(|\cos|\)</span> rather than through the vectors, since the SVD chose the
+line’s direction and either sign is correct.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the residual is parallel to the left-null line (|cos| = 1)   [got 1 vs expected 1 (rtol=0, atol=1e-12)]
+✓  the projection lies in the plane: no left-null component   [max|Δ| = 9.61009e-17 (rtol=0, atol=1e-13)]
+✓  and the residual lies off it: no column-space component   [max|Δ| = 3.60638e-16 (rtol=0, atol=1e-13)]
+✓  Pythagoras closes the decomposition in R^3   [got 3.06 vs expected 3.06 (rtol=0, atol=1e-12)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p>A matrix divides both of its spaces in two, perpendicularly, and everything
+Chapter I has asked follows from that.</p>
+<p>The concrete results, all for the <span class="math notranslate nohighlight">\(3\times4\)</span> rank-2 matrix of
+<a class="reference internal" href="#equation-eq-subspaces-a34">Eq. 77</a>:</p>
+<ul class="simple">
+<li><p>one call to <code class="docutils literal notranslate"><span class="pre">np.linalg.svd</span></code> produced orthonormal bases for <strong>all four</strong>
+subspaces via <a class="reference internal" href="#equation-eq-subspaces-from-svd">Eq. 76</a>, with dimensions
+<span class="math notranslate nohighlight">\((2, 1, 2, 2)\)</span> and rank–nullity holding on both sides;</p></li>
+<li><p>SymPy’s exact construction gave <strong>completely different bases</strong> — integer
+special solutions with Gram matrix far from <span class="math notranslate nohighlight">\(I\)</span> — describing the <strong>same four
+subspaces</strong>, with projector gaps below <span class="math notranslate nohighlight">\(10^{-12}\)</span> and traces equal to the
+dimensions exactly;</p></li>
+<li><p>the two orthogonality relations <a class="reference internal" href="#equation-eq-subspaces-orthogonality">Eq. 73</a> held to
+<span class="math notranslate nohighlight">\(10^{-14}\)</span>, and the stronger complement identity
+<a class="reference internal" href="#equation-eq-subspaces-complement">Eq. 78</a> — <span class="math notranslate nohighlight">\(P_{\text{row}} + P_{\text{null}} = I_4\)</span> and
+<span class="math notranslate nohighlight">\(P_{\text{col}} + P_{\text{left}} = I_3\)</span> — to <span class="math notranslate nohighlight">\(10^{-13}\)</span>;</p></li>
+<li><p>splitting 200 random vectors by <a class="reference internal" href="#equation-eq-subspaces-split">Eq. 74</a> gave
+<span class="math notranslate nohighlight">\(A\mathbf{x} = A\mathbf{x}_{\text{row}}\)</span> to <span class="math notranslate nohighlight">\(10^{-13}\)</span> and Pythagoras to the
+same, with half of a typical input discarded, matching
+<span class="math notranslate nohighlight">\(\dim N(A)/n = 2/4\)</span>;</p></li>
+<li><p><span class="math notranslate nohighlight">\(A\)</span> was injective on the row space with the <strong>sharp</strong> constant
+<span class="math notranslate nohighlight">\(\sigma_r = 0.9418\)</span>, and <span class="math notranslate nohighlight">\(\mathbf{x}_{\text{row}}\)</span> beat all 1000 random
+competitors for shortest vector with its output;</p></li>
+<li><p>the Fredholm certificate <span class="math notranslate nohighlight">\(\mathbf{y} = (-1,-1,1)^{\top}\)</span> — which is just the
+row dependency <span class="math notranslate nohighlight">\(\mathbf{r}_3 = \mathbf{r}_1 + \mathbf{r}_2\)</span> — gave
+<span class="math notranslate nohighlight">\(\mathbf{y}^{\top}\mathbf{b} = 0\)</span> for the consistent right-hand side and
+<span class="math notranslate nohighlight">\(\neq 0\)</span> for the inconsistent one, and the least-squares <strong>residual equalled
+the left-null component</strong> of <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> to <span class="math notranslate nohighlight">\(10^{-10}\)</span>, computed by two
+unrelated routes;</p></li>
+<li><p>and in <span class="math notranslate nohighlight">\(\mathbb{R}^3\)</span> the picture closed: an amber plane, a perpendicular
+line, and <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> split between them with <span class="math notranslate nohighlight">\(|\cos| = 1\)</span> against the line.</p></li>
+</ul>
+<p>Methods met: the full <code class="docutils literal notranslate"><span class="pre">np.linalg.svd</span></code> and the rank split of
+<a class="reference internal" href="#equation-eq-subspaces-from-svd">Eq. 76</a>, <code class="docutils literal notranslate"><span class="pre">sympy.Matrix.nullspace</span></code> and <code class="docutils literal notranslate"><span class="pre">.rref</span></code>, orthogonal
+projectors as the basis-independent representative of a subspace,
+<code class="docutils literal notranslate"><span class="pre">np.linalg.lstsq</span></code> and its residual, and <code class="docutils literal notranslate"><span class="pre">ecp.linalg.big_picture</span></code> and
+<code class="docutils literal notranslate"><span class="pre">subspace_plane</span></code>.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Dropping the perpendicular, properly.</strong> Exercise 6 drew the projection of
+<span class="math notranslate nohighlight">\(\mathbf{b}\)</span> into the column space and called the leftover a residual. Making
+that a computation — for any <span class="math notranslate nohighlight">\(A\)</span>, without an SVD — is
+<a class="reference internal" href="../02-orthogonality/projections-normal-equations.html"><span class="std std-doc">§2.1</span></a>, and it is the
+whole of least squares.</p></li>
+<li><p><strong>Bases worth having.</strong> The SVD’s bases were orthonormal and SymPy’s were
+not, and orthonormality is what made every projector in this notebook a
+simple <span class="math notranslate nohighlight">\(QQ^{\top}\)</span>. Constructing an orthonormal basis for a given subspace
+directly, without the SVD, is the <span class="math notranslate nohighlight">\(QR\)</span> factorization of
+<a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html"><span class="std std-doc">§2.2</span></a>.</p></li>
+<li><p><strong>The abstract version.</strong> Nothing here needed the vectors to be columns of
+numbers: “subspace”, “dimension”, “complement” make sense wherever addition
+and scaling do. <a class="reference internal" href="vector-spaces-coordinates.html"><span class="std std-doc">§1.5</span></a> says what a vector
+space is in general, and finds these same four subspaces sitting inside
+spaces of polynomials and of matrices.</p></li>
+<li><p><strong>Why <span class="math notranslate nohighlight">\(\sigma_r\)</span> was the sharp constant.</strong> Exercise 4 found the injectivity
+constant to be the smallest nonzero singular value, exactly. That is not a
+coincidence, and <a class="reference internal" href="../04-svd/svd-geometry.html"><span class="std std-doc">§4.1</span></a> explains it: the
+singular values <em>are</em> the stretching factors of the map, and <span class="math notranslate nohighlight">\(\sigma_r\)</span> is
+how much it shrinks the direction it shrinks most.</p></li>
+</ul>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h3>
+<div class="docutils container" id="id3">
+<div role="list" class="citation-list">
+<div class="citation" id="id4" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">Str23</a><span class="fn-bracket">]</span></span>
+<p>Gilbert Strang. <em>Introduction to Linear Algebra</em>. Wellesley-Cambridge Press, Wellesley, MA, 6 edition, 2023. ISBN 978-1-7331466-7-8.</p>
+</div>
+<div class="citation" id="id11" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">TB97</a><span class="fn-bracket">]</span></span>
+<p>Lloyd N. Trefethen and David Bau, III. <em>Numerical Linear Algebra</em>. SIAM, Philadelphia, 1997. <a class="reference external" href="https://doi.org/10.1137/1.9780898719574">doi:10.1137/1.9780898719574</a>.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/01-matrices"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="inverses-rank-cr.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">1.3 Inverses, Rank, and A = CR</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="vector-spaces-coordinates.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">1.5 Vector Spaces, Bases, and Coordinates</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-four-spaces">The four spaces</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-orthogonality-in-one-line-each">The orthogonality, in one line each</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-the-matrix-does">What the matrix does</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-fredholm-alternative">The Fredholm alternative</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computing-them">Computing them</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-all-four-from-one-svd">Exercise 1: All four, from one SVD</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-same-four-exactly-and-why-the-bases-differ">Exercise 2: The same four, exactly, and why the bases differ</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-right-angles-and-the-big-picture">Exercise 3: The right angles, and the Big Picture</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-what-the-matrix-actually-does">Exercise 4: What the matrix actually does</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-the-fredholm-alternative">Exercise 5: The Fredholm alternative</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-the-picture-in-three-dimensions">Exercise 6: The picture in three dimensions</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

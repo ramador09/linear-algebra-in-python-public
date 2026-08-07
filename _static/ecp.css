@@ -1,0 +1,167 @@
+/* Elementary Computational Physics — Jupyter Book site theme.
+   Matches the notebook header identity defined in ecp/style.py.
+
+   IMPORTANT: the site supports light AND dark mode (the theme toggle / OS
+   preference). We therefore do NOT hard-code a text colour on the body — the
+   theme already picks a readable colour per mode. We only:
+     - apply the series fonts (both modes),
+     - brand the *headings* per mode (ink navy in light, warm near-white in dark),
+     - colour links with the amber accent (brightened slightly for dark),
+     (solution-cell visibility is handled by the build pipelines, not CSS).
+   This avoids the dark-on-dark contrast problem of hard-coding --ecp-ink. */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root {
+  --ecp-ink: #16213e;
+  --ecp-accent: #c0851a;
+  --ecp-accent-bright: #e0a93f;   /* amber for dark backgrounds */
+  --ecp-heading-dark: #f3efe3;    /* warm near-parchment for dark mode headings */
+}
+
+/* ---- Fonts: both modes ------------------------------------------------- */
+.bd-article,
+.bd-article p,
+.bd-article li {
+  font-family: 'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+  font-size: 1.02rem;
+  /* no colour here — let the theme set readable body text in light AND dark */
+}
+
+.bd-article h1,
+.bd-article h2,
+.bd-article h3,
+.bd-article h4 {
+  font-family: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+  font-variation-settings: 'opsz' 96;
+  letter-spacing: -0.01em;
+}
+
+.bd-article h2 {
+  border-bottom: 1px solid var(--pst-color-border, rgba(128, 128, 128, 0.25));
+  padding-bottom: 0.25rem;
+}
+
+code, pre, .highlight {
+  font-family: 'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;
+}
+.cell_output pre { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
+
+/* ---- Brand heading colour: LIGHT mode --------------------------------- */
+html[data-theme="light"] .bd-article h1,
+html[data-theme="light"] .bd-article h2,
+html[data-theme="light"] .bd-article h3,
+html[data-theme="light"] .bd-article h4 {
+  color: var(--ecp-ink);
+}
+html[data-theme="light"] .bd-article a { color: var(--ecp-accent); }
+html[data-theme="light"] .bd-article a:hover { color: var(--ecp-ink); }
+
+/* ---- Brand heading colour: DARK mode (readable, warm) ----------------- */
+html[data-theme="dark"] .bd-article h1,
+html[data-theme="dark"] .bd-article h2,
+html[data-theme="dark"] .bd-article h3,
+html[data-theme="dark"] .bd-article h4 {
+  color: var(--ecp-heading-dark);
+}
+html[data-theme="dark"] .bd-article a { color: var(--ecp-accent-bright); }
+html[data-theme="dark"] .bd-article a:hover { color: #ffffff; }
+
+/* ---- Solution-cell visibility ------------------------------------------
+   Solution INPUTS are hidden on the public site by tools/strip_solutions.py,
+   which replaces the source with a placeholder and adds the `remove-input`
+   tag BEFORE the build — nothing reaches the HTML, so no CSS is needed (and
+   CSS `display:none` would be no protection anyway: hidden content still
+   ships in the page source). An earlier blanket rule here
+   (div.cell[class*="tag_solution"] div.cell_input { display: none; })
+   also suppressed every solution cell on the AUTHOR-ONLY solutions build,
+   which shares this stylesheet — hiding exactly the worked solution code
+   that site exists to show. Removed 2026-07-03: visibility is decided by
+   the pipelines (strip for public, reveal_figure_solutions for MyST-NB
+   figure cells on the solutions build), never by the stylesheet. */
+
+/* ---- Admonitions match the palette ------------------------------------ */
+.admonition { border-left-color: var(--ecp-accent) !important; }
+
+/* ---- Figure-caption labels: bold, amber, upright "Fig. N." ------------
+   The theme renders the label as <span class="caption-number">Fig. N </span>
+   (italic, with a trailing space) ahead of the caption body. We restyle ONLY
+   the label span: de-italicise, bold, amber accent (brightened for dark), and
+   add the APS/Nature period after the number. Making the span inline-block
+   trims its trailing space so the period sits flush ("Fig. 41."), and a small
+   right margin restores the gap to the caption text. The caption BODY is left
+   exactly as the theme renders it (roman, with inline <em> emphasis intact),
+   so we do NOT set font-style on figcaption itself. In-text {numref} links use
+   .std-numref (not .caption-number), so they keep reading "Fig. N" with no
+   period — which is why the period lives here in CSS, not in numfig_format
+   (a numfig_format period would also append to every in-text ref, producing
+   "…in Fig. 42.." at sentence ends). */
+figcaption .caption-number,
+.bd-article figcaption .caption-number {
+  display: inline-block;
+  margin-right: 0.3em;
+  font-weight: 700;
+  font-style: normal;
+}
+figcaption .caption-number::after { content: "."; }
+html[data-theme="light"] figcaption .caption-number { color: var(--ecp-accent); }
+html[data-theme="dark"] figcaption .caption-number { color: var(--ecp-accent-bright); }
+
+/* ---- Primary sidebar drawer (narrow screens) -----------------------------
+   The "Toggle primary sidebar" button ships broken at every width: the page
+   renders two toggles and the theme's handler drives neither the visible one,
+   so no class is ever applied. On a phone that left the site with no navigation
+   at all. _static/sidebar-toggle.js drives the button itself and sets a body
+   class in either regime: below 992px it opens the drawer styled here (the
+   theme's own narrow-screen rules still target
+   `input#pst-primary-sidebar-checkbox`, which pydata 0.16 no longer emits), and
+   at 992px and up it collapses the sidebar out of the flow. */
+@media (max-width: 991.98px) {
+  .bd-sidebar-primary {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: min(85vw, 22rem) !important;
+    max-width: 22rem !important;
+    height: 100dvh !important;
+    margin-left: 0 !important;
+    z-index: 1082 !important;
+    overflow-y: auto !important;
+    opacity: 1 !important;
+    background: var(--pst-color-background) !important;
+    /* closed by default; the drawer slides in from the left when opened */
+    transform: translateX(-102%) !important;
+    visibility: hidden !important;
+    transition: transform 0.25s ease, visibility 0.25s ease !important;
+    box-shadow: 0 0 2rem rgba(0, 0, 0, 0.35);
+  }
+
+  body.ecp-nav-open .bd-sidebar-primary {
+    transform: translateX(0) !important;
+    visibility: visible !important;
+  }
+
+  /* Tap-anywhere-else to dismiss. A <button> so it is keyboard reachable. */
+  .ecp-nav-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1081;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* Wide screens: collapse the sidebar out of the flow. Driven from a body class
+   like the drawer above, rather than from the theme's own class, which does not
+   reliably win the cascade here. */
+@media (min-width: 992px) {
+  body.ecp-nav-collapsed .bd-sidebar-primary {
+    display: none !important;
+  }
+}
+
+@media (max-width: 991.98px) and (prefers-reduced-motion: reduce) {
+  .bd-sidebar-primary { transition: none !important; }
+}

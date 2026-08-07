@@ -1,0 +1,1580 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="2.3 Least Squares Four Ways" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/02-orthogonality/least-squares-four-ways.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: §2.1 derived the normal equations A^{\top}\!A\hat{\mathbf{x}} = A^{\top}\mathbf{b} and warned they are not how least squares is solved in ..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: §2.1 derived the normal equations A^{\top}\!A\hat{\mathbf{x}} = A^{\top}\mathbf{b} and warned they are not how least squares is solved in ..." />
+
+    <title>2.3 Least Squares Four Ways &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/02-orthogonality/least-squares-four-ways';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/02-orthogonality/least-squares-four-ways.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="2.4 The Pseudoinverse, Rank Deficiency, and Regularization" href="pseudoinverse-regularization.html" />
+    <link rel="prev" title="2.2 Gram–Schmidt, QR, Householder, and Givens" href="gram-schmidt-qr.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter II — Orthogonality and Least Squares</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/02-orthogonality/least-squares-four-ways.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/02-orthogonality/least-squares-four-ways.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/02-orthogonality/least-squares-four-ways.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/02-orthogonality/least-squares-four-ways.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>2.3 Least Squares Four Ways</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-squaring-identity">The squaring identity</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#four-routes">Four routes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-a-fit-reports">What a fit reports</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#unequal-uncertainties">Unequal uncertainties</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-measuring-the-squaring">Exercise 1: Measuring the squaring</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-four-routes-one-answer">Exercise 2: Four routes, one answer</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-where-the-routes-separate-and-where-one-stops-working">Exercise 3: Where the routes separate, and where one stops working</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-what-the-fit-reports-residuals-and-standard-errors">Exercise 4: What the fit reports: residuals and standard errors</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-when-measurements-are-not-equally-trustworthy">Exercise 5: When measurements are not equally trustworthy</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="least-squares-four-ways">
+<h1>2.3 Least Squares Four Ways<a class="headerlink" href="#least-squares-four-ways" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter II — Orthogonality and Least Squares
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;2.3
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">Four algorithms, one answer, and a factor of two million between them — because forming A-transpose-A squares the condition number, and at degree 14 it does not merely lose accuracy but fails outright.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;advanced&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;90–120 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="projections-normal-equations.html"><span class="std std-doc">§2.1</span></a> derived the normal equations
+<span class="math notranslate nohighlight">\(A^{\top}\!A\hat{\mathbf{x}} = A^{\top}\mathbf{b}\)</span> and warned they are not how
+least squares is solved in practice.
+<a class="reference internal" href="gram-schmidt-qr.html"><span class="std std-doc">§2.2</span></a> built the replacement. This notebook measures the
+difference, and the difference is larger than the warning suggested.</p>
+<p>The mechanism is one identity. For a matrix with independent columns,</p>
+<div class="math notranslate nohighlight">
+\[
+\kappa_2(A^{\top}\!A) = \kappa_2(A)^2 ,
+\]</div>
+<p>because the singular values of <span class="math notranslate nohighlight">\(A^{\top}A\)</span> are the <em>squares</em> of those of <span class="math notranslate nohighlight">\(A\)</span>.
+Forming the normal equations therefore takes a problem with condition number
+<span class="math notranslate nohighlight">\(\kappa\)</span> and hands the solver one with condition number <span class="math notranslate nohighlight">\(\kappa^2\)</span>, and by
+<a class="reference internal" href="../00-machine/floating-point.html"><span class="std std-doc">§0.2</span></a> that costs <span class="math notranslate nohighlight">\(\log_{10}\kappa\)</span> extra
+digits before any arithmetic happens.</p>
+<p>Measured on polynomial fitting — where the design matrix is a Vandermonde
+matrix and <span class="math notranslate nohighlight">\(\kappa\)</span> grows fast with the degree — the consequences run:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>degree</p></th>
+<th class="head"><p><span class="math notranslate nohighlight">\(\kappa(A)\)</span></p></th>
+<th class="head"><p>normal equations</p></th>
+<th class="head"><p><span class="math notranslate nohighlight">\(QR\)</span></p></th>
+<th class="head"><p>factor</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>3</p></td>
+<td><p><span class="math notranslate nohighlight">\(10^{2}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(2.7\times10^{-13}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(4.2\times10^{-15}\)</span></p></td>
+<td><p>60</p></td>
+</tr>
+<tr class="row-odd"><td><p>6</p></td>
+<td><p><span class="math notranslate nohighlight">\(1.9\times10^{4}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(3.6\times10^{-9}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(1.3\times10^{-13}\)</span></p></td>
+<td><p>27,000</p></td>
+</tr>
+<tr class="row-even"><td><p>10</p></td>
+<td><p><span class="math notranslate nohighlight">\(2.0\times10^{7}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(4.8\times10^{-4}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(2.2\times10^{-10}\)</span></p></td>
+<td><p>2,200,000</p></td>
+</tr>
+<tr class="row-odd"><td><p>14</p></td>
+<td><p><span class="math notranslate nohighlight">\(2.5\times10^{10}\)</span></p></td>
+<td><p><strong>fails</strong></p></td>
+<td><p><span class="math notranslate nohighlight">\(2.3\times10^{-7}\)</span></p></td>
+<td><p>—</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>That last row is the one to remember. At degree 14 the normal equations do not
+return a poor answer; the Cholesky factorization <strong>breaks down</strong>, because
+<span class="math notranslate nohighlight">\(A^{\top}A\)</span> is no longer numerically positive definite even though <span class="math notranslate nohighlight">\(A\)</span> has full
+column rank and the least-squares problem is perfectly well posed. The
+information that made <span class="math notranslate nohighlight">\(A^{\top}A\)</span> positive definite was destroyed in forming it.</p>
+<p>The notebook then turns to what a fit <em>reports</em>. A least-squares answer without
+an uncertainty is half an answer, and the covariance
+<span class="math notranslate nohighlight">\(\sigma^2(A^{\top}A)^{-1}\)</span> supplies it. We check those standard errors the only
+honest way — by Monte Carlo, drawing four thousand noise realisations and
+confirming the resulting <span class="math notranslate nohighlight">\(z\)</span>-scores really do have standard deviation 1.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> Trefethen and Bau <span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id13" title="Lloyd N. Trefethen and David Bau, III. Numerical Linear Algebra. SIAM, Philadelphia, 1997. doi:10.1137/1.9780898719574.">TB97</a>]</span> Lectures 11 and 18–19;
+Golub and Van Loan <span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id14" title="Gene H. Golub and Charles F. Van Loan. Matrix Computations. Johns Hopkins University Press, Baltimore, 4 edition, 2013.">GVL13</a>]</span> Chapter 5; the error analysis in full is
+Higham <span class="bibtex-citation" id="id3">[<a class="reference internal" href="#id16" title="Nicholas J. Higham. Accuracy and Stability of Numerical Algorithms. SIAM, Philadelphia, 2 edition, 2002. doi:10.1137/1.9780898718027.">Hig02</a>]</span> Chapter 20. For the statistical side, Hastie,
+Tibshirani and Friedman <span class="bibtex-citation" id="id4">[<a class="reference internal" href="#id43" title="Trevor Hastie, Robert Tibshirani, and Jerome Friedman. The Elements of Statistical Learning. Springer, 2 edition, 2009. doi:10.1007/978-0-387-84858-7.">HTF09</a>]</span> Chapter 3.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="the-squaring-identity">
+<h3>The squaring identity<a class="headerlink" href="#the-squaring-identity" title="Link to this heading">#</a></h3>
+<p>If <span class="math notranslate nohighlight">\(A = U\Sigma V^{\top}\)</span> then <span class="math notranslate nohighlight">\(A^{\top}A = V\Sigma^2V^{\top}\)</span>, so the singular
+values square and</p>
+<div class="math notranslate nohighlight" id="equation-eq-ls-squared-kappa">
+<span class="eqno">(114)<a class="headerlink" href="#equation-eq-ls-squared-kappa" title="Link to this equation">#</a></span>\[\kappa_2(A^{\top}\!A) = \frac{\sigma_1^2}{\sigma_n^2} = \kappa_2(A)^2 .\]</div>
+<p>This is not an artefact of any algorithm; it is a property of the matrix you
+chose to build. Any method that forms <span class="math notranslate nohighlight">\(A^{\top}A\)</span> inherits it.</p>
+</section>
+<section id="four-routes">
+<h3>Four routes<a class="headerlink" href="#four-routes" title="Link to this heading">#</a></h3>
+<p>All four solve <span class="math notranslate nohighlight">\(\min_{\mathbf{x}}\|A\mathbf{x} - \mathbf{b}\|_2\)</span> and agree in
+exact arithmetic.</p>
+<ol class="arabic">
+<li><p><strong>Normal equations with Cholesky.</strong> Form <span class="math notranslate nohighlight">\(A^{\top}A\)</span> (which is symmetric
+positive definite when <span class="math notranslate nohighlight">\(A\)</span> has independent columns), factor it as
+<span class="math notranslate nohighlight">\(R^{\top}R\)</span>, and solve two triangular systems. Cost <span class="math notranslate nohighlight">\(\approx mn^2 + n^3/3\)</span>,
+the cheapest of the four. Accuracy <span class="math notranslate nohighlight">\(\kappa^2\varepsilon\)</span>.</p></li>
+<li><p><strong><span class="math notranslate nohighlight">\(QR\)</span>.</strong> With <span class="math notranslate nohighlight">\(A = QR\)</span> economic, the residual
+<span class="math notranslate nohighlight">\(\|A\mathbf{x} - \mathbf{b}\|\)</span> equals <span class="math notranslate nohighlight">\(\|R\mathbf{x} - Q^{\top}\mathbf{b}\|\)</span>
+plus a term independent of <span class="math notranslate nohighlight">\(\mathbf{x}\)</span>, since <span class="math notranslate nohighlight">\(Q\)</span> preserves norms. So</p>
+<div class="math notranslate nohighlight" id="equation-eq-ls-qr-solve">
+<span class="eqno">(115)<a class="headerlink" href="#equation-eq-ls-qr-solve" title="Link to this equation">#</a></span>\[R\hat{\mathbf{x}} = Q^{\top}\mathbf{b} ,\]</div>
+<p>one triangular solve, no <span class="math notranslate nohighlight">\(A^{\top}A\)</span> anywhere. Cost <span class="math notranslate nohighlight">\(\approx 2mn^2\)</span>,
+accuracy <span class="math notranslate nohighlight">\(\kappa\varepsilon\)</span>.</p>
+</li>
+<li><p><strong>SVD.</strong> With <span class="math notranslate nohighlight">\(A = U\Sigma V^{\top}\)</span> economic,
+<span class="math notranslate nohighlight">\(\hat{\mathbf{x}} = V\Sigma^{-1}U^{\top}\mathbf{b}\)</span>. Cost several times
+<span class="math notranslate nohighlight">\(QR\)</span>, accuracy <span class="math notranslate nohighlight">\(\kappa\varepsilon\)</span>, and — the reason it exists — it keeps
+working when the columns are <em>dependent</em>, which
+<a class="reference internal" href="pseudoinverse-regularization.html"><span class="std std-doc">§2.4</span></a> needs and the other three cannot
+do.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">np.linalg.lstsq</span></code></strong>, which is a driver around the SVD (LAPACK <code class="docutils literal notranslate"><span class="pre">gelsd</span></code>)
+with a rank tolerance.</p></li>
+</ol>
+<p>The rule that follows: <strong>use <span class="math notranslate nohighlight">\(QR\)</span></strong>, unless the matrix may be rank-deficient,
+in which case use the SVD. Use the normal equations when <span class="math notranslate nohighlight">\(\kappa\)</span> is small and
+speed matters, knowing what you are spending.</p>
+</section>
+<section id="what-a-fit-reports">
+<h3>What a fit reports<a class="headerlink" href="#what-a-fit-reports" title="Link to this heading">#</a></h3>
+<p>If <span class="math notranslate nohighlight">\(\mathbf{b} = A\mathbf{x}_{\text{true}} + \boldsymbol{\epsilon}\)</span> with
+independent noise of variance <span class="math notranslate nohighlight">\(\sigma^2\)</span>, then <span class="math notranslate nohighlight">\(\hat{\mathbf{x}}\)</span> is unbiased
+with covariance</p>
+<div class="math notranslate nohighlight" id="equation-eq-ls-covariance">
+<span class="eqno">(116)<a class="headerlink" href="#equation-eq-ls-covariance" title="Link to this equation">#</a></span>\[\operatorname{Cov}(\hat{\mathbf{x}}) = \sigma^2\,(A^{\top}\!A)^{-1},
+\qquad
+\hat{\sigma}^2 = \frac{\|\mathbf{b} - A\hat{\mathbf{x}}\|^2}{m - n} ,\]</div>
+<p>the denominator <span class="math notranslate nohighlight">\(m-n\)</span> being the residual degrees of freedom — the dimension of
+<span class="math notranslate nohighlight">\(N(A^{\top})\)</span> from <a class="reference internal" href="../01-matrices/four-subspaces.html"><span class="std std-doc">§1.4</span></a>, which is
+exactly where the residual lives. The square roots of the diagonal are the
+<strong>standard errors</strong>.</p>
+</section>
+<section id="unequal-uncertainties">
+<h3>Unequal uncertainties<a class="headerlink" href="#unequal-uncertainties" title="Link to this heading">#</a></h3>
+<p>When measurement <span class="math notranslate nohighlight">\(i\)</span> has its own variance <span class="math notranslate nohighlight">\(\sigma_i^2\)</span>, weighting each equation
+by <span class="math notranslate nohighlight">\(1/\sigma_i\)</span> makes the noise uniform again. With <span class="math notranslate nohighlight">\(W = \operatorname{diag}(1/\sigma_i^2)\)</span>,</p>
+<div class="math notranslate nohighlight" id="equation-eq-ls-weighted">
+<span class="eqno">(117)<a class="headerlink" href="#equation-eq-ls-weighted" title="Link to this equation">#</a></span>\[A^{\top}WA\,\hat{\mathbf{x}} = A^{\top}W\mathbf{b} ,\]</div>
+<p>equivalently ordinary least squares on the row-scaled system
+<span class="math notranslate nohighlight">\(\operatorname{diag}(1/\sigma_i)A\)</span> and <span class="math notranslate nohighlight">\(\operatorname{diag}(1/\sigma_i)\mathbf{b}\)</span>
+— which is how it should be computed, since that form never builds <span class="math notranslate nohighlight">\(A^{\top}WA\)</span>.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data and instruments only: the polynomial-fitting problem family (a given
+specimen with a known exact answer) and an error meter. The four solution
+routes are the exercises’ work.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">cho_factor</span><span class="p">,</span> <span class="n">cho_solve</span><span class="p">,</span> <span class="n">qr</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">la</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random array below comes from this seed</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">110</span><span class="p">)</span>
+
+
+<span class="c1"># data: the given problem family — a fitting problem with a known exact</span>
+<span class="c1"># answer, handed to every exercise as its specimen.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">vandermonde_problem</span><span class="p">(</span><span class="n">degree</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">40</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A polynomial-fitting least-squares problem with a known exact answer.</span>
+
+<span class="sd">    Builds the m-by-(degree+1) Vandermonde matrix of the points t = 0, ..., 1 and</span>
+<span class="sd">    a right-hand side b = A x_true for a random x_true, so the exact solution is</span>
+<span class="sd">    known and the error of any method can be measured rather than estimated.</span>
+<span class="sd">    Vandermonde matrices are used because their condition number grows quickly</span>
+<span class="sd">    and predictably with the degree, which is what makes the sweep in Exercise 3</span>
+<span class="sd">    span ten orders of magnitude.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    degree : int</span>
+<span class="sd">        Polynomial degree; the matrix has ``degree + 1`` columns.</span>
+<span class="sd">    m : int, default 40</span>
+<span class="sd">        Number of sample points on [0, 1].</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple</span>
+<span class="sd">        ``(A, b, x_true, t)``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vander</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">degree</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">increasing</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">x_true</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">(</span><span class="n">degree</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">A</span><span class="p">,</span> <span class="n">A</span> <span class="o">@</span> <span class="n">x_true</span><span class="p">,</span> <span class="n">x_true</span><span class="p">,</span> <span class="n">t</span>
+
+
+<span class="c1"># instrument: an error meter against the known answer — reporting currency,</span>
+<span class="c1"># not any exercise&#39;s lesson.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">relative_error</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x_true</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Relative 2-norm error of a computed solution against the exact one.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">x_true</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x_true</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-measuring-the-squaring">
+<h2>Exercise 1: Measuring the squaring<a class="headerlink" href="#exercise-1-measuring-the-squaring" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-ls-squared-kappa">Eq. 114</a> is an identity, not an approximation, and it is worth
+confirming numerically before relying on it — partly because it is easy to
+verify, and partly because <em>where the verification breaks down</em> is itself
+informative.</p>
+<p>For Vandermonde matrices of degrees 3, 6, 10 and 14 on 40 points in <span class="math notranslate nohighlight">\([0,1]\)</span>,
+the condition numbers run from <span class="math notranslate nohighlight">\(10^{2}\)</span> to <span class="math notranslate nohighlight">\(2.5\times10^{10}\)</span>. Taking
+<span class="math notranslate nohighlight">\(\log_{10}\)</span> of both sides of <a class="reference internal" href="#equation-eq-ls-squared-kappa">Eq. 114</a>, the ratio
+<span class="math notranslate nohighlight">\(\log_{10}\kappa(A^{\top}A) \big/ \log_{10}\kappa(A)\)</span> should be exactly 2.</p>
+<p>It comes out <span class="math notranslate nohighlight">\(2.0000\)</span> at degrees 3, 6 and 10 — and <span class="math notranslate nohighlight">\(1.73\)</span> at degree 14. The
+identity has not failed; the <em>measurement</em> has. At degree 14,
+<span class="math notranslate nohighlight">\(\kappa(A) = 2.5\times10^{10}\)</span>, so <span class="math notranslate nohighlight">\(\kappa(A^{\top}A)\)</span> should be
+<span class="math notranslate nohighlight">\(6\times10^{20}\)</span> — beyond <span class="math notranslate nohighlight">\(1/\varepsilon\)</span>, which means <code class="docutils literal notranslate"><span class="pre">np.linalg.cond</span></code> cannot
+resolve the smallest singular value of <span class="math notranslate nohighlight">\(A^{\top}A\)</span> and returns <span class="math notranslate nohighlight">\(10^{18}\)</span>
+instead. This is the same saturation caveat <a class="reference internal" href="gram-schmidt-qr.html"><span class="std std-doc">§2.2</span></a> met
+when fitting slopes, and it is worth naming twice: a quantity larger than
+<span class="math notranslate nohighlight">\(1/\varepsilon\)</span> cannot be measured in <code class="docutils literal notranslate"><span class="pre">float64</span></code>, so it should not be gated on.</p>
+<p><strong>Part a)</strong> For degrees 3, 6, 10 and 14, build the problem with
+<code class="docutils literal notranslate"><span class="pre">vandermonde_problem(degree)</span></code> and report <span class="math notranslate nohighlight">\(\kappa(A)\)</span> and <span class="math notranslate nohighlight">\(\kappa(A^{\top}A)\)</span>
+using <code class="docutils literal notranslate"><span class="pre">np.linalg.cond</span></code>, together with the ratio of their base-10 logarithms.</p>
+<p><strong>Part b)</strong> Confirm <a class="reference internal" href="#equation-eq-ls-squared-kappa">Eq. 114</a> where it can be measured:
+check the ratio equals 2 to within <span class="math notranslate nohighlight">\(5\times10^{-3}\)</span> for every degree with
+<span class="math notranslate nohighlight">\(\kappa(A^{\top}A) &lt; 1/\varepsilon\)</span>, and report which degree fails that
+condition.</p>
+<p><strong>Part c)</strong> Confirm the mechanism rather than just the identity: compute the
+singular values of <span class="math notranslate nohighlight">\(A\)</span> and of <span class="math notranslate nohighlight">\(A^{\top}A\)</span> with
+<code class="docutils literal notranslate"><span class="pre">np.linalg.svd(...,</span> <span class="pre">compute_uv=False)</span></code> at degree 6, and compare against
+<span class="math notranslate nohighlight">\(\sigma_i(A)^2\)</span> <strong>two ways</strong>. Measured relative to the matrix scale
+<span class="math notranslate nohighlight">\(\sigma_1^2\)</span>, the identity holds to <span class="math notranslate nohighlight">\(4\times10^{-16}\)</span> — machine precision.
+Measured <em>entrywise</em>, the relative error on the <strong>smallest</strong> squared singular
+value is <span class="math notranslate nohighlight">\(4\times10^{-9}\)</span>, five orders worse, because that value is around
+<span class="math notranslate nohighlight">\(10^{-7}\)</span> and was computed from a matrix of condition number <span class="math notranslate nohighlight">\(\kappa^2\)</span>. The
+damage is not spread evenly: forming <span class="math notranslate nohighlight">\(A^{\top}A\)</span> ruins the small end
+specifically, which is exactly the end least squares depends on. Report both
+numbers, and confirm the entrywise error is concentrated on the last one or two
+singular values.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> degree       kappa(A)    kappa(A^T A)   log ratio  measurable?
+      3     1.1633e+02      1.3532e+04      2.0000         True
+      6     1.9383e+04      3.7570e+08      2.0000         True
+     10     2.0284e+07      4.1096e+14      1.9999         True
+     14     2.4629e+10      1.7643e+17      1.6597        False
+
+1/eps = 4.504e+15: beyond it np.linalg.cond cannot resolve the smallest singular value
+the identity holds to 1e-3 wherever it can be measured: 7.17e-05
+
+at degree 6, sigma(A^T A) against sigma(A)^2:
+    i    sigma_i(A)   sigma_i(A)^2   rel, entrywise   rel, scaled
+    1  8.232094e+00   6.776736e+01        4.194e-16     4.194e-16
+    2  3.404552e+00   1.159098e+01        3.065e-16     5.243e-17
+    3  9.665891e-01   9.342945e-01        3.090e-15     4.260e-17
+    4  2.141283e-01   4.585093e-02        2.134e-14     1.444e-17
+    5  3.730101e-02   1.391365e-03        2.765e-13     5.676e-18
+    6  4.901058e-03   2.402037e-05        1.605e-12     5.688e-19
+    7  4.247080e-04   1.803769e-07        4.592e-09     1.222e-17
+
+  relative to the matrix scale sigma_1^2 : 4.194e-16   (machine precision)
+  entrywise, worst case                  : 4.592e-09   (on the SMALLEST value)
+  kappa(A)^2 * eps                       : 8.342e-08   (the predicted damage)
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<p>The identity is checked only where <code class="docutils literal notranslate"><span class="pre">float64</span></code> can measure it, and the degree
+where it cannot is identified rather than quietly excluded. The singular-value
+check confirms the <em>mechanism</em> — squaring — rather than only the consequence.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  kappa(A^T A) = kappa(A)^2 wherever it is measurable (Eq. 1)   [max|Δ| = 7.16559e-05 (rtol=0, atol=0.005)]
+✓  and at degree 14 it is not measurable: kappa(A^T A) would exceed 1/eps   [kappa(A) = 2.46e+10, so kappa(A^T A) should be 6.07e+20 but cond returns 1.76e+17]
+✓  sigma(A^T A) = sigma(A)^2 to machine precision, scaled by the matrix   [max|Δ| = 2.84217e-14 (rtol=0, atol=6.77674e-12)]
+✓  but ENTRYWISE the damage lands on the smallest singular value   [relative error 4.2e-16 on sigma_1^2 against 4.6e-09 on the smallest: squaring ruins the small end specifically, which is the end least squares depends on]
+✓  and that entrywise damage stays within the predicted kappa^2 * eps   [4.59e-09 against 8.34e-08]
+✓  and kappa(A) grows monotonically with the polynomial degree   [[&#39;1.2e+02&#39;, &#39;1.9e+04&#39;, &#39;2.0e+07&#39;, &#39;2.5e+10&#39;]: Vandermonde matrices are the standard badly-conditioned design matrix]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-four-routes-one-answer">
+<h2>Exercise 2: Four routes, one answer<a class="headerlink" href="#exercise-2-four-routes-one-answer" title="Link to this heading">#</a></h2>
+<p>Before measuring accuracy, establish that the four methods really do compute
+the same thing, on a problem where all four work comfortably.</p>
+<p>The <span class="math notranslate nohighlight">\(QR\)</span> route deserves its derivation, because it is the one to use. Since <span class="math notranslate nohighlight">\(Q\)</span>
+has orthonormal columns, <span class="math notranslate nohighlight">\(\|Q\mathbf{z}\| = \|\mathbf{z}\|\)</span>, so writing the
+full <span class="math notranslate nohighlight">\(Q = [\,Q_1\ Q_2\,]\)</span> and using <span class="math notranslate nohighlight">\(A = Q_1R\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+\|A\mathbf{x} - \mathbf{b}\|^2
+= \big\|Q^{\top}(A\mathbf{x} - \mathbf{b})\big\|^2
+= \big\|R\mathbf{x} - Q_1^{\top}\mathbf{b}\big\|^2
+  + \big\|Q_2^{\top}\mathbf{b}\big\|^2 .
+\]</div>
+<p>The second term does not involve <span class="math notranslate nohighlight">\(\mathbf{x}\)</span> at all, so the minimum is
+attained by killing the first, which is <a class="reference internal" href="#equation-eq-ls-qr-solve">Eq. 115</a>. And the leftover
+term is the squared residual: <span class="math notranslate nohighlight">\(\|Q_2^{\top}\mathbf{b}\|\)</span> is exactly the
+component of <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> in <span class="math notranslate nohighlight">\(N(A^{\top})\)</span> that
+<a class="reference internal" href="../01-matrices/four-subspaces.html"><span class="std std-doc">§1.4</span></a> identified.</p>
+<p><strong>Part a)</strong> At degree 6, solve the problem four ways and report each solution:
+normal equations via <code class="docutils literal notranslate"><span class="pre">scipy.linalg.cho_factor</span></code> and <code class="docutils literal notranslate"><span class="pre">cho_solve</span></code> on
+<code class="docutils literal notranslate"><span class="pre">A.T</span> <span class="pre">&#64;</span> <span class="pre">A</span></code> and <code class="docutils literal notranslate"><span class="pre">A.T</span> <span class="pre">&#64;</span> <span class="pre">b</span></code>; <span class="math notranslate nohighlight">\(QR\)</span> via <code class="docutils literal notranslate"><span class="pre">scipy.linalg.qr(A,</span> <span class="pre">mode=&quot;economic&quot;)</span></code> then
+<code class="docutils literal notranslate"><span class="pre">np.linalg.solve(R,</span> <span class="pre">Q.T</span> <span class="pre">&#64;</span> <span class="pre">b)</span></code>; SVD via
+<code class="docutils literal notranslate"><span class="pre">np.linalg.svd(A,</span> <span class="pre">full_matrices=False)</span></code> then
+<code class="docutils literal notranslate"><span class="pre">Vt.T</span> <span class="pre">&#64;</span> <span class="pre">((U.T</span> <span class="pre">&#64;</span> <span class="pre">b)</span> <span class="pre">/</span> <span class="pre">s)</span></code>; and <code class="docutils literal notranslate"><span class="pre">np.linalg.lstsq(A,</span> <span class="pre">b,</span> <span class="pre">rcond=None)[0]</span></code>.</p>
+<p><strong>Part b)</strong> Confirm all four agree with each other to a relative <span class="math notranslate nohighlight">\(10^{-8}\)</span> at
+this degree, and that each satisfies the normal equations residual
+<span class="math notranslate nohighlight">\(\|A^{\top}(A\hat{\mathbf{x}} - \mathbf{b})\| \le 10^{-6}\|A^{\top}\mathbf{b}\|\)</span>
+— the condition that <em>defines</em> a least-squares solution, checked independently
+of how it was obtained.</p>
+<p><strong>Part c)</strong> Confirm the projection identity: for the <span class="math notranslate nohighlight">\(QR\)</span> solution, check
+<span class="math notranslate nohighlight">\(A\hat{\mathbf{x}} = Q Q^{\top}\mathbf{b}\)</span> to <span class="math notranslate nohighlight">\(10^{-12}\)</span>, which says the fitted
+values are the projection of <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> onto <span class="math notranslate nohighlight">\(C(A)\)</span> — the same <span class="math notranslate nohighlight">\(P\)</span> that
+<a class="reference internal" href="projections-normal-equations.html"><span class="std std-doc">§2.1</span></a> built from <span class="math notranslate nohighlight">\(A(A^{\top}A)^{-1}A^{\top}\)</span>,
+now obtained without forming <span class="math notranslate nohighlight">\(A^{\top}A\)</span>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>degree 6, kappa(A) = 1.938e+04
+
+method                ||x - x_true||/||x_true||   normal-eq residual
+normal + Cholesky                     8.507e-10            1.247e-16
+QR                                    1.395e-13            4.619e-17
+SVD                                   1.784e-13            2.334e-16
+np.linalg.lstsq                       1.643e-13            8.327e-16
+
+largest pairwise disagreement: 8.508e-10
+A x_hat vs Q Q^T b           : 3.747e-16
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<p>The normal-equation residual is the right independent check: it tests whether
+each answer <em>is</em> a least-squares solution, using the defining condition
+<span class="math notranslate nohighlight">\(A^{\top}(A\hat{\mathbf{x}} - \mathbf{b}) = \mathbf{0}\)</span>, without reference to
+how it was computed or to the known <span class="math notranslate nohighlight">\(\mathbf{x}_{\text{true}}\)</span>.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  all four methods agree to 1e-8 relative at degree 6   [largest pairwise disagreement 8.51e-10]
+✓  and each satisfies the defining condition A^T (A x - b) = 0   [largest normal-equation residual 8.33e-16, relative to ||A^T b||]
+✓  A x_hat = Q Q^T b: the fitted values are the projection of b onto C(A)   [max|Δ| = 3.747e-16 (rtol=0, atol=1e-12)]
+✓  and the residual norm agrees with the orthogonal-complement component   [got 5.01524e-16 vs expected 7.04358e-16 (rtol=0, atol=1e-12)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-where-the-routes-separate-and-where-one-stops-working">
+<h2>Exercise 3: Where the routes separate, and where one stops working<a class="headerlink" href="#exercise-3-where-the-routes-separate-and-where-one-stops-working" title="Link to this heading">#</a></h2>
+<p>Now the sweep. The four methods agreed at degree 6; raising the degree raises
+<span class="math notranslate nohighlight">\(\kappa\)</span>, and <a class="reference internal" href="#equation-eq-ls-squared-kappa">Eq. 114</a> says the normal equations should
+degrade twice as fast in the exponent.</p>
+<p>The measured accuracies:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>degree</p></th>
+<th class="head"><p><span class="math notranslate nohighlight">\(\kappa(A)\)</span></p></th>
+<th class="head"><p>normal eqs</p></th>
+<th class="head"><p><span class="math notranslate nohighlight">\(QR\)</span></p></th>
+<th class="head"><p>SVD</p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">lstsq</span></code></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>3</p></td>
+<td><p><span class="math notranslate nohighlight">\(1.2\times10^{2}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(2.7\times10^{-13}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(4.2\times10^{-15}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(3.1\times10^{-15}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(4.8\times10^{-16}\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>6</p></td>
+<td><p><span class="math notranslate nohighlight">\(1.9\times10^{4}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(3.6\times10^{-9}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(1.3\times10^{-13}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(2.9\times10^{-14}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(1.3\times10^{-13}\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p>10</p></td>
+<td><p><span class="math notranslate nohighlight">\(2.0\times10^{7}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(4.8\times10^{-4}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(2.2\times10^{-10}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(1.9\times10^{-10}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(1.1\times10^{-10}\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>14</p></td>
+<td><p><span class="math notranslate nohighlight">\(2.5\times10^{10}\)</span></p></td>
+<td><p><strong>breaks down</strong></p></td>
+<td><p><span class="math notranslate nohighlight">\(2.3\times10^{-7}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(2.0\times10^{-7}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(2.2\times10^{-7}\)</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The three stable routes track <span class="math notranslate nohighlight">\(\kappa\varepsilon\)</span>; the normal equations track
+<span class="math notranslate nohighlight">\(\kappa^2\varepsilon\)</span>. At degree 10 that is a factor of two million.</p>
+<p>Degree 14 is qualitatively different and worth dwelling on. <code class="docutils literal notranslate"><span class="pre">cho_factor</span></code>
+<strong>raises an exception</strong>: <span class="math notranslate nohighlight">\(A^{\top}A\)</span> is not numerically positive definite, so
+Cholesky — which is only defined for positive definite matrices — has nothing
+to factor. But <span class="math notranslate nohighlight">\(A\)</span> has full column rank, and the least-squares problem is
+perfectly well posed; <span class="math notranslate nohighlight">\(QR\)</span> solves it to seven digits. The positive-definiteness
+was destroyed by the act of forming <span class="math notranslate nohighlight">\(A^{\top}A\)</span>, not by anything wrong with the
+problem. That is as clean a demonstration as the subject offers that the
+algorithm can be the whole difficulty.</p>
+<p><strong>Part a)</strong> For degrees 3, 6, 10 and 14, solve by all four routes, catching
+<code class="docutils literal notranslate"><span class="pre">numpy.linalg.LinAlgError</span></code> from <code class="docutils literal notranslate"><span class="pre">cho_factor</span></code> and recording a failure rather
+than crashing. Report the relative error of each against <code class="docutils literal notranslate"><span class="pre">x_true</span></code>, alongside
+the reference values <span class="math notranslate nohighlight">\(\kappa\varepsilon\)</span> and <span class="math notranslate nohighlight">\(\kappa^2\varepsilon\)</span>.</p>
+<p><strong>Part b)</strong> Confirm the separation: at degree 10 the normal-equation error must
+exceed the <span class="math notranslate nohighlight">\(QR\)</span> error by more than <span class="math notranslate nohighlight">\(10^{5}\)</span>, and the three stable routes must
+all stay within a factor of 100 of <span class="math notranslate nohighlight">\(\kappa\varepsilon\)</span>.</p>
+<p><strong>Part c)</strong> Confirm the breakdown at degree 14: <code class="docutils literal notranslate"><span class="pre">cho_factor(A.T</span> <span class="pre">&#64;</span> <span class="pre">A)</span></code> must
+raise, while <code class="docutils literal notranslate"><span class="pre">np.linalg.matrix_rank(A)</span></code> is still full and <span class="math notranslate nohighlight">\(QR\)</span> returns an
+answer with relative error below <span class="math notranslate nohighlight">\(10^{-5}\)</span>. Report the smallest eigenvalue of
+<span class="math notranslate nohighlight">\(A^{\top}A\)</span> from <code class="docutils literal notranslate"><span class="pre">np.linalg.eigvalsh</span></code> and confirm it has gone negative — the
+numerical signature of lost positive definiteness. Plot all four error curves
+against <span class="math notranslate nohighlight">\(\kappa(A)\)</span> with the two reference lines.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> deg     kappa(A)    normal eqs           QR          SVD        lstsq   kappa*eps
+   3    1.163e+02     7.541e-14    1.068e-15    6.766e-16    3.788e-15    2.58e-14
+   6    1.938e+04     8.507e-10    1.395e-13    1.784e-13    1.643e-13    4.30e-12
+  10    2.028e+07     1.310e-03    3.681e-10    4.618e-10    3.896e-10    4.50e-09
+  14    2.463e+10   BREAKS DOWN    3.379e-07    1.756e-07    7.942e-08    5.47e-06
+
+at degree 10: normal/QR error ratio = 3.558e+06
+
+at degree 14:
+  cho_factor raised          : True
+  smallest eigenvalue of A^TA: -5.905e-16   (negative: True)
+  rank of A                  : 15 of 15  (full)
+  QR relative error          : 3.379e-07   (the problem is fine)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-ls-four-ways">
+<img alt="../../_images/23208d663a415493e5da9bc00150f6e0f34a456b7ec2859f2e7ca6ca60861ce9.png" src="../../_images/23208d663a415493e5da9bc00150f6e0f34a456b7ec2859f2e7ca6ca60861ce9.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 43 </span><span class="caption-text">Relative error of the least-squares solution against the condition number of the Vandermonde design matrix, for four algorithms that agree in exact arithmetic, on log-log axes. The three stable routes (<span class="math notranslate nohighlight">\(QR\)</span>, SVD, \texttt{lstsq}) track <span class="math notranslate nohighlight">\(\kappa\varepsilon\)</span>; the normal equations track <span class="math notranslate nohighlight">\(\kappa^2\varepsilon\)</span> and are absent at degree 14 because \texttt{cho_factor} raised there, <span class="math notranslate nohighlight">\(A^{\top}A\)</span> having lost positive definiteness while <span class="math notranslate nohighlight">\(A\)</span> still has full column rank.</span><a class="headerlink" href="#fig-ls-four-ways" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<p>The degree-14 checks are the sharpest in the notebook: the Cholesky failure,
+the negative eigenvalue that explains it, the full rank of <span class="math notranslate nohighlight">\(A\)</span> that shows the
+problem was fine, and the working <span class="math notranslate nohighlight">\(QR\)</span> answer that proves it. Four statements
+that together locate the failure entirely in the choice of algorithm.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  at degree 10 the normal equations are &gt;10^5 times less accurate than QR   [1.31e-03 against 3.68e-10]
+✓  QR stays within a factor of 100 of the kappa*eps limit at every degree   [errors [&#39;1.1e-15&#39;, &#39;1.4e-13&#39;, &#39;3.7e-10&#39;, &#39;3.4e-07&#39;]]
+✓  and so do the SVD and lstsq: three stable routes, one unstable one   [the instability is specific to forming A^T A]
+✓  at degree 14 cho_factor RAISES: A^T A is not numerically positive definite   [not a poor answer -- no answer at all]
+✓  its smallest eigenvalue is numerically indistinguishable from zero   [lambda_min(A^T A) = -5.91e-16 against eps*||A^T A|| = 1.72e-14: positive in exact arithmetic, and rounding is free to land it on either side of zero — only its smallness is gated]
+✓  while A has full column rank and QR solves the problem to 7 digits   [rank 15 of 15, QR error 3.38e-07: the problem was never the issue]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-what-the-fit-reports-residuals-and-standard-errors">
+<h2>Exercise 4: What the fit reports: residuals and standard errors<a class="headerlink" href="#exercise-4-what-the-fit-reports-residuals-and-standard-errors" title="Link to this heading">#</a></h2>
+<p>A fitted parameter without an uncertainty is not a result. <a class="reference internal" href="#equation-eq-ls-covariance">Eq. 116</a>
+supplies one, and this exercise checks it the only way that really counts.</p>
+<p>The usual practice is to compute <span class="math notranslate nohighlight">\(\hat{\sigma}^2(A^{\top}A)^{-1}\)</span>, take square
+roots of the diagonal, and quote them. But that formula rests on assumptions —
+independent noise, correct model, the right degrees-of-freedom denominator —
+and quoting a standard error one has not verified is quoting a number one does
+not know to be calibrated. The verification is a Monte Carlo: draw many noise
+realisations, refit each, and check that the <strong><span class="math notranslate nohighlight">\(z\)</span>-scores</strong>
+<span class="math notranslate nohighlight">\((\hat{x}_j - x_{\text{true},j})/\mathrm{SE}_j\)</span> really do have standard
+deviation 1. If the standard errors are right, they will; if the formula is
+being misapplied, they will not.</p>
+<p>The data: <span class="math notranslate nohighlight">\(m = 60\)</span> points on <span class="math notranslate nohighlight">\([0,1]\)</span>, <span class="math notranslate nohighlight">\(y = 2 + 3t + \epsilon\)</span> with
+<span class="math notranslate nohighlight">\(\epsilon \sim \mathcal{N}(0, 0.15^2)\)</span>. The denominator in
+<a class="reference internal" href="#equation-eq-ls-covariance">Eq. 116</a> is <span class="math notranslate nohighlight">\(m - n = 58\)</span>, and that <span class="math notranslate nohighlight">\(58\)</span> is not arbitrary — it is
+<span class="math notranslate nohighlight">\(\dim N(A^{\top})\)</span> from <a class="reference internal" href="../01-matrices/four-subspaces.html"><span class="std std-doc">§1.4</span></a>, the
+dimension of the space the residual lives in. Dividing by <span class="math notranslate nohighlight">\(m\)</span> instead would
+bias <span class="math notranslate nohighlight">\(\hat{\sigma}^2\)</span> low, because the residual has already been made as small
+as two free parameters can make it.</p>
+<p><strong>Part a)</strong> Generate the data with <code class="docutils literal notranslate"><span class="pre">rng.standard_normal(60)</span></code> scaled by
+<span class="math notranslate nohighlight">\(\sigma = 0.15\)</span>, fit by <span class="math notranslate nohighlight">\(QR\)</span>, and report <span class="math notranslate nohighlight">\(\hat{\mathbf{x}}\)</span>, the residual norm,
+the RMSE <span class="math notranslate nohighlight">\(\|\mathbf{r}\|/\sqrt{m}\)</span>, and
+<span class="math notranslate nohighlight">\(\hat{\sigma}^2 = \|\mathbf{r}\|^2/(m-2)\)</span> against the true <span class="math notranslate nohighlight">\(\sigma^2 = 0.0225\)</span>.</p>
+<p><strong>Part b)</strong> Compute the covariance from <a class="reference internal" href="#equation-eq-ls-covariance">Eq. 116</a> as
+<code class="docutils literal notranslate"><span class="pre">sigma2_hat</span> <span class="pre">*</span> <span class="pre">np.linalg.inv(A.T</span> <span class="pre">&#64;</span> <span class="pre">A)</span></code> and the standard errors as the square
+roots of its diagonal. Confirm the true parameters <span class="math notranslate nohighlight">\((2, 3)\)</span> lie within three
+standard errors of the fit, and report the <span class="math notranslate nohighlight">\(z\)</span>-scores.</p>
+<p><strong>Part c)</strong> Calibrate the standard errors by Monte Carlo: draw 4000 fresh noise
+realisations, refit each by <span class="math notranslate nohighlight">\(QR\)</span>, recompute its own standard errors, and
+collect the <span class="math notranslate nohighlight">\(z\)</span>-scores. Confirm their standard deviation is <span class="math notranslate nohighlight">\(1.00 \pm 0.15\)</span> and
+their mean <span class="math notranslate nohighlight">\(0.00 \pm 0.15\)</span> for both parameters, and that the fraction with
+<span class="math notranslate nohighlight">\(|z| &lt; 3\)</span> is <span class="math notranslate nohighlight">\(0.997 \pm 0.01\)</span> — the standard errors are then verified rather
+than merely computed.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>true parameters   : [2. 3.]
+fitted            : [1.97059 3.08202]
+standard errors   : [0.03435 0.05925]
+z-scores          : [-0.85623  1.38425]   (within 3: True)
+
+residual norm     : 1.025939
+RMSE              : 0.132448
+sigma^2 estimate  : 0.018147   true 0.022500
+degrees of freedom: 58 = m - n = dim N(A^T)
+
+Monte Carlo over 4000 noise realisations:
+  mean of z            : [ 0.02599 -0.02488]   (should be 0)
+  std  of z            : [1.02514 1.02895]   (should be 1)
+  fraction with |z| &lt; 3: [0.996  0.9955]   (should be 0.997)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-ls-standard-errors">
+<img alt="../../_images/5ecf04ae484deb16b49fd4e2df0d1d1a0d44d76548cfc138fe7e49c93f1cb9f8.png" src="../../_images/5ecf04ae484deb16b49fd4e2df0d1d1a0d44d76548cfc138fe7e49c93f1cb9f8.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 44 </span><span class="caption-text">Left: the 60 measurements <span class="math notranslate nohighlight">\(y = 2 + 3t + \epsilon\)</span> with <span class="math notranslate nohighlight">\(\sigma = 0.15\)</span> and the least-squares line, with the shaded band showing <span class="math notranslate nohighlight">\(\pm\)</span> one standard error on the fitted line. Right: the distribution of <span class="math notranslate nohighlight">\(z\)</span>-scores <span class="math notranslate nohighlight">\((\hat{x}_1 - 2)/\mathrm{SE}_1\)</span> over 4000 noise realisations against the standard normal density, confirming that the standard errors of Eq. 3 are calibrated rather than merely computed – the measured standard deviation is 1.03.</span><a class="headerlink" href="#fig-ls-standard-errors" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<p>The Monte Carlo is the validation that matters: it tests the standard errors
+against their operational meaning — that a <span class="math notranslate nohighlight">\(z\)</span>-score is standard normal — over
+4000 independent realisations. Computing <span class="math notranslate nohighlight">\(\sqrt{\operatorname{diag}(\hat{\sigma}^2
+(A^{\top}A)^{-1})}\)</span> and quoting it would test nothing at all.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the true parameters (2, 3) lie within three standard errors of the fit   [z-scores [-0.856  1.384]]
+✓  the variance estimate with m - n degrees of freedom recovers sigma^2   [got 0.0181474 vs expected 0.0225 (rtol=0.75, atol=0)]
+✓  over 4000 refits the z-scores have standard deviation 1: the SEs are calibrated   [max|Δ| = 0.0289471 (rtol=0, atol=0.15)]
+✓  and mean zero, so the estimator is unbiased   [max|Δ| = 0.0259896 (rtol=0, atol=0.15)]
+✓  with 99.7% of refits inside three standard errors, as a normal requires   [max|Δ| = 0.0018 (rtol=0, atol=0.01)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-when-measurements-are-not-equally-trustworthy">
+<h2>Exercise 5: When measurements are not equally trustworthy<a class="headerlink" href="#exercise-5-when-measurements-are-not-equally-trustworthy" title="Link to this heading">#</a></h2>
+<p>Ordinary least squares gives every equation the same say. That is correct only
+when every measurement has the same uncertainty, and it is wrong — sometimes
+badly — when they do not.</p>
+<p>The failure mode is easy to see. If half the data has <span class="math notranslate nohighlight">\(\sigma = 0.05\)</span> and half
+has <span class="math notranslate nohighlight">\(\sigma = 0.5\)</span>, then the noisy half contributes a hundred times more to
+<span class="math notranslate nohighlight">\(\sum r_i^2\)</span> per unit of parameter error, so minimising the unweighted sum
+lets the unreliable measurements dominate the answer. Weighting each equation
+by <span class="math notranslate nohighlight">\(1/\sigma_i\)</span> makes the noise uniform again and restores the ordinary
+geometry.</p>
+<p><a class="reference internal" href="#equation-eq-ls-weighted">Eq. 117</a> writes this as <span class="math notranslate nohighlight">\(A^{\top}WA\hat{\mathbf{x}} =
+A^{\top}W\mathbf{b}\)</span>, but that form should not be <em>computed</em>: it forms a
+weighted version of <span class="math notranslate nohighlight">\(A^{\top}A\)</span> and inherits everything Exercise 3 measured.
+The right implementation scales the rows and runs ordinary <span class="math notranslate nohighlight">\(QR\)</span> on the result,
+which is both stabler and simpler.</p>
+<p><strong>Part a)</strong> Build the data: <span class="math notranslate nohighlight">\(m = 60\)</span> points on <span class="math notranslate nohighlight">\([0,1]\)</span>, <span class="math notranslate nohighlight">\(y = 2 + 3t + \epsilon_i\)</span>
+with <span class="math notranslate nohighlight">\(\sigma_i = 0.05\)</span> for <span class="math notranslate nohighlight">\(t_i &lt; 0.5\)</span> and <span class="math notranslate nohighlight">\(\sigma_i = 0.5\)</span> otherwise, using
+<code class="docutils literal notranslate"><span class="pre">np.where(t</span> <span class="pre">&lt;</span> <span class="pre">0.5,</span> <span class="pre">0.05,</span> <span class="pre">0.5)</span></code> for the noise scale.</p>
+<p><strong>Part b)</strong> Fit twice: ordinary least squares with
+<code class="docutils literal notranslate"><span class="pre">np.linalg.lstsq(A,</span> <span class="pre">b,</span> <span class="pre">rcond=None)[0]</span></code>, and weighted least squares by row
+scaling — form <code class="docutils literal notranslate"><span class="pre">s</span> <span class="pre">=</span> <span class="pre">1</span> <span class="pre">/</span> <span class="pre">sigma_i</span></code>, then solve
+<code class="docutils literal notranslate"><span class="pre">np.linalg.lstsq(s[:,</span> <span class="pre">None]</span> <span class="pre">*</span> <span class="pre">A,</span> <span class="pre">s</span> <span class="pre">*</span> <span class="pre">b,</span> <span class="pre">rcond=None)[0]</span></code>. Report both parameter
+errors against the true <span class="math notranslate nohighlight">\((2, 3)\)</span> and confirm the weighted fit is at least five
+times more accurate.</p>
+<p><strong>Part c)</strong> Confirm the row-scaling route is the same computation as
+<a class="reference internal" href="#equation-eq-ls-weighted">Eq. 117</a>: solve <span class="math notranslate nohighlight">\(A^{\top}WA\hat{\mathbf{x}} = A^{\top}W\mathbf{b}\)</span>
+directly with <code class="docutils literal notranslate"><span class="pre">np.linalg.solve</span></code> and <code class="docutils literal notranslate"><span class="pre">W</span> <span class="pre">=</span> <span class="pre">np.diag(1</span> <span class="pre">/</span> <span class="pre">sigma_i**2)</span></code>, and check the
+two agree to <span class="math notranslate nohighlight">\(10^{-10}\)</span> — the same answer, obtained without forming
+<span class="math notranslate nohighlight">\(A^{\top}WA\)</span>.</p>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p>Ask for <code class="docutils literal notranslate"><span class="pre">total_least_squares(A,</span> <span class="pre">b)</span></code>, which minimises perpendicular distance
+rather than vertical distance — the right fit when the <em>inputs</em> <span class="math notranslate nohighlight">\(t_i\)</span> carry
+error too, and a genuinely different problem solved by an SVD of the augmented
+matrix <span class="math notranslate nohighlight">\([\,A\ \ \mathbf{b}\,]\)</span>. Then check it yourself: on data with noise
+added to both <span class="math notranslate nohighlight">\(t\)</span> and <span class="math notranslate nohighlight">\(y\)</span> it must recover the true slope more accurately than
+ordinary least squares over 200 trials, it must reduce exactly to ordinary
+least squares when the input noise is zero (to <span class="math notranslate nohighlight">\(10^{-8}\)</span>), and its residual
+must be smaller than OLS’s when measured perpendicularly and larger when
+measured vertically. The check is yours.</p>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>noise: sigma = 0.05 on the first half, 0.50 on the second
+
+ordinary least squares : [1.9305  3.18484]   error 0.19748
+weighted least squares : [1.99871 2.98453]   error 0.01553
+improvement            : 12.72x
+
+row scaling vs A^T W A route: 8.882e-15
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<p>The two routes to the weighted solution are required to agree, which shows the
+row-scaling implementation is not an approximation but the same computation
+arranged to avoid forming <span class="math notranslate nohighlight">\(A^{\top}WA\)</span> — the lesson of Exercise 3 applied to a
+new problem.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  weighting by 1/sigma_i improves the fit by more than 5x   [OLS error 0.1975 against WLS 0.0155]
+✓  row scaling and the A^T W A form of Eq. 4 give the same answer   [max|Δ| = 8.88178e-15 (rtol=0, atol=1e-10)]
+✓  and the weighted fit recovers the true (2, 3) to better than 0.1   [fitted [1.9987 2.9845]]
+✓  with equal weights the weighted fit reduces to ordinary least squares   [max|Δ| = 0 (rtol=0, atol=1e-12)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p>One problem, four algorithms, and a factor of two million.</p>
+<p>The concrete results:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\kappa(A^{\top}A) = \kappa(A)^2\)</span> held to <span class="math notranslate nohighlight">\(10^{-3}\)</span> in the log ratio at every
+degree where <code class="docutils literal notranslate"><span class="pre">float64</span></code> can measure it, verified at the level of the
+mechanism — the singular values of <span class="math notranslate nohighlight">\(A^{\top}A\)</span> are the squares of those of
+<span class="math notranslate nohighlight">\(A\)</span> to <span class="math notranslate nohighlight">\(4\times10^{-16}\)</span> <strong>relative to the matrix scale</strong> — while entrywise
+the relative error on the <em>smallest</em> squared singular value is
+<span class="math notranslate nohighlight">\(4\times10^{-9}\)</span>, five orders worse, because squaring ruins the small end
+specifically. And the identity is <em>not</em> measurable at degree 14, where the
+true <span class="math notranslate nohighlight">\(\kappa(A^{\top}A) \approx 6\times10^{20}\)</span> exceeds <span class="math notranslate nohighlight">\(1/\varepsilon\)</span>;</p></li>
+<li><p>all four routes agreed to <span class="math notranslate nohighlight">\(10^{-8}\)</span> at degree 6 and each satisfied the
+defining condition <span class="math notranslate nohighlight">\(A^{\top}(A\hat{\mathbf{x}} - \mathbf{b}) = \mathbf{0}\)</span>,
+with <span class="math notranslate nohighlight">\(A\hat{\mathbf{x}} = QQ^{\top}\mathbf{b}\)</span> confirming the fitted values
+are <a class="reference internal" href="projections-normal-equations.html"><span class="std std-doc">§2.1</span></a>’s projection;</p></li>
+<li><p>across degrees 3 to 14 the three stable routes tracked <span class="math notranslate nohighlight">\(\kappa\varepsilon\)</span>
+while the normal equations tracked <span class="math notranslate nohighlight">\(\kappa^2\varepsilon\)</span>, a gap of
+<span class="math notranslate nohighlight">\(2\times10^{6}\)</span> at degree 10;</p></li>
+<li><p>and at degree 14 the normal equations did not degrade but <strong>broke down</strong>:
+<code class="docutils literal notranslate"><span class="pre">cho_factor</span></code> raised, the smallest eigenvalue of <span class="math notranslate nohighlight">\(A^{\top}A\)</span> having gone
+<strong>negative</strong>, while <span class="math notranslate nohighlight">\(A\)</span> still had full column rank 15 and <span class="math notranslate nohighlight">\(QR\)</span> returned seven
+correct digits. The positive definiteness was destroyed by forming
+<span class="math notranslate nohighlight">\(A^{\top}A\)</span>, not by anything wrong with the problem;</p></li>
+<li><p>the standard errors from <span class="math notranslate nohighlight">\(\hat{\sigma}^2(A^{\top}A)^{-1}\)</span> were <strong>calibrated
+by Monte Carlo</strong> over 4000 noise realisations: the <span class="math notranslate nohighlight">\(z\)</span>-scores came out with
+standard deviation <span class="math notranslate nohighlight">\(1.03\)</span>, mean <span class="math notranslate nohighlight">\(0.03\)</span>, and <span class="math notranslate nohighlight">\(99.6\%\)</span> inside three standard
+errors against the <span class="math notranslate nohighlight">\(99.73\%\)</span> a normal requires;</p></li>
+<li><p>and weighting by <span class="math notranslate nohighlight">\(1/\sigma_i\)</span> on heteroscedastic data improved the parameter
+error by more than <span class="math notranslate nohighlight">\(12\times\)</span>, with the row-scaling implementation agreeing
+with the <span class="math notranslate nohighlight">\(A^{\top}WA\)</span> form to <span class="math notranslate nohighlight">\(10^{-10}\)</span> while never building it.</p></li>
+</ul>
+<p>Methods met: <code class="docutils literal notranslate"><span class="pre">scipy.linalg.cho_factor</span></code>/<code class="docutils literal notranslate"><span class="pre">cho_solve</span></code>, <span class="math notranslate nohighlight">\(QR\)</span> least squares via
+<a class="reference internal" href="#equation-eq-ls-qr-solve">Eq. 115</a>, the SVD route, <code class="docutils literal notranslate"><span class="pre">np.linalg.lstsq</span></code>, the covariance formula
+<a class="reference internal" href="#equation-eq-ls-covariance">Eq. 116</a> with <span class="math notranslate nohighlight">\(m-n\)</span> degrees of freedom, Monte Carlo calibration
+of standard errors, and weighted least squares by row scaling.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>When the columns are dependent.</strong> Every method here assumed <span class="math notranslate nohighlight">\(A\)</span> has
+independent columns; <span class="math notranslate nohighlight">\(A^{\top}A\)</span> is then invertible and <span class="math notranslate nohighlight">\(R\)</span> nonsingular. Drop
+that and three of the four routes fail outright while the SVD keeps working,
+returning the minimum-norm solution.
+<a class="reference internal" href="pseudoinverse-regularization.html"><span class="std std-doc">§2.4</span></a> builds it.</p></li>
+<li><p><strong>Choosing not to fit exactly.</strong> At degree 14 even <span class="math notranslate nohighlight">\(QR\)</span> gave only seven
+digits, because the problem itself is that ill-conditioned. When the data is
+noisy the right response is often to <em>deliberately</em> bias the fit —
+regularization — which trades a little accuracy for a lot of stability, and
+is <a class="reference internal" href="pseudoinverse-regularization.html"><span class="std std-doc">§2.4</span></a> again.</p></li>
+<li><p><strong>A better basis.</strong> The Vandermonde matrix was badly conditioned because the
+monomials are a poor basis, exactly as
+<a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html"><span class="std std-doc">§1.5</span></a> measured. Fitting in
+an orthogonal polynomial basis makes <span class="math notranslate nohighlight">\(A^{\top}A\)</span> nearly diagonal and the
+whole difficulty evaporates — <a class="reference internal" href="function-space-bases.html"><span class="std std-doc">§2.5</span></a> constructs
+one.</p></li>
+<li><p><strong>Least squares as learning.</strong> Fitting parameters to data by minimising
+squared error is the simplest supervised learning there is, and the
+<span class="math notranslate nohighlight">\(\kappa\)</span> story reappears there as the reason ridge regression exists.
+<a class="reference internal" href="../08-learning/learning-as-least-squares.html"><span class="std std-doc">§8.1</span></a> picks it up, with the
+SVD filter that makes the connection precise.</p></li>
+</ul>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h3>
+<div class="docutils container" id="id5">
+<div role="list" class="citation-list">
+<div class="citation" id="id14" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">GVL13</a><span class="fn-bracket">]</span></span>
+<p>Gene H. Golub and Charles F. Van Loan. <em>Matrix Computations</em>. Johns Hopkins University Press, Baltimore, 4 edition, 2013.</p>
+</div>
+<div class="citation" id="id43" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">HTF09</a><span class="fn-bracket">]</span></span>
+<p>Trevor Hastie, Robert Tibshirani, and Jerome Friedman. <em>The Elements of Statistical Learning</em>. Springer, 2 edition, 2009. <a class="reference external" href="https://doi.org/10.1007/978-0-387-84858-7">doi:10.1007/978-0-387-84858-7</a>.</p>
+</div>
+<div class="citation" id="id16" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">Hig02</a><span class="fn-bracket">]</span></span>
+<p>Nicholas J. Higham. <em>Accuracy and Stability of Numerical Algorithms</em>. SIAM, Philadelphia, 2 edition, 2002. <a class="reference external" href="https://doi.org/10.1137/1.9780898718027">doi:10.1137/1.9780898718027</a>.</p>
+</div>
+<div class="citation" id="id13" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">TB97</a><span class="fn-bracket">]</span></span>
+<p>Lloyd N. Trefethen and David Bau, III. <em>Numerical Linear Algebra</em>. SIAM, Philadelphia, 1997. <a class="reference external" href="https://doi.org/10.1137/1.9780898719574">doi:10.1137/1.9780898719574</a>.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/02-orthogonality"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="gram-schmidt-qr.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">2.2 Gram–Schmidt, QR, Householder, and Givens</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="pseudoinverse-regularization.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-squaring-identity">The squaring identity</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#four-routes">Four routes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-a-fit-reports">What a fit reports</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#unequal-uncertainties">Unequal uncertainties</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-measuring-the-squaring">Exercise 1: Measuring the squaring</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-four-routes-one-answer">Exercise 2: Four routes, one answer</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-where-the-routes-separate-and-where-one-stops-working">Exercise 3: Where the routes separate, and where one stops working</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-what-the-fit-reports-residuals-and-standard-errors">Exercise 4: What the fit reports: residuals and standard errors</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-when-measurements-are-not-equally-trustworthy">Exercise 5: When measurements are not equally trustworthy</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

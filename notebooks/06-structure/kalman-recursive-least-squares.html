@@ -1,0 +1,1340 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="6.6 The Kalman Filter: Least Squares, Recursively" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/06-structure/kalman-recursive-least-squares.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: §2.3 solved least squares with all the rows on the table. This notebook asks the streaming question: rows arrive one at a time, and re-sol..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: §2.3 solved least squares with all the rows on the table. This notebook asks the streaming question: rows arrive one at a time, and re-sol..." />
+
+    <title>6.6 The Kalman Filter: Least Squares, Recursively &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/06-structure/kalman-recursive-least-squares';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/06-structure/kalman-recursive-least-squares.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Chapter VII — Multilinear Algebra and Tensor Networks" href="../07-tensors/index.html" />
+    <link rel="prev" title="6.5 Positive Definite Kernels and the Gram Matrix" href="kernels-gram-matrix.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/06-structure/kalman-recursive-least-squares.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/06-structure/kalman-recursive-least-squares.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/06-structure/kalman-recursive-least-squares.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/06-structure/kalman-recursive-least-squares.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>6.6 The Kalman Filter: Least Squares, Recursively</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#least-squares-one-row-at-a-time">Least squares, one row at a time</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#let-the-state-move">Let the state move</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-gain-s-fixed-point">The gain’s fixed point</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-recursive-least-squares-information-form">Exercise 1: Recursive least squares, information form</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-gain-form-shermanmorrison-does-the-inverting">Exercise 2: The gain form: Sherman–Morrison does the inverting</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-kalman-filter-assembled">Exercise 3: The Kalman filter, assembled</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-freeze-the-dynamics-and-the-filter-is-least-squares">Exercise 4: Freeze the dynamics and the filter IS least squares</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-the-gain-settles-where-the-riccati-equation-says">Exercise 5: The gain settles where the Riccati equation says</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-the-innovations-testify">Exercise 6: The innovations testify</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="the-kalman-filter-least-squares-recursively">
+<h1>6.6 The Kalman Filter: Least Squares, Recursively<a class="headerlink" href="#the-kalman-filter-least-squares-recursively" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter VI — Structure, Graphs, and Fast Algorithms
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;6.6
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">Feed least squares its rows one at a time and the update is a rank-one identity the reader already proved. Add a dynamics matrix and the same recursion tracks a moving target — the Kalman filter, gated equal to batch least squares on every prefix, and equal to its own steady-state Riccati equation at the end.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;advanced&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;120–150 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html"><span class="std std-doc">§2.3</span></a> solved least
+squares with all the rows on the table. This notebook asks the streaming
+question: rows arrive one at a time, and re-solving from scratch at every
+arrival wastes everything already computed. The answer is <strong>recursive
+least squares</strong> — a rank-one update of the normal equations whose inverse
+form is exactly the Sherman–Morrison identity the reader proved in
+<a class="reference internal" href="../01-matrices/inverses-rank-cr.html"><span class="std std-doc">§1.3</span></a> — and its central promise is
+gateable to near rounding: after <em>every</em> row, the recursive estimate
+equals the batch solution on the rows so far.</p>
+<p>Then the structural turn, and the reason this notebook lives in Chapter
+VI: give the unknown a <strong>dynamics matrix</strong> — let the state <em>move</em> between
+measurements — and the same two-line update becomes the <strong>Kalman
+filter</strong> <span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id63" title="Rudolph E. Kalman. A new approach to linear filtering and prediction problems. Journal of Basic Engineering, 82(1):35–45, 1960. doi:10.1115/1.3662552.">Kal60</a>]</span>, the workhorse estimator of navigation,
+tracking and control. The kinship is not an analogy: with the dynamics
+frozen (<span class="math notranslate nohighlight">\(F = I\)</span>, <span class="math notranslate nohighlight">\(Q = 0\)</span>) the filter’s output reproduces recursive least
+squares to <span class="math notranslate nohighlight">\(10^{-12}\)</span>, step for step. The filter also diagnoses itself —
+its innovation sequence should be white with predicted variance, its gain
+should settle to the fixed point of a Riccati equation — and both
+predictions are gated against independent routes.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> Kalman’s original paper is <span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id63" title="Rudolph E. Kalman. A new approach to linear filtering and prediction problems. Journal of Basic Engineering, 82(1):35–45, 1960. doi:10.1115/1.3662552.">Kal60</a>]</span>; Golub and
+Van Loan <span class="bibtex-citation" id="id3">[<a class="reference internal" href="#id13" title="Gene H. Golub and Charles F. Van Loan. Matrix Computations. Johns Hopkins University Press, Baltimore, 4 edition, 2013.">GVL13</a>]</span> §6.5 treats updating least squares, and the
+Sherman–Morrison identity behind the gain is
+<a class="reference internal" href="../01-matrices/inverses-rank-cr.html"><span class="std std-doc">§1.3</span></a>’s Exercise 6.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="least-squares-one-row-at-a-time">
+<h3>Least squares, one row at a time<a class="headerlink" href="#least-squares-one-row-at-a-time" title="Link to this heading">#</a></h3>
+<p>With rows <span class="math notranslate nohighlight">\(\mathbf{a}_1^{\top}, \dots, \mathbf{a}_k^{\top}\)</span> stacked in
+<span class="math notranslate nohighlight">\(A_k\)</span> and measurements <span class="math notranslate nohighlight">\(\mathbf{y}_k\)</span>, the batch solution solves the
+normal equations of
+<a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html"><span class="std std-doc">§2.3</span></a>:</p>
+<div class="math notranslate nohighlight" id="equation-eq-kf-normal">
+<span class="eqno">(263)<a class="headerlink" href="#equation-eq-kf-normal" title="Link to this equation">#</a></span>\[G_k\,\hat{\mathbf{x}}_k = \mathbf{c}_k,
+\qquad G_k = A_k^{\top}A_k,\quad \mathbf{c}_k = A_k^{\top}\mathbf{y}_k .\]</div>
+<p>A new row touches both sides by a <strong>rank-one</strong> amount:</p>
+<div class="math notranslate nohighlight" id="equation-eq-kf-rankone">
+<span class="eqno">(264)<a class="headerlink" href="#equation-eq-kf-rankone" title="Link to this equation">#</a></span>\[G_{k+1} = G_k + \mathbf{a}_{k+1}\mathbf{a}_{k+1}^{\top},
+\qquad
+\mathbf{c}_{k+1} = \mathbf{c}_k + y_{k+1}\,\mathbf{a}_{k+1} ,\]</div>
+<p>so the <em>information</em> accumulates by outer products. Inverting the update
+instead of the matrix is Sherman–Morrison
+(<a class="reference internal" href="../01-matrices/inverses-rank-cr.html"><span class="std std-doc">§1.3</span></a>): with <span class="math notranslate nohighlight">\(P_k = G_k^{-1}\)</span>,</p>
+<div class="math notranslate nohighlight" id="equation-eq-kf-sm">
+<span class="eqno">(265)<a class="headerlink" href="#equation-eq-kf-sm" title="Link to this equation">#</a></span>\[\mathbf{k} = \frac{P_k\,\mathbf{a}}{1 + \mathbf{a}^{\top}P_k\,\mathbf{a}},
+\qquad
+\hat{\mathbf{x}} \leftarrow \hat{\mathbf{x}} +
+\mathbf{k}\,(y - \mathbf{a}^{\top}\hat{\mathbf{x}}),
+\qquad
+P \leftarrow P - \mathbf{k}\,\mathbf{a}^{\top}P ,\]</div>
+<p>a per-row cost of <span class="math notranslate nohighlight">\(O(p^2)\)</span> against the <span class="math notranslate nohighlight">\(O(p^3)\)</span> of re-solving — and an
+<em>identity</em>, not an approximation: <a class="reference internal" href="#equation-eq-kf-sm">Eq. 265</a> reproduces the batch
+answer exactly, which is precisely what the exercises gate.</p>
+</section>
+<section id="let-the-state-move">
+<h3>Let the state move<a class="headerlink" href="#let-the-state-move" title="Link to this heading">#</a></h3>
+<p>The Kalman filter estimates a state obeying</p>
+<div class="math notranslate nohighlight" id="equation-eq-kf-model">
+<span class="eqno">(266)<a class="headerlink" href="#equation-eq-kf-model" title="Link to this equation">#</a></span>\[\mathbf{x}_{t+1} = F\mathbf{x}_t + \mathbf{w}_t,
+\qquad z_t = H\mathbf{x}_t + v_t,
+\qquad \mathbf{w} \sim Q,\; v \sim R,\]</div>
+<p>by alternating a <strong>prediction</strong> through the dynamics,</p>
+<div class="math notranslate nohighlight" id="equation-eq-kf-predict">
+<span class="eqno">(267)<a class="headerlink" href="#equation-eq-kf-predict" title="Link to this equation">#</a></span>\[\mathbf{x} \leftarrow F\mathbf{x}, \qquad P \leftarrow FPF^{\top} + Q ,\]</div>
+<p>with an <strong>update</strong> that is <a class="reference internal" href="#equation-eq-kf-sm">Eq. 265</a> with the measurement noise <span class="math notranslate nohighlight">\(R\)</span>
+in the denominator:</p>
+<div class="math notranslate nohighlight" id="equation-eq-kf-update">
+<span class="eqno">(268)<a class="headerlink" href="#equation-eq-kf-update" title="Link to this equation">#</a></span>\[S = HPH^{\top} + R,\quad
+K = PH^{\top}S^{-1},\quad
+\mathbf{x} \leftarrow \mathbf{x} + K\,\nu,\quad
+P \leftarrow P - KHP,\]</div>
+<p>where <span class="math notranslate nohighlight">\(\nu = z - H\mathbf{x}\)</span> is the <strong>innovation</strong> — what the
+measurement says that the prediction did not already know. When the
+model is right, the innovations are white with variance <span class="math notranslate nohighlight">\(S\)</span>: the filter
+publishes its own error bars, and they are checkable.</p>
+</section>
+<section id="the-gain-s-fixed-point">
+<h3>The gain’s fixed point<a class="headerlink" href="#the-gain-s-fixed-point" title="Link to this heading">#</a></h3>
+<p>Iterating <a class="reference internal" href="#equation-eq-kf-predict">Eq. 267</a>–<a class="reference internal" href="#equation-eq-kf-update">Eq. 268</a> drives the predicted
+covariance to the fixed point of the discrete algebraic Riccati equation</p>
+<div class="math notranslate nohighlight" id="equation-eq-kf-dare">
+<span class="eqno">(269)<a class="headerlink" href="#equation-eq-kf-dare" title="Link to this equation">#</a></span>\[P = F\bigl(P - PH^{\top}(HPH^{\top} + R)^{-1}HP\bigr)F^{\top} + Q ,\]</div>
+<p>so the gain settles to a constant <span class="math notranslate nohighlight">\(K_{\infty}\)</span> computable <em>without
+filtering anything</em> — an independent route
+(<code class="docutils literal notranslate"><span class="pre">scipy.linalg.solve_discrete_are</span></code>) the running filter is gated against.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data only: the streaming least-squares scene (80 rows of a seeded line
+fit) and the tracking scene (a constant-velocity target simulated from
+<a class="reference internal" href="#equation-eq-kf-model">Eq. 266</a> with seeded process and measurement noise). Every
+method — the rank-one update, the Sherman–Morrison gain, the Kalman
+step — is built in the exercises, where it is the lesson.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">solve_discrete_are</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random array below comes from this seed</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+
+<span class="c1"># data: the streaming scene — 80 rows of the line y = 1.5 + 0.8 t at noise</span>
+<span class="c1"># 0.3, arriving one at a time. Rows of A are (1, t_k).</span>
+<span class="n">N_ROWS</span> <span class="o">=</span> <span class="mi">80</span>
+<span class="n">t_r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="n">N_ROWS</span><span class="p">)</span>
+<span class="n">A_ROWS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">N_ROWS</span><span class="p">),</span> <span class="n">t_r</span><span class="p">])</span>
+<span class="n">Y_ROWS</span> <span class="o">=</span> <span class="mf">1.5</span> <span class="o">+</span> <span class="mf">0.8</span> <span class="o">*</span> <span class="n">t_r</span> <span class="o">+</span> <span class="mf">0.3</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">(</span><span class="n">N_ROWS</span><span class="p">)</span>
+
+<span class="c1"># data: the tracking scene — a constant-velocity target (Eq. 4): state</span>
+<span class="c1"># (position, velocity), dt = 1, white-acceleration process noise at 0.05,</span>
+<span class="c1"># position measured at noise 0.5, 120 steps from (0, 1).</span>
+<span class="n">DT</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">Q_ACC</span> <span class="o">=</span> <span class="mf">0.05</span>
+<span class="n">R_MEAS</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">T_STEPS</span> <span class="o">=</span> <span class="mi">120</span>
+<span class="n">F_DYN</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">DT</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]])</span>
+<span class="c1"># discrete white-noise acceleration: one random acceleration kick per</span>
+<span class="c1"># step enters through G = [dt^2/2, dt], so the process covariance is</span>
+<span class="c1"># EXACTLY sigma^2 G G^T — the same G the simulation below uses, which is</span>
+<span class="c1"># what makes Exercise 6&#39;s &quot;correctly-modelled filter&quot; a true statement</span>
+<span class="c1"># rather than a hopeful one.</span>
+<span class="n">G_ACC</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">DT</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">DT</span><span class="p">])</span>
+<span class="n">Q_DYN</span> <span class="o">=</span> <span class="n">Q_ACC</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">G_ACC</span><span class="p">,</span> <span class="n">G_ACC</span><span class="p">)</span>
+<span class="n">H_OBS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]])</span>
+<span class="n">_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">])</span>
+<span class="n">TRUTH</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">T_STEPS</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">MEAS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">T_STEPS</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">_t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T_STEPS</span><span class="p">):</span>
+    <span class="n">_x</span> <span class="o">=</span> <span class="n">F_DYN</span> <span class="o">@</span> <span class="n">_x</span> <span class="o">+</span> <span class="n">Q_ACC</span> <span class="o">*</span> <span class="n">G_ACC</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">()</span>
+    <span class="n">TRUTH</span><span class="p">[</span><span class="n">_t</span><span class="p">]</span> <span class="o">=</span> <span class="n">_x</span>
+    <span class="n">MEAS</span><span class="p">[</span><span class="n">_t</span><span class="p">]</span> <span class="o">=</span> <span class="n">_x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">R_MEAS</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-recursive-least-squares-information-form">
+<h2>Exercise 1: Recursive least squares, information form<a class="headerlink" href="#exercise-1-recursive-least-squares-information-form" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-kf-rankone">Eq. 264</a> promises that streaming and batch see the same
+normal equations — so after <em>every</em> row, the recursive estimate must
+equal <code class="docutils literal notranslate"><span class="pre">np.linalg.lstsq</span></code> on the prefix. That identity is the exercise.</p>
+<p><strong>Part a)</strong> Initialise exactly: solve <a class="reference internal" href="#equation-eq-kf-normal">Eq. 263</a> on the first
+two rows of the Setup’s <code class="docutils literal notranslate"><span class="pre">A_ROWS</span></code>, <code class="docutils literal notranslate"><span class="pre">Y_ROWS</span></code> (<span class="math notranslate nohighlight">\(G_2 = A_2^{\top}A_2\)</span>,
+<span class="math notranslate nohighlight">\(2\times2\)</span> and invertible). Then stream rows <span class="math notranslate nohighlight">\(k = 3, \dots, 80\)</span> through
+the rank-one update <a class="reference internal" href="#equation-eq-kf-rankone">Eq. 264</a>, re-solving the <span class="math notranslate nohighlight">\(2\times2\)</span>
+system at each arrival.</p>
+<p><strong>Write this one yourself</strong> — the update is two <code class="docutils literal notranslate"><span class="pre">+=</span></code> lines and one
+solve, and Exercises 2–4 are all refactorings of what you write here.</p>
+<p><strong>Part b)</strong> Gate the identity: at <strong>every</strong> prefix <span class="math notranslate nohighlight">\(k\)</span>, the streamed
+<span class="math notranslate nohighlight">\(\hat{\mathbf{x}}_k\)</span> equals <code class="docutils literal notranslate"><span class="pre">np.linalg.lstsq(A_ROWS[:k],</span> <span class="pre">Y_ROWS[:k],</span> <span class="pre">rcond=None)</span></code> to <span class="math notranslate nohighlight">\(10^{-11}\)</span> relative (78 comparisons, worst reported —
+measured near <span class="math notranslate nohighlight">\(10^{-15}\)</span>: the same equations, met from two directions).</p>
+<p><strong>Part c)</strong> Draw the convergence: the data, the final batch line, and
+the streamed line at <span class="math notranslate nohighlight">\(k = 4, 10, 20, 80\)</span> — the estimate settling as
+evidence accumulates.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>streamed vs batch over 78 prefixes: worst relative gap 4.85e-15
+final estimate [1.4557 0.8402] (planted (1.5, 0.8))
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  after every row, streaming equals batch (Eqs. 1-2)   [78 prefix solutions compared against np.linalg.lstsq: the rank-one update is an identity about the normal equations, not an approximation to them [4.85491e-15 &lt; 1e-11]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-kf-rls">
+<img alt="../../_images/1ec421d97e64ba7643079bec17406a4d6c6db7d4cd1bfa78c25c251f975cadee.png" src="../../_images/1ec421d97e64ba7643079bec17406a4d6c6db7d4cd1bfa78c25c251f975cadee.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 128 </span><span class="caption-text">Recursive least squares on the streaming line fit: the 80 noisy measurements (grey), the final batch fit (ink), and the streamed estimate’s line after <span class="math notranslate nohighlight">\(k = 4, 10, 20\)</span> and <span class="math notranslate nohighlight">\(80\)</span> rows (ambers, light to dark). The <span class="math notranslate nohighlight">\(k = 80\)</span> line sits exactly on the batch fit — gated at <span class="math notranslate nohighlight">\(10^{-11}\)</span> over every prefix — and the early lines show the estimate swinging while the information matrix <span class="math notranslate nohighlight">\(G_k\)</span> is still thin.</span><a class="headerlink" href="#fig-kf-rls" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-the-gain-form-shermanmorrison-does-the-inverting">
+<h2>Exercise 2: The gain form: Sherman–Morrison does the inverting<a class="headerlink" href="#exercise-2-the-gain-form-shermanmorrison-does-the-inverting" title="Link to this heading">#</a></h2>
+<p>Exercise 1 re-solved a linear system per row; <a class="reference internal" href="#equation-eq-kf-sm">Eq. 265</a> updates the
+<em>inverse</em> directly — <a class="reference internal" href="../01-matrices/inverses-rank-cr.html"><span class="std std-doc">§1.3</span></a>’s
+Sherman–Morrison identity, earning its keep. Per row it costs <span class="math notranslate nohighlight">\(O(p^2)\)</span>
+(three matrix–vector products) against the information form’s <span class="math notranslate nohighlight">\(O(p^3)\)</span>
+solve — at <span class="math notranslate nohighlight">\(p = 2\)</span> nobody cares, at <span class="math notranslate nohighlight">\(p = 10^4\)</span> everything does, and the
+count follows from the formulas alone.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">rls_gain_step(x,</span> <span class="pre">P,</span> <span class="pre">a,</span> <span class="pre">y)</span></code> implementing
+<a class="reference internal" href="#equation-eq-kf-sm">Eq. 265</a> and returning <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">P)</span></code>. Initialise from the same exact
+two-row start (<span class="math notranslate nohighlight">\(P_2 = G_2^{-1}\)</span> by <code class="docutils literal notranslate"><span class="pre">np.linalg.inv</span></code>) and stream the same
+78 rows.</p>
+<p><strong>Write this one yourself</strong> — the three lines are the Kalman update in
+embryo, and Exercise 4 gates that sentence literally.</p>
+<p><strong>Part b)</strong> Gate both identities at every step: the gain-form estimate
+equals Exercise 1’s information-form estimate to <span class="math notranslate nohighlight">\(10^{-12}\)</span> relative,
+and <span class="math notranslate nohighlight">\(P_k\)</span> equals <code class="docutils literal notranslate"><span class="pre">np.linalg.inv(G_k)</span></code> to <span class="math notranslate nohighlight">\(10^{-11}\)</span> relative — the
+inverse maintained without ever inverting.</p>
+<p><strong>Part c)</strong> Gate the covariance’s health: every <span class="math notranslate nohighlight">\(P_k\)</span> symmetric to
+<span class="math notranslate nohighlight">\(10^{-13}\)</span> and positive definite (smallest eigenvalue positive) — <span class="math notranslate nohighlight">\(P\)</span>
+is the estimate’s error covariance, and a covariance that loses
+symmetry or positivity has stopped meaning anything.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>gain vs information route: worst 4.32e-15; P vs inv(G): worst 3.03e-15
+P symmetric to 1.1e-16; smallest eigenvalue 2.03e-03 &gt; 0
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the Sherman-Morrison gain and the re-solved system agree, step for step (Eq. 3)   [two refactorings of one identity — the 1.3 formula run forward 78 times without drifting from the truth it rearranges [4.3188e-15 &lt; 1e-12]]
+✓  and P tracks the exact inverse without ever inverting   [the O(p^2) route maintains what the O(p^3) route recomputes — the entire point of updating, gated as an identity [3.02501e-15 &lt; 1e-11]]
+✓  the covariance stays symmetric and positive definite throughout   [symmetry 1.1e-16, min eigenvalue 2.03e-03: an error covariance that loses either has stopped meaning anything]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-the-kalman-filter-assembled">
+<h2>Exercise 3: The Kalman filter, assembled<a class="headerlink" href="#exercise-3-the-kalman-filter-assembled" title="Link to this heading">#</a></h2>
+<p>Add <a class="reference internal" href="#equation-eq-kf-predict">Eq. 267</a> in front of the update and the streaming
+estimator can chase a <em>moving</em> state. The Setup simulated the scene:
+a constant-velocity target under <a class="reference internal" href="#equation-eq-kf-model">Eq. 266</a>, its position
+measured at noise <span class="math notranslate nohighlight">\(\sigma_R = 0.5\)</span> for 120 steps.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">kalman_step(x,</span> <span class="pre">P,</span> <span class="pre">z,</span> <span class="pre">F,</span> <span class="pre">Q,</span> <span class="pre">H,</span> <span class="pre">R)</span></code> returning
+<code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">P,</span> <span class="pre">nu,</span> <span class="pre">S)</span></code>: predict by <a class="reference internal" href="#equation-eq-kf-predict">Eq. 267</a>, then update by
+<a class="reference internal" href="#equation-eq-kf-update">Eq. 268</a>, with <code class="docutils literal notranslate"><span class="pre">.item()</span></code> to read the <span class="math notranslate nohighlight">\(1\times1\)</span> innovation
+variance. Initialise at <span class="math notranslate nohighlight">\(\mathbf{x}_0 = (z_0, 0)\)</span>, <span class="math notranslate nohighlight">\(P_0 =
+\operatorname{diag}(\sigma_R^2, 1)\)</span> and filter the remaining 119
+measurements.</p>
+<p><strong>Write this one yourself</strong> — it is Exercise 2’s step with a dynamics
+matrix in front, and that refactoring is the notebook’s thesis.</p>
+<p><strong>Part b)</strong> Gate the covariance exactly as in Exercise 2 (symmetric to
+<span class="math notranslate nohighlight">\(10^{-13}\)</span>, positive definite throughout), and gate that filtering
+<em>helps</em>: the filtered position’s RMS error against the simulated truth
+is smaller than the raw measurements’ RMS error <span class="math notranslate nohighlight">\(\approx \sigma_R\)</span> —
+the filter is averaging along the trajectory, and it must beat the
+sensor it reads.</p>
+<p><strong>Part c)</strong> Draw the track: truth, measurements, the filtered position
+and its published <span class="math notranslate nohighlight">\(\pm2\sqrt{P_{11}}\)</span> band — wide at the start, then
+settling as the gain does.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>RMS position error: filter 0.3233 vs raw measurements 0.5296
+covariance: symmetric to 6.9e-18, min eigenvalue 5.28e-03
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the filter&#39;s covariance stays symmetric positive definite for 119 steps (Eqs. 5-6)   [symmetry 6.9e-18, min eigenvalue 5.28e-03 — the same health checks as RLS, surviving the dynamics]
+✓  and filtering beats the sensor it reads   [RMS 0.323 against the measurements&#39; 0.530: the dynamics let every past measurement testify about the present, which is what the recursion is for]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-kf-track">
+<img alt="../../_images/ab59ecfae664b35df160b12e30292f5c9b4246590972ad3bea13f46209514f4e.png" src="../../_images/ab59ecfae664b35df160b12e30292f5c9b4246590972ad3bea13f46209514f4e.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 129 </span><span class="caption-text">The constant-velocity target over 120 steps: simulated truth (ink), position measurements at <span class="math notranslate nohighlight">\(\sigma_R = 0.5\)</span> (grey), and the filtered position (amber) with its published <span class="math notranslate nohighlight">\(\pm2\sqrt{P_{11}}\)</span> band (shaded). The band hugs the track at the steady width the Riccati equation of Exercise 5 predicts (its brief wide opening, while the filter still knows nothing about velocity, is finished within a dozen steps), and the filtered curve runs visibly smoother than the measurements that produced it.</span><a class="headerlink" href="#fig-kf-track" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-freeze-the-dynamics-and-the-filter-is-least-squares">
+<h2>Exercise 4: Freeze the dynamics and the filter IS least squares<a class="headerlink" href="#exercise-4-freeze-the-dynamics-and-the-filter-is-least-squares" title="Link to this heading">#</a></h2>
+<p>The claim behind the notebook’s title, gated literally: run Exercise
+3’s <code class="docutils literal notranslate"><span class="pre">kalman_step</span></code> with the state frozen — <span class="math notranslate nohighlight">\(F = I\)</span>, <span class="math notranslate nohighlight">\(Q = 0\)</span>, unit
+measurement noise <span class="math notranslate nohighlight">\(R = 1\)</span>, and the streaming rows as time-varying
+measurement maps <span class="math notranslate nohighlight">\(H_k = \mathbf{a}_k^{\top}\)</span> — and it must reproduce
+Exercise 2’s recursive least squares, step for step.</p>
+<p><strong>Part a)</strong> Stream the same 78 rows through <code class="docutils literal notranslate"><span class="pre">kalman_step</span></code> from the same
+exact two-row start, and gate the frozen filter against the RLS
+estimates at <span class="math notranslate nohighlight">\(10^{-12}\)</span> relative at <strong>every</strong> step — with <span class="math notranslate nohighlight">\(F = I\)</span> the
+prediction does nothing, and <a class="reference internal" href="#equation-eq-kf-update">Eq. 268</a> at <span class="math notranslate nohighlight">\(R = 1\)</span> <em>is</em>
+<a class="reference internal" href="#equation-eq-kf-sm">Eq. 265</a>, symbol for symbol.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>frozen Kalman vs RLS over 78 steps: worst relative gap 4.88e-16
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  Kalman with F = I, Q = 0, R = 1 reproduces recursive least squares step for step   [the title&#39;s claim as a measurement: the filter is least squares with a dynamics matrix in front, and freezing the dynamics removes the difference to rounding [4.88134e-16 &lt; 1e-12]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-the-gain-settles-where-the-riccati-equation-says">
+<h2>Exercise 5: The gain settles where the Riccati equation says<a class="headerlink" href="#exercise-5-the-gain-settles-where-the-riccati-equation-says" title="Link to this heading">#</a></h2>
+<p>Exercise 3’s filter never referenced <a class="reference internal" href="#equation-eq-kf-dare">Eq. 269</a>, yet its gain
+must converge to the fixed point — computable in one call that filters
+nothing. Two independent routes, one number.</p>
+<p><strong>Part a)</strong> Solve <a class="reference internal" href="#equation-eq-kf-dare">Eq. 269</a> with
+<code class="docutils literal notranslate"><span class="pre">scipy.linalg.solve_discrete_are(F.T,</span> <span class="pre">H.T,</span> <span class="pre">Q,</span> <span class="pre">[[R]])</span></code> and form the
+steady gain <span class="math notranslate nohighlight">\(K_{\infty} = P_{\infty}H^{\top}/(HP_{\infty}H^{\top}+R)\)</span>.
+Re-run the filter recording the gain at every step, and gate the final
+gain against <span class="math notranslate nohighlight">\(K_{\infty}\)</span> to <span class="math notranslate nohighlight">\(10^{-8}\)</span> relative (measured: near
+<span class="math notranslate nohighlight">\(10^{-15}\)</span> — the Riccati iteration converges long before step 119).</p>
+<p><strong>Part b)</strong> Draw both gain components against the step with the DARE
+values dashed: a dozen steps of transient, then the constants the
+filter was always heading for.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>final gain [0.36 0.08] vs DARE [0.36 0.08] (relative gap 7.71e-16)
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the running filter&#39;s gain lands on the Riccati fixed point (Eq. 7)   [solve_discrete_are filtered nothing, the filter solved no Riccati equation, and they agree near rounding — two routes to one steady state [7.70988e-16 &lt; 1e-08]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-kf-gain">
+<img alt="../../_images/10c74573d60e031b6b66cad9920788e3e31b3712c65b71b8c41fc23fa184183c.png" src="../../_images/10c74573d60e031b6b66cad9920788e3e31b3712c65b71b8c41fc23fa184183c.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 130 </span><span class="caption-text">The Kalman gain’s two components (position, ink; velocity, amber) at every step of the 119-step run, with the DARE fixed point’s values dashed. The transient lasts about a dozen steps — the filter unlearning its ignorant <span class="math notranslate nohighlight">\(P_0\)</span> — after which both components sit on the constants that solve_discrete_are computed without filtering a single measurement.</span><a class="headerlink" href="#fig-kf-gain" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-6-the-innovations-testify">
+<h2>Exercise 6: The innovations testify<a class="headerlink" href="#exercise-6-the-innovations-testify" title="Link to this heading">#</a></h2>
+<p>A correctly-modelled filter leaves nothing predictable behind: the
+innovation sequence should be <strong>white</strong>, with the variance <span class="math notranslate nohighlight">\(S\)</span> the
+filter itself published. Both are statistics of a seeded run, so both
+are gated in generous bands and reported precisely.</p>
+<p><strong>Part a)</strong> Normalise Exercise 3’s innovations as <span class="math notranslate nohighlight">\(\nu_t/\sqrt{S_t}\)</span>
+and gate the moments: standard deviation inside <span class="math notranslate nohighlight">\([0.8, 1.25]\)</span>
+(measured <span class="math notranslate nohighlight">\(1.06\)</span> over 119 samples, where the standard error alone is
+<span class="math notranslate nohighlight">\(\approx 0.065\)</span>), and lag-<span class="math notranslate nohighlight">\(1,2,3\)</span> autocorrelations each inside
+<span class="math notranslate nohighlight">\(\pm0.35\)</span> (nearly four standard errors at this run length).</p>
+<p><strong>Part b)</strong> Draw the normalised innovations with the <span class="math notranslate nohighlight">\(\pm2\)</span> band: a
+white scatter, no drift, no ringing — the filter’s self-diagnosis,
+passed in plain sight.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>normalised innovations: std 1.062; lag-1,2,3 autocorrelations [&#39;-0.079&#39;, &#39;0.020&#39;, &#39;-0.037&#39;]
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-6">
+<h3>Validation 6<a class="headerlink" href="#validation-6" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the innovations carry exactly the variance the filter published   [std 1.062 on 119 samples (standard error about 0.065): the filter&#39;s error bars are calibrated, not decorative]
+✓  and they are white: the filter left nothing predictable behind   [lag-1,2,3 autocorrelations [&#39;-0.08&#39;, &#39;0.02&#39;, &#39;-0.04&#39;] inside a generous +-0.35 band — a mis-modelled dynamics would ring here first]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-kf-innov">
+<img alt="../../_images/3f74e18b703edd31ede3969499daf54ea289d81ab649866c238c8d0e2d73b189.png" src="../../_images/3f74e18b703edd31ede3969499daf54ea289d81ab649866c238c8d0e2d73b189.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 131 </span><span class="caption-text">The normalised innovations <span class="math notranslate nohighlight">\(\nu_t/\sqrt{S_t}\)</span> of the 119-step run with the <span class="math notranslate nohighlight">\(\pm2\)</span> band shaded: white scatter at unit scale, no drift and no ringing. This is the filter grading its own homework — a wrong <span class="math notranslate nohighlight">\(F\)</span>, <span class="math notranslate nohighlight">\(Q\)</span> or <span class="math notranslate nohighlight">\(R\)</span> would show up here as structure before it showed up anywhere else.</span><a class="headerlink" href="#fig-kf-innov" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p><strong>Streaming equals batch, at rounding, 78 times.</strong> The rank-one
+information update reproduced <code class="docutils literal notranslate"><span class="pre">np.linalg.lstsq</span></code> on every prefix with a
+worst relative gap near <span class="math notranslate nohighlight">\(10^{-15}\)</span> (gated at <span class="math notranslate nohighlight">\(10^{-11}\)</span>), and the
+Sherman–Morrison gain form tracked both the information route
+(<span class="math notranslate nohighlight">\(10^{-12}\)</span>) and the explicit inverse (<span class="math notranslate nohighlight">\(10^{-11}\)</span>) without ever
+inverting — the <a class="reference internal" href="../01-matrices/inverses-rank-cr.html"><span class="std std-doc">§1.3</span></a> identity
+doing production work at <span class="math notranslate nohighlight">\(O(p^2)\)</span> per row.</p>
+<p><strong>The filter is that update with dynamics in front.</strong> Assembled from
+<a class="reference internal" href="#equation-eq-kf-predict">Eq. 267</a>–<a class="reference internal" href="#equation-eq-kf-update">Eq. 268</a>, it tracked the
+constant-velocity target with a covariance that stayed symmetric to
+<span class="math notranslate nohighlight">\(10^{-16}\)</span>-scale and positive definite for all 119 steps, beat the raw
+sensor’s RMS error, and — with <span class="math notranslate nohighlight">\(F = I\)</span>, <span class="math notranslate nohighlight">\(Q = 0\)</span>, <span class="math notranslate nohighlight">\(R = 1\)</span> — reproduced
+recursive least squares to <span class="math notranslate nohighlight">\(10^{-15}\)</span>-scale, step for step: the title,
+measured.</p>
+<p><strong>Two Riccati routes, one gain.</strong> The running filter’s gain landed on
+<code class="docutils literal notranslate"><span class="pre">solve_discrete_are</span></code>’s fixed point near rounding (gated at <span class="math notranslate nohighlight">\(10^{-8}\)</span>),
+a dozen transient steps after starting from an ignorant <span class="math notranslate nohighlight">\(P_0\)</span>.</p>
+<p><strong>The diagnostics passed in the open.</strong> Normalised innovations came out
+white — std <span class="math notranslate nohighlight">\(1.06\)</span> against the published variance, lag-1,2,3
+autocorrelations under <span class="math notranslate nohighlight">\(0.08\)</span> in a <span class="math notranslate nohighlight">\(\pm0.35\)</span> band — the one set of
+statistical gates in the notebook, stated with their standard errors.</p>
+<p><strong>Methods introduced.</strong> The rank-one normal-equation stream,
+<code class="docutils literal notranslate"><span class="pre">rls_gain_step</span></code> via Sherman–Morrison, exact two-row initialisation,
+<code class="docutils literal notranslate"><span class="pre">kalman_step</span></code> (predict–update with <code class="docutils literal notranslate"><span class="pre">.item()</span></code> scalar hygiene), the
+frozen-dynamics reduction, the DARE cross-check, and
+innovation-whiteness testing with explicit bands.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Weights are covariances.</strong> Replacing <span class="math notranslate nohighlight">\(1 + \mathbf{a}^{\top}P\mathbf{a}\)</span>
+by <span class="math notranslate nohighlight">\(R + \mathbf{a}^{\top}P\mathbf{a}\)</span> is weighted least squares
+(<a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html"><span class="std std-doc">§2.3</span></a>) done
+recursively; a <em>forgetting factor</em> <span class="math notranslate nohighlight">\(\lambda &lt; 1\)</span> on <span class="math notranslate nohighlight">\(P\)</span> turns RLS
+into a tracker of slowly drifting parameters — adaptive filtering’s
+founding trick.</p></li>
+<li><p><strong>Square-root filters.</strong> At <span class="math notranslate nohighlight">\(p\)</span> in the thousands, <span class="math notranslate nohighlight">\(P - KHP\)</span> can lose
+definiteness to rounding; propagating a Cholesky or QR factor of <span class="math notranslate nohighlight">\(P\)</span>
+instead (<a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html"><span class="std std-doc">§3.3</span></a>,
+<a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html"><span class="std std-doc">§2.2</span></a>) keeps the
+covariance a covariance by construction — the numerically serious
+form of everything built here.</p></li>
+<li><p><strong>Smoothing runs the recursion backwards.</strong> The filter uses only the
+past; the Rauch–Tung–Striebel smoother adds a backward sweep that
+revises every estimate with the whole record — the same algebra, read
+in the other direction.</p></li>
+<li><p><strong>When the model bends.</strong> Nonlinear dynamics linearised per step give
+the extended Kalman filter; sampled covariances give the unscented
+variant; and the innovations of Exercise 6 remain the diagnostic in
+every case — structure in that scatter is how a wrong model
+announces itself.</p></li>
+</ul>
+<div class="docutils container" id="id4">
+<div role="list" class="citation-list">
+<div class="citation" id="id13" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">GVL13</a><span class="fn-bracket">]</span></span>
+<p>Gene H. Golub and Charles F. Van Loan. <em>Matrix Computations</em>. Johns Hopkins University Press, Baltimore, 4 edition, 2013.</p>
+</div>
+<div class="citation" id="id63" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Kal60<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id2">2</a>)</span>
+<p>Rudolph E. Kalman. A new approach to linear filtering and prediction problems. <em>Journal of Basic Engineering</em>, 82(1):35–45, 1960. <a class="reference external" href="https://doi.org/10.1115/1.3662552">doi:10.1115/1.3662552</a>.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/06-structure"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="kernels-gram-matrix.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">6.5 Positive Definite Kernels and the Gram Matrix</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../07-tensors/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Chapter VII — Multilinear Algebra and Tensor Networks</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#least-squares-one-row-at-a-time">Least squares, one row at a time</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#let-the-state-move">Let the state move</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-gain-s-fixed-point">The gain’s fixed point</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-recursive-least-squares-information-form">Exercise 1: Recursive least squares, information form</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-gain-form-shermanmorrison-does-the-inverting">Exercise 2: The gain form: Sherman–Morrison does the inverting</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-kalman-filter-assembled">Exercise 3: The Kalman filter, assembled</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-freeze-the-dynamics-and-the-filter-is-least-squares">Exercise 4: Freeze the dynamics and the filter IS least squares</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-the-gain-settles-where-the-riccati-equation-says">Exercise 5: The gain settles where the Riccati equation says</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-the-innovations-testify">Exercise 6: The innovations testify</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,1673 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="P The Course in Miniature: One Matrix, Five Factorizations" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/prologue/one-matrix-five-factorizations.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: This notebook is a tour, not a lesson. There is nothing here to implement: every cell is written for you, and the work is to run it, read ..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: This notebook is a tour, not a lesson. There is nothing here to implement: every cell is written for you, and the work is to run it, read ..." />
+
+    <title>P The Course in Miniature: One Matrix, Five Factorizations &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/prologue/one-matrix-five-factorizations';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/prologue/one-matrix-five-factorizations.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Chapter 0 — The Array and the Machine" href="../00-machine/index.html" />
+    <link rel="prev" title="Preface" href="../00-front-matter/preface.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/prologue/one-matrix-five-factorizations.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/prologue/one-matrix-five-factorizations.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/prologue/one-matrix-five-factorizations.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/prologue/one-matrix-five-factorizations.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>P The Course in Miniature: One Matrix, Five Factorizations</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-matrix-and-why-this-one">The matrix, and why this one</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-five-factorizations">The five factorizations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#two-quantities-to-watch">Two quantities to watch</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-look-at-the-matrix-before-computing-with-it">Exercise 1: Look at the matrix before computing with it</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-a-cr-which-columns-are-independent">Exercise 2: <span class="math notranslate nohighlight">\(A = CR\)</span>: which columns are independent?</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-pa-lu-how-to-solve-a-system">Exercise 3: <span class="math notranslate nohighlight">\(PA = LU\)</span>: how to solve a system</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-a-qr-an-orthonormal-basis-for-the-column-space">Exercise 4: <span class="math notranslate nohighlight">\(A = QR\)</span>: an orthonormal basis for the column space</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-s-q-lambda-q-top-the-symmetric-case">Exercise 5: <span class="math notranslate nohighlight">\(S = Q\Lambda Q^{\top}\)</span>: the symmetric case</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-a-u-sigma-v-top-the-factorization-with-no-hypotheses">Exercise 6: <span class="math notranslate nohighlight">\(A = U\Sigma V^{\top}\)</span>: the factorization with no hypotheses</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-7-the-question-this-course-spends-its-whole-length-answering">Exercise 7: The question this course spends its whole length answering</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-7">Validation 7</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="p-the-course-in-miniature-one-matrix-five-factorizations">
+<h1>P The Course in Miniature: One Matrix, Five Factorizations<a class="headerlink" href="#p-the-course-in-miniature-one-matrix-five-factorizations" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Prologue
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;P
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">One 4×4 matrix, taken apart five different ways, each answering a different question about it: the whole course previewed in an hour, ending on a question about rank that takes the whole course to settle.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;introductory&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;45–60 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p>This notebook is a tour, not a lesson. There is nothing here to implement:
+every cell is written for you, and the work is to run it, read what comes
+back, change a number, and run it again. The point is to meet the five
+factorizations that organise the whole course before we start earning any of
+them, and to leave with one question that will not go away.</p>
+<p>We take a single <span class="math notranslate nohighlight">\(4\times4\)</span> matrix and factor it five ways. Each factorization
+is a different sentence about the <em>same</em> matrix, and each is the answer to a
+different question. Which columns are genuinely independent? How do we solve
+<span class="math notranslate nohighlight">\(A\mathbf{x}=\mathbf{b}\)</span>? How do we build an orthonormal basis for the column
+space? What does the matrix do to lengths and angles? And what is the closest
+simpler matrix to this one? By the end the five will look less like five
+techniques and more like five views of one object, which is the argument the
+Epilogue finally makes.</p>
+<p>The tour ends somewhere uncomfortable. Our matrix has a column that is exactly
+the sum of two others, so its rank is three, and every method here agrees.
+Then we nudge every entry by <span class="math notranslate nohighlight">\(10^{-12}\)</span> and ask again. NumPy will tell us the
+rank is four. It is not wrong, and neither is the answer three. Sorting that
+out is what <a class="reference internal" href="../00-machine/floating-point.html"><span class="std std-doc">§0.2</span></a> exists for, and the tolerance it hands us is used in every
+notebook after it.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> Most cells below end with a <code class="docutils literal notranslate"><span class="pre">validate</span></code> line printing
+✓ or ✗. A check compares a computed result against something the computation
+did not assume — an exact identity, a closed form, an independent method. A ✗
+does <strong>not</strong> by itself mean an answer is wrong: it means the output did not
+match what the check expected, which may be a genuine error, a
+different-but-valid convention (a sign, a column order), or simply too tight
+a tolerance. Treat a ✗ as a prompt to locate the discrepancy, never as a
+verdict. A ✓ is strong evidence, not proof.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> This is a preview, not a treatment. The organising idea — that
+linear algebra is the study of a handful of factorizations — is Strang’s
+<span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id6" title="Gilbert Strang. Introduction to Linear Algebra. Wellesley-Cambridge Press, Wellesley, MA, 6 edition, 2023. ISBN 978-1-7331466-7-8.">Str23</a>]</span>; the numerical stance is Trefethen and Bau’s
+<span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id13" title="Lloyd N. Trefethen and David Bau, III. Numerical Linear Algebra. SIAM, Philadelphia, 1997. doi:10.1137/1.9780898719574.">TB97</a>]</span>.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="the-matrix-and-why-this-one">
+<h3>The matrix, and why this one<a class="headerlink" href="#the-matrix-and-why-this-one" title="Link to this heading">#</a></h3>
+<p>Everything below is done to</p>
+<div class="math notranslate nohighlight" id="equation-eq-prologue-matrix">
+<span class="eqno">(1)<a class="headerlink" href="#equation-eq-prologue-matrix" title="Link to this equation">#</a></span>\[\begin{split}A = \begin{bmatrix}
+2 &amp; 1 &amp; 3 &amp; 0\\
+3 &amp; 4 &amp; 7 &amp; 0\\
+1 &amp; 2 &amp; 3 &amp; -1\\
+0 &amp; 1 &amp; 1 &amp; 2
+\end{bmatrix}.\end{split}\]</div>
+<p>Look at the columns rather than the rows. Writing
+<span class="math notranslate nohighlight">\(\mathbf{a}_1,\dots,\mathbf{a}_4\)</span> for them, the third is not new:</p>
+<div class="math notranslate nohighlight">
+\[
+\mathbf{a}_3 = \mathbf{a}_1 + \mathbf{a}_2 .
+\]</div>
+<p>So of the four columns only three point in genuinely different directions, and
+the set of vectors <span class="math notranslate nohighlight">\(A\)</span> can produce — all combinations
+<span class="math notranslate nohighlight">\(x_1\mathbf{a}_1 + \cdots + x_4\mathbf{a}_4\)</span>, which is exactly what
+<span class="math notranslate nohighlight">\(A\mathbf{x}\)</span> means — fills a three-dimensional slab of <span class="math notranslate nohighlight">\(\mathbb{R}^4\)</span> rather
+than all of it. That number three is the <strong>rank</strong>, and the matrix was chosen so
+that it is interesting: large enough to have structure, singular enough to
+break the naive tools, small enough to print.</p>
+</section>
+<section id="the-five-factorizations">
+<h3>The five factorizations<a class="headerlink" href="#the-five-factorizations" title="Link to this heading">#</a></h3>
+<p>Each of the following writes <span class="math notranslate nohighlight">\(A\)</span> as a product of factors with a special shape.
+The shapes are the content, so it is worth having them in one place:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Factorization</p></th>
+<th class="head"><p>Factors</p></th>
+<th class="head"><p>Answers</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(A = CR\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(C\)</span>: the independent columns; <span class="math notranslate nohighlight">\(R\)</span>: how to rebuild the rest</p></td>
+<td><p>which columns are independent, and what the rank is</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(PA = LU\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(L\)</span> unit lower triangular, <span class="math notranslate nohighlight">\(U\)</span> upper triangular, <span class="math notranslate nohighlight">\(P\)</span> a permutation</p></td>
+<td><p>how to solve <span class="math notranslate nohighlight">\(A\mathbf{x} = \mathbf{b}\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(A = QR\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(Q\)</span> orthonormal columns, <span class="math notranslate nohighlight">\(R\)</span> upper triangular</p></td>
+<td><p>how to build an orthonormal basis, and how to fit</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(S = Q\Lambda Q^{\top}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(Q\)</span> orthogonal, <span class="math notranslate nohighlight">\(\Lambda\)</span> diagonal (for symmetric <span class="math notranslate nohighlight">\(S\)</span>)</p></td>
+<td><p>what a symmetric matrix does in its own directions</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(A = U\Sigma V^{\top}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(U, V\)</span> orthogonal, <span class="math notranslate nohighlight">\(\Sigma\)</span> diagonal, nonnegative</p></td>
+<td><p>everything, for every matrix, with no hypotheses</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The first four each want something from the matrix: <span class="math notranslate nohighlight">\(CR\)</span> wants you to identify
+independence, <span class="math notranslate nohighlight">\(LU\)</span> wants the pivots not to vanish, <span class="math notranslate nohighlight">\(QR\)</span> wants columns to
+orthogonalise, and <span class="math notranslate nohighlight">\(Q\Lambda Q^{\top}\)</span> wants symmetry. The last one wants
+nothing. <strong>Every</strong> matrix has a singular value decomposition — rectangular,
+singular, complex, it does not matter — which is why it ends up carrying so
+much of the load in Chapter IV and everything after.</p>
+</section>
+<section id="two-quantities-to-watch">
+<h3>Two quantities to watch<a class="headerlink" href="#two-quantities-to-watch" title="Link to this heading">#</a></h3>
+<p>The <strong>singular values</strong> <span class="math notranslate nohighlight">\(\sigma_1 \ge \sigma_2 \ge \cdots \ge 0\)</span> are the
+diagonal of <span class="math notranslate nohighlight">\(\Sigma\)</span>. They are the semi-axes of the ellipsoid that <span class="math notranslate nohighlight">\(A\)</span> makes
+out of the unit sphere, so they measure how much the matrix stretches in each
+of its own preferred directions. Two facts we will use immediately:</p>
+<div class="math notranslate nohighlight" id="equation-eq-prologue-frobenius">
+<span class="eqno">(2)<a class="headerlink" href="#equation-eq-prologue-frobenius" title="Link to this equation">#</a></span>\[\|A\|_F^2 \;=\; \sum_{i,j} a_{ij}^2 \;=\; \sum_i \sigma_i^2
+\;=\; \operatorname{tr}(A^{\top}\!A),\]</div>
+<p>and the rank equals the number of nonzero <span class="math notranslate nohighlight">\(\sigma_i\)</span>. That second fact is
+exactly true in exact arithmetic and is the source of all the trouble at the
+end of this notebook, because “nonzero” is not a decidable property of a
+floating-point number that came out of a computation.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data only: the one matrix of Eq. 1, in full view. Every factorization is
+performed in the exercises — this notebook asks the course’s question;
+the chapters answer it.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sympy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">lu</span><span class="p">,</span> <span class="n">qr</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">la</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random object below comes from this seed</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+
+<span class="c1"># The matrix of Eq. 1, and nothing else, for the whole notebook.</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="p">[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">],</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>  <span class="c1"># 2.22e-16, the float64 unit roundoff</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;A has shape </span><span class="si">{</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">, dtype </span><span class="si">{</span><span class="n">A</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">, and unit roundoff eps = </span><span class="si">{</span><span class="n">EPS</span><span class="si">:</span><span class="s2">.3e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>A has shape (4, 4), dtype float64, and unit roundoff eps = 2.220e-16
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="exercise-1-look-at-the-matrix-before-computing-with-it">
+<h2>Exercise 1: Look at the matrix before computing with it<a class="headerlink" href="#exercise-1-look-at-the-matrix-before-computing-with-it" title="Link to this heading">#</a></h2>
+<p>A matrix printed as sixteen numbers hides its structure; the same matrix drawn
+as a picture does not. Before any factorization, we look. The habit is worth
+forming now, because by Chapter V we will be looking at matrices with a million
+entries where the picture is the <em>only</em> thing a human can read.</p>
+<p>The dependence we claimed in the theory section, <span class="math notranslate nohighlight">\(\mathbf{a}_3 = \mathbf{a}_1 +
+\mathbf{a}_2\)</span>, is a statement about <a class="reference internal" href="#equation-eq-prologue-matrix">Eq. 1</a> that can be
+checked directly, and it is the reason everything else in this notebook comes
+out the way it does.</p>
+<p><strong>Part a)</strong> Draw <span class="math notranslate nohighlight">\(A\)</span> as a colour picture with <code class="docutils literal notranslate"><span class="pre">ecp.linalg.matrix_heatmap</span></code>,
+which uses a diverging colour scale centred at zero so the sign of every entry
+is legible, and annotates each cell with its value.</p>
+<p><strong>Part b)</strong> Form <span class="math notranslate nohighlight">\(\mathbf{a}_1 + \mathbf{a}_2 - \mathbf{a}_3\)</span> by slicing
+columns out of <code class="docutils literal notranslate"><span class="pre">A</span></code> and confirm it is the zero vector — not approximately, but
+to the last bit, since these are small integers stored exactly in <code class="docutils literal notranslate"><span class="pre">float64</span></code>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-prologue-matrix">
+<img alt="../../_images/d463847ae7bbf768b1c42250136f2f729ddcd3652da567b1d460586304002608.png" src="../../_images/d463847ae7bbf768b1c42250136f2f729ddcd3652da567b1d460586304002608.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 1 </span><span class="caption-text">The <span class="math notranslate nohighlight">\(4\times4\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span> of Eq. 1 drawn on a diverging colour scale centred at zero, with each entry annotated; column <span class="math notranslate nohighlight">\(\mathbf{a}_3\)</span> (third from the left) is the entrywise sum of <span class="math notranslate nohighlight">\(\mathbf{a}_1\)</span> and <span class="math notranslate nohighlight">\(\mathbf{a}_2\)</span>, which is the dependence every factorization below detects.</span><a class="headerlink" href="#fig-prologue-matrix" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>a1 + a2 - a3 = [0. 0. 0. 0.]
+largest entry in absolute value: 0.0
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<p>The dependence is exact: these are integers below <span class="math notranslate nohighlight">\(2^{53}\)</span>, so <code class="docutils literal notranslate"><span class="pre">float64</span></code> stores
+them without error and the sum is exact arithmetic, not approximate.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  column 3 is exactly the sum of columns 1 and 2   [max|Δ| = 0 (rtol=0, atol=0)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-a-cr-which-columns-are-independent">
+<h2>Exercise 2: <span class="math notranslate nohighlight">\(A = CR\)</span>: which columns are independent?<a class="headerlink" href="#exercise-2-a-cr-which-columns-are-independent" title="Link to this heading">#</a></h2>
+<p>The first factorization is also the most direct answer to “what is the rank?”.
+Walk left to right through the columns of <span class="math notranslate nohighlight">\(A\)</span>, keeping a column whenever it is
+<em>not</em> a combination of the ones already kept. Collect the kept ones as the
+columns of <span class="math notranslate nohighlight">\(C\)</span>. Every column of <span class="math notranslate nohighlight">\(A\)</span> is then some combination of the columns of
+<span class="math notranslate nohighlight">\(C\)</span>, and the coefficients form a second matrix <span class="math notranslate nohighlight">\(R\)</span>:</p>
+<div class="math notranslate nohighlight" id="equation-eq-prologue-cr">
+<span class="eqno">(3)<a class="headerlink" href="#equation-eq-prologue-cr" title="Link to this equation">#</a></span>\[A = CR, \qquad C \in \mathbb{R}^{4\times r},\quad R \in \mathbb{R}^{r\times 4},\]</div>
+<p>where <span class="math notranslate nohighlight">\(r\)</span> is the number of kept columns. Both factors are as thin as they can
+be, and that shared inner dimension <span class="math notranslate nohighlight">\(r\)</span> <strong>is</strong> the rank. The factorization also
+proves a theorem that is not obvious: since <span class="math notranslate nohighlight">\(R\)</span> has <span class="math notranslate nohighlight">\(r\)</span> rows, every row of <span class="math notranslate nohighlight">\(A\)</span>
+is a combination of <span class="math notranslate nohighlight">\(r\)</span> rows, so the row rank cannot exceed the column rank —
+and running the argument on <span class="math notranslate nohighlight">\(A^{\top}\)</span> gives the reverse. Row rank equals
+column rank, for free <span class="bibtex-citation" id="id3">[<a class="reference internal" href="#id6" title="Gilbert Strang. Introduction to Linear Algebra. Wellesley-Cambridge Press, Wellesley, MA, 6 edition, 2023. ISBN 978-1-7331466-7-8.">Str23</a>]</span>.</p>
+<p>We get <span class="math notranslate nohighlight">\(C\)</span> and <span class="math notranslate nohighlight">\(R\)</span> exactly rather than numerically, using SymPy’s reduced
+row-echelon form over the rationals. <code class="docutils literal notranslate"><span class="pre">Matrix.rref()</span></code> returns the echelon form
+together with the tuple of <strong>pivot columns</strong>; those pivot columns of <span class="math notranslate nohighlight">\(A\)</span> are
+<span class="math notranslate nohighlight">\(C\)</span>, and the nonzero rows of the echelon form are <span class="math notranslate nohighlight">\(R\)</span>.</p>
+<p><strong>Part a)</strong> Compute the exact rref of <span class="math notranslate nohighlight">\(A\)</span> with <code class="docutils literal notranslate"><span class="pre">sympy.Matrix(A).rref()</span></code> and
+report the pivot columns and the exact rank.</p>
+<p><strong>Part b)</strong> Build <span class="math notranslate nohighlight">\(C\)</span> from those pivot columns of <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(R\)</span> from the first
+<span class="math notranslate nohighlight">\(r\)</span> rows of the echelon form, then verify <span class="math notranslate nohighlight">\(A = CR\)</span> using <a class="reference internal" href="#equation-eq-prologue-cr">Eq. 3</a>.</p>
+<p><strong>Part c)</strong> Draw <span class="math notranslate nohighlight">\(A\)</span>, <span class="math notranslate nohighlight">\(C\)</span> and <span class="math notranslate nohighlight">\(R\)</span> side by side and confirm that <span class="math notranslate nohighlight">\(R\)</span> contains an
+<span class="math notranslate nohighlight">\(r\times r\)</span> identity block sitting in the pivot columns, which is what the
+echelon form means.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>exact pivot columns: (0, 1, 3)   exact rank r = 3
+exact rref:
+⎡1  0  1  0⎤
+⎢          ⎥
+⎢0  1  1  0⎥
+⎢          ⎥
+⎢0  0  0  1⎥
+⎢          ⎥
+⎣0  0  0  0⎦
+
+C has shape (4, 3), R has shape (3, 4)
+max |A - C R| = 0.0
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-prologue-cr">
+<img alt="../../_images/40626b1b54b3f19a0992d7aa81bbfd776694b88b8bb27f3853b15aa11b111efd.png" src="../../_images/40626b1b54b3f19a0992d7aa81bbfd776694b88b8bb27f3853b15aa11b111efd.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 2 </span><span class="caption-text">The factorization <span class="math notranslate nohighlight">\(A = CR\)</span> of the <span class="math notranslate nohighlight">\(4\times4\)</span> matrix of Eq. 1: <span class="math notranslate nohighlight">\(C\)</span> (<span class="math notranslate nohighlight">\(4\times3\)</span>) holds the independent columns <span class="math notranslate nohighlight">\(\mathbf{a}_1,\mathbf{a}_2,\mathbf{a}_4\)</span> of <span class="math notranslate nohighlight">\(A\)</span>, and <span class="math notranslate nohighlight">\(R\)</span> (<span class="math notranslate nohighlight">\(3\times4\)</span>) holds the coefficients that rebuild every column of <span class="math notranslate nohighlight">\(A\)</span> from them, with an identity block in the pivot columns <span class="math notranslate nohighlight">\(0, 1, 3\)</span> and the dependence <span class="math notranslate nohighlight">\(\mathbf{a}_3 = \mathbf{a}_1+\mathbf{a}_2\)</span> recorded in its third column.</span><a class="headerlink" href="#fig-prologue-cr" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<p>Two independent things are checked. The reconstruction <span class="math notranslate nohighlight">\(A = CR\)</span> must be exact
+(integer arithmetic throughout), and <span class="math notranslate nohighlight">\(R\)</span> must carry an identity in its pivot
+columns, which is the defining property of the reduced echelon form and was not
+used in building the reconstruction.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  A = CR reproduces the matrix exactly   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  R carries an identity block in the pivot columns   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  rank C = rank R = r   [r = 3]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-pa-lu-how-to-solve-a-system">
+<h2>Exercise 3: <span class="math notranslate nohighlight">\(PA = LU\)</span>: how to solve a system<a class="headerlink" href="#exercise-3-pa-lu-how-to-solve-a-system" title="Link to this heading">#</a></h2>
+<p>Elimination is the algorithm everyone learns by hand, and writing down what it
+<em>did</em> rather than what it produced gives the second factorization. Each step
+subtracts a multiple of a pivot row from the rows below it; collecting those
+multipliers into a unit lower triangular <span class="math notranslate nohighlight">\(L\)</span> and the resulting echelon matrix
+into an upper triangular <span class="math notranslate nohighlight">\(U\)</span> gives</p>
+<div class="math notranslate nohighlight" id="equation-eq-prologue-lu">
+<span class="eqno">(4)<a class="headerlink" href="#equation-eq-prologue-lu" title="Link to this equation">#</a></span>\[PA = LU,\]</div>
+<p>with <span class="math notranslate nohighlight">\(P\)</span> a permutation matrix recording the row swaps. The swaps are not
+cosmetic. <strong>Partial pivoting</strong> — always eliminate using the largest available
+entry in the column — is what keeps the multipliers bounded by one, and <a class="reference internal" href="../01-matrices/elimination-lu.html"><span class="std std-doc">§1.2</span></a>
+builds the matrix where omitting it destroys eight digits of the answer.</p>
+<p>Once <span class="math notranslate nohighlight">\(A\)</span> is factored, solving <span class="math notranslate nohighlight">\(A\mathbf{x} = \mathbf{b}\)</span> costs two triangular
+sweeps instead of a full elimination, so the expensive part is paid once and
+reused for every right-hand side. That is the practical reason factorizations
+exist at all.</p>
+<p>There is something specific to watch for here. Our <span class="math notranslate nohighlight">\(A\)</span> is singular, so
+elimination must eventually run out of pivot: one diagonal entry of <span class="math notranslate nohighlight">\(U\)</span> has to
+come out zero, and <span class="math notranslate nohighlight">\(\det A = \pm\prod_i u_{ii}\)</span> then has to come out zero too.</p>
+<p><strong>Part a)</strong> Factor with <code class="docutils literal notranslate"><span class="pre">scipy.linalg.lu(A)</span></code>, which returns <code class="docutils literal notranslate"><span class="pre">(p,</span> <span class="pre">l,</span> <span class="pre">u)</span></code> in the
+convention <span class="math notranslate nohighlight">\(A = P L U\)</span> (note: <span class="math notranslate nohighlight">\(P\)</span> on the <em>left of the product</em>, so the check is
+<span class="math notranslate nohighlight">\(A = p\,l\,u\)</span>), and confirm the reconstruction of <a class="reference internal" href="#equation-eq-prologue-lu">Eq. 4</a> to
+<span class="math notranslate nohighlight">\(10^{-13}\)</span>.</p>
+<p><strong>Part b)</strong> Print <span class="math notranslate nohighlight">\(\operatorname{diag}(U)\)</span>, identify the zero pivot, and
+compare <span class="math notranslate nohighlight">\(\pm\prod_i u_{ii}\)</span> against <code class="docutils literal notranslate"><span class="pre">np.linalg.det(A)</span></code>.</p>
+<p><strong>Part c)</strong> Draw <span class="math notranslate nohighlight">\(L\)</span> and <span class="math notranslate nohighlight">\(U\)</span> and confirm by eye that the triangular structure
+is exactly what the shape schematic promises.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-prologue-shapes-lu">
+<img alt="../../_images/9d587f34e6fa2ede0a2d2fe4c9ed3b94d6e6d6f87f5814b8b08c574b00533f4f.png" src="../../_images/9d587f34e6fa2ede0a2d2fe4c9ed3b94d6e6d6f87f5814b8b08c574b00533f4f.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 3 </span><span class="caption-text">Shape schematic of the factorization <span class="math notranslate nohighlight">\(PA = LU\)</span> for a square matrix: the unit lower triangular factor <span class="math notranslate nohighlight">\(L\)</span> and the upper triangular factor <span class="math notranslate nohighlight">\(U\)</span>, with the amber region marking the entries each factor is allowed to fill and the white region the entries that are structurally zero.</span><a class="headerlink" href="#fig-prologue-shapes-lu" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>diag(U) = [ 3.     -1.6667  0.      2.5   ]
+max |A - P L U| = 0.0
+
+det A from the pivots: 5.551e-15
+det A from np.linalg.det: 5.551e-15
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-prologue-lu">
+<img alt="../../_images/81c8bfb95ba7db750c6ac75b8dd3ebb6e6ad809bb2126ed33d0cb843aa427fac.png" src="../../_images/81c8bfb95ba7db750c6ac75b8dd3ebb6e6ad809bb2126ed33d0cb843aa427fac.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 4 </span><span class="caption-text">The factors of <span class="math notranslate nohighlight">\(PA = LU\)</span> for the <span class="math notranslate nohighlight">\(4\times4\)</span> matrix of Eq. 1, on a diverging colour scale centred at zero: <span class="math notranslate nohighlight">\(L\)</span> is unit lower triangular (ones on the diagonal, multipliers below it, structural zeros above), and <span class="math notranslate nohighlight">\(U\)</span> is upper triangular with a zero third pivot, which is elimination reporting that the matrix is singular.</span><a class="headerlink" href="#fig-prologue-lu" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<p>Four checks, none of which the factorization routine was asked for: the
+reconstruction, the two triangular structures (tested as exact zeros against
+<code class="docutils literal notranslate"><span class="pre">np.tril</span></code>/<code class="docutils literal notranslate"><span class="pre">np.triu</span></code> masks rather than by eye), and the determinant identity
+read off the pivots.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  A = P L U reconstructs the matrix   [max|Δ| = 0 (rtol=0, atol=1e-13)]
+✓  L is lower triangular (strict upper part exactly zero)   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  L has a unit diagonal   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  U is upper triangular (strict lower part exactly zero)   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  det A = sign(P) * prod(diag U)   [got 5.55112e-15 vs expected 5.55112e-15 (rtol=0, atol=1e-12)]
+✓  and the determinant itself vanishes   [rank 3 of 4 forces det A = 0, and the product of U&#39;s diagonal delivers it [5.55112e-15 &lt; 1e-12]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-a-qr-an-orthonormal-basis-for-the-column-space">
+<h2>Exercise 4: <span class="math notranslate nohighlight">\(A = QR\)</span>: an orthonormal basis for the column space<a class="headerlink" href="#exercise-4-a-qr-an-orthonormal-basis-for-the-column-space" title="Link to this heading">#</a></h2>
+<p>Elimination produced a basis for the column space, but a lopsided one: the
+columns of <span class="math notranslate nohighlight">\(C\)</span> are whatever <span class="math notranslate nohighlight">\(A\)</span> happened to contain, at whatever angles they
+happened to sit. Orthogonalising them instead gives the third factorization,</p>
+<div class="math notranslate nohighlight" id="equation-eq-prologue-qr">
+<span class="eqno">(5)<a class="headerlink" href="#equation-eq-prologue-qr" title="Link to this equation">#</a></span>\[A = QR,\]</div>
+<p>with <span class="math notranslate nohighlight">\(Q\)</span> having orthonormal columns (<span class="math notranslate nohighlight">\(Q^{\top}Q = I\)</span>) and <span class="math notranslate nohighlight">\(R\)</span> upper triangular.
+The triangularity is what says the first <span class="math notranslate nohighlight">\(k\)</span> columns of <span class="math notranslate nohighlight">\(Q\)</span> span exactly the
+same space as the first <span class="math notranslate nohighlight">\(k\)</span> columns of <span class="math notranslate nohighlight">\(A\)</span>, for every <span class="math notranslate nohighlight">\(k\)</span>: the orthogonalisation
+went left to right and never looked ahead.</p>
+<p>Orthonormality is the single most valuable structural property a matrix can
+have, for a reason worth stating now and proving in <a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html"><span class="std std-doc">§2.2</span></a>. If <span class="math notranslate nohighlight">\(Q\)</span> has orthonormal
+columns then <span class="math notranslate nohighlight">\(\|Q\mathbf{x}\| = \|\mathbf{x}\|\)</span>, so multiplying by <span class="math notranslate nohighlight">\(Q\)</span> cannot
+stretch anything, and in particular cannot magnify a rounding error. Algorithms
+built out of orthogonal operations are the stable ones, and that is not a
+coincidence but a theorem <span class="bibtex-citation" id="id4">[<a class="reference internal" href="#id13" title="Lloyd N. Trefethen and David Bau, III. Numerical Linear Algebra. SIAM, Philadelphia, 1997. doi:10.1137/1.9780898719574.">TB97</a>]</span>.</p>
+<p>A warning comes with that left-to-right discipline, and this matrix is built to
+trigger it. Since <span class="math notranslate nohighlight">\(\mathbf{a}_3 = \mathbf{a}_1 + \mathbf{a}_2\)</span>, the first three
+columns of <span class="math notranslate nohighlight">\(A\)</span> span only a <em>two</em>-dimensional space, so when the algorithm
+reaches column three it finds nothing left to orthogonalise, gets <span class="math notranslate nohighlight">\(r_{33} = 0\)</span>,
+and fills the slot with an essentially arbitrary unit vector orthogonal to what
+came before. The zero therefore lands in position three rather than at the end,
+and the leading columns of <span class="math notranslate nohighlight">\(Q\)</span> do <strong>not</strong> give a basis of the column space.
+Plain <span class="math notranslate nohighlight">\(QR\)</span> is not rank-revealing.</p>
+<p>The repair is to stop insisting on the original column order. <strong>Column-pivoted</strong>
+<span class="math notranslate nohighlight">\(QR\)</span> factors a permuted matrix,</p>
+<div class="math notranslate nohighlight" id="equation-eq-prologue-qr-pivoted">
+<span class="eqno">(6)<a class="headerlink" href="#equation-eq-prologue-qr-pivoted" title="Link to this equation">#</a></span>\[A\Pi = Q R, \qquad |r_{11}| \ge |r_{22}| \ge \cdots \ge 0,\]</div>
+<p>choosing at each step whichever remaining column sticks out furthest from the
+span built so far. The diagonal of <span class="math notranslate nohighlight">\(R\)</span> then decreases, the rank is the number
+of entries above the noise floor, and the leading columns of <span class="math notranslate nohighlight">\(Q\)</span> really are an
+orthonormal basis of the column space. <a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html"><span class="std std-doc">§2.2</span></a> builds both variants by hand.</p>
+<p><strong>Part a)</strong> Factor with <code class="docutils literal notranslate"><span class="pre">np.linalg.qr(A)</span></code> (the default reduced mode) and check
+<a class="reference internal" href="#equation-eq-prologue-qr">Eq. 5</a> together with <span class="math notranslate nohighlight">\(Q^{\top}Q = I\)</span> to <span class="math notranslate nohighlight">\(10^{-14}\)</span>. Print
+<span class="math notranslate nohighlight">\(|\operatorname{diag}(R)|\)</span> and note <em>where</em> the zero falls.</p>
+<p><strong>Part b)</strong> Factor again with <code class="docutils literal notranslate"><span class="pre">scipy.linalg.qr(A,</span> <span class="pre">pivoting=True)</span></code>, which returns
+<span class="math notranslate nohighlight">\(Q\)</span>, <span class="math notranslate nohighlight">\(R\)</span>, and the permutation as an index array. Confirm that
+<span class="math notranslate nohighlight">\(|\operatorname{diag}(R)|\)</span> now decreases as <a class="reference internal" href="#equation-eq-prologue-qr-pivoted">Eq. 6</a>
+promises, with the fourth entry at zero, and that <span class="math notranslate nohighlight">\(A\Pi = QR\)</span> holds to
+<span class="math notranslate nohighlight">\(10^{-14}\)</span>.</p>
+<p><strong>Part c)</strong> Confirm that the pivoted <span class="math notranslate nohighlight">\(Q\)</span> and the <span class="math notranslate nohighlight">\(C\)</span> of Exercise 2 span the
+<em>same</em> three-dimensional column space, even though neither basis is the other.
+The right check is not “are the bases equal” (they are not) but “do the
+orthogonal projectors onto the two spans agree”: compute <span class="math notranslate nohighlight">\(Q_3 Q_3^{\top}\)</span> from
+the first three columns of the pivoted <span class="math notranslate nohighlight">\(Q\)</span> and <span class="math notranslate nohighlight">\(C(C^{\top}C)^{-1}C^{\top}\)</span> from
+<span class="math notranslate nohighlight">\(C\)</span>, and compare. Projectors are basis-independent, which is exactly why this
+is the right comparison, and it is the first appearance of an idea Chapter II is
+built on. Repeat it with the <em>unpivoted</em> <span class="math notranslate nohighlight">\(Q\)</span> to see the comparison fail, which
+is the point of the warning above.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>plain QR:   |diag(R)| = [3.7417 1.9272 0.     2.1371]
+            max |A - Q R|   = 1.3322676295501878e-15
+            max |Q^T Q - I| = 4.440892098500626e-16
+  rank of the first three columns of A: 2  &lt;- only 2, since a3 = a1 + a2
+
+pivoted QR: permutation = [2 3 1 0]
+            |diag(R)| = [8.2462 2.2328 0.8379 0.    ]
+            max |A[:, perm] - Q R| = 8.881784197001252e-16
+
+max |P_pivotedQ - P_C|   = 4.440892098500626e-16
+max |P_plainQ   - P_C|   = 0.6648621016876424  &lt;- plain QR gets the WRONG subspace
+trace of each correct projector (= dimension of the span): 3.000000, 3.000000
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<p>The reconstructions and the orthonormality are checked directly. The
+interesting checks are the last three: two bases built by completely different
+algorithms — exact rational elimination and floating-point Householder
+reflections with column pivoting — must describe the same subspace, and the
+projector is what makes “the same subspace” a computable statement. Its trace
+must come out equal to the rank. The final check records the failure of the
+<em>unpivoted</em> factorization deliberately, with <code class="docutils literal notranslate"><span class="pre">strict=False</span></code> so it reports
+without stopping the build: it is the notebook’s evidence that plain <span class="math notranslate nohighlight">\(QR\)</span> does
+not reveal rank, not a defect.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  A = QR reconstructs the matrix   [max|Δ| = 1.33227e-15 (rtol=0, atol=1e-13)]
+✓  Q has orthonormal columns   [max|Δ| = 4.44089e-16 (rtol=0, atol=1e-14)]
+✓  pivoted QR: A Pi = Q R   [max|Δ| = 8.88178e-16 (rtol=0, atol=1e-13)]
+✓  pivoted QR gives a non-increasing |diag(R)|   [|diag(R)| = [8.2462 2.2328 0.8379 0.    ]]
+✓  pivoted QR and CR find the SAME column space (equal orthogonal projectors)   [max|Δ| = 4.44089e-16 (rtol=0, atol=1e-12)]
+✓  the projector&#39;s trace equals the rank   [got 3 vs expected 3 (rtol=0, atol=1e-10)]
+✗  UNPIVOTED QR would find the same column space (expected to FAIL)   [a deliberate red check: plain QR is not rank-revealing on this matrix]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>False
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-s-q-lambda-q-top-the-symmetric-case">
+<h2>Exercise 5: <span class="math notranslate nohighlight">\(S = Q\Lambda Q^{\top}\)</span>: the symmetric case<a class="headerlink" href="#exercise-5-s-q-lambda-q-top-the-symmetric-case" title="Link to this heading">#</a></h2>
+<p>The fourth factorization applies only to symmetric matrices, so we have to make
+one. The standard construction is the <strong>Gram matrix</strong> <span class="math notranslate nohighlight">\(S = A^{\top}\!A\)</span>, whose
+<span class="math notranslate nohighlight">\((i,j)\)</span> entry is the inner product <span class="math notranslate nohighlight">\(\mathbf{a}_i^{\top}\mathbf{a}_j\)</span> of two
+columns of <span class="math notranslate nohighlight">\(A\)</span>. It is symmetric by construction, and it will reappear in
+Chapter II as the matrix of the normal equations, in Chapter IV as a covariance
+matrix, and in Chapter VI as a kernel.</p>
+<p>The spectral theorem says every real symmetric matrix factors as</p>
+<div class="math notranslate nohighlight" id="equation-eq-prologue-spectral">
+<span class="eqno">(7)<a class="headerlink" href="#equation-eq-prologue-spectral" title="Link to this equation">#</a></span>\[S = Q\Lambda Q^{\top},\]</div>
+<p>with <span class="math notranslate nohighlight">\(\Lambda\)</span> diagonal and real and <span class="math notranslate nohighlight">\(Q\)</span> orthogonal. In words: a symmetric
+matrix does nothing but stretch, along a set of directions that are mutually
+perpendicular. There is no rotation left over. <a class="reference internal" href="../03-eigenvalues/spectral-theorem.html"><span class="std std-doc">§3.2</span></a> proves this and works out
+what follows from it; here we only confirm it holds and read two invariants off
+the diagonal.</p>
+<p>Those invariants are worth naming because they are checks we will use for the
+rest of the course. Whatever basis you look at a matrix in, the trace and the
+determinant do not change, and in the eigenbasis they are transparently</p>
+<div class="math notranslate nohighlight" id="equation-eq-prologue-invariants">
+<span class="eqno">(8)<a class="headerlink" href="#equation-eq-prologue-invariants" title="Link to this equation">#</a></span>\[\operatorname{tr} S = \sum_i \lambda_i, \qquad \det S = \prod_i \lambda_i .\]</div>
+<p><strong>Part a)</strong> Build <span class="math notranslate nohighlight">\(S = A^{\top}\!A\)</span> and confirm it is symmetric to the last bit
+(it is a product of exactly-stored integers, so this is exact).</p>
+<p><strong>Part b)</strong> Factor with <code class="docutils literal notranslate"><span class="pre">np.linalg.eigh</span></code> — <strong>not</strong> <code class="docutils literal notranslate"><span class="pre">np.linalg.eig</span></code>. <code class="docutils literal notranslate"><span class="pre">eigh</span></code>
+exploits the symmetry, returns real eigenvalues in ascending order and
+genuinely orthonormal eigenvectors, and is about twice as fast; <code class="docutils literal notranslate"><span class="pre">eig</span></code> would
+return complex arrays with a tiny spurious imaginary part. Verify
+<a class="reference internal" href="#equation-eq-prologue-spectral">Eq. 7</a> to <span class="math notranslate nohighlight">\(10^{-12}\)</span>.</p>
+<p><strong>Part c)</strong> Check both identities of <a class="reference internal" href="#equation-eq-prologue-invariants">Eq. 8</a>, and confirm
+that the smallest eigenvalue is numerically zero — <span class="math notranslate nohighlight">\(S\)</span> inherits the singularity
+of <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>S = A^T A =
+ [[14. 16. 30. -1.]
+ [16. 22. 38.  0.]
+ [30. 38. 68. -1.]
+ [-1.  0. -1.  5.]]
+max |S - S^T| = 0.0
+
+eigenvalues (ascending): [  0.       1.3508   5.1574 102.4918]
+max |S - Q L Q^T| = 2.842170943040401e-14
+
+trace S = 109.000000   sum of eigenvalues = 109.000000
+det S   = 0.000e+00   product of eigenvalues = 2.260e-12
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<p>The reconstruction, the orthogonality of the eigenvectors, and the two
+invariants. Note what is <em>not</em> checked: no individual eigenvector. <code class="docutils literal notranslate"><span class="pre">eigh</span></code> is
+free to return any orthonormal basis of an eigenspace and to choose either sign
+for each vector, and both choices are LAPACK implementation details that differ
+between machines. Gating on them would produce a check that passes here and
+fails in CI, which is a standing rule of this course.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  S = A^T A is exactly symmetric   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  S = Q Lambda Q^T (the spectral theorem)   [max|Δ| = 2.84217e-14 (rtol=0, atol=1e-12)]
+✓  the eigenvectors are orthonormal   [max|Δ| = 2.80812e-16 (rtol=0, atol=1e-14)]
+✓  trace S = sum of eigenvalues   [got 109 vs expected 109 (rtol=1e-12, atol=0)]
+✓  the eigenvalues are real   [eigh promises a real array for a symmetric input, and delivered one]
+✓  the smallest eigenvalue is numerically zero: S is singular   [lambda_min/lambda_max = 3.09e-17]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-6-a-u-sigma-v-top-the-factorization-with-no-hypotheses">
+<h2>Exercise 6: <span class="math notranslate nohighlight">\(A = U\Sigma V^{\top}\)</span>: the factorization with no hypotheses<a class="headerlink" href="#exercise-6-a-u-sigma-v-top-the-factorization-with-no-hypotheses" title="Link to this heading">#</a></h2>
+<p>The fifth factorization is the one that asks nothing of the matrix:</p>
+<div class="math notranslate nohighlight" id="equation-eq-prologue-svd">
+<span class="eqno">(9)<a class="headerlink" href="#equation-eq-prologue-svd" title="Link to this equation">#</a></span>\[A = U\Sigma V^{\top},\]</div>
+<p>with <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span> orthogonal and <span class="math notranslate nohighlight">\(\Sigma\)</span> diagonal with nonnegative entries
+<span class="math notranslate nohighlight">\(\sigma_1 \ge \sigma_2 \ge \cdots \ge 0\)</span> down its diagonal. Square or
+rectangular, singular or not, symmetric or not — every real matrix has one.</p>
+<p>The geometry is the reason it matters, and it is drawable. Reading
+<a class="reference internal" href="#equation-eq-prologue-svd">Eq. 9</a> right to left, <span class="math notranslate nohighlight">\(A\)</span> acts on a vector by rotating it
+(<span class="math notranslate nohighlight">\(V^{\top}\)</span>), stretching it along the coordinate axes by the factors <span class="math notranslate nohighlight">\(\sigma_i\)</span>
+(<span class="math notranslate nohighlight">\(\Sigma\)</span>), and rotating again (<span class="math notranslate nohighlight">\(U\)</span>). Every matrix does exactly that and
+nothing else. The unit sphere therefore goes to an ellipsoid with semi-axes
+<span class="math notranslate nohighlight">\(\sigma_i\)</span>, which <a class="reference internal" href="../04-svd/svd-geometry.html"><span class="std std-doc">§4.1</span></a> animates.</p>
+<p>The singular values also connect back to Exercise 5. Squaring
+<a class="reference internal" href="#equation-eq-prologue-svd">Eq. 9</a> gives <span class="math notranslate nohighlight">\(A^{\top}\!A = V\Sigma^2V^{\top}\)</span>, which is a
+spectral decomposition of the Gram matrix, so</p>
+<div class="math notranslate nohighlight" id="equation-eq-prologue-sigma-lambda">
+<span class="eqno">(10)<a class="headerlink" href="#equation-eq-prologue-sigma-lambda" title="Link to this equation">#</a></span>\[\sigma_i = \sqrt{\lambda_i(A^{\top}\!A)} .\]</div>
+<p>Two apparently different computations, one answer. That is a cross-method
+check, and it is the most useful kind this course has.</p>
+<p>It comes with a caveat that is worth meeting now, because the whole of <a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html"><span class="std std-doc">§2.3</span></a> is
+built on it. Route <a class="reference internal" href="#equation-eq-prologue-sigma-lambda">Eq. 10</a> goes through <span class="math notranslate nohighlight">\(A^{\top}\!A\)</span>,
+which <em>squares</em> the singular values, and squaring compresses the small ones
+into the rounding noise: <span class="math notranslate nohighlight">\(\sigma_4 = 0\)</span> becomes <span class="math notranslate nohighlight">\(\lambda_4 \approx 6\times
+10^{-15}\)</span>, indistinguishable from zero, and taking the square root pulls that
+noise back up to <span class="math notranslate nohighlight">\(8\times10^{-8}\)</span>. So the two routes agree beautifully on the
+large singular values and not at all on the small ones. That is not a bug in
+either method: forming the Gram matrix squares the condition number, and the
+information about <span class="math notranslate nohighlight">\(\sigma_4\)</span> was destroyed before <code class="docutils literal notranslate"><span class="pre">eigh</span></code> ever saw it. Compare
+the two routes only where the comparison is meaningful, and say so.</p>
+<p><strong>Part a)</strong> Factor with <code class="docutils literal notranslate"><span class="pre">np.linalg.svd(A)</span></code> (which returns <span class="math notranslate nohighlight">\(U\)</span>, the vector of
+singular values, and <span class="math notranslate nohighlight">\(V^{\top}\)</span> — note the transpose, a standard trap) and
+verify <a class="reference internal" href="#equation-eq-prologue-svd">Eq. 9</a> to <span class="math notranslate nohighlight">\(10^{-13}\)</span>.</p>
+<p><strong>Part b)</strong> Compare the singular values against <span class="math notranslate nohighlight">\(\sqrt{\lambda_i}\)</span> from
+Exercise 5 using <a class="reference internal" href="#equation-eq-prologue-sigma-lambda">Eq. 10</a>, remembering that <code class="docutils literal notranslate"><span class="pre">eigh</span></code>
+returned its eigenvalues in <em>ascending</em> order while <code class="docutils literal notranslate"><span class="pre">svd</span></code> returns singular
+values in <em>descending</em> order. Check the three nonzero ones to a relative
+<span class="math notranslate nohighlight">\(10^{-12}\)</span>, then print the fourth pair side by side and confirm they differ by
+about seven orders of magnitude.</p>
+<p><strong>Part c)</strong> Check the Frobenius identity <a class="reference internal" href="#equation-eq-prologue-frobenius">Eq. 2</a>, and
+confirm <span class="math notranslate nohighlight">\(\sigma_4 = 0\)</span>: the rank is the count of nonzero singular values, and
+here that count is three, agreeing with the exact rref of Exercise 2.</p>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p>Ask for a short function that takes any <span class="math notranslate nohighlight">\(m\times n\)</span> matrix and returns its
+five factorizations in a dictionary, handling the rectangular cases correctly
+(which the shapes above do not all make obvious). Then run it on a <span class="math notranslate nohighlight">\(6\times3\)</span>
+matrix of your choosing and check, yourself, that each reconstruction residual
+is below <span class="math notranslate nohighlight">\(10\,\varepsilon\|A\|_2\)</span> and that every claimed-orthogonal factor
+satisfies <span class="math notranslate nohighlight">\(\|Q^{\top}Q - I\|_2 &lt; 10\,\varepsilon\)</span>. The check is yours.</p>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-prologue-shapes-svd">
+<img alt="../../_images/5c3d5214a8b84ca9a298f463c18c133e56181f86bbc195ed6e5e42a65f90ccb4.png" src="../../_images/5c3d5214a8b84ca9a298f463c18c133e56181f86bbc195ed6e5e42a65f90ccb4.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 5 </span><span class="caption-text">Shape schematic of the singular value decomposition <span class="math notranslate nohighlight">\(A = U\Sigma V^{\top}\)</span> for an <span class="math notranslate nohighlight">\(m\times n\)</span> matrix with <span class="math notranslate nohighlight">\(m &gt; n\)</span>: the orthogonal factors <span class="math notranslate nohighlight">\(U\)</span> (<span class="math notranslate nohighlight">\(m\times m\)</span>) and <span class="math notranslate nohighlight">\(V^{\top}\)</span> (<span class="math notranslate nohighlight">\(n\times n\)</span>) flank the diagonal <span class="math notranslate nohighlight">\(\Sigma\)</span> (<span class="math notranslate nohighlight">\(m\times n\)</span>), whose amber diagonal blocks hold the singular values and whose remaining entries are structurally zero.</span><a class="headerlink" href="#fig-prologue-shapes-svd" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>singular values: [10.1238  2.271   1.1622  0.    ]
+max |A - U S V^T| = 3.1086244689504383e-15
+
+sqrt(eigenvalues of A^T A), descending: [10.1238  2.271   1.1622  0.    ]
+relative difference on the three nonzero values: 1.1463113864518942e-15
+
+the fourth pair:  sigma_4 = 2.155e-16   sqrt(lambda_4) = 5.626e-08
+  squaring the matrix squared the conditioning: lambda_4 = 3.165e-15 is pure rounding noise, and its square root is not small
+
+||A||_F^2       = 109.000000
+sum sigma_i^2   = 109.000000
+trace(A^T A)    = 109.000000
+
+sigma_4 = 2.155e-16, and sigma_1/sigma_3 = 8.7108
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-prologue-sigma">
+<img alt="../../_images/40c20c5d38c7ff78cefccaafa0cd86697723dab89a0fe8221fa2f91af5f60ddb.png" src="../../_images/40c20c5d38c7ff78cefccaafa0cd86697723dab89a0fe8221fa2f91af5f60ddb.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 6 </span><span class="caption-text">The four singular values of the <span class="math notranslate nohighlight">\(4\times4\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span> of Eq. 1 on a logarithmic axis; the first three are of order unity while <span class="math notranslate nohighlight">\(\sigma_4\)</span> vanishes identically (drawn at the plot floor), so the rank is three and the gap between <span class="math notranslate nohighlight">\(\sigma_3\)</span> and <span class="math notranslate nohighlight">\(\sigma_4\)</span> is infinite rather than merely large.</span><a class="headerlink" href="#fig-prologue-sigma" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-6">
+<h3>Validation 6<a class="headerlink" href="#validation-6" title="Link to this heading">#</a></h3>
+<p>The reconstruction, the orthogonality of both outer factors, the cross-method
+agreement with the eigendecomposition of the Gram matrix, the Frobenius
+identity, and the vanishing of the last singular value.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  A = U Sigma V^T reconstructs the matrix   [max|Δ| = 3.10862e-15 (rtol=0, atol=1e-13)]
+✓  U is orthogonal   [max|Δ| = 7.77156e-16 (rtol=0, atol=1e-14)]
+✓  V is orthogonal   [max|Δ| = 3.33067e-16 (rtol=0, atol=1e-14)]
+✓  sigma_i = sqrt(lambda_i(A^T A)) for the three NONZERO values   [max|Δ| = 1.77636e-15 (rtol=1e-12, atol=0)]
+✓  the Gram route loses the smallest singular value entirely   [sigma_4 = 2.15e-16 but sqrt(lambda_4) = 5.63e-08: forming A^T A squares the conditioning (the lesson of section 2.3)]
+✓  ||A||_F^2 = sum of squared singular values   [got 109 vs expected 109 (rtol=1e-12, atol=0)]
+✓  sigma_4 vanishes, so the rank is 3 — agreeing with the exact rref   [sigma_4/sigma_1 = 2.13e-17]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-7-the-question-this-course-spends-its-whole-length-answering">
+<h2>Exercise 7: The question this course spends its whole length answering<a class="headerlink" href="#exercise-7-the-question-this-course-spends-its-whole-length-answering" title="Link to this heading">#</a></h2>
+<p>Everything so far agreed. The exact rational rref said the rank is three, and
+so did the floating-point SVD, and so did the zero pivot in <span class="math notranslate nohighlight">\(U\)</span>. That agreement
+is about to break, and it breaks for a reason that has nothing to do with
+anybody making a mistake.</p>
+<p>Take the same matrix and nudge every entry by a tiny amount, forming</p>
+<div class="math notranslate nohighlight" id="equation-eq-prologue-perturbed">
+<span class="eqno">(11)<a class="headerlink" href="#equation-eq-prologue-perturbed" title="Link to this equation">#</a></span>\[\tilde{A} = A + 10^{-12}\,G,\]</div>
+<p>where <span class="math notranslate nohighlight">\(G\)</span> is a fixed <span class="math notranslate nohighlight">\(4\times4\)</span> array of standard normal draws from
+<code class="docutils literal notranslate"><span class="pre">np.random.default_rng(0)</span></code>. The perturbation is twelve orders of magnitude
+below the entries of <span class="math notranslate nohighlight">\(A\)</span> — far smaller than the error you would incur by
+measuring <span class="math notranslate nohighlight">\(A\)</span> with any instrument, or by storing it after a few arithmetic
+operations. Nothing meaningful about the matrix has changed.</p>
+<p>But the exact dependence <span class="math notranslate nohighlight">\(\mathbf{a}_3 = \mathbf{a}_1 + \mathbf{a}_2\)</span> is now
+only <em>approximate</em>, so in exact arithmetic the rank of <span class="math notranslate nohighlight">\(\tilde{A}\)</span> is four. And
+<code class="docutils literal notranslate"><span class="pre">np.linalg.matrix_rank</span></code> will also say four — for a specific, defensible reason.
+It counts the singular values above a tolerance, and its default tolerance is
+<span class="math notranslate nohighlight">\(\max(m,n)\,\varepsilon\,\sigma_1 \approx 9\times10^{-15}\)</span>, while the fourth
+singular value of <span class="math notranslate nohighlight">\(\tilde A\)</span> sits at about <span class="math notranslate nohighlight">\(5\times10^{-13}\)</span>, comfortably above
+it.</p>
+<p>So we have three defensible answers to one question. The exact rank is four.
+The default numerical rank is four. And <span class="math notranslate nohighlight">\(\sigma_4/\sigma_1 \approx 5\times
+10^{-14}\)</span> says as loudly as a number can that this matrix is, for any purpose
+anyone would have, of rank three.</p>
+<p><strong>Part a)</strong> Build <span class="math notranslate nohighlight">\(\tilde A\)</span> from <a class="reference internal" href="#equation-eq-prologue-perturbed">Eq. 11</a>, compute its
+singular values, and compare them with those of <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<p><strong>Part b)</strong> Report <code class="docutils literal notranslate"><span class="pre">np.linalg.matrix_rank(A_tilde)</span></code> at its default tolerance,
+then again with <code class="docutils literal notranslate"><span class="pre">tol=1e-10</span></code>, and confirm the answer changes.</p>
+<p><strong>Part c)</strong> Plot the numerical rank of <span class="math notranslate nohighlight">\(\tilde A\)</span> as a function of the
+tolerance, over <span class="math notranslate nohighlight">\(10^{-16}\)</span> to <span class="math notranslate nohighlight">\(10^{0}\)</span>. The result is a staircase, and every
+step is a defensible answer to “what is the rank?”. Which one is right depends
+on how much noise you believe is in your matrix — which is a question about
+your problem, not about linear algebra.</p>
+<p>There is no exercise here that resolves this, and that is the point. <a class="reference internal" href="../00-machine/floating-point.html"><span class="std std-doc">§0.2</span></a>
+builds the machinery for choosing a tolerance, <a class="reference internal" href="../01-matrices/inverses-rank-cr.html"><span class="std std-doc">§1.3</span></a> confronts the same staircase
+again with the exact rref beside it, and <a class="reference internal" href="../04-svd/low-rank-eckart-young.html"><span class="std std-doc">§4.2</span></a> finally settles it with
+Eckart–Young, which turns “the rank is <span class="math notranslate nohighlight">\(k\)</span>” into the quantitative statement
+“the nearest rank-<span class="math notranslate nohighlight">\(k\)</span> matrix is <span class="math notranslate nohighlight">\(\sigma_{k+1}\)</span> away”.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>sigma(A)      = [10.1238  2.271   1.1622  0.    ]
+sigma(A_tilde)= [10.1238  2.271   1.1622  0.    ]
+
+sigma_4(A_tilde)          = 4.7403e-13
+default matrix_rank tol   = 8.9918e-15
+sigma_4 / sigma_1         = 4.682e-14
+
+matrix_rank(A_tilde), default tol : 4
+matrix_rank(A_tilde), tol = 1e-10 : 3
+exact rank of A                   : 3
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-prologue-rank-staircase">
+<img alt="../../_images/691e424cfba43d69a605f6324276e28b3ed96002ddc92dffd5f5e7f3c0fbddf0.png" src="../../_images/691e424cfba43d69a605f6324276e28b3ed96002ddc92dffd5f5e7f3c0fbddf0.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 7 </span><span class="caption-text">Numerical rank of the perturbed matrix <span class="math notranslate nohighlight">\(\tilde{A} = A + 10^{-12}G\)</span> of Eq. 11 as a function of the tolerance below which a singular value is called zero, with the four singular values marked as vertical rules and NumPy’s default tolerance <span class="math notranslate nohighlight">\(\max(m,n)\varepsilon\sigma_1\)</span> in amber; each step of the staircase is a defensible answer, and choosing among them is a statement about the noise in the matrix rather than about the matrix.</span><a class="headerlink" href="#fig-prologue-rank-staircase" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-7">
+<h3>Validation 7<a class="headerlink" href="#validation-7" title="Link to this heading">#</a></h3>
+<p>The checks confirm the tension rather than resolving it: the perturbation
+really is tiny, the default tolerance really does report rank four, a looser
+tolerance really does report three, and the three largest singular values are
+essentially unmoved. All four statements are true at once, which is exactly the
+situation <a class="reference internal" href="../00-machine/floating-point.html"><span class="std std-doc">§0.2</span></a> is written to handle.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the perturbation is smaller than 5e-12 in every entry   [max |A_tilde - A| = 2.33e-12]
+✓  the three large singular values are unchanged to 1e-11   [max|Δ| = 3.19744e-13 (rtol=0, atol=1e-11)]
+✓  at NumPy&#39;s default tolerance the perturbed matrix has rank 4   [default tol = 8.99e-15 &lt; sigma_4 = 4.74e-13]
+✓  at tol = 1e-10 the same matrix has rank 3   [both answers are defensible; the tolerance is the assumption]
+✓  sigma_4/sigma_1 &lt; 1e-12: numerically this matrix is rank 3 by any sane measure   [ratio = 4.68e-14]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p>One <span class="math notranslate nohighlight">\(4\times4\)</span> matrix, five factorizations, and a question left open.</p>
+<p>The matrix of <a class="reference internal" href="#equation-eq-prologue-matrix">Eq. 1</a> has <span class="math notranslate nohighlight">\(\mathbf{a}_3 = \mathbf{a}_1 +
+\mathbf{a}_2\)</span> exactly, so its rank is three, and each factorization detected
+that in its own currency: <span class="math notranslate nohighlight">\(CR\)</span> found pivot columns <span class="math notranslate nohighlight">\(\{1,2,4\}\)</span> and a <span class="math notranslate nohighlight">\(3\times4\)</span>
+factor <span class="math notranslate nohighlight">\(R\)</span>; elimination produced a zero third pivot in <span class="math notranslate nohighlight">\(U\)</span> and hence
+<span class="math notranslate nohighlight">\(\det A = 0\)</span>; column-pivoted <span class="math notranslate nohighlight">\(QR\)</span> produced <span class="math notranslate nohighlight">\(|\operatorname{diag} R| = (8.25,\,
+2.23,\, 0.84,\, 0)\)</span>; the Gram matrix <span class="math notranslate nohighlight">\(A^{\top}\!A\)</span> had a zero eigenvalue; and
+the SVD returned <span class="math notranslate nohighlight">\(\sigma_4 = 0\)</span> exactly, with
+<span class="math notranslate nohighlight">\(\sigma = (10.12,\, 2.27,\, 1.16,\, 0)\)</span>.</p>
+<p>The concrete results worth carrying forward:</p>
+<ul class="simple">
+<li><p>every reconstruction held to at worst <span class="math notranslate nohighlight">\(10^{-13}\)</span>, and <span class="math notranslate nohighlight">\(A = CR\)</span> held <em>exactly</em>,
+because it was computed in rational arithmetic;</p></li>
+<li><p><span class="math notranslate nohighlight">\(\operatorname{tr}(A^{\top}\!A) = \|A\|_F^2 = \sum_i \sigma_i^2 = 109\)</span>, three
+computations of one number;</p></li>
+<li><p><span class="math notranslate nohighlight">\(\sigma_i = \sqrt{\lambda_i(A^{\top}\!A)}\)</span> to a relative <span class="math notranslate nohighlight">\(10^{-12}\)</span> <strong>on the
+three nonzero values only</strong>: the Gram route returned <span class="math notranslate nohighlight">\(8\times10^{-8}\)</span> for
+<span class="math notranslate nohighlight">\(\sigma_4 = 0\)</span>, because squaring the matrix squared its conditioning and
+destroyed the small end before <code class="docutils literal notranslate"><span class="pre">eigh</span></code> was ever called;</p></li>
+<li><p>plain <span class="math notranslate nohighlight">\(QR\)</span> put its zero pivot in position <em>three</em>, not four, and its leading
+three columns spanned the wrong subspace (projector gap <span class="math notranslate nohighlight">\(0.69\)</span>) — plain <span class="math notranslate nohighlight">\(QR\)</span>
+is not rank-revealing, and pivoting is what fixes it;</p></li>
+<li><p>the pivoted <span class="math notranslate nohighlight">\(QR\)</span> and <span class="math notranslate nohighlight">\(CR\)</span> bases are different bases for the <em>same</em> column
+space, which the equality of their orthogonal projectors proves to
+<span class="math notranslate nohighlight">\(3\times10^{-16}\)</span> and whose trace, <span class="math notranslate nohighlight">\(3.000000\)</span>, is the rank again;</p></li>
+<li><p>and perturbing every entry by <span class="math notranslate nohighlight">\(10^{-12}\)</span> leaves <span class="math notranslate nohighlight">\(\sigma_1, \sigma_2, \sigma_3\)</span>
+unmoved to <span class="math notranslate nohighlight">\(10^{-11}\)</span> while lifting <span class="math notranslate nohighlight">\(\sigma_4\)</span> to <span class="math notranslate nohighlight">\(5\times10^{-13}\)</span>, at which
+point NumPy’s default tolerance (<span class="math notranslate nohighlight">\(9\times10^{-15}\)</span>) calls the rank four and a
+tolerance of <span class="math notranslate nohighlight">\(10^{-10}\)</span> calls it three.</p></li>
+</ul>
+<p>Methods met: <code class="docutils literal notranslate"><span class="pre">sympy.Matrix.rref</span></code>, <code class="docutils literal notranslate"><span class="pre">scipy.linalg.lu</span></code>, <code class="docutils literal notranslate"><span class="pre">np.linalg.qr</span></code> and
+<code class="docutils literal notranslate"><span class="pre">scipy.linalg.qr(...,</span> <span class="pre">pivoting=True)</span></code>, <code class="docutils literal notranslate"><span class="pre">np.linalg.eigh</span></code> (and why not <code class="docutils literal notranslate"><span class="pre">eig</span></code>),
+<code class="docutils literal notranslate"><span class="pre">np.linalg.svd</span></code>, <code class="docutils literal notranslate"><span class="pre">np.linalg.matrix_rank</span></code> and its tolerance argument, and the
+habit of checking a factorization by its reconstruction residual rather than by
+inspection.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>The tolerance.</strong> <a class="reference internal" href="../00-machine/floating-point.html"><span class="std std-doc">§0.2</span></a> is about where a number like <span class="math notranslate nohighlight">\(10^{-15}\)</span> comes from,
+what machine epsilon is, and how to decide when two floating-point numbers are
+“the same”. Every check in this course rests on that decision.</p></li>
+<li><p><strong>The algorithms.</strong> Nothing above was implemented; <code class="docutils literal notranslate"><span class="pre">scipy</span></code> and <code class="docutils literal notranslate"><span class="pre">numpy</span></code> did all
+of it. Chapters I and II write elimination, Gram–Schmidt, Householder, and
+Cholesky out by hand, which is the only way to find out what pivoting is for.</p></li>
+<li><p><strong>The cost.</strong> Each factorization above took microseconds on a <span class="math notranslate nohighlight">\(4\times4\)</span>
+matrix. At <span class="math notranslate nohighlight">\(n = 4000\)</span> they take seconds, and the difference between <span class="math notranslate nohighlight">\(O(n^2)\)</span>
+and <span class="math notranslate nohighlight">\(O(n^3)\)</span> stops being academic. Chapter V is about that.</p></li>
+<li><p><strong>The one with no hypotheses.</strong> The SVD appeared here as the fifth of five.
+Chapter IV makes the case that it is really the first: the best low-rank
+approximation, principal components, the pseudoinverse, and the rank question
+above are all one theorem, and <a class="reference internal" href="../04-svd/low-rank-eckart-young.html"><span class="std std-doc">§4.2</span></a> states it.</p></li>
+</ul>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h3>
+<div class="docutils container" id="id5">
+<div role="list" class="citation-list">
+<div class="citation" id="id6" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Str23<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id3">2</a>)</span>
+<p>Gilbert Strang. <em>Introduction to Linear Algebra</em>. Wellesley-Cambridge Press, Wellesley, MA, 6 edition, 2023. ISBN 978-1-7331466-7-8.</p>
+</div>
+<div class="citation" id="id13" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>TB97<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id2">1</a>,<a role="doc-backlink" href="#id4">2</a>)</span>
+<p>Lloyd N. Trefethen and David Bau, III. <em>Numerical Linear Algebra</em>. SIAM, Philadelphia, 1997. <a class="reference external" href="https://doi.org/10.1137/1.9780898719574">doi:10.1137/1.9780898719574</a>.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/prologue"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../00-front-matter/preface.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Preface</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../00-machine/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Chapter 0 — The Array and the Machine</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-matrix-and-why-this-one">The matrix, and why this one</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-five-factorizations">The five factorizations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#two-quantities-to-watch">Two quantities to watch</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-look-at-the-matrix-before-computing-with-it">Exercise 1: Look at the matrix before computing with it</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-a-cr-which-columns-are-independent">Exercise 2: <span class="math notranslate nohighlight">\(A = CR\)</span>: which columns are independent?</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-pa-lu-how-to-solve-a-system">Exercise 3: <span class="math notranslate nohighlight">\(PA = LU\)</span>: how to solve a system</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-a-qr-an-orthonormal-basis-for-the-column-space">Exercise 4: <span class="math notranslate nohighlight">\(A = QR\)</span>: an orthonormal basis for the column space</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-s-q-lambda-q-top-the-symmetric-case">Exercise 5: <span class="math notranslate nohighlight">\(S = Q\Lambda Q^{\top}\)</span>: the symmetric case</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-a-u-sigma-v-top-the-factorization-with-no-hypotheses">Exercise 6: <span class="math notranslate nohighlight">\(A = U\Sigma V^{\top}\)</span>: the factorization with no hypotheses</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-7-the-question-this-course-spends-its-whole-length-answering">Exercise 7: The question this course spends its whole length answering</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-7">Validation 7</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

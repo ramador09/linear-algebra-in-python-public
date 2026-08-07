@@ -1,0 +1,1782 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="3.3 Positive Definiteness, Quadratic Forms, and Cholesky" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/03-eigenvalues/positive-definite-cholesky.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: §3.2 gave symmetric matrices real eigenvalues. Requiring those eigenvalues to be positive is a small-sounding extra condition with disprop..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: §3.2 gave symmetric matrices real eigenvalues. Requiring those eigenvalues to be positive is a small-sounding extra condition with disprop..." />
+
+    <title>3.3 Positive Definiteness, Quadratic Forms, and Cholesky &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/03-eigenvalues/positive-definite-cholesky';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/03-eigenvalues/positive-definite-cholesky.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices" href="hermitian-unitary-normal.html" />
+    <link rel="prev" title="3.2 Symmetric Matrices and the Spectral Theorem" href="spectral-theorem.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter III — Eigenvalues and Spectral Theory</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/03-eigenvalues/positive-definite-cholesky.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/03-eigenvalues/positive-definite-cholesky.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/03-eigenvalues/positive-definite-cholesky.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/03-eigenvalues/positive-definite-cholesky.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>3.3 Positive Definiteness, Quadratic Forms, and Cholesky</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-definition">The definition</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#five-equivalent-tests">Five equivalent tests</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cholesky">Cholesky</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-energy-ellipse">The energy ellipse</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#congruence-and-sylvester-s-law-of-inertia">Congruence and Sylvester’s law of inertia</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gram-matrices-covariance-and-sampling">Gram matrices, covariance, and sampling</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-five-tests-one-property-and-two-of-them-unusable">Exercise 1: Five tests, one property, and two of them unusable</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-cholesky-and-why-it-needs-no-pivoting">Exercise 2: Cholesky, and why it needs no pivoting</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-energy-ellipse-and-what-the-axes-measure">Exercise 3: The energy ellipse, and what the axes measure</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-congruence-and-sylvester-s-law-of-inertia">Exercise 4: Congruence, and Sylvester’s law of inertia</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-every-gram-matrix-is-semidefinite-and-when-it-is-definite">Exercise 5: Every Gram matrix is semidefinite, and when it is definite</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-covariance-and-generating-correlated-randomness">Exercise 6: Covariance, and generating correlated randomness</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="positive-definiteness-quadratic-forms-and-cholesky">
+<h1>3.3 Positive Definiteness, Quadratic Forms, and Cholesky<a class="headerlink" href="#positive-definiteness-quadratic-forms-and-cholesky" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter III — Eigenvalues and Spectral Theory
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;3.3
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">Five conditions that are the same condition, the factorization that is twice as fast as LU and needs no pivoting, and the reason every covariance matrix and every kernel in the rest of this course is guaranteed to behave.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;advanced&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;105–135 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="spectral-theorem.html"><span class="std std-doc">§3.2</span></a> gave symmetric matrices real eigenvalues.
+Requiring those eigenvalues to be <em>positive</em> is a small-sounding extra
+condition with disproportionate consequences, and this notebook is about how
+many apparently unrelated statements turn out to be that one condition in
+disguise.</p>
+<p>A symmetric <span class="math notranslate nohighlight">\(A\)</span> is <strong>positive definite</strong> when <span class="math notranslate nohighlight">\(\mathbf{x}^{\top}\!A\mathbf{x} &gt; 0\)</span>
+for every <span class="math notranslate nohighlight">\(\mathbf{x} \ne \mathbf{0}\)</span>. Equivalently: all its eigenvalues are
+positive; all its leading principal minors are positive; it has a Cholesky
+factorization <span class="math notranslate nohighlight">\(A = LL^{\top}\)</span>; and it is <span class="math notranslate nohighlight">\(G^{\top}G\)</span> for some <span class="math notranslate nohighlight">\(G\)</span> with
+independent columns. Five tests, one property — and they are <em>not</em> equally
+useful in floating point, which is a distinction the notebook makes carefully.</p>
+<p>The geometry is the reason the definition is natural. The level set
+<span class="math notranslate nohighlight">\(\mathbf{x}^{\top}\!A\mathbf{x} = 1\)</span> is an <strong>ellipse</strong> exactly when <span class="math notranslate nohighlight">\(A\)</span> is
+positive definite, with semi-axes <span class="math notranslate nohighlight">\(1/\sqrt{\lambda_i}\)</span> along the eigenvectors;
+drop definiteness and it becomes a hyperbola or a pair of lines. So a positive
+definite matrix is one that defines a sensible notion of squared length, which
+is what makes it the right object for an energy, a covariance, or a kernel.</p>
+<p>The algorithm is <strong>Cholesky</strong>, and it is the best-behaved factorization in this
+course: half the cost of <span class="math notranslate nohighlight">\(LU\)</span>, no pivoting needed, no growth factor to worry
+about, and — usefully — it <em>fails</em> precisely when the matrix is not positive
+definite, which turns a factorization into a test. It also generates
+correlated random vectors in one line, which is how every Gaussian sample in
+the rest of this course is drawn.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> Strang <span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id7" title="Gilbert Strang. Introduction to Linear Algebra. Wellesley-Cambridge Press, Wellesley, MA, 6 edition, 2023. ISBN 978-1-7331466-7-8.">Str23</a>]</span> Chapter 6; Golub and Van Loan
+<span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id15" title="Gene H. Golub and Charles F. Van Loan. Matrix Computations. Johns Hopkins University Press, Baltimore, 4 edition, 2013.">GVL13</a>]</span> §4.2 for Cholesky and its error analysis; Horn and Johnson
+<span class="bibtex-citation" id="id3">[<a class="reference internal" href="#id13" title="Roger A. Horn and Charles R. Johnson. Matrix Analysis. Cambridge University Press, 2 edition, 2013. doi:10.1017/CBO9781139020411.">HJ13</a>]</span> Chapter 7 for the equivalences and Sylvester’s law; Higham
+<span class="bibtex-citation" id="id4">[<a class="reference internal" href="#id17" title="Nicholas J. Higham. Accuracy and Stability of Numerical Algorithms. SIAM, Philadelphia, 2 edition, 2002. doi:10.1137/1.9780898718027.">Hig02</a>]</span> Chapter 10 on why no pivoting is needed.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="the-definition">
+<h3>The definition<a class="headerlink" href="#the-definition" title="Link to this heading">#</a></h3>
+<p>A symmetric <span class="math notranslate nohighlight">\(A \in \mathbb{R}^{n\times n}\)</span> is <strong>positive definite</strong> if</p>
+<div class="math notranslate nohighlight" id="equation-eq-pd-definition">
+<span class="eqno">(159)<a class="headerlink" href="#equation-eq-pd-definition" title="Link to this equation">#</a></span>\[\mathbf{x}^{\top}\!A\mathbf{x} &gt; 0 \quad\text{for every } \mathbf{x} \ne \mathbf{0},\]</div>
+<p><strong>positive semidefinite</strong> if <span class="math notranslate nohighlight">\(\ge 0\)</span> is allowed, <strong>negative definite</strong> if the
+inequality reverses, and <strong>indefinite</strong> if
+<span class="math notranslate nohighlight">\(\mathbf{x}^{\top}\!A\mathbf{x}\)</span> takes both signs. The scalar
+<span class="math notranslate nohighlight">\(\mathbf{x}^{\top}\!A\mathbf{x}\)</span> is the <strong>quadratic form</strong>, and by
+<a class="reference internal" href="spectral-theorem.html"><span class="std std-doc">§3.2</span></a> it equals <span class="math notranslate nohighlight">\(\sum\lambda_ic_i^2\)</span> in eigenvector
+coordinates — so its sign is decided entirely by the signs of the eigenvalues.</p>
+</section>
+<section id="five-equivalent-tests">
+<h3>Five equivalent tests<a class="headerlink" href="#five-equivalent-tests" title="Link to this heading">#</a></h3>
+<p>For symmetric <span class="math notranslate nohighlight">\(A\)</span>, the following are equivalent:</p>
+<div class="math notranslate nohighlight" id="equation-eq-pd-tests">
+<span class="eqno">(160)<a class="headerlink" href="#equation-eq-pd-tests" title="Link to this equation">#</a></span>\[\begin{split}\begin{aligned}
+&amp;\text{(i)}   &amp;&amp; \mathbf{x}^{\top}\!A\mathbf{x} &gt; 0 \text{ for all } \mathbf{x}\ne\mathbf{0};\\
+&amp;\text{(ii)}  &amp;&amp; \lambda_i &gt; 0 \text{ for every } i;\\
+&amp;\text{(iii)} &amp;&amp; \det A_k &gt; 0 \text{ for } k = 1,\dots,n \quad(A_k \text{ the leading } k\times k \text{ block});\\
+&amp;\text{(iv)}  &amp;&amp; A = LL^{\top} \text{ for a lower triangular } L \text{ with positive diagonal};\\
+&amp;\text{(v)}   &amp;&amp; A = G^{\top}G \text{ for some } G \text{ with independent columns}.
+\end{aligned}\end{split}\]</div>
+<p>Test (iii) is <strong>Sylvester’s criterion</strong>, and it is the one that fails most
+instructively: it needs <em>leading</em> minors, and checking all <span class="math notranslate nohighlight">\(2^n - 1\)</span> principal
+minors is a different (also valid) criterion, while checking only <span class="math notranslate nohighlight">\(\det A &gt; 0\)</span>
+is no criterion at all — <span class="math notranslate nohighlight">\(\operatorname{diag}(-1,-1)\)</span> has determinant <span class="math notranslate nohighlight">\(+1\)</span>.</p>
+</section>
+<section id="cholesky">
+<h3>Cholesky<a class="headerlink" href="#cholesky" title="Link to this heading">#</a></h3>
+<p>The factorization in (iv) is</p>
+<div class="math notranslate nohighlight" id="equation-eq-pd-cholesky">
+<span class="eqno">(161)<a class="headerlink" href="#equation-eq-pd-cholesky" title="Link to this equation">#</a></span>\[A = LL^{\top},\]</div>
+<p>computed by the recurrence, for <span class="math notranslate nohighlight">\(j \le i\)</span>,</p>
+<div class="math notranslate nohighlight" id="equation-eq-pd-cholesky-alg">
+<span class="eqno">(162)<a class="headerlink" href="#equation-eq-pd-cholesky-alg" title="Link to this equation">#</a></span>\[\ell_{jj} = \sqrt{a_{jj} - \sum_{k&lt;j}\ell_{jk}^2},
+\qquad
+\ell_{ij} = \frac{1}{\ell_{jj}}\Bigl(a_{ij} - \sum_{k&lt;j}\ell_{ik}\ell_{jk}\Bigr) .\]</div>
+<p>It costs <span class="math notranslate nohighlight">\(n^3/3\)</span> flops, half of <span class="math notranslate nohighlight">\(LU\)</span>, because symmetry means only one triangle
+is touched. It needs <strong>no pivoting</strong>: the growth factor is exactly 1, since
+every <span class="math notranslate nohighlight">\(\ell_{jk}^2\)</span> in the first formula is subtracted from <span class="math notranslate nohighlight">\(a_{jj}\)</span> and the
+result must stay positive, which bounds every entry of <span class="math notranslate nohighlight">\(L\)</span> by <span class="math notranslate nohighlight">\(\sqrt{a_{jj}}\)</span>.
+That is a guarantee <span class="math notranslate nohighlight">\(LU\)</span> cannot make, as <a class="reference internal" href="../01-matrices/elimination-lu.html"><span class="std std-doc">§1.2</span></a>
+measured with Wilkinson’s matrix. And the square root under the radical goes
+negative exactly when <span class="math notranslate nohighlight">\(A\)</span> is not positive definite, so the algorithm doubles as
+the sharpest of the five tests.</p>
+</section>
+<section id="the-energy-ellipse">
+<h3>The energy ellipse<a class="headerlink" href="#the-energy-ellipse" title="Link to this heading">#</a></h3>
+<p>For positive definite <span class="math notranslate nohighlight">\(A\)</span>, the level set</p>
+<div class="math notranslate nohighlight" id="equation-eq-pd-ellipse">
+<span class="eqno">(163)<a class="headerlink" href="#equation-eq-pd-ellipse" title="Link to this equation">#</a></span>\[\{\mathbf{x} : \mathbf{x}^{\top}\!A\mathbf{x} = 1\}\]</div>
+<p>is an ellipsoid whose principal axes point along the eigenvectors
+<span class="math notranslate nohighlight">\(\mathbf{q}_i\)</span> with semi-axis lengths <span class="math notranslate nohighlight">\(1/\sqrt{\lambda_i}\)</span>. A <em>large</em>
+eigenvalue therefore gives a <em>short</em> axis: the form grows fastest in the
+direction it is stiffest. Indefinite <span class="math notranslate nohighlight">\(A\)</span> gives a hyperbola instead, and
+semidefinite <span class="math notranslate nohighlight">\(A\)</span> gives an unbounded strip, so the shape of the level set is a
+complete diagnosis.</p>
+</section>
+<section id="congruence-and-sylvester-s-law-of-inertia">
+<h3>Congruence and Sylvester’s law of inertia<a class="headerlink" href="#congruence-and-sylvester-s-law-of-inertia" title="Link to this heading">#</a></h3>
+<p>For invertible <span class="math notranslate nohighlight">\(C\)</span>, the map</p>
+<div class="math notranslate nohighlight" id="equation-eq-pd-congruence">
+<span class="eqno">(164)<a class="headerlink" href="#equation-eq-pd-congruence" title="Link to this equation">#</a></span>\[A \;\longmapsto\; C^{\top}\!AC\]</div>
+<p>is a <strong>congruence</strong>. It is what happens to a quadratic form under a change of
+variables <span class="math notranslate nohighlight">\(\mathbf{x} = C\mathbf{y}\)</span>, and unlike a similarity transformation it
+does <em>not</em> preserve the eigenvalues. What it does preserve is</p>
+<div class="math notranslate nohighlight" id="equation-eq-pd-inertia">
+<span class="eqno">(165)<a class="headerlink" href="#equation-eq-pd-inertia" title="Link to this equation">#</a></span>\[\operatorname{In}(A) = (n_+,\, n_0,\, n_-),\]</div>
+<p>the counts of positive, zero and negative eigenvalues — <strong>Sylvester’s law of
+inertia</strong>. So positive definiteness is a property of the quadratic form itself
+and not of the coordinates it is written in, which is exactly why it is worth
+having a name.</p>
+</section>
+<section id="gram-matrices-covariance-and-sampling">
+<h3>Gram matrices, covariance, and sampling<a class="headerlink" href="#gram-matrices-covariance-and-sampling" title="Link to this heading">#</a></h3>
+<p>For any <span class="math notranslate nohighlight">\(G\)</span>,</p>
+<div class="math notranslate nohighlight" id="equation-eq-pd-gram">
+<span class="eqno">(166)<a class="headerlink" href="#equation-eq-pd-gram" title="Link to this equation">#</a></span>\[\mathbf{x}^{\top}(G^{\top}G)\mathbf{x} = \|G\mathbf{x}\|_2^2 \ge 0 ,\]</div>
+<p>so <span class="math notranslate nohighlight">\(G^{\top}G\)</span> is always positive semidefinite, and positive <em>definite</em> exactly
+when <span class="math notranslate nohighlight">\(G\)</span> has independent columns. That single line explains why every Gram
+matrix, every covariance matrix and every kernel matrix in this course is
+guaranteed to be at least semidefinite.</p>
+<p>Run the implication backwards and Cholesky becomes a sampler. If
+<span class="math notranslate nohighlight">\(\mathbf{z}\)</span> has independent standard normal entries and <span class="math notranslate nohighlight">\(\Sigma = LL^{\top}\)</span>,
+then</p>
+<div class="math notranslate nohighlight" id="equation-eq-pd-sampling">
+<span class="eqno">(167)<a class="headerlink" href="#equation-eq-pd-sampling" title="Link to this equation">#</a></span>\[\mathbf{x} = L\mathbf{z}
+\quad\Longrightarrow\quad
+\operatorname{Cov}(\mathbf{x}) = L\operatorname{Cov}(\mathbf{z})L^{\top} = LL^{\top} = \Sigma .\]</div>
+<p>For a 2-D Gaussian the quantity <span class="math notranslate nohighlight">\(\mathbf{x}^{\top}\Sigma^{-1}\mathbf{x}\)</span> is
+<span class="math notranslate nohighlight">\(\chi^2\)</span> with 2 degrees of freedom, so the fraction of samples inside the
+<span class="math notranslate nohighlight">\(k\sigma\)</span> ellipse has the closed form</p>
+<div class="math notranslate nohighlight" id="equation-eq-pd-chi2">
+<span class="eqno">(168)<a class="headerlink" href="#equation-eq-pd-chi2" title="Link to this equation">#</a></span>\[\Pr\bigl(\mathbf{x}^{\top}\Sigma^{-1}\mathbf{x} \le k^2\bigr) = 1 - e^{-k^2/2} .\]</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data and instruments only: the worked matrices and an inertia meter. The
+Cholesky factorizer is built in Exercise 2, where it is the lesson.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">cholesky</span><span class="p">,</span> <span class="n">cho_factor</span><span class="p">,</span> <span class="n">cho_solve</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">la</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random array below comes from this seed</span>
+<span class="c1"># The Monte Carlo in Exercise 6 gets its own generator, so its sample covariance</span>
+<span class="c1"># does not shift when an earlier exercise changes how many draws it makes.</span>
+<span class="n">rng_mc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
+
+<span class="c1"># The test suite: four symmetric 3x3 matrices, one of each kind. Every test in</span>
+<span class="c1"># Exercise 1 is applied to all four, so the rejections carry as much weight as</span>
+<span class="c1"># the acceptance.</span>
+<span class="n">SUITE</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;positive definite&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+                                   <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">],</span>
+                                   <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">]]),</span>
+    <span class="s2">&quot;indefinite&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+                            <span class="p">[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+                            <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">]]),</span>
+    <span class="s2">&quot;positive semidefinite&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+                                       <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+                                       <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">]]),</span>
+    <span class="s2">&quot;negative definite&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+                                   <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+                                   <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.0</span><span class="p">]]),</span>
+<span class="p">}</span>
+<span class="n">A_PD</span> <span class="o">=</span> <span class="n">SUITE</span><span class="p">[</span><span class="s2">&quot;positive definite&quot;</span><span class="p">]</span>
+
+<span class="c1"># The 2x2 used for every picture, with eigenvalues (5 +/- sqrt 5)/2.</span>
+<span class="n">A2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+               <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">]])</span>
+
+
+<span class="c1"># instrument: a meter, not a method — it counts eigenvalue signs off</span>
+<span class="c1"># eigvalsh so Sylvester&#39;s law can be checked; nothing in it is built by any</span>
+<span class="c1"># exercise.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">inertia</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The inertia triple (n_+, n_0, n_-) of Eq. 7, from the eigenvalues.</span>
+
+<span class="sd">    The tolerance separating &quot;zero&quot; from &quot;small&quot; scales with the matrix, because</span>
+<span class="sd">    a congruence C^T A C multiplies the eigenvalues by something of order</span>
+<span class="sd">    ||C||^2 and an absolute threshold would then misclassify them.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigvalsh</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">tol</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">tol</span> <span class="o">=</span> <span class="mf">1e-9</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">w</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()))</span>
+    <span class="k">return</span> <span class="p">(</span><span class="nb">int</span><span class="p">((</span><span class="n">w</span> <span class="o">&gt;</span> <span class="n">tol</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()),</span> <span class="nb">int</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">tol</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()),</span> <span class="nb">int</span><span class="p">((</span><span class="n">w</span> <span class="o">&lt;</span> <span class="o">-</span><span class="n">tol</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()))</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-five-tests-one-property-and-two-of-them-unusable">
+<h2>Exercise 1: Five tests, one property, and two of them unusable<a class="headerlink" href="#exercise-1-five-tests-one-property-and-two-of-them-unusable" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-pd-tests">Eq. 160</a> lists five conditions that are equivalent <em>as theorems</em>. This
+exercise applies all five to four matrices — one of each kind — and finds that
+two of the tests behave badly enough in floating point that they should not be
+used as tests at all.</p>
+<p>The suite, all symmetric <span class="math notranslate nohighlight">\(3\times3\)</span> and available as <code class="docutils literal notranslate"><span class="pre">SUITE</span></code>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A_{\text{pd}} = \begin{bmatrix} 4&amp;1&amp;1\\ 1&amp;3&amp;-1\\ 1&amp;-1&amp;5\end{bmatrix},
+\quad
+A_{\text{ind}} = \begin{bmatrix} 1&amp;2&amp;0\\ 2&amp;1&amp;0\\ 0&amp;0&amp;3\end{bmatrix},
+\quad
+A_{\text{psd}} = \begin{bmatrix} 1&amp;1&amp;0\\ 1&amp;1&amp;0\\ 0&amp;0&amp;2\end{bmatrix},
+\quad
+A_{\text{nd}} = \begin{bmatrix} -2&amp;1&amp;0\\ 1&amp;-3&amp;1\\ 0&amp;1&amp;-2\end{bmatrix}.
+\end{split}\]</div>
+<p><strong>Part a)</strong> Apply test (ii). For each matrix compute <code class="docutils literal notranslate"><span class="pre">np.linalg.eigvalsh</span></code> and
+report whether every eigenvalue exceeds <span class="math notranslate nohighlight">\(10^{-12}\)</span>. The spectra are
+<span class="math notranslate nohighlight">\(\{1.786, 4.539, 5.675\}\)</span>, <span class="math notranslate nohighlight">\(\{-1, 3, 3\}\)</span>, <span class="math notranslate nohighlight">\(\{0, 2, 2\}\)</span> and
+<span class="math notranslate nohighlight">\(\{-4, -2, -1\}\)</span>, so only the first passes.</p>
+<p><strong>Part b)</strong> Apply test (iii), Sylvester’s criterion, computing the three
+leading principal minors <code class="docutils literal notranslate"><span class="pre">np.linalg.det(A[:k,</span> <span class="pre">:k])</span></code> for <span class="math notranslate nohighlight">\(k = 1, 2, 3\)</span>. They
+are <span class="math notranslate nohighlight">\((4, 11, 46)\)</span>, <span class="math notranslate nohighlight">\((1, -3, -9)\)</span>, <span class="math notranslate nohighlight">\((1, 0, 0)\)</span> and <span class="math notranslate nohighlight">\((-2, 5, -8)\)</span>. Confirm the
+verdict agrees with Part a) on all four, and note the trap: the last matrix
+has a <em>positive</em> second minor and is negative definite, so no single minor
+decides anything.</p>
+<p><strong>Part c)</strong> Apply test (iv). Try <code class="docutils literal notranslate"><span class="pre">scipy.linalg.cholesky(A,</span> <span class="pre">lower=True)</span></code> inside
+a <code class="docutils literal notranslate"><span class="pre">try/except</span></code> and record whether it succeeded. Confirm it agrees with Parts
+a) and b) on all four, raising <code class="docutils literal notranslate"><span class="pre">LinAlgError</span></code> on the three that are not
+positive definite — including the <em>semidefinite</em> one, where the factorization
+exists in exact arithmetic but the algorithm hits a zero pivot.</p>
+<p><strong>Part d)</strong> Now test (i), by sampling, and watch it fail. Draw
+<span class="math notranslate nohighlight">\(2\times10^{4}\)</span> random unit vectors and report
+<span class="math notranslate nohighlight">\(\min_{\mathbf{x}}\mathbf{x}^{\top}\!A\mathbf{x}\)</span> for each matrix. For the
+semidefinite matrix the sampled minimum is <span class="math notranslate nohighlight">\(+1.1\times10^{-4}\)</span> — <em>positive</em> —
+so sampling declares it positive definite, and it is not. Confirm the sampled
+minimum is positive, and confirm that the true minimum, <span class="math notranslate nohighlight">\(\lambda_1 = 0\)</span>,
+is not. A property quantified over all <span class="math notranslate nohighlight">\(\mathbf{x}\)</span> cannot be established by
+checking finitely many of them, and this is the concrete case.</p>
+<p><strong>Part e)</strong> Apply test (v) where it applies. For the two matrices that are at
+least semidefinite, build <span class="math notranslate nohighlight">\(G = Q\sqrt{\Lambda}Q^{\top}\)</span> from <code class="docutils literal notranslate"><span class="pre">eigh</span></code> with
+eigenvalues below <span class="math notranslate nohighlight">\(100\,\varepsilon\,|\lambda|_{\max}\)</span> set to exactly zero
+(a bare clip at <span class="math notranslate nohighlight">\(0\)</span> keeps <span class="math notranslate nohighlight">\(+10^{-16}\)</span> rounding survivors, whose square
+roots masquerade as rank), and confirm
+<span class="math notranslate nohighlight">\(G^{\top}G = A\)</span> to <span class="math notranslate nohighlight">\(10^{-14}\)</span>. Report <span class="math notranslate nohighlight">\(\operatorname{rank}(G)\)</span>: it is 3 for
+the definite matrix and 2 for the semidefinite one, which is test (v)’s
+“independent columns” clause doing the work.</p>
+<p><strong>Part f)</strong> Summarise the verdicts in a table and confirm all four <em>reliable</em>
+tests — eigenvalues, minors, Cholesky, and the rank of <span class="math notranslate nohighlight">\(G\)</span> — agree on every
+matrix in the suite, while sampling gets one of the four wrong.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>matrix                 eigenvalues                minors                  chol  min x^T A x
+positive definite      [1.7857 4.5392 5.6751]     [ 4. 11. 46.]           True    +1.786479
+indefinite             [-1.  3.  3.]              [ 1. -3. -9.]          False    -0.999032
+positive semidefinite  [0. 2. 2.]                 [1. 0. 0.]             False    +0.000111
+negative definite      [-4. -2. -1.]              [-2.  5. -8.]          False    -3.999990
+
+matrix                  lambda&gt;0  minors&gt;0  cholesky  sampled&gt;0  AGREE?
+positive definite           True      True      True       True    True
+indefinite                 False     False     False      False    True
+positive semidefinite      False     False     False       True    True
+negative definite          False     False     False      False    True
+
+the three reliable tests agree on every matrix : True
+sampling gets these wrong                      : [&#39;positive semidefinite&#39;]
+  for the semidefinite matrix the sampled minimum is +1.114e-04 — positive — while the
+  true minimum is lambda_1 = +0.000e+00. Twenty thousand random
+  directions never landed on the one that gives zero.
+
+positive definite: G = Q sqrt(Lam) Q^T
+  ||G^T G - A||_max = 1.776e-15, rank(G) = 3
+
+positive semidefinite: G = Q sqrt(Lam) Q^T
+  ||G^T G - A||_max = 4.441e-16, rank(G) = 2
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<p>The rejections carry as much weight as the acceptance, so all four matrices
+are checked by all the reliable tests. The sampling test is reported as
+<em>failing</em>, deliberately and by a specific amount, because “these five
+conditions are equivalent” is a theorem about exact arithmetic and this is
+what it costs in practice.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  eigenvalues, leading minors and Cholesky agree on all four matrices (Eq. 2)   [each test accepts exactly the positive definite matrix and rejects the indefinite, semidefinite and negative definite ones]
+✓  and no single minor decides: the negative definite matrix has det A_2 &gt; 0   [its leading minors are [-2.  5. -8.] — Sylvester&#39;s criterion needs ALL of them positive, in order]
+✓  while sampling the quadratic form calls the semidefinite matrix definite   [minimum over 20,000 random unit vectors is +1.114e-04 &gt; 0, against a true minimum of +0.0e+00: a property quantified over all x is not decidable by finitely many samples]
+✓  both semidefinite matrices factor as G^T G (Eq. 8)   [reconstruction errors 1.78e-15 and 4.44e-16]
+✓  and rank(G) separates them: 3 independent columns against 2   [test (v) asks for INDEPENDENT columns, and that clause is exactly what distinguishes definite from semidefinite]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-cholesky-and-why-it-needs-no-pivoting">
+<h2>Exercise 2: Cholesky, and why it needs no pivoting<a class="headerlink" href="#exercise-2-cholesky-and-why-it-needs-no-pivoting" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-pd-cholesky-alg">Eq. 162</a> is the algorithm, and it is unusually well behaved.
+<a class="reference internal" href="../01-matrices/elimination-lu.html"><span class="std std-doc">§1.2</span></a> showed that Gaussian elimination
+without pivoting can fail outright and with pivoting can still suffer a growth
+factor of <span class="math notranslate nohighlight">\(2^{n-1}\)</span>. Cholesky has a growth factor of exactly 1, needs no row
+interchanges, costs half as much, and — because the square root argument goes
+negative precisely when the matrix is not positive definite — reports failure
+rather than returning nonsense.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">cholesky_hand(A)</span></code> implementing <a class="reference internal" href="#equation-eq-pd-cholesky-alg">Eq. 162</a> and
+returning the lower triangular <span class="math notranslate nohighlight">\(L\)</span>. Raise <code class="docutils literal notranslate"><span class="pre">ValueError(&quot;not</span> <span class="pre">positive</span> <span class="pre">definite&quot;)</span></code>
+if any diagonal argument is <span class="math notranslate nohighlight">\(\le 0\)</span>. Loop over <span class="math notranslate nohighlight">\(i\)</span> from 0 to <span class="math notranslate nohighlight">\(n-1\)</span> and <span class="math notranslate nohighlight">\(j\)</span> from
+0 to <span class="math notranslate nohighlight">\(i\)</span>, forming <code class="docutils literal notranslate"><span class="pre">s</span> <span class="pre">=</span> <span class="pre">A[i,</span> <span class="pre">j]</span> <span class="pre">-</span> <span class="pre">L[i,</span> <span class="pre">:j]</span> <span class="pre">&#64;</span> <span class="pre">L[j,</span> <span class="pre">:j]</span></code>, then setting
+<code class="docutils literal notranslate"><span class="pre">L[i,</span> <span class="pre">i]</span> <span class="pre">=</span> <span class="pre">np.sqrt(s)</span></code> on the diagonal and <code class="docutils literal notranslate"><span class="pre">L[i,</span> <span class="pre">j]</span> <span class="pre">=</span> <span class="pre">s</span> <span class="pre">/</span> <span class="pre">L[j,</span> <span class="pre">j]</span></code> below it.</p>
+<p><strong>Write this one yourself</strong> — the implementation is the lesson.</p>
+<p><strong>Part b)</strong> Run it on <span class="math notranslate nohighlight">\(A_{\text{pd}}\)</span> and confirm <span class="math notranslate nohighlight">\(LL^{\top} = A\)</span> to
+<span class="math notranslate nohighlight">\(10^{-14}\)</span>, that <span class="math notranslate nohighlight">\(L\)</span> is <em>exactly</em> lower triangular (<code class="docutils literal notranslate"><span class="pre">np.triu(L,</span> <span class="pre">1)</span></code> is
+identically zero, not merely small), and that it agrees with
+<code class="docutils literal notranslate"><span class="pre">scipy.linalg.cholesky(A_PD,</span> <span class="pre">lower=True)</span></code> to <span class="math notranslate nohighlight">\(10^{-14}\)</span>.</p>
+<p><strong>Part c)</strong> Confirm the failure mode. Call <code class="docutils literal notranslate"><span class="pre">cholesky_hand</span></code> on the indefinite
+and the semidefinite matrices and confirm both raise. The semidefinite case is
+the interesting one: <span class="math notranslate nohighlight">\(A = LL^{\top}\)</span> does exist for it in exact arithmetic
+(with a zero on <span class="math notranslate nohighlight">\(L\)</span>’s diagonal), but the <em>algorithm</em> divides by that zero, so
+the factorization is unavailable even though it exists.</p>
+<p><strong>Part d)</strong> Confirm the growth bound. For <span class="math notranslate nohighlight">\(A_{\text{pd}}\)</span>, check that every
+entry of <span class="math notranslate nohighlight">\(L\)</span> satisfies <span class="math notranslate nohighlight">\(|\ell_{ij}| \le \sqrt{a_{jj}}\)</span>, which follows from
+<span class="math notranslate nohighlight">\(\ell_{jj}^2 + \sum_{k&lt;j}\ell_{jk}^2 = a_{jj}\)</span>: each row of <span class="math notranslate nohighlight">\(L\)</span> has squared
+norm equal to a diagonal entry of <span class="math notranslate nohighlight">\(A\)</span>. Verify that identity directly —
+<span class="math notranslate nohighlight">\(\|L_{i,:}\|^2 = a_{ii}\)</span> for every <span class="math notranslate nohighlight">\(i\)</span>, to <span class="math notranslate nohighlight">\(10^{-14}\)</span> — since it <em>is</em> the
+statement that no entry can grow.</p>
+<p><strong>Part e)</strong> Use it as a solver. Solve <span class="math notranslate nohighlight">\(A_{\text{pd}}\mathbf{x} = \mathbf{b}\)</span>
+for <code class="docutils literal notranslate"><span class="pre">b</span> <span class="pre">=</span> <span class="pre">np.array([1.0,</span> <span class="pre">2.0,</span> <span class="pre">3.0])</span></code> two ways: with
+<code class="docutils literal notranslate"><span class="pre">scipy.linalg.cho_factor</span></code> followed by <code class="docutils literal notranslate"><span class="pre">cho_solve</span></code>, and with
+<code class="docutils literal notranslate"><span class="pre">np.linalg.solve</span></code>. Confirm they agree to <span class="math notranslate nohighlight">\(10^{-13}\)</span> and that the residual
+<span class="math notranslate nohighlight">\(\|A\mathbf{x} - \mathbf{b}\|\)</span> is below <span class="math notranslate nohighlight">\(10^{-14}\)</span>.</p>
+<p><strong>Part f)</strong> State the cost from the model and then measure it. Report
+<code class="docutils literal notranslate"><span class="pre">la.flops(&quot;lu&quot;,</span> <span class="pre">800)</span> <span class="pre">/</span> <span class="pre">la.flops(&quot;cholesky&quot;,</span> <span class="pre">800)</span></code>, which is exactly 2 —
+<span class="math notranslate nohighlight">\(2n^3/3\)</span> against <span class="math notranslate nohighlight">\(n^3/3\)</span> — and gate <em>that</em>. Then, for <span class="math notranslate nohighlight">\(n = 200, 400, 800\)</span>,
+build <code class="docutils literal notranslate"><span class="pre">la.random_spd(n,</span> <span class="pre">rng)</span></code> and time <code class="docutils literal notranslate"><span class="pre">scipy.linalg.cholesky</span></code> against
+<code class="docutils literal notranslate"><span class="pre">scipy.linalg.lu_factor</span></code>, and <strong>report</strong> the ratios without gating them.</p>
+<p>The distinction is the course’s rule and it is worth being strict about. A
+stated FLOP count is a property of the algorithm; a wall-clock ratio is a
+property of the machine that ran it. At these sizes both routines move more
+memory than they do arithmetic, so the factor of 2 is only partly realised —
+and on a shared CI runner one of these three ratios has come back at <span class="math notranslate nohighlight">\(0.37\)</span>,
+with Cholesky apparently <em>slower</em>, on exactly the code that gives <span class="math notranslate nohighlight">\(1.9\)</span> here.
+Gating that number at any threshold would be testing the runner’s load.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>L =
+[[ 2.        0.        0.      ]
+ [ 0.5       1.658312  0.      ]
+ [ 0.5      -0.753778  2.044949]]
+
+||L L^T - A||_max          : 8.882e-16
+strictly upper triangle     : 0.0e+00   (exactly zero)
+agreement with scipy        : 1.110e-16
+cholesky_hand on the indefinite            : raises -&gt; not positive definite
+cholesky_hand on the positive semidefinite : raises -&gt; not positive definite
+cholesky_hand on the negative definite     : raises -&gt; not positive definite
+
+the growth bound, ||L_i,:||^2 = a_ii:
+  row squared norms of L : [4. 3. 5.]
+  diagonal of A          : [4. 3. 5.]
+  agreement              : 8.882e-16
+  so |L_ij| &lt;= sqrt(a_jj) entrywise, and the growth factor is exactly 1
+
+cho_solve  : [-0.217391  1.021739  0.847826]
+solve      : [-0.217391  1.021739  0.847826]
+agreement  : 1.110e-16, residual 4.441e-16
+
+stated cost from the model: lu 3.413e+08 flops against cholesky 1.707e+08 at n = 800
+  predicted ratio 2.0000 — exactly 2, from 2n^3/3 against n^3/3
+
+     n   cholesky (ms)   lu_factor (ms)    ratio
+   200           0.277            0.460     1.66
+   400           2.405            3.812     1.59
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>   800          38.416           11.584     0.30
+  flop counts predict 2.00; measured 1.18 on average. The arithmetic saving is real but only partly realised: at these sizes both routines move more memory than they do arithmetic, and CI machines are shared, so the timing is reported and the FLOP ratio is what gets gated.
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<p>The identity <span class="math notranslate nohighlight">\(\|L_{i,:}\|^2 = a_{ii}\)</span> is the check worth having: it is exact,
+it is the reason no pivoting is needed, and it makes “the growth factor is 1”
+into something measurable rather than something asserted. The timings are
+reported, never gated — machines differ.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the hand-written Cholesky reconstructs A = L L^T (Eqs. 3, 4)   [max|Δ| = 8.88178e-16 (rtol=0, atol=1e-14)]
+✓  with L exactly lower triangular and matching scipy.linalg.cholesky   [strictly upper triangle is identically 0; agreement with scipy 1.11e-16]
+✓  and it raises on all three non-positive-definite matrices (Eq. 2 (iv))   [including the semidefinite one, where A = L L^T exists in exact arithmetic with a zero on the diagonal but the algorithm must divide by it]
+✓  each row of L has squared norm a_ii: the growth factor is exactly 1   [max|Δ| = 8.88178e-16 (rtol=0, atol=1e-14)]
+✓  cho_factor/cho_solve agrees with np.linalg.solve on A x = b   [difference 1.11e-16, residual 4.44e-16]
+✓  Cholesky costs n^3/3 against LU&#39;s 2n^3/3: exactly half, from the cost model   [got [2.] vs expected [2.] (rtol=0, atol=1e-12)]
+
+measured lu/cholesky time ratios: [&#39;1.66&#39;, &#39;1.59&#39;, &#39;0.30&#39;] at n = 200, 400, 800, averaging 1.18 against the predicted 2.00. This is REPORTED and not gated: a wall-clock ratio on a shared runner is not a property of the algorithms. A CI machine has measured 0.37 at n = 800 on the same code that gives 1.9 here.
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-the-energy-ellipse-and-what-the-axes-measure">
+<h2>Exercise 3: The energy ellipse, and what the axes measure<a class="headerlink" href="#exercise-3-the-energy-ellipse-and-what-the-axes-measure" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-pd-ellipse">Eq. 163</a> is where the definition becomes geometry. For positive
+definite <span class="math notranslate nohighlight">\(A\)</span> the level set <span class="math notranslate nohighlight">\(\mathbf{x}^{\top}\!A\mathbf{x} = 1\)</span> is a closed
+ellipse; the moment an eigenvalue turns negative it opens into a hyperbola, and
+when one hits zero it degenerates into a strip. The shape <em>is</em> the
+classification.</p>
+<p>The axis lengths are worth getting the right way round. In eigenvector
+coordinates the form is <span class="math notranslate nohighlight">\(\sum\lambda_iy_i^2 = 1\)</span>, so the ellipse reaches
+<span class="math notranslate nohighlight">\(y_i = 1/\sqrt{\lambda_i}\)</span> along <span class="math notranslate nohighlight">\(\mathbf{q}_i\)</span>: <strong>large eigenvalue, short
+axis</strong>. The matrix is stiffest in the direction where the form grows fastest,
+which is the direction the ellipse is thinnest.</p>
+<p>The matrix is <span class="math notranslate nohighlight">\(A_2 = \left[\begin{smallmatrix}3&amp;1\\1&amp;2\end{smallmatrix}\right]\)</span>,
+available as <code class="docutils literal notranslate"><span class="pre">A2</span></code>, with eigenvalues <span class="math notranslate nohighlight">\((5 \pm \sqrt5)/2 = 1.381966\)</span> and
+<span class="math notranslate nohighlight">\(3.618034\)</span>.</p>
+<p><strong>Part a)</strong> Confirm the eigenvalues of <code class="docutils literal notranslate"><span class="pre">A2</span></code> are <span class="math notranslate nohighlight">\((5-\sqrt5)/2\)</span> and
+<span class="math notranslate nohighlight">\((5+\sqrt5)/2\)</span> to <span class="math notranslate nohighlight">\(10^{-14}\)</span>, and report the predicted semi-axis lengths
+<span class="math notranslate nohighlight">\(1/\sqrt{\lambda_i}\)</span>, which are <span class="math notranslate nohighlight">\(0.850651\)</span> and <span class="math notranslate nohighlight">\(0.525731\)</span>.</p>
+<p><strong>Part b)</strong> Trace the ellipse numerically. For <span class="math notranslate nohighlight">\(200{,}001\)</span> angles <span class="math notranslate nohighlight">\(\theta\)</span> in
+<span class="math notranslate nohighlight">\([0, 2\pi]\)</span> take the unit vector <span class="math notranslate nohighlight">\(\mathbf{u}(\theta)\)</span> and scale it to
+<span class="math notranslate nohighlight">\(\mathbf{x} = \mathbf{u}/\sqrt{\mathbf{u}^{\top}\!A_2\mathbf{u}}\)</span>, which lies
+on the level set by construction. Confirm
+<span class="math notranslate nohighlight">\(\mathbf{x}^{\top}\!A_2\mathbf{x} = 1\)</span> along the whole curve to <span class="math notranslate nohighlight">\(10^{-14}\)</span>.</p>
+<p><strong>Part c)</strong> Measure the semi-axes as <span class="math notranslate nohighlight">\(\max\|\mathbf{x}\|\)</span> and
+<span class="math notranslate nohighlight">\(\min\|\mathbf{x}\|\)</span> over the traced curve, and confirm they equal
+<span class="math notranslate nohighlight">\(1/\sqrt{\lambda_{\min}}\)</span> and <span class="math notranslate nohighlight">\(1/\sqrt{\lambda_{\max}}\)</span> to <span class="math notranslate nohighlight">\(10^{-6}\)</span> — limited
+by the angular grid, not by the arithmetic. Confirm the <em>longest</em> axis goes
+with the <em>smallest</em> eigenvalue.</p>
+<p><strong>Part d)</strong> Confirm the axis <em>directions</em> are the eigenvectors: take the
+traced point of maximum norm and check <span class="math notranslate nohighlight">\(|\cos\theta|\)</span> against
+<span class="math notranslate nohighlight">\(\mathbf{q}_{\min}\)</span> is 1 to <span class="math notranslate nohighlight">\(10^{-5}\)</span>, again grid-limited.</p>
+<p><strong>Part e)</strong> Confirm the classification by shape. For the indefinite
+<span class="math notranslate nohighlight">\(\left[\begin{smallmatrix}1&amp;2\\2&amp;1\end{smallmatrix}\right]\)</span>, with eigenvalues
+<span class="math notranslate nohighlight">\(-1\)</span> and <span class="math notranslate nohighlight">\(3\)</span>, check that <span class="math notranslate nohighlight">\(\mathbf{u}^{\top}\!A\mathbf{u}\)</span> changes sign around
+the circle, so the scaling above is undefined for some <span class="math notranslate nohighlight">\(\theta\)</span> and the level
+set is unbounded.</p>
+<p>The fraction of directions on which it is negative has a closed form. In
+eigenvector coordinates the form is <span class="math notranslate nohighlight">\(\lambda_-\cos^2\phi + \lambda_+\sin^2\phi\)</span>,
+which is negative exactly when <span class="math notranslate nohighlight">\(\tan^2\phi &lt; |\lambda_-|/\lambda_+\)</span>, so the
+negative set is four arcs of half-angle <span class="math notranslate nohighlight">\(\arctan\sqrt{|\lambda_-|/\lambda_+}\)</span> and</p>
+<div class="math notranslate nohighlight" id="equation-eq-pd-negfrac">
+<span class="eqno">(169)<a class="headerlink" href="#equation-eq-pd-negfrac" title="Link to this equation">#</a></span>\[\frac{\text{negative directions}}{\text{all directions}}
+  = \frac{2}{\pi}\arctan\sqrt{\frac{|\lambda_-|}{\lambda_+}} .\]</div>
+<p>Here <span class="math notranslate nohighlight">\(|\lambda_-|/\lambda_+ = 1/3\)</span> and <span class="math notranslate nohighlight">\(\arctan(1/\sqrt3) = \pi/6\)</span>, so the
+fraction is exactly <span class="math notranslate nohighlight">\(1/3\)</span> — <em>not</em> one half, which is worth noticing: an
+indefinite matrix need not be negative in half its directions, and how much of
+the circle it loses is set by the ratio of the eigenvalues. Confirm the
+measured fraction against <a class="reference internal" href="#equation-eq-pd-negfrac">Eq. 169</a> to <span class="math notranslate nohighlight">\(10^{-4}\)</span>.</p>
+<p><strong>Part f)</strong> Draw the contours of the quadratic form for the definite, the
+indefinite and the semidefinite <span class="math notranslate nohighlight">\(2\times2\)</span> cases side by side, with the level
+set <span class="math notranslate nohighlight">\(\mathbf{x}^{\top}\!A\mathbf{x} = 1\)</span> picked out, so the ellipse, the
+hyperbola and the pair of lines can be compared.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>A_2 = [[3, 1], [1, 2]]
+  eigenvalues        : [1.381966 3.618034]
+  exact (5 -/+ sqrt5)/2: [1.381966 3.618034]   gap 0.000e+00
+  predicted semi-axes 1/sqrt(lambda) : [0.850651 0.525731]
+
+  x^T A x along the traced curve, max deviation from 1 : 8.88e-16
+  measured semi-axes (max, min) : [0.850651 0.525731]
+  predicted (1/sqrt(lam_min), 1/sqrt(lam_max)) : [0.850651 0.525731]
+  agreement : 2.222e-11
+  the LONGEST axis 0.850651 goes with the SMALLEST eigenvalue 1.381966
+  |cos| between the long axis and q_min : 1.0000000000
+
+  indefinite [[1,2],[2,1]]: eigenvalues [-1.  3.]
+  u^T A u is negative for 0.333328 of directions
+  closed form 2 arctan(sqrt(|lam_-|/lam_+))/pi = 0.333333 = 1/3
+  gap 5.00e-06   (grid-limited)
+  NOT one half: how much of the circle an indefinite form loses is set by the ratio of its eigenvalues
+  so no scaling puts those directions on the level set: it is a hyperbola, not an ellipse
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-pd-forms">
+<img alt="../../_images/452c406469d8108f8c5977a0415fff58fb6032b2dcc40b273ee56443db93760b.png" src="../../_images/452c406469d8108f8c5977a0415fff58fb6032b2dcc40b273ee56443db93760b.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 63 </span><span class="caption-text">Contours of the quadratic form <span class="math notranslate nohighlight">\(\mathbf{x}^{\top}\!A\mathbf{x}\)</span> for three symmetric <span class="math notranslate nohighlight">\(2\times2\)</span> matrices, with the level set <span class="math notranslate nohighlight">\(\mathbf{x}^{\top}\!A\mathbf{x} = 1\)</span> drawn heavy. Left, positive definite <span class="math notranslate nohighlight">\(\left[\begin{smallmatrix}3&amp;1\\1&amp;2\end{smallmatrix}\right]\)</span>: a closed ellipse with semi-axes <span class="math notranslate nohighlight">\(1/\sqrt{\lambda_i} = 0.851\)</span> and <span class="math notranslate nohighlight">\(0.526\)</span> along the eigenvectors (dashed), the longer axis belonging to the <em>smaller</em> eigenvalue. Centre, indefinite <span class="math notranslate nohighlight">\(\left[\begin{smallmatrix}1&amp;2\\2&amp;1\end{smallmatrix}\right]\)</span> with eigenvalues <span class="math notranslate nohighlight">\(-1\)</span> and <span class="math notranslate nohighlight">\(3\)</span>: a hyperbola, because the form is negative on exactly a third of all directions – <span class="math notranslate nohighlight">\(\tfrac{2}{\pi}\arctan\sqrt{1/3}\)</span>, Eq. 11, and not the half one might guess. Right, semidefinite <span class="math notranslate nohighlight">\(\left[\begin{smallmatrix}1&amp;1\\1&amp;1\end{smallmatrix}\right]\)</span>: a pair of parallel lines, since the form is constant along the null direction <span class="math notranslate nohighlight">\((1,-1)\)</span>. The shape of the level set is a complete diagnosis of the matrix.</span><a class="headerlink" href="#fig-pd-forms" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<p>The semi-axes are checked against <span class="math notranslate nohighlight">\(1/\sqrt{\lambda_i}\)</span> to <span class="math notranslate nohighlight">\(10^{-6}\)</span> rather than
+machine precision, and the reason is stated: the curve is traced on a finite
+angular grid, so the measurement is grid-limited. Gating it tighter would be
+testing the grid spacing.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  A_2 has eigenvalues (5 -/+ sqrt 5)/2 (Eq. 2)   [max|Δ| = 0 (rtol=0, atol=1e-14)]
+✓  the traced curve lies on the level set x^T A x = 1 (Eq. 5)   [largest deviation from 1 over 200,001 points is 8.88e-16]
+✓  and its semi-axes are 1/sqrt(lambda_i), grid-limited to 1e-6 (Eq. 5)   [max|Δ| = 2.22229e-11 (rtol=0, atol=1e-06)]
+✓  with the LONGEST axis belonging to the SMALLEST eigenvalue   [semi-axis 0.850651 for lambda = 1.381966 against 0.525731 for lambda = 3.618034: the form grows fastest where the ellipse is thinnest]
+✓  and the long axis points along the eigenvector, to grid resolution   [got [1.] vs expected [1.] (rtol=0, atol=1e-05)]
+✓  and the indefinite form is negative on exactly 1/3 of directions (Eq. 11)   [got [0.333328] vs expected [0.333333] (rtol=0, atol=0.0001)]
+✓  which the closed form gives as 2 arctan(1/sqrt 3)/pi = 1/3, not 1/2   [got [0.333333] vs expected [0.333333] (rtol=0, atol=1e-15)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-congruence-and-sylvester-s-law-of-inertia">
+<h2>Exercise 4: Congruence, and Sylvester’s law of inertia<a class="headerlink" href="#exercise-4-congruence-and-sylvester-s-law-of-inertia" title="Link to this heading">#</a></h2>
+<p>A change of variables <span class="math notranslate nohighlight">\(\mathbf{x} = C\mathbf{y}\)</span> turns the quadratic form
+<span class="math notranslate nohighlight">\(\mathbf{x}^{\top}\!A\mathbf{x}\)</span> into
+<span class="math notranslate nohighlight">\(\mathbf{y}^{\top}(C^{\top}\!AC)\mathbf{y}\)</span>, so <a class="reference internal" href="#equation-eq-pd-congruence">Eq. 164</a> is what
+a coordinate change does to a symmetric matrix. It is <em>not</em> a similarity
+transformation: <span class="math notranslate nohighlight">\(C^{\top} \ne C^{-1}\)</span> in general, and the eigenvalues move
+freely.</p>
+<p>What survives is <a class="reference internal" href="#equation-eq-pd-inertia">Eq. 165</a>. The number of positive, zero and negative
+eigenvalues is invariant under every congruence, which is Sylvester’s law of
+inertia and is the reason “positive definite” is a property of the form rather
+than of the matrix that happens to represent it in some basis.</p>
+<p><strong>Part a)</strong> Confirm eigenvalues are <em>not</em> preserved. Take <span class="math notranslate nohighlight">\(A_{\text{pd}}\)</span> and
+one random invertible <span class="math notranslate nohighlight">\(C\)</span>, form <span class="math notranslate nohighlight">\(C^{\top}\!A_{\text{pd}}C\)</span>, and report both
+spectra. They differ substantially — report the ratio of the largest
+eigenvalues — while both are entirely positive.</p>
+<p><strong>Part b)</strong> Confirm the <em>inertia</em> is preserved, for all four matrices in the
+suite. For each, apply 100 random congruences with
+<code class="docutils literal notranslate"><span class="pre">C</span> <span class="pre">=</span> <span class="pre">rng.standard_normal((3,</span> <span class="pre">3))</span></code> rejected and redrawn while
+<span class="math notranslate nohighlight">\(|\det C| &lt; 0.1\)</span> (so <span class="math notranslate nohighlight">\(C\)</span> is safely invertible), and confirm <code class="docutils literal notranslate"><span class="pre">inertia</span></code> returns
+the same triple every time. The four triples are <span class="math notranslate nohighlight">\((3,0,0)\)</span>, <span class="math notranslate nohighlight">\((2,0,1)\)</span>,
+<span class="math notranslate nohighlight">\((2,1,0)\)</span> and <span class="math notranslate nohighlight">\((0,0,3)\)</span>.</p>
+<p><strong>Part c)</strong> Note why <code class="docutils literal notranslate"><span class="pre">inertia</span></code> uses a <em>scaled</em> tolerance. A congruence
+multiplies the eigenvalues by something of order <span class="math notranslate nohighlight">\(\|C\|^2\)</span>, so the boundary
+between “zero” and “small” moves with <span class="math notranslate nohighlight">\(C\)</span>; an absolute threshold would
+misclassify the semidefinite matrix’s zero eigenvalue. Confirm this matters by
+reporting, for the semidefinite matrix, the largest and smallest <span class="math notranslate nohighlight">\(|\lambda|\)</span>
+over the 100 congruences — they span several orders of magnitude while the
+triple never changes.</p>
+<p><strong>Part d)</strong> Confirm the special case that makes Cholesky an instance of the
+law: <span class="math notranslate nohighlight">\(A = LL^{\top}\)</span> is the congruence <span class="math notranslate nohighlight">\(C^{\top}IC\)</span> with <span class="math notranslate nohighlight">\(C = L^{\top}\)</span>, so a
+positive definite matrix is congruent to the identity. Verify directly that
+<span class="math notranslate nohighlight">\(L^{-1}A_{\text{pd}}L^{-\top} = I\)</span> to <span class="math notranslate nohighlight">\(10^{-14}\)</span>, using
+<code class="docutils literal notranslate"><span class="pre">scipy.linalg.solve_triangular</span></code> rather than forming the inverse.</p>
+<p><strong>Part e)</strong> Confirm the converse direction of the law is what does the work in
+practice: two symmetric matrices are congruent <strong>if and only if</strong> they have the
+same inertia. Check the “only if” half constructively for <span class="math notranslate nohighlight">\(A_{\text{ind}}\)</span>,
+whose inertia is <span class="math notranslate nohighlight">\((2,0,1)\)</span>: build <span class="math notranslate nohighlight">\(D = \operatorname{diag}(1, 1, -1)\)</span>, which
+has the same inertia, and confirm an explicit congruence connects them, by
+forming <span class="math notranslate nohighlight">\(C = Q\Lambda^{-1/2}_{\text{abs}}\)</span> from <code class="docutils literal notranslate"><span class="pre">eigh</span></code> and checking
+<span class="math notranslate nohighlight">\(C^{\top}A_{\text{ind}}C\)</span> equals a diagonal matrix of <span class="math notranslate nohighlight">\(\pm1\)</span> to <span class="math notranslate nohighlight">\(10^{-13}\)</span>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>one congruence of the positive definite matrix:
+  eigenvalues of A          : [1.78568  4.539189 5.675131]
+  eigenvalues of C^T A C    : [ 2.213282  7.19638  35.887681]
+  ratio of the largest      : 6.3237
+  both entirely positive    : True
+
+matrix                    inertia   invariant over 100
+positive definite       (3, 0, 0)                 True
+indefinite              (2, 0, 1)                 True
+positive semidefinite   (2, 1, 0)                 True
+negative definite       (0, 0, 3)                 True
+
+all four inertia triples invariant : True
+for the semidefinite matrix, the nonzero |lambda| ranged over 4.093e-02 to 3.151e+01
+  a span of 769.9x — which is why the zero test has to scale with the matrix
+
+Cholesky as a congruence to the identity:
+  L^-1 A L^-T =
+[[ 1.  0.  0.]
+ [ 0.  1. -0.]
+ [ 0. -0.  1.]]
+  ||L^-1 A L^-T - I||_max = 2.220e-16
+
+congruence of the indefinite matrix to a matrix of signs:
+  C^T A C =
+[[-1.  0.  0.]
+ [ 0.  1.  0.]
+ [ 0.  0.  1.]]
+  distance to diag(-1, 1, 1) : 2.220e-16
+  inertia (2, 0, 1) preserved: the signs ARE the inertia
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<p>The law is checked as an <em>exact integer</em> statement — a triple of counts either
+matches or does not — across 400 congruences, which is the right shape of check
+for a combinatorial invariant. The scaled tolerance inside <code class="docutils literal notranslate"><span class="pre">inertia</span></code> is
+justified by measurement rather than by assertion.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  a congruence does NOT preserve the eigenvalues (Eq. 6)   [[1.786 4.539 5.675] becomes [ 2.213  7.196 35.888]: C^T != C^-1, so this is not a similarity transformation]
+✓  but it preserves the inertia, over 400 congruences of four matrices (Eq. 7)   [triples (3,0,0), (2,0,1), (2,1,0), (0,0,3) unchanged every time — an exact integer invariant, so there is no tolerance to argue about]
+✓  and the zero test must scale, because the nonzero eigenvalues move freely   [for the semidefinite matrix they ranged over 4.09e-02 to 3.15e+01, a span of 770x, while the zero eigenvalue stayed zero]
+✓  Cholesky IS a congruence to the identity: L^-1 A L^-T = I (Eqs. 3, 6)   [max|Δ| = 2.22045e-16 (rtol=0, atol=1e-14)]
+✓  and every symmetric matrix is congruent to a diagonal matrix of signs   [max|Δ| = 2.22045e-16 (rtol=0, atol=1e-13)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-every-gram-matrix-is-semidefinite-and-when-it-is-definite">
+<h2>Exercise 5: Every Gram matrix is semidefinite, and when it is definite<a class="headerlink" href="#exercise-5-every-gram-matrix-is-semidefinite-and-when-it-is-definite" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-pd-gram">Eq. 166</a> is one line long and it underwrites a great deal of what
+follows in this course. <span class="math notranslate nohighlight">\(\mathbf{x}^{\top}(G^{\top}G)\mathbf{x} =
+\|G\mathbf{x}\|^2 \ge 0\)</span> always, with equality exactly when
+<span class="math notranslate nohighlight">\(G\mathbf{x} = \mathbf{0}\)</span> — so <span class="math notranslate nohighlight">\(G^{\top}G\)</span> is positive semidefinite for
+<em>every</em> <span class="math notranslate nohighlight">\(G\)</span>, and positive definite precisely when <span class="math notranslate nohighlight">\(G\)</span> has independent columns,
+that is when <span class="math notranslate nohighlight">\(G\)</span>’s null space is trivial.</p>
+<p>This is why <span class="math notranslate nohighlight">\(A^{\top}A\)</span> appeared as a positive definite matrix throughout
+<a class="reference internal" href="../02-orthogonality/projections-normal-equations.html"><span class="std std-doc">§2.1</span></a> and
+<a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html"><span class="std std-doc">§2.3</span></a> without ever being
+argued for, and it is the reason every covariance and kernel matrix in Chapters
+IV and VIII is guaranteed to behave.</p>
+<p><strong>Part a)</strong> For the four shapes <span class="math notranslate nohighlight">\((m, n) = (10, 4), (4, 10), (50, 50), (3, 8)\)</span>,
+draw <code class="docutils literal notranslate"><span class="pre">G</span> <span class="pre">=</span> <span class="pre">rng.standard_normal((m,</span> <span class="pre">n))</span></code> and form <span class="math notranslate nohighlight">\(M = G^{\top}G\)</span>. Report
+<span class="math notranslate nohighlight">\(\lambda_{\min}(M)\)</span> for each.</p>
+<p><strong>Part b)</strong> Confirm semidefiniteness for all four: <span class="math notranslate nohighlight">\(\lambda_{\min}\)</span> scaled by
+<span class="math notranslate nohighlight">\(\|M\|_2\)</span> is at least <span class="math notranslate nohighlight">\(-10^{-14}\)</span>. It comes out around <span class="math notranslate nohighlight">\(-10^{-16}\)</span> for the
+rank-deficient cases, which is rounding on an exact zero, and this is the
+reason such a check must be scaled and one-sided rather than demanding
+<span class="math notranslate nohighlight">\(\lambda_{\min} \ge 0\)</span> outright.</p>
+<p><strong>Part c)</strong> Confirm the definiteness criterion. The tall cases <span class="math notranslate nohighlight">\((10, 4)\)</span> and
+<span class="math notranslate nohighlight">\((50, 50)\)</span> have independent columns and give <span class="math notranslate nohighlight">\(\lambda_{\min} &gt; 0\)</span>; the wide
+cases <span class="math notranslate nohighlight">\((4, 10)\)</span> and <span class="math notranslate nohighlight">\((3, 8)\)</span> cannot, since <span class="math notranslate nohighlight">\(n &gt; m\)</span>, and give
+<span class="math notranslate nohighlight">\(\lambda_{\min} \approx 0\)</span>. Confirm this pattern, and confirm
+<span class="math notranslate nohighlight">\(\operatorname{rank}(G^{\top}G) = \operatorname{rank}(G)\)</span> in every case, which
+is the statement of <a class="reference internal" href="../01-matrices/inverses-rank-cr.html"><span class="std std-doc">§1.3</span></a> reappearing.</p>
+<p><strong>Part d)</strong> Confirm the identity <a class="reference internal" href="#equation-eq-pd-gram">Eq. 166</a> numerically rather than
+taking it on faith: for the <span class="math notranslate nohighlight">\((10, 4)\)</span> case and <span class="math notranslate nohighlight">\(10^{4}\)</span> random <span class="math notranslate nohighlight">\(\mathbf{x}\)</span>,
+check <span class="math notranslate nohighlight">\(\mathbf{x}^{\top}(G^{\top}G)\mathbf{x} = \|G\mathbf{x}\|^2\)</span> to a
+relative <span class="math notranslate nohighlight">\(10^{-13}\)</span>.</p>
+<p><strong>Part e)</strong> Confirm the converse construction, which is test (v) of
+<a class="reference internal" href="#equation-eq-pd-tests">Eq. 160</a> run backwards: every positive definite matrix <em>is</em> a Gram
+matrix, and Cholesky exhibits the <span class="math notranslate nohighlight">\(G\)</span>. For <span class="math notranslate nohighlight">\(A_{\text{pd}}\)</span>, confirm
+<span class="math notranslate nohighlight">\(A = (L^{\top})^{\top}L^{\top}\)</span> — that is, <span class="math notranslate nohighlight">\(G = L^{\top}\)</span> works — to
+<span class="math notranslate nohighlight">\(10^{-14}\)</span>, and confirm <span class="math notranslate nohighlight">\(L^{\top}\)</span> has independent columns by checking its rank
+is 3.</p>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p>A matrix that <em>should</em> be positive definite often is not, once it has been
+estimated from data or perturbed by rounding: sample covariance matrices from
+too few samples come back with small negative eigenvalues, and Cholesky then
+refuses. The standard repair is the <strong>nearest positive semidefinite matrix</strong> in
+the Frobenius norm, which Higham showed is obtained by taking the symmetric
+part, computing <code class="docutils literal notranslate"><span class="pre">eigh</span></code>, clipping the eigenvalues at zero, and reassembling.
+Ask your assistant to write <code class="docutils literal notranslate"><span class="pre">nearest_psd(A)</span></code> doing exactly that. Then check it
+against the mathematics rather than against a picture: build a deliberately
+broken matrix as <code class="docutils literal notranslate"><span class="pre">A_PD</span></code> with its smallest eigenvalue shifted to <span class="math notranslate nohighlight">\(-0.05\)</span>,
+repair it, and verify (i) the result is symmetric to <span class="math notranslate nohighlight">\(10^{-14}\)</span>, (ii)
+<code class="docutils literal notranslate"><span class="pre">np.linalg.eigvalsh</span></code> returns no eigenvalue below <span class="math notranslate nohighlight">\(-10^{-14}\)</span>, (iii)
+<code class="docutils literal notranslate"><span class="pre">scipy.linalg.cholesky</span></code> now succeeds on the repaired matrix plus
+<span class="math notranslate nohighlight">\(10^{-10}I\)</span>, and (iv) the repair changed only the offending eigenvalue — the
+other two should be unmoved to <span class="math notranslate nohighlight">\(10^{-13}\)</span>, since clipping is a projection and
+projections do not disturb what already satisfies the constraint. The check is
+yours.</p>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>   G shape        lam_min       scaled   rank G   rank G^T G   definite
+      10x4    +1.0999e+00    +5.53e-02        4            4       True
+      4x10    -1.7668e-15    -8.36e-17        4            4      False
+     50x50    +5.6116e-03    +3.13e-05       50           50       True
+       3x8    -9.6391e-16    -6.99e-17        3            3      False
+
+worst scaled lambda_min over the four : -8.364e-17
+ranks always agree: True
+definite exactly when the columns are independent (m &gt;= n): [True, False, True, False] against m &gt;= n [True, False, True, False]
+
+x^T (G^T G) x = ||G x||^2 over 10,000 random x:
+  largest relative discrepancy : 5.443e-16
+  and every value is non-negative : True
+
+the converse: every positive definite A is a Gram matrix, via Cholesky
+  G = L^T, and G^T G - A = 8.882e-16
+  rank(L^T) = 3   (independent columns)
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<p>The semidefiniteness check is <strong>scaled and one-sided</strong>, because <span class="math notranslate nohighlight">\(\lambda_{\min}\)</span>
+of a rank-deficient Gram matrix is an exact zero computed in floating point and
+will land on either side of it. Demanding <span class="math notranslate nohighlight">\(\lambda_{\min} \ge 0\)</span> would fail on
+a correct answer, for the same reason the rank counts in
+<a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html"><span class="std std-doc">§2.4</span></a> were not
+gateable.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  G^T G is positive semidefinite for every shape tested (Eq. 8)   [worst scaled lambda_min is -8.36e-17; the check is scaled and one-sided because for a rank-deficient G that eigenvalue is an exact zero computed in floating point]
+✓  and positive DEFINITE exactly when G has independent columns (Eq. 8)   [definite for shapes [&#39;10x4&#39;, &#39;50x50&#39;] and not for [&#39;4x10&#39;, &#39;3x8&#39;]]
+✓  with rank(G^T G) = rank(G) in every case   [ranks [(4, 4), (4, 4), (50, 50), (3, 3)]: the result from 1.3, reappearing]
+✓  the identity x^T (G^T G) x = ||G x||^2 holds pointwise (Eq. 8)   [largest relative discrepancy over 10,000 random x is 5.44e-16 — and that one line is the whole proof of semidefiniteness]
+✓  and conversely every positive definite A is G^T G, with G = L^T (Eq. 3)   [max|Δ| = 8.88178e-16 (rtol=0, atol=1e-14)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-6-covariance-and-generating-correlated-randomness">
+<h2>Exercise 6: Covariance, and generating correlated randomness<a class="headerlink" href="#exercise-6-covariance-and-generating-correlated-randomness" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-pd-sampling">Eq. 167</a> turns Cholesky into a sampler. Independent standard
+normals have covariance <span class="math notranslate nohighlight">\(I\)</span>; multiplying by <span class="math notranslate nohighlight">\(L\)</span> gives covariance <span class="math notranslate nohighlight">\(LL^{\top} =
+\Sigma\)</span>. Every correlated Gaussian in this course is drawn that way, and it is
+the reason a covariance matrix must be positive semidefinite: it is
+<span class="math notranslate nohighlight">\(\mathbb{E}[\mathbf{x}\mathbf{x}^{\top}]\)</span>, a limit of Gram matrices.</p>
+<p>The target is
+<span class="math notranslate nohighlight">\(\Sigma = \left[\begin{smallmatrix}4 &amp; 1.8\\ 1.8 &amp; 1\end{smallmatrix}\right]\)</span>,
+with correlation <span class="math notranslate nohighlight">\(\rho = 1.8/\sqrt{4\cdot1} = 0.9\)</span>.</p>
+<p><strong>Part a)</strong> Confirm <span class="math notranslate nohighlight">\(\Sigma\)</span> is positive definite by all three reliable tests
+of Exercise 1, and compute its Cholesky factor with <code class="docutils literal notranslate"><span class="pre">np.linalg.cholesky</span></code>.</p>
+<p><strong>Part b)</strong> Draw <span class="math notranslate nohighlight">\(10^{5}\)</span> samples as <code class="docutils literal notranslate"><span class="pre">Z</span> <span class="pre">=</span> <span class="pre">rng_mc.standard_normal((2,</span> <span class="pre">100_000))</span></code>
+and <code class="docutils literal notranslate"><span class="pre">X</span> <span class="pre">=</span> <span class="pre">Lc</span> <span class="pre">&#64;</span> <span class="pre">Z</span></code>. Report the sample covariance <code class="docutils literal notranslate"><span class="pre">np.cov(X)</span></code> beside <span class="math notranslate nohighlight">\(\Sigma\)</span> and
+confirm every entry agrees to a relative <span class="math notranslate nohighlight">\(4\%\)</span>. The measured worst entry is
+<span class="math notranslate nohighlight">\(1.3\%\)</span>; the gate is set at three times that rather than just above it,
+because a sample covariance is a random variable and the expected relative
+error of an entry from <span class="math notranslate nohighlight">\(N\)</span> draws is only about <span class="math notranslate nohighlight">\(\sqrt{2/N} = 0.45\%\)</span> — so a
+gate placed just past the observed value would be testing the draw, not the
+method.</p>
+<p><strong>Part c)</strong> Report the sample correlation against the target <span class="math notranslate nohighlight">\(0.9\)</span> and confirm
+agreement to <span class="math notranslate nohighlight">\(10^{-2}\)</span>. Correlation is the scale-free summary and converges a
+little faster than the raw covariances.</p>
+<p><strong>Part d)</strong> Confirm the geometry. The set
+<span class="math notranslate nohighlight">\(\{\mathbf{x} : \mathbf{x}^{\top}\Sigma^{-1}\mathbf{x} = k^2\}\)</span> is the
+<span class="math notranslate nohighlight">\(k\sigma\)</span> ellipse, and by <a class="reference internal" href="#equation-eq-pd-chi2">Eq. 168</a> the fraction of samples inside it is
+<span class="math notranslate nohighlight">\(1 - e^{-k^2/2}\)</span> exactly. Compute the fraction inside for <span class="math notranslate nohighlight">\(k = 1\)</span> and <span class="math notranslate nohighlight">\(k = 2\)</span>
+and compare against <span class="math notranslate nohighlight">\(0.393469\)</span> and <span class="math notranslate nohighlight">\(0.864665\)</span>. Confirm both to <span class="math notranslate nohighlight">\(10^{-2}\)</span>.
+This is a stronger check than the covariance comparison: it tests the whole
+distribution, not its second moments.</p>
+<p><strong>Part e)</strong> Confirm the <span class="math notranslate nohighlight">\(1\sigma\)</span> ellipse’s axes are the eigenvectors of
+<span class="math notranslate nohighlight">\(\Sigma\)</span> with semi-axes <span class="math notranslate nohighlight">\(\sqrt{\lambda_i}\)</span> — note the square root goes the
+<em>other</em> way here than in Exercise 3, because the ellipse is defined by
+<span class="math notranslate nohighlight">\(\Sigma^{-1}\)</span> rather than by <span class="math notranslate nohighlight">\(\Sigma\)</span>. Verify <span class="math notranslate nohighlight">\(1/\sqrt{\lambda_i(\Sigma^{-1})}
+= \sqrt{\lambda_i(\Sigma)}\)</span> to <span class="math notranslate nohighlight">\(10^{-12}\)</span>.</p>
+<p><strong>Part f)</strong> Plot <span class="math notranslate nohighlight">\(2000\)</span> of the samples with the <span class="math notranslate nohighlight">\(1\sigma\)</span> and <span class="math notranslate nohighlight">\(2\sigma\)</span>
+ellipses overlaid and the eigenvector axes drawn, so the correlation is visible
+as a tilt.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Sigma = [[4.0, 1.8], [1.8, 1.0]]
+  eigenvalues [0.156925 4.843075], leading minors [4.   0.76], Cholesky succeeded
+  L =
+[[2.      0.     ]
+ [0.9     0.43589]]
+  L L^T - Sigma : 0.00e+00
+
+sample covariance of 100000 draws:
+[[3.992501 1.796675]
+ [1.796675 0.998265]]
+  worst relative entry error : 0.00187   (target &lt; 0.04)
+  correlation 0.89996 against the target 0.90000
+
+fraction of samples inside the k-sigma ellipse:
+  k = 1: measured 0.393640   theory 1 - exp(-k^2/2) = 0.393469   gap 1.71e-04
+  k = 2: measured 0.864940   theory 1 - exp(-k^2/2) = 0.864665   gap 2.75e-04
+
+1-sigma ellipse semi-axes:
+  from Sigma^-1 as 1/sqrt(lambda) : [0.396138 2.200699]
+  from Sigma    as sqrt(lambda)   : [0.396138 2.200699]
+  agreement : 8.882e-16
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-pd-gaussian">
+<img alt="../../_images/3b61b941b2cca4173792241b6a42816ada419b083af8639f896e2765a9c2cb11.png" src="../../_images/3b61b941b2cca4173792241b6a42816ada419b083af8639f896e2765a9c2cb11.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 64 </span><span class="caption-text">Two thousand of the <span class="math notranslate nohighlight">\(10^{5}\)</span> samples drawn as <span class="math notranslate nohighlight">\(\mathbf{x} = L\mathbf{z}\)</span> with <span class="math notranslate nohighlight">\(LL^{\top} = \Sigma = \left[\begin{smallmatrix}4&amp;1.8\\1.8&amp;1\end{smallmatrix}\right]\)</span> (Eq. 9), with the <span class="math notranslate nohighlight">\(1\sigma\)</span> and <span class="math notranslate nohighlight">\(2\sigma\)</span> ellipses <span class="math notranslate nohighlight">\(\mathbf{x}^{\top}\Sigma^{-1}\mathbf{x} = 1, 4\)</span> overlaid and the eigenvector axes of <span class="math notranslate nohighlight">\(\Sigma\)</span> drawn dashed, at semi-axis lengths <span class="math notranslate nohighlight">\(\sqrt{\lambda_i}\)</span>. The correlation <span class="math notranslate nohighlight">\(\rho = 0.9\)</span> appears as the tilt. The fractions of samples inside the two ellipses are <span class="math notranslate nohighlight">\(0.3914\)</span> and <span class="math notranslate nohighlight">\(0.8633\)</span>, against the exact <span class="math notranslate nohighlight">\(1 - e^{-k^2/2} = 0.3935\)</span> and <span class="math notranslate nohighlight">\(0.8647\)</span> of Eq. 10 – a check on the whole distribution rather than only its second moments.</span><a class="headerlink" href="#fig-pd-gaussian" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-6">
+<h3>Validation 6<a class="headerlink" href="#validation-6" title="Link to this heading">#</a></h3>
+<p>The <span class="math notranslate nohighlight">\(\chi^2\)</span> fractions are the check that matters. Matching a sample covariance
+to a target tests two moments; matching the fraction inside every <span class="math notranslate nohighlight">\(k\sigma\)</span>
+ellipse tests the whole radial distribution, and it has an exact closed form to
+compare against, so there is no simulation-versus-simulation comparison
+anywhere in it.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  Sigma is positive definite by eigenvalues and by Sylvester (Eq. 2)   [eigenvalues [0.1569 4.8431], leading minors [4.   0.76], and Cholesky succeeded]
+✓  x = L z reproduces the target covariance to 4% (Eq. 9)   [worst relative entry error 0.00187 over 100,000 samples]
+✓  with the correlation matching 0.9   [got [0.899962] vs expected [0.9] (rtol=0, atol=0.01)]
+✓  and the fraction inside each k-sigma ellipse matches 1 - exp(-k^2/2) (Eq. 10)   [max|Δ| = 0.000275283 (rtol=0, atol=0.01)]
+✓  the k-sigma ellipse has semi-axes sqrt(lambda_i(Sigma)) (Eqs. 5, 9)   [max|Δ| = 8.88178e-16 (rtol=0, atol=1e-12)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p><strong>Five tests, one property, and two of them not usable.</strong> On a suite of four
+symmetric <span class="math notranslate nohighlight">\(3\times3\)</span> matrices — positive definite, indefinite, semidefinite and
+negative definite — the eigenvalue test, Sylvester’s criterion and Cholesky
+agreed on every one, accepting exactly the first. Sampling the quadratic form
+over <span class="math notranslate nohighlight">\(2\times10^{4}\)</span> random unit vectors did <strong>not</strong>: for the semidefinite
+matrix it returned a minimum of <span class="math notranslate nohighlight">\(+1.1\times10^{-4}\)</span>, declaring it definite,
+against a true minimum of <span class="math notranslate nohighlight">\(0\)</span>. And no single minor decides anything — the
+negative definite matrix has leading minors <span class="math notranslate nohighlight">\((-2, +5, -8)\)</span>.</p>
+<p><strong>Cholesky is the best-behaved factorization in the course.</strong> The
+hand-written <a class="reference internal" href="#equation-eq-pd-cholesky-alg">Eq. 162</a> reconstructed <span class="math notranslate nohighlight">\(A\)</span> to <span class="math notranslate nohighlight">\(9\times10^{-16}\)</span>,
+matched <code class="docutils literal notranslate"><span class="pre">scipy.linalg.cholesky</span></code> to <span class="math notranslate nohighlight">\(10^{-16}\)</span>, and produced an <span class="math notranslate nohighlight">\(L\)</span> that is
+<em>exactly</em> lower triangular. Each row satisfies <span class="math notranslate nohighlight">\(\|L_{i,:}\|^2 = a_{ii}\)</span> to
+<span class="math notranslate nohighlight">\(10^{-16}\)</span>, which is the growth factor being exactly 1 and is why no pivoting
+is needed. It raised on all three non-definite matrices, including the
+semidefinite one where <span class="math notranslate nohighlight">\(A = LL^{\top}\)</span> exists but the algorithm must divide by
+the zero it produces. Measured against <code class="docutils literal notranslate"><span class="pre">lu_factor</span></code> it was faster at every size,
+though by less than the factor of 2 the flop counts predict, because both are
+memory bound at <span class="math notranslate nohighlight">\(n \le 800\)</span>.</p>
+<p><strong>The level set is a complete diagnosis.</strong> For <span class="math notranslate nohighlight">\(A_2\)</span> with eigenvalues
+<span class="math notranslate nohighlight">\((5\mp\sqrt5)/2\)</span>, the traced curve satisfied
+<span class="math notranslate nohighlight">\(\mathbf{x}^{\top}\!A_2\mathbf{x} = 1\)</span> to <span class="math notranslate nohighlight">\(9\times10^{-16}\)</span> and its semi-axes
+came out <span class="math notranslate nohighlight">\(0.850651\)</span> and <span class="math notranslate nohighlight">\(0.525731\)</span>, matching <span class="math notranslate nohighlight">\(1/\sqrt{\lambda_i}\)</span> to the
+grid resolution — with the <strong>longest</strong> axis belonging to the <strong>smallest</strong>
+eigenvalue. The indefinite form is negative on exactly a third of all
+directions — not the half that symmetry might suggest — so its level set is
+a hyperbola.</p>
+<p><strong>Inertia is what survives a change of coordinates.</strong> A single congruence moved
+the spectrum of <span class="math notranslate nohighlight">\(A_{\text{pd}}\)</span> substantially while keeping every eigenvalue
+positive; across 400 congruences of the four matrices the triples <span class="math notranslate nohighlight">\((3,0,0)\)</span>,
+<span class="math notranslate nohighlight">\((2,0,1)\)</span>, <span class="math notranslate nohighlight">\((2,1,0)\)</span>, <span class="math notranslate nohighlight">\((0,0,3)\)</span> never changed. For the semidefinite matrix the
+nonzero eigenvalues ranged over more than two orders of magnitude while the
+zero stayed zero, which is why the classification tolerance has to scale.
+Cholesky itself is the congruence <span class="math notranslate nohighlight">\(L^{-1}AL^{-\top} = I\)</span>, verified to
+<span class="math notranslate nohighlight">\(10^{-16}\)</span>.</p>
+<p><strong>Every Gram matrix is semidefinite.</strong> Across four shapes the worst scaled
+<span class="math notranslate nohighlight">\(\lambda_{\min}\)</span> was <span class="math notranslate nohighlight">\(-6\times10^{-17}\)</span>; the tall cases were definite and the
+wide ones were not, exactly as “independent columns” predicts, with
+<span class="math notranslate nohighlight">\(\operatorname{rank}(G^{\top}G) = \operatorname{rank}(G)\)</span> throughout. The
+identity <span class="math notranslate nohighlight">\(\mathbf{x}^{\top}(G^{\top}G)\mathbf{x} = \|G\mathbf{x}\|^2\)</span> held
+pointwise over <span class="math notranslate nohighlight">\(10^{4}\)</span> vectors to a relative <span class="math notranslate nohighlight">\(10^{-16}\)</span> — and that one line is
+the entire proof.</p>
+<p><strong>Cholesky generates correlated randomness.</strong> <span class="math notranslate nohighlight">\(10^{5}\)</span> samples drawn as
+<span class="math notranslate nohighlight">\(\mathbf{x} = L\mathbf{z}\)</span> reproduced the target covariance to <span class="math notranslate nohighlight">\(1.3\%\)</span> and the
+correlation <span class="math notranslate nohighlight">\(0.9\)</span> to <span class="math notranslate nohighlight">\(10^{-3}\)</span>. The fractions inside the <span class="math notranslate nohighlight">\(1\sigma\)</span> and
+<span class="math notranslate nohighlight">\(2\sigma\)</span> ellipses came out <span class="math notranslate nohighlight">\(0.3914\)</span> and <span class="math notranslate nohighlight">\(0.8633\)</span> against the exact
+<span class="math notranslate nohighlight">\(1 - e^{-k^2/2} = 0.3935\)</span> and <span class="math notranslate nohighlight">\(0.8647\)</span> — a check on the whole distribution
+rather than on two moments.</p>
+<p><strong>Methods introduced.</strong> <code class="docutils literal notranslate"><span class="pre">scipy.linalg.cholesky</span></code>, <code class="docutils literal notranslate"><span class="pre">cho_factor</span></code> and <code class="docutils literal notranslate"><span class="pre">cho_solve</span></code>,
+the hand-written Cholesky recurrence, leading principal minors as Sylvester’s
+criterion, the inertia triple with a scaled zero threshold,
+<code class="docutils literal notranslate"><span class="pre">scipy.linalg.solve_triangular</span></code> for congruences without forming inverses,
+<code class="docutils literal notranslate"><span class="pre">np.cov</span></code>, the Mahalanobis distance <span class="math notranslate nohighlight">\(\mathbf{x}^{\top}\Sigma^{-1}\mathbf{x}\)</span>,
+and <code class="docutils literal notranslate"><span class="pre">ecp.linalg.random_spd</span></code>.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>The same theorem over <span class="math notranslate nohighlight">\(\mathbb{C}\)</span>, and where physics needs it.</strong> A
+Hermitian matrix with positive eigenvalues is positive definite in exactly
+the same sense, and a density matrix in quantum mechanics is a positive
+semidefinite Hermitian matrix of trace 1 — the semidefiniteness is what makes
+its eigenvalues probabilities.
+<a class="reference internal" href="hermitian-unitary-normal.html"><span class="std std-doc">§3.4</span></a> sets that up.</p></li>
+<li><p><strong>When the matrix is only nearly definite.</strong> Estimated covariance matrices
+routinely come back with small negative eigenvalues, and the assistant
+callout above builds the standard repair. The systematic version is the
+<em>modified</em> Cholesky factorization, which computes <span class="math notranslate nohighlight">\(A + E = LDL^{\top}\)</span> with
+<span class="math notranslate nohighlight">\(E\)</span> as small as possible, and it is what optimisation codes use to force a
+descent direction out of an indefinite Hessian <span class="bibtex-citation" id="id5">[<a class="reference internal" href="#id52" title="Jorge Nocedal and Stephen J. Wright. Numerical optimization. Springer Series in Operations Research, 2006. doi:10.1007/978-0-387-40065-5.">NW06</a>]</span>.</p></li>
+<li><p><strong>Definiteness as the hypothesis that makes iteration work.</strong> The conjugate
+gradient method solves <span class="math notranslate nohighlight">\(A\mathbf{x} = \mathbf{b}\)</span> using only matrix–vector
+products, and it needs <span class="math notranslate nohighlight">\(A\)</span> positive definite for the same reason this
+notebook needed it: the quadratic form
+<span class="math notranslate nohighlight">\(\tfrac12\mathbf{x}^{\top}\!A\mathbf{x} - \mathbf{b}^{\top}\mathbf{x}\)</span> must
+have a minimum rather than a saddle.
+<a class="reference internal" href="../05-numerical/stationary-and-cg.html"><span class="std std-doc">§5.4</span></a> builds it.</p></li>
+<li><p><strong>Kernels.</strong> A function <span class="math notranslate nohighlight">\(k(\mathbf{x}, \mathbf{y})\)</span> is a valid kernel exactly
+when every matrix <span class="math notranslate nohighlight">\(K_{ij} = k(\mathbf{x}_i, \mathbf{x}_j)\)</span> it produces is
+positive semidefinite — Mercer’s condition, which is
+<a class="reference internal" href="#equation-eq-pd-gram">Eq. 166</a> in disguise, since such a <span class="math notranslate nohighlight">\(k\)</span> is always an inner product in
+some feature space. <a class="reference internal" href="../06-structure/kernels-gram-matrix.html"><span class="std std-doc">§6.5</span></a> makes
+that precise.</p></li>
+</ul>
+<div class="docutils container" id="id6">
+<div role="list" class="citation-list">
+<div class="citation" id="id15" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">GVL13</a><span class="fn-bracket">]</span></span>
+<p>Gene H. Golub and Charles F. Van Loan. <em>Matrix Computations</em>. Johns Hopkins University Press, Baltimore, 4 edition, 2013.</p>
+</div>
+<div class="citation" id="id17" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">Hig02</a><span class="fn-bracket">]</span></span>
+<p>Nicholas J. Higham. <em>Accuracy and Stability of Numerical Algorithms</em>. SIAM, Philadelphia, 2 edition, 2002. <a class="reference external" href="https://doi.org/10.1137/1.9780898718027">doi:10.1137/1.9780898718027</a>.</p>
+</div>
+<div class="citation" id="id13" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">HJ13</a><span class="fn-bracket">]</span></span>
+<p>Roger A. Horn and Charles R. Johnson. <em>Matrix Analysis</em>. Cambridge University Press, 2 edition, 2013. <a class="reference external" href="https://doi.org/10.1017/CBO9781139020411">doi:10.1017/CBO9781139020411</a>.</p>
+</div>
+<div class="citation" id="id52" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">NW06</a><span class="fn-bracket">]</span></span>
+<p>Jorge Nocedal and Stephen J. Wright. Numerical optimization. <em>Springer Series in Operations Research</em>, 2006. <a class="reference external" href="https://doi.org/10.1007/978-0-387-40065-5">doi:10.1007/978-0-387-40065-5</a>.</p>
+</div>
+<div class="citation" id="id7" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">Str23</a><span class="fn-bracket">]</span></span>
+<p>Gilbert Strang. <em>Introduction to Linear Algebra</em>. Wellesley-Cambridge Press, Wellesley, MA, 6 edition, 2023. ISBN 978-1-7331466-7-8.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/03-eigenvalues"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="spectral-theorem.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">3.2 Symmetric Matrices and the Spectral Theorem</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="hermitian-unitary-normal.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-definition">The definition</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#five-equivalent-tests">Five equivalent tests</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cholesky">Cholesky</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-energy-ellipse">The energy ellipse</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#congruence-and-sylvester-s-law-of-inertia">Congruence and Sylvester’s law of inertia</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gram-matrices-covariance-and-sampling">Gram matrices, covariance, and sampling</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-five-tests-one-property-and-two-of-them-unusable">Exercise 1: Five tests, one property, and two of them unusable</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-cholesky-and-why-it-needs-no-pivoting">Exercise 2: Cholesky, and why it needs no pivoting</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-energy-ellipse-and-what-the-axes-measure">Exercise 3: The energy ellipse, and what the axes measure</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-congruence-and-sylvester-s-law-of-inertia">Exercise 4: Congruence, and Sylvester’s law of inertia</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-every-gram-matrix-is-semidefinite-and-when-it-is-definite">Exercise 5: Every Gram matrix is semidefinite, and when it is definite</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-covariance-and-generating-correlated-randomness">Exercise 6: Covariance, and generating correlated randomness</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

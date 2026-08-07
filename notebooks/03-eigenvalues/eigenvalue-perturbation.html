@@ -1,0 +1,1354 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="3.7 Eigenvalue Perturbation: Who Moves, and How Far" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/03-eigenvalues/eigenvalue-perturbation.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: §3.5 priced perturbation with Bauer–Fike: every eigenvalue of A + E lies within\operatorname{cond}(X)\lVert E\rVert of some eigenvalue of ..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: §3.5 priced perturbation with Bauer–Fike: every eigenvalue of A + E lies within\operatorname{cond}(X)\lVert E\rVert of some eigenvalue of ..." />
+
+    <title>3.7 Eigenvalue Perturbation: Who Moves, and How Far &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/03-eigenvalues/eigenvalue-perturbation';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/03-eigenvalues/eigenvalue-perturbation.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Chapter IV — The Singular Value Decomposition" href="../04-svd/index.html" />
+    <link rel="prev" title="3.6 Matrix Functions and the Matrix Exponential" href="matrix-functions-exponential.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter III — Eigenvalues and Spectral Theory</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/03-eigenvalues/eigenvalue-perturbation.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/03-eigenvalues/eigenvalue-perturbation.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/03-eigenvalues/eigenvalue-perturbation.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/03-eigenvalues/eigenvalue-perturbation.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>3.7 Eigenvalue Perturbation: Who Moves, and How Far</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#one-condition-number-per-eigenvalue">One condition number per eigenvalue</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#first-order-and-its-quadratic-remainder">First order, and its quadratic remainder</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#degeneracy-an-eigenvalue-problem-one-dimension-down">Degeneracy: an eigenvalue problem one dimension down</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#eigenvectors-obey-the-gap-not-the-conditioning">Eigenvectors obey the gap, not the conditioning</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-one-condition-number-per-eigenvalue">Exercise 1: One condition number per eigenvalue</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-first-order-and-the-quadratic-remainder">Exercise 2: First order, and the quadratic remainder</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-well-conditioned-eigenvalue-really-does-stay-put">Exercise 3: The well-conditioned eigenvalue really does stay put</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-degeneracy-splits-by-the-compressed-perturbation">Exercise 4: Degeneracy splits by the compressed perturbation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-eigenvectors-obey-the-gap">Exercise 5: Eigenvectors obey the gap</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="eigenvalue-perturbation-who-moves-and-how-far">
+<h1>3.7 Eigenvalue Perturbation: Who Moves, and How Far<a class="headerlink" href="#eigenvalue-perturbation-who-moves-and-how-far" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter III — Eigenvalues and Spectral Theory
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;3.7
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">A matrix has one condition number for its eigenvector basis, but each eigenvalue has its own — and they can differ by a factor of eight in a 3x3. This notebook prices movement per eigenvalue, splits a degenerate pair by the physicists&#x27; rule, and shows why an eigenvector with a nearby neighbour cannot be trusted at all.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;advanced&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;105–135 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="schur-jordan-nonnormality.html"><span class="std std-doc">§3.5</span></a> priced perturbation with
+<strong>Bauer–Fike</strong>: every eigenvalue of <span class="math notranslate nohighlight">\(A + E\)</span> lies within
+<span class="math notranslate nohighlight">\(\operatorname{cond}(X)\lVert E\rVert\)</span> of some eigenvalue of <span class="math notranslate nohighlight">\(A\)</span>. That is
+one number for the whole matrix, and it is the right answer to the
+question “how bad can it get?”. It is the wrong answer to the question a
+practitioner actually asks, which is <em>which</em> eigenvalue moved.</p>
+<p>This notebook answers that one. Each eigenvalue carries its <strong>own</strong>
+condition number <span class="math notranslate nohighlight">\(\kappa_i = 1/|\mathbf{y}_i^{*}\mathbf{x}_i|\)</span> — the
+secant of the angle between its left and right eigenvectors — and on the
+worked <span class="math notranslate nohighlight">\(3\times3\)</span> these come out <span class="math notranslate nohighlight">\((\sqrt{65}, \sqrt{65}, 1)\)</span> while
+Bauer–Fike’s single number is <span class="math notranslate nohighlight">\(8 + \sqrt{65}\)</span>. One eigenvalue of a badly
+non-normal matrix is <em>perfectly</em> conditioned, and the global bound cannot
+say so.</p>
+<p>Two things follow that the course has not met. When eigenvalues
+<strong>coincide</strong>, first-order theory does not fail — it becomes an
+eigenvalue problem one dimension down: the splittings are the eigenvalues
+of the perturbation <em>compressed onto the degenerate eigenspace</em>, which is
+the rule quantum mechanics calls degenerate perturbation theory and which
+this notebook gates to <span class="math notranslate nohighlight">\(10^{-12}\)</span>. And <strong>eigenvectors</strong> obey a different
+law from eigenvalues: they rotate by roughly <span class="math notranslate nohighlight">\(\lVert E\rVert/\text{gap}\)</span>,
+so a well-conditioned eigenvalue with a nearby neighbour still has a
+useless eigenvector. That is the Davis–Kahan story, and it is why
+<a class="reference internal" href="../04-svd/pca-covariance-whitening.html"><span class="std std-doc">§4.3</span></a>’s principal components
+scramble when two variances are close while their sum stays put.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> Golub and Van Loan <span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id14" title="Gene H. Golub and Charles F. Van Loan. Matrix Computations. Johns Hopkins University Press, Baltimore, 4 edition, 2013.">GVL13</a>]</span> §7.2 for the
+eigenvalue condition number, Horn and Johnson <span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id12" title="Roger A. Horn and Charles R. Johnson. Matrix Analysis. Cambridge University Press, 2 edition, 2013. doi:10.1017/CBO9781139020411.">HJ13</a>]</span> §6.3 for
+the perturbation series; the eigenvector bound is Davis and Kahan’s
+<span class="bibtex-citation" id="id3">[<a class="reference internal" href="#id71" title="Chandler Davis and W. M. Kahan. The rotation of eigenvectors by a perturbation. III. SIAM Journal on Numerical Analysis, 7(1):1–46, 1970. doi:10.1137/0707001.">DK70</a>]</span>. Bauer–Fike itself lives in
+<a class="reference internal" href="schur-jordan-nonnormality.html"><span class="std std-doc">§3.5</span></a> and is not repeated here.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="one-condition-number-per-eigenvalue">
+<h3>One condition number per eigenvalue<a class="headerlink" href="#one-condition-number-per-eigenvalue" title="Link to this heading">#</a></h3>
+<p>Let <span class="math notranslate nohighlight">\(A\)</span> be diagonalizable with a simple eigenvalue <span class="math notranslate nohighlight">\(\lambda_i\)</span>, right
+eigenvector <span class="math notranslate nohighlight">\(A\mathbf{x}_i = \lambda_i\mathbf{x}_i\)</span> and <strong>left</strong>
+eigenvector <span class="math notranslate nohighlight">\(\mathbf{y}_i^{*}A = \lambda_i\mathbf{y}_i^{*}\)</span>, both scaled
+to unit norm. The <strong>eigenvalue condition number</strong> is</p>
+<div class="math notranslate nohighlight" id="equation-eq-ep-kappa">
+<span class="eqno">(188)<a class="headerlink" href="#equation-eq-ep-kappa" title="Link to this equation">#</a></span>\[\kappa_i \;=\; \frac{1}{|\mathbf{y}_i^{*}\mathbf{x}_i|}
+\;=\; \sec\theta_i ,\]</div>
+<p>with <span class="math notranslate nohighlight">\(\theta_i\)</span> the angle between the two eigenvectors. For a normal
+matrix left and right eigenvectors coincide, <span class="math notranslate nohighlight">\(\theta_i = 0\)</span> and
+<span class="math notranslate nohighlight">\(\kappa_i = 1\)</span>: the <a class="reference internal" href="spectral-theorem.html"><span class="std std-doc">§3.2</span></a> case, where Weyl’s
+inequality says eigenvalues move no further than <span class="math notranslate nohighlight">\(\lVert E\rVert\)</span>. The
+more the two directions separate, the more that eigenvalue amplifies a
+perturbation — and <span class="math notranslate nohighlight">\(\kappa_i \le \operatorname{cond}(X)\)</span> always, so the
+per-eigenvalue numbers refine <a class="reference internal" href="schur-jordan-nonnormality.html"><span class="std std-doc">§3.5</span></a>’s
+global bound rather than contradicting it.</p>
+</section>
+<section id="first-order-and-its-quadratic-remainder">
+<h3>First order, and its quadratic remainder<a class="headerlink" href="#first-order-and-its-quadratic-remainder" title="Link to this heading">#</a></h3>
+<p>Differentiate <span class="math notranslate nohighlight">\(A(t) = A + tE\)</span> along the perturbation. For a simple
+eigenvalue,</p>
+<div class="math notranslate nohighlight" id="equation-eq-ep-first-order">
+<span class="eqno">(189)<a class="headerlink" href="#equation-eq-ep-first-order" title="Link to this equation">#</a></span>\[\lambda_i(t) \;=\; \lambda_i \;+\;
+t\,\frac{\mathbf{y}_i^{*}E\mathbf{x}_i}{\mathbf{y}_i^{*}\mathbf{x}_i}
+\;+\; O(t^2) ,\]</div>
+<p>and since <span class="math notranslate nohighlight">\(|\mathbf{y}_i^{*}E\mathbf{x}_i| \le \lVert E\rVert\)</span> for unit
+vectors, the slope is at most <span class="math notranslate nohighlight">\(\kappa_i\lVert E\rVert\)</span> — <a class="reference internal" href="#equation-eq-ep-kappa">Eq. 188</a>
+earning its name. The remainder is genuinely quadratic, which the
+exercises verify by watching the residual fall by <span class="math notranslate nohighlight">\(100\)</span> each time <span class="math notranslate nohighlight">\(t\)</span>
+falls by <span class="math notranslate nohighlight">\(10\)</span>.</p>
+</section>
+<section id="degeneracy-an-eigenvalue-problem-one-dimension-down">
+<h3>Degeneracy: an eigenvalue problem one dimension down<a class="headerlink" href="#degeneracy-an-eigenvalue-problem-one-dimension-down" title="Link to this heading">#</a></h3>
+<p><a class="reference internal" href="#equation-eq-ep-first-order">Eq. 189</a> divides by <span class="math notranslate nohighlight">\(\mathbf{y}_i^{*}\mathbf{x}_i\)</span> and
+assumes <span class="math notranslate nohighlight">\(\lambda_i\)</span> is simple. When <span class="math notranslate nohighlight">\(\lambda\)</span> is repeated with an
+orthonormal eigenspace basis <span class="math notranslate nohighlight">\(V\)</span> (columns spanning it), first-order
+theory does not break — the perturbation must first choose <em>which</em>
+directions inside the eigenspace are the right ones, and it does so by
+its own compression:</p>
+<div class="math notranslate nohighlight" id="equation-eq-ep-degenerate">
+<span class="eqno">(190)<a class="headerlink" href="#equation-eq-ep-degenerate" title="Link to this equation">#</a></span>\[\lambda_k(t) \;=\; \lambda \;+\; t\,\mu_k \;+\; O(t^2),
+\qquad \mu_k \in \operatorname{eig}\bigl(V^{*}EV\bigr) .\]</div>
+<p>The degenerate level splits into as many branches as the compressed
+perturbation has eigenvalues, with slopes given by those eigenvalues —
+a <span class="math notranslate nohighlight">\(2\times2\)</span> problem hiding inside an <span class="math notranslate nohighlight">\(n\times n\)</span> one. Physicists meet
+this as <em>degenerate perturbation theory</em>; it is the reason a symmetry
+must be broken before a level splits, and the reason the splitting
+pattern reveals which symmetry broke.</p>
+</section>
+<section id="eigenvectors-obey-the-gap-not-the-conditioning">
+<h3>Eigenvectors obey the gap, not the conditioning<a class="headerlink" href="#eigenvectors-obey-the-gap-not-the-conditioning" title="Link to this heading">#</a></h3>
+<p>Eigenvalues of a symmetric matrix are perfectly conditioned. Their
+eigenvectors are not. For a simple eigenvalue <span class="math notranslate nohighlight">\(\lambda_i\)</span> of a symmetric
+<span class="math notranslate nohighlight">\(A\)</span> separated from the rest of the spectrum by
+<span class="math notranslate nohighlight">\(\mathrm{gap}_i = \min_{j\ne i}|\lambda_i - \lambda_j|\)</span>, the <strong>Davis–Kahan
+<span class="math notranslate nohighlight">\(\sin\theta\)</span> theorem</strong> <span class="bibtex-citation" id="id4">[<a class="reference internal" href="#id71" title="Chandler Davis and W. M. Kahan. The rotation of eigenvectors by a perturbation. III. SIAM Journal on Numerical Analysis, 7(1):1–46, 1970. doi:10.1137/0707001.">DK70</a>]</span> bounds the rotation of its
+eigenvector under a symmetric <span class="math notranslate nohighlight">\(E\)</span>:</p>
+<div class="math notranslate nohighlight" id="equation-eq-ep-davis-kahan">
+<span class="eqno">(191)<a class="headerlink" href="#equation-eq-ep-davis-kahan" title="Link to this equation">#</a></span>\[\sin\theta(\mathbf{v}_i, \tilde{\mathbf{v}}_i)
+\;\le\; \frac{\lVert E\rVert_2}{\mathrm{gap}_i} .\]</div>
+<p>The gap, not the conditioning, is what an eigenvector’s trustworthiness
+depends on — and a gap can be small in a matrix whose every eigenvalue is
+impeccably conditioned. That is the whole warning.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data only: the worked non-normal <span class="math notranslate nohighlight">\(3\times3\)</span> whose per-eigenvalue
+conditioning is known in closed form, the symmetric matrix carrying an
+exactly doubled eigenvalue, the gap-sweep family, and the seeded
+generators. The condition numbers, the first-order shifts, the
+degenerate splittings and the rotation meter are all built in the
+exercises, where they are the lesson.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sympy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random matrix below comes from this seed</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+
+<span class="c1"># data: the worked non-normal matrix. Its 2x2 upper block carries the</span>
+<span class="c1"># non-normality (the 8 off the diagonal), while the third row and column</span>
+<span class="c1"># are decoupled — so eigenvalue 5 is PERFECTLY conditioned while 1 and 2</span>
+<span class="c1"># are not, which is the contrast the whole notebook turns on. Every</span>
+<span class="c1"># constant is exact: kappa = (sqrt(65), sqrt(65), 1), cond(X) = 8 + sqrt(65).</span>
+<span class="n">A_WORK</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+                   <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+                   <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">]])</span>
+
+<span class="c1"># data: a symmetric matrix with an exactly doubled eigenvalue, built by</span>
+<span class="c1"># conjugating diag(3, 3, 7) with a seeded orthogonal Q — so the degenerate</span>
+<span class="c1"># eigenspace is Q[:, :2] exactly, and Exercise 4 knows the answer it is</span>
+<span class="c1"># looking for.</span>
+<span class="n">_Q_DEG</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)))</span>
+<span class="n">LAM_DEG</span><span class="p">,</span> <span class="n">LAM_HIGH</span> <span class="o">=</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">7.0</span>
+<span class="n">A_DEG</span> <span class="o">=</span> <span class="n">_Q_DEG</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="n">LAM_DEG</span><span class="p">,</span> <span class="n">LAM_DEG</span><span class="p">,</span> <span class="n">LAM_HIGH</span><span class="p">])</span> <span class="o">@</span> <span class="n">_Q_DEG</span><span class="o">.</span><span class="n">T</span>
+<span class="n">A_DEG</span> <span class="o">=</span> <span class="p">(</span><span class="n">A_DEG</span> <span class="o">+</span> <span class="n">A_DEG</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>        <span class="c1"># symmetric to the last bit</span>
+<span class="n">V_DEG</span> <span class="o">=</span> <span class="n">_Q_DEG</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span>                  <span class="c1"># the degenerate eigenspace</span>
+
+<span class="c1"># data: the gap-sweep family. diag(1, 1 + gap, 5) isolates one control —</span>
+<span class="c1"># only the distance between the first two eigenvalues changes.</span>
+<span class="n">GAPS</span> <span class="o">=</span> <span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">)</span>
+
+<span class="c1"># data: one fixed symmetric unit-norm perturbation, shared across the</span>
+<span class="c1"># whole gap sweep so the only thing varying in Exercise 5 is the gap.</span>
+<span class="n">_E_FIX</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">E_SWEEP</span> <span class="o">=</span> <span class="p">(</span><span class="n">_E_FIX</span> <span class="o">+</span> <span class="n">_E_FIX</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+<span class="n">E_SWEEP</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">E_SWEEP</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-one-condition-number-per-eigenvalue">
+<h2>Exercise 1: One condition number per eigenvalue<a class="headerlink" href="#exercise-1-one-condition-number-per-eigenvalue" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-ep-kappa">Eq. 188</a> prices each eigenvalue separately, through the angle
+between its left and right eigenvectors. This exercise builds that
+meter and puts it beside <a class="reference internal" href="schur-jordan-nonnormality.html"><span class="std std-doc">§3.5</span></a>’s
+single <span class="math notranslate nohighlight">\(\operatorname{cond}(X)\)</span>.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">eig_condition(A)</span></code> returning <code class="docutils literal notranslate"><span class="pre">(w,</span> <span class="pre">kappa)</span></code>: take
+<code class="docutils literal notranslate"><span class="pre">np.linalg.eig(A)</span></code> for the right eigenvectors <span class="math notranslate nohighlight">\(X\)</span>, get the left ones as
+the columns of <span class="math notranslate nohighlight">\((X^{-1})^{*}\)</span> (the rows of <span class="math notranslate nohighlight">\(X^{-1}\)</span> are the left
+eigenvectors — that is what <span class="math notranslate nohighlight">\(X^{-1}AX = \Lambda\)</span> says), normalise both
+to unit length, and set <span class="math notranslate nohighlight">\(\kappa_i = 1/|\mathbf{y}_i^{*}\mathbf{x}_i|\)</span>.</p>
+<p><strong>Write this one yourself</strong> — the left eigenvector is the object the
+course has not needed until now, and it is the whole content of
+<a class="reference internal" href="#equation-eq-ep-kappa">Eq. 188</a>.</p>
+<p><strong>Part b)</strong> Gate the closed forms on <code class="docutils literal notranslate"><span class="pre">A_WORK</span></code>, all to <span class="math notranslate nohighlight">\(10^{-13}\)</span>: the
+eigenvalues are exactly <span class="math notranslate nohighlight">\((1, 2, 5)\)</span>; <span class="math notranslate nohighlight">\(\kappa\)</span> for the eigenvalue <span class="math notranslate nohighlight">\(5\)</span> is
+exactly <span class="math notranslate nohighlight">\(1\)</span> (its eigenvector is <span class="math notranslate nohighlight">\(\mathbf{e}_3\)</span>, left and right alike);
+and <span class="math notranslate nohighlight">\(\kappa\)</span> for both <span class="math notranslate nohighlight">\(1\)</span> and <span class="math notranslate nohighlight">\(2\)</span> is <span class="math notranslate nohighlight">\(\sqrt{65} = 8.0623\)</span>. Verify
+<span class="math notranslate nohighlight">\(\sqrt{65}\)</span> symbolically with SymPy from the <span class="math notranslate nohighlight">\(2\times2\)</span> block, so the
+constant is algebra rather than a measurement.</p>
+<p><strong>Part c)</strong> Gate the relationship to the global bound:
+<span class="math notranslate nohighlight">\(\max_i \kappa_i \le \operatorname{cond}(X)\)</span>, with
+<span class="math notranslate nohighlight">\(\operatorname{cond}(X) = 8 + \sqrt{65} = 16.0623\)</span> to <span class="math notranslate nohighlight">\(10^{-12}\)</span> — the
+Bauer–Fike constant is a ceiling over the per-eigenvalue numbers, and
+here it is twice the largest of them.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>eigenvalues [1. 2. 5.]
+condition numbers [8.062258 8.062258 1.      ]
+SymPy: kappa of the 2x2 block is sqrt(65): True (8.062258)
+cond(X) = 16.062258 vs 8 + sqrt(65) = 16.062258
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the worked matrix has eigenvalues 1, 2, 5   [max|Δ| = 0 (rtol=0, atol=1e-13)]
+✓  each eigenvalue carries its own conditioning: (sqrt 65, sqrt 65, 1)   [the decoupled eigenvalue 5 is PERFECTLY conditioned while 1 and 2 amplify by 8.06 — one matrix, three different sensitivities, and SymPy confirms sqrt(65) is algebra rather than measurement]
+✓  and Bauer-Fike&#39;s cond(X) = 8 + sqrt(65) is a ceiling over all of them   [max kappa 8.0623 under cond(X) 16.0623: 3.5&#39;s global bound is true and twice as pessimistic as the worst individual eigenvalue here — which is what &#39;per eigenvalue&#39; buys]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-first-order-and-the-quadratic-remainder">
+<h2>Exercise 2: First order, and the quadratic remainder<a class="headerlink" href="#exercise-2-first-order-and-the-quadratic-remainder" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-ep-first-order">Eq. 189</a> is a derivative, so the honest test is a finite
+difference — and the honest gate is on the <em>remainder</em>, which must fall
+by <span class="math notranslate nohighlight">\(100\)</span> whenever <span class="math notranslate nohighlight">\(t\)</span> falls by <span class="math notranslate nohighlight">\(10\)</span>.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">first_order_slopes(A,</span> <span class="pre">E)</span></code> returning the <span class="math notranslate nohighlight">\(n\)</span> slopes
+<span class="math notranslate nohighlight">\((\mathbf{y}_i^{*}E\mathbf{x}_i)/(\mathbf{y}_i^{*}\mathbf{x}_i)\)</span> of
+<a class="reference internal" href="#equation-eq-ep-first-order">Eq. 189</a>, reusing Exercise 1’s eigenvector pairs. On
+<code class="docutils literal notranslate"><span class="pre">A_WORK</span></code> with a seeded unit-norm <span class="math notranslate nohighlight">\(E\)</span>, report the three slopes.</p>
+<p><strong>Write this one yourself</strong> — it is <a class="reference internal" href="#equation-eq-ep-first-order">Eq. 189</a> transcribed,
+and Exercises 3 and 4 both run on it.</p>
+<p><strong>Part b)</strong> Gate that the prediction is first-order accurate: for
+<span class="math notranslate nohighlight">\(t = 10^{-3}, 10^{-4}, 10^{-5}\)</span> — a <em>clean band</em>, in
+<a class="reference internal" href="../05-numerical/stationary-and-cg.html"><span class="std std-doc">§5.4</span></a>’s sense: at
+<span class="math notranslate nohighlight">\(t = 10^{-2}\)</span> the <span class="math notranslate nohighlight">\(O(t^3)\)</span> term still contributes about 10% of the
+remainder and would spoil a constant-ratio test, while below
+<span class="math notranslate nohighlight">\(10^{-6}\)</span> the residual approaches rounding. Compare the true
+eigenvalues of
+<span class="math notranslate nohighlight">\(A + tE\)</span> (matched to the unperturbed ones by proximity) against
+<span class="math notranslate nohighlight">\(\lambda_i + t\,s_i\)</span>, and gate that each residual divided by <span class="math notranslate nohighlight">\(t^2\)</span> is
+<strong>constant to 5%</strong> across the three scales. A first-order formula whose
+error scaled like <span class="math notranslate nohighlight">\(t\)</span> would fail this; one whose error scaled like <span class="math notranslate nohighlight">\(t^3\)</span>
+would too. Report the three ratios.</p>
+<p><strong>Part c)</strong> Gate the slope bound of <a class="reference internal" href="#equation-eq-ep-kappa">Eq. 188</a>:
+<span class="math notranslate nohighlight">\(|s_i| \le \kappa_i\lVert E\rVert_2\)</span> for every <span class="math notranslate nohighlight">\(i\)</span>, one-sided, over 200
+seeded unit-norm perturbations — the condition number earning its name
+600 times.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>first-order slopes [-6.105369  5.958212 -0.431493]
+t = 1e-03: residual [&#39;3.56e-05&#39;, &#39;3.57e-05&#39;, &#39;6.53e-08&#39;] -&gt; /t^2 [&#39;35.600&#39;, &#39;35.666&#39;, &#39;0.065&#39;]
+t = 1e-04: residual [&#39;3.60e-07&#39;, &#39;3.61e-07&#39;, &#39;6.52e-10&#39;] -&gt; /t^2 [&#39;35.985&#39;, &#39;36.051&#39;, &#39;0.065&#39;]
+t = 1e-05: residual [&#39;3.60e-09&#39;, &#39;3.61e-09&#39;, &#39;6.52e-12&#39;] -&gt; /t^2 [&#39;36.024&#39;, &#39;36.090&#39;, &#39;0.065&#39;]
+remainder/t^2 constant to 1.18%
+worst |slope| - kappa over 600 checks: 0.00e+00 (must stay &lt;= 0)
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the remainder is genuinely quadratic (Eq. 2)   [residual/t^2 varies by 1.18% across three decades of t — a first-order formula with a linear error could not do this, and neither could one that was accidentally exact [0.0117729 &lt; 0.05]]
+✓  and every slope respects its own condition number (Eq. 1)   [200 seeded unit-norm perturbations, three eigenvalues each: |y* E x| &lt;= ||E|| for unit vectors, so the slope cannot exceed kappa_i — the bound is one-sided and was never approached from above]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-the-well-conditioned-eigenvalue-really-does-stay-put">
+<h2>Exercise 3: The well-conditioned eigenvalue really does stay put<a class="headerlink" href="#exercise-3-the-well-conditioned-eigenvalue-really-does-stay-put" title="Link to this heading">#</a></h2>
+<p>Exercise 1 said eigenvalue <span class="math notranslate nohighlight">\(5\)</span> is immune and <span class="math notranslate nohighlight">\(1, 2\)</span> are not. This
+exercise measures it, which is a different claim from proving it.</p>
+<p><strong>Part a)</strong> For 200 seeded unit-norm perturbations at
+<span class="math notranslate nohighlight">\(t = 10^{-6}\)</span>, record how far each eigenvalue of <span class="math notranslate nohighlight">\(A + tE\)</span> moves from
+its unperturbed value. Gate the two facts: every displacement is under
+<span class="math notranslate nohighlight">\(\kappa_i t (1 + 10^{-3})\)</span> (one-sided, the first-order bound with room
+for the quadratic remainder), and the <strong>median</strong> displacement of
+eigenvalue <span class="math notranslate nohighlight">\(5\)</span> is at least <span class="math notranslate nohighlight">\(4\times\)</span> smaller than that of eigenvalue
+<span class="math notranslate nohighlight">\(1\)</span> — the conditioning showing up as a measured ratio, not just a bound.</p>
+<p><strong>Part b)</strong> Contrast with the symmetric case: build the symmetric part
+family <span class="math notranslate nohighlight">\(S = (A_{\text{WORK}} + A_{\text{WORK}}^{\top})/2\)</span> and repeat.
+Gate that all three of <em>its</em> condition numbers are <span class="math notranslate nohighlight">\(1\)</span> to <span class="math notranslate nohighlight">\(10^{-13}\)</span>
+(a symmetric matrix has orthogonal eigenvectors, so left and right
+coincide) and that no eigenvalue moves further than
+<span class="math notranslate nohighlight">\(t(1 + 10^{-3})\)</span> — Weyl’s inequality of
+<a class="reference internal" href="spectral-theorem.html"><span class="std std-doc">§3.2</span></a>, recovered as the <span class="math notranslate nohighlight">\(\kappa_i = 1\)</span> special
+case of <a class="reference internal" href="#equation-eq-ep-kappa">Eq. 188</a>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>median displacement: lambda=1 2.546e-06, lambda=2 2.551e-06, lambda=5 2.851e-07
+the decoupled eigenvalue moves 8.9x less than the worst; worst overshoot of the bound -1.9e-07
+symmetric part: kappa = [1. 1. 1.]; worst Weyl overshoot -5.0e-09
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  displacement tracks the per-eigenvalue condition number (Eq. 1)   [600 measured displacements, none above kappa_i t; and the decoupled eigenvalue moved 8.9x less than the ill-conditioned one — the same matrix, the same perturbations, different fates]
+✓  and the symmetric case has kappa = 1, which IS Weyl&#39;s inequality   [orthogonal eigenvectors make left and right coincide, so Eq. 1 gives 1 for every eigenvalue and 3.2&#39;s bound falls out as the special case]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-degeneracy-splits-by-the-compressed-perturbation">
+<h2>Exercise 4: Degeneracy splits by the compressed perturbation<a class="headerlink" href="#exercise-4-degeneracy-splits-by-the-compressed-perturbation" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-ep-first-order">Eq. 189</a> divides by <span class="math notranslate nohighlight">\(\mathbf{y}^{*}\mathbf{x}\)</span> and needs
+a simple eigenvalue. <code class="docutils literal notranslate"><span class="pre">A_DEG</span></code> has an exactly doubled eigenvalue <span class="math notranslate nohighlight">\(3\)</span>, and
+<a class="reference internal" href="#equation-eq-ep-degenerate">Eq. 190</a> says the perturbation itself decides how the
+level splits — through its compression onto the eigenspace.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">degenerate_shifts(V,</span> <span class="pre">E)</span></code> returning the eigenvalues of
+the compressed perturbation <span class="math notranslate nohighlight">\(V^{*}EV\)</span> (<span class="math notranslate nohighlight">\(2\times2\)</span> here), sorted
+ascending. With the Setup’s <code class="docutils literal notranslate"><span class="pre">V_DEG</span></code> and a seeded symmetric unit-norm
+<span class="math notranslate nohighlight">\(E\)</span>, report the two slopes.</p>
+<p><strong>Write this one yourself</strong> — the compression is three characters of
+NumPy and the entire content of degenerate perturbation theory.</p>
+<p><strong>Part b)</strong> Gate the splitting law: for <span class="math notranslate nohighlight">\(t = 10^{-3}, 10^{-4},
+10^{-5}\)</span>, the two lowest eigenvalues of <span class="math notranslate nohighlight">\(A_{\text{DEG}} + tE\)</span> equal
+<span class="math notranslate nohighlight">\(3 + t\mu_k\)</span> with residual falling quadratically — gate residual/<span class="math notranslate nohighlight">\(t^2\)</span>
+constant to 5%, as in Exercise 2.</p>
+<p><strong>Part c)</strong> Gate the exact identity underneath it: the <strong>sum</strong> of the
+first-order shifts equals <span class="math notranslate nohighlight">\(\operatorname{tr}(V^{*}EV)\)</span> to <span class="math notranslate nohighlight">\(10^{-14}\)</span>,
+and equals the first-order movement of the eigenvalue <em>sum</em> — because
+the trace of the whole matrix moves by <span class="math notranslate nohighlight">\(t\operatorname{tr}E\)</span> whatever
+the eigenvectors do. Splitting redistributes; it does not create.
+Draw the fan: the two branches separating linearly out of the
+degenerate level as <span class="math notranslate nohighlight">\(t\)</span> grows.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>first-order splittings mu = [-0.268038  0.436009] (the level splits into two branches)
+t = 1e-03: actual [2.99973196 3.000436  ] predicted [2.99973196 3.00043601]
+t = 1e-04: actual [2.9999732 3.0000436] predicted [2.9999732 3.0000436]
+t = 1e-05: actual [2.99999732 3.00000436] predicted [2.99999732 3.00000436]
+degenerate remainder/t^2 constant to 0.41%
+sum of shifts vs trace of the compression: 8.3e-17
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  a degenerate level splits at the compressed perturbation&#39;s eigenvalues (Eq. 3)   [residual/t^2 constant to 0.41% over three decades: the perturbation picks its own basis inside the eigenspace, and the slopes are the eigenvalues of a 2x2 — degenerate perturbation theory, gated [0.00409753 &lt; 0.05]]
+✓  and the splittings sum to the trace of the compression   [an exact identity: splitting redistributes the level, it does not create — the trace moves by t tr(E) whatever the eigenvectors do [8.32667e-17 &lt; 1e-14]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-ep-fan">
+<img alt="../../_images/02e823dceec59e0d29386bdeff2492edc3637c1c9276ffaa498e5169a723c1b9.png" src="../../_images/02e823dceec59e0d29386bdeff2492edc3637c1c9276ffaa498e5169a723c1b9.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 71 </span><span class="caption-text">The degenerate level splitting. The doubled eigenvalue <span class="math notranslate nohighlight">\(\lambda = 3\)</span> of the symmetric <span class="math notranslate nohighlight">\(A_{\mathrm{DEG}}\)</span> (dotted rule) fans into two branches as the perturbation <span class="math notranslate nohighlight">\(tE\)</span> is switched on, with the measured eigenvalues (points) sitting on the first-order predictions <span class="math notranslate nohighlight">\(3 + t\mu_k\)</span> (lines) whose slopes are the two eigenvalues of the compressed perturbation <span class="math notranslate nohighlight">\(V^{\top}EV\)</span>. Nothing about the <span class="math notranslate nohighlight">\(3\times3\)</span> problem chooses the splitting directions — the <span class="math notranslate nohighlight">\(2\times2\)</span> compression does, which is the content of Eq. 3.</span><a class="headerlink" href="#fig-ep-fan" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-eigenvectors-obey-the-gap">
+<h2>Exercise 5: Eigenvectors obey the gap<a class="headerlink" href="#exercise-5-eigenvectors-obey-the-gap" title="Link to this heading">#</a></h2>
+<p>Every eigenvalue of a symmetric matrix has <span class="math notranslate nohighlight">\(\kappa_i = 1\)</span>. Exercise 3
+gated that. It says nothing about the eigen<em>vectors</em>, and
+<a class="reference internal" href="#equation-eq-ep-davis-kahan">Eq. 191</a> says those depend on the <strong>gap</strong> — which the
+Setup’s family varies while holding everything else fixed.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">rotation(v0,</span> <span class="pre">v1)</span></code> returning
+<span class="math notranslate nohighlight">\(\sin\theta\)</span> between two unit vectors as
+<span class="math notranslate nohighlight">\(\sqrt{1 - |\mathbf{v}_0^{*}\mathbf{v}_1|^2}\)</span> — the modulus first,
+because an eigenvector’s sign is arbitrary and a raw subtraction would
+measure the solver’s convention rather than the mathematics.</p>
+<p><strong>Part b)</strong> For each gap in <span class="math notranslate nohighlight">\((2, 0.5, 0.1, 0.02)\)</span>, perturb
+<span class="math notranslate nohighlight">\(\operatorname{diag}(1, 1+\mathrm{gap}, 5)\)</span> by <span class="math notranslate nohighlight">\(tE\)</span> with the Setup’s
+<strong>fixed</strong> <code class="docutils literal notranslate"><span class="pre">E_SWEEP</span></code> at <span class="math notranslate nohighlight">\(t = 10^{-4}\)</span>, and measure the first
+eigenvector’s rotation. Gate <a class="reference internal" href="#equation-eq-ep-davis-kahan">Eq. 191</a> one-sidedly —
+<span class="math notranslate nohighlight">\(\sin\theta \le t/\mathrm{gap}\)</span> every time — and gate the sharper
+statement the fixed perturbation makes available: the product
+<span class="math notranslate nohighlight">\(\sin\theta \cdot \mathrm{gap}/t\)</span> is <strong>constant to 2%</strong> across two
+decades of gap, so the rotation really does scale as <span class="math notranslate nohighlight">\(1/\mathrm{gap}\)</span>
+rather than merely staying under it.</p>
+<p><strong>Part c)</strong> Gate the moral against Exercise 3’s result: at
+<span class="math notranslate nohighlight">\(\mathrm{gap} = 0.02\)</span> the eigenvalues still move by at most <span class="math notranslate nohighlight">\(t\)</span>
+(Weyl, <span class="math notranslate nohighlight">\(\kappa = 1\)</span> — measured: <span class="math notranslate nohighlight">\(0.49\,t\)</span>) while the eigenvector
+rotates by more than <span class="math notranslate nohighlight">\(20\,t\)</span> (measured: <span class="math notranslate nohighlight">\(28\,t\)</span>), so the eigenvector
+turns some <strong>fifty times further</strong> than any eigenvalue moves —
+perfectly conditioned eigenvalues, untrustworthy eigenvectors, in the
+same matrix at the same moment. Draw the sweep on log axes.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>gap  2.00: sin(theta) 2.8580e-05  bound 5.0000e-05  sin*gap/t 0.5716  eigenvalue move 4.87e-05
+gap  0.50: sin(theta) 1.1359e-04  bound 2.0000e-04  sin*gap/t 0.5679  eigenvalue move 4.87e-05
+gap  0.10: sin(theta) 5.6752e-04  bound 1.0000e-03  sin*gap/t 0.5675  eigenvalue move 4.88e-05
+gap  0.02: sin(theta) 2.8329e-03  bound 5.0000e-03  sin*gap/t 0.5666  eigenvalue move 4.89e-05
+Davis-Kahan respected: True; sin*gap/t constant to 0.88%
+at the smallest gap the eigenvector rotates 28t while no eigenvalue moves more than 0.49t
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the eigenvector rotation never exceeds ||E||/gap (Eq. 4)   [Davis-Kahan, one-sided over four gaps spanning two decades — the bound is a theorem, and sampling can only lose to it]
+✓  and the rotation scales as 1/gap, not merely under it   [sin(theta) * gap / t constant to 0.88% with the perturbation held fixed: the gap is the whole story, which a one-sided bound alone would not establish [0.00878533 &lt; 0.02]]
+✓  so a perfectly conditioned eigenvalue can carry a useless eigenvector   [at gap = 0.02 no eigenvalue moved past 0.49t (Weyl, kappa = 1) while the eigenvector turned by 28t — conditioning and trustworthiness are different questions, asked of different objects]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-ep-gap">
+<img alt="../../_images/eab94c37789294fcec4f6640a16409f3078822c38c8cb380465e0bca65df3bff.png" src="../../_images/eab94c37789294fcec4f6640a16409f3078822c38c8cb380465e0bca65df3bff.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 72 </span><span class="caption-text">Eigenvector rotation against eigenvalue gap, log-log, for a fixed symmetric perturbation of norm <span class="math notranslate nohighlight">\(t = 10^{-4}\)</span>. The measured <span class="math notranslate nohighlight">\(\sin\theta\)</span> (ink) runs parallel to the Davis–Kahan ceiling <span class="math notranslate nohighlight">\(t/\mathrm{gap}\)</span> (amber, dashed) across two decades — the rotation scales as <span class="math notranslate nohighlight">\(1/\mathrm{gap}\)</span>, gated to 2%, rather than merely staying beneath the bound. The grey rule is how far the eigenVALUES moved: flat at <span class="math notranslate nohighlight">\(t\)</span>, because every eigenvalue of a symmetric matrix is perfectly conditioned no matter how close its neighbour is. The two lines diverging leftward is the notebook’s warning in one picture.</span><a class="headerlink" href="#fig-ep-gap" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p><strong>Conditioning is a property of an eigenvalue, not of a matrix.</strong> On the
+worked <span class="math notranslate nohighlight">\(3\times3\)</span> the three eigenvalues came out with <span class="math notranslate nohighlight">\(\kappa =
+(\sqrt{65}, \sqrt{65}, 1)\)</span> — the decoupled eigenvalue <span class="math notranslate nohighlight">\(5\)</span> perfectly
+conditioned while <span class="math notranslate nohighlight">\(1\)</span> and <span class="math notranslate nohighlight">\(2\)</span> amplify by <span class="math notranslate nohighlight">\(8.06\)</span> — against
+<a class="reference internal" href="schur-jordan-nonnormality.html"><span class="std std-doc">§3.5</span></a>’s single
+<span class="math notranslate nohighlight">\(\operatorname{cond}(X) = 8 + \sqrt{65} = 16.06\)</span>, a true ceiling that is
+twice as pessimistic as the worst individual eigenvalue. SymPy confirmed
+<span class="math notranslate nohighlight">\(\sqrt{65}\)</span> exactly.</p>
+<p><strong>First order is first order.</strong> The residual against
+<span class="math notranslate nohighlight">\(\lambda_i + t\,s_i\)</span> divided by <span class="math notranslate nohighlight">\(t^2\)</span> held constant to 1.2% across three
+decades of <span class="math notranslate nohighlight">\(t\)</span> inside the clean band, and no slope exceeded its own <span class="math notranslate nohighlight">\(\kappa_i\lVert E\rVert\)</span> over 600
+checks. Measured displacements obeyed the same bound over 600 more, with
+the well-conditioned eigenvalue moving several times less than its
+neighbours under identical perturbations — and the symmetric part
+returned <span class="math notranslate nohighlight">\(\kappa = 1\)</span> for all three, recovering
+<a class="reference internal" href="spectral-theorem.html"><span class="std std-doc">§3.2</span></a>’s Weyl inequality as the special case.</p>
+<p><strong>A degenerate level splits by its own compression.</strong> The doubled
+eigenvalue <span class="math notranslate nohighlight">\(3\)</span> fanned into two branches whose slopes are the eigenvalues
+of the <span class="math notranslate nohighlight">\(2\times2\)</span> compression <span class="math notranslate nohighlight">\(V^{\top}EV\)</span>, with a quadratic remainder
+constant to well under a percent, and the two shifts summed to the
+compression’s trace at rounding: splitting redistributes a level, it
+never creates one. That is degenerate perturbation theory, gated.</p>
+<p><strong>Eigenvectors obey the gap.</strong> Across gaps from <span class="math notranslate nohighlight">\(2\)</span> down to <span class="math notranslate nohighlight">\(0.02\)</span> the
+eigenvector rotation stayed under Davis–Kahan’s <span class="math notranslate nohighlight">\(\lVert E\rVert/
+\mathrm{gap}\)</span> and — the sharper fact — scaled as <span class="math notranslate nohighlight">\(1/\mathrm{gap}\)</span> to
+within 2%. At the smallest gap the eigenvalues moved by at most <span class="math notranslate nohighlight">\(t\)</span>
+(measured <span class="math notranslate nohighlight">\(0.49\,t\)</span>) while the eigenvector turned by <span class="math notranslate nohighlight">\(28\,t\)</span> — some
+fifty times further: the same matrix, at the same moment, with
+impeccable eigenvalues and an untrustworthy basis.</p>
+<p><strong>Methods introduced.</strong> <code class="docutils literal notranslate"><span class="pre">eig_condition</span></code> (left eigenvectors and the
+secant of their angle), <code class="docutils literal notranslate"><span class="pre">first_order_slopes</span></code>, the remainder-over-<span class="math notranslate nohighlight">\(t^2\)</span>
+test for genuine first-order accuracy, <code class="docutils literal notranslate"><span class="pre">degenerate_shifts</span></code> via the
+compressed perturbation, and <code class="docutils literal notranslate"><span class="pre">rotation</span></code> as a sign-blind subspace meter.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Why <code class="docutils literal notranslate"><span class="pre">eigh</span></code> is not <code class="docutils literal notranslate"><span class="pre">eig</span></code>.</strong> The algorithms of
+<a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html"><span class="std std-doc">§5.2</span></a> are backward
+stable: they return the exact spectrum of <span class="math notranslate nohighlight">\(A + E\)</span> with
+<span class="math notranslate nohighlight">\(\lVert E\rVert \sim \varepsilon\lVert A\rVert\)</span>. Everything in this
+notebook then prices the <em>forward</em> error you actually receive — which
+is why a symmetric solver is trusted and a general one is read with
+its condition numbers in hand.</p></li>
+<li><p><strong>Clustered principal components.</strong> In
+<a class="reference internal" href="../04-svd/pca-covariance-whitening.html"><span class="std std-doc">§4.3</span></a> two nearly equal
+variances make the corresponding components rotate freely inside their
+plane while the <em>subspace they span</em> stays put — the same distinction
+Exercise 5 measured, and the reason component-wise interpretation of
+near-degenerate PCA is a mistake the mathematics predicts.</p></li>
+<li><p><strong>Symmetry, and what breaking it reveals.</strong> Exercise 4’s compression
+is how a physicist reads a spectrum: the degeneracy is a symmetry, the
+splitting pattern names the perturbation that broke it, and the slopes
+are its matrix elements. <a class="reference internal" href="../09-quantum/qubits-gates-bloch.html"><span class="std std-doc">§9.1</span></a>’s
+Pauli algebra is exactly this calculation on a two-level system.</p></li>
+<li><p><strong>Pseudospectra saw it first.</strong>
+<a class="reference internal" href="schur-jordan-nonnormality.html"><span class="std std-doc">§3.5</span></a>’s contours are the global
+picture of what <span class="math notranslate nohighlight">\(\kappa_i\)</span> measures locally: where the resolvent norm
+bulges, an eigenvalue is soft. The per-eigenvalue number is the
+linearisation; the pseudospectrum is the whole nonlinear truth.</p></li>
+</ul>
+<div class="docutils container" id="id5">
+<div role="list" class="citation-list">
+<div class="citation" id="id71" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>DK70<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id3">1</a>,<a role="doc-backlink" href="#id4">2</a>)</span>
+<p>Chandler Davis and W. M. Kahan. The rotation of eigenvectors by a perturbation. III. <em>SIAM Journal on Numerical Analysis</em>, 7(1):1–46, 1970. <a class="reference external" href="https://doi.org/10.1137/0707001">doi:10.1137/0707001</a>.</p>
+</div>
+<div class="citation" id="id14" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">GVL13</a><span class="fn-bracket">]</span></span>
+<p>Gene H. Golub and Charles F. Van Loan. <em>Matrix Computations</em>. Johns Hopkins University Press, Baltimore, 4 edition, 2013.</p>
+</div>
+<div class="citation" id="id12" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">HJ13</a><span class="fn-bracket">]</span></span>
+<p>Roger A. Horn and Charles R. Johnson. <em>Matrix Analysis</em>. Cambridge University Press, 2 edition, 2013. <a class="reference external" href="https://doi.org/10.1017/CBO9781139020411">doi:10.1017/CBO9781139020411</a>.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/03-eigenvalues"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="matrix-functions-exponential.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">3.6 Matrix Functions and the Matrix Exponential</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../04-svd/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Chapter IV — The Singular Value Decomposition</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#one-condition-number-per-eigenvalue">One condition number per eigenvalue</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#first-order-and-its-quadratic-remainder">First order, and its quadratic remainder</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#degeneracy-an-eigenvalue-problem-one-dimension-down">Degeneracy: an eigenvalue problem one dimension down</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#eigenvectors-obey-the-gap-not-the-conditioning">Eigenvectors obey the gap, not the conditioning</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-one-condition-number-per-eigenvalue">Exercise 1: One condition number per eigenvalue</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-first-order-and-the-quadratic-remainder">Exercise 2: First order, and the quadratic remainder</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-well-conditioned-eigenvalue-really-does-stay-put">Exercise 3: The well-conditioned eigenvalue really does stay put</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-degeneracy-splits-by-the-compressed-perturbation">Exercise 4: Degeneracy splits by the compressed perturbation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-eigenvectors-obey-the-gap">Exercise 5: Eigenvectors obey the gap</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

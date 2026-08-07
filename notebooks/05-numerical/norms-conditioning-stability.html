@@ -1,0 +1,1436 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="5.1 Norms, Conditioning, and Backward Stability" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/05-numerical/norms-conditioning-stability.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: Chapter V opens by keeping a promise. Since §0.2 this course has used\kappa to predict lost digits, and since §2.3 it has promised that co..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: Chapter V opens by keeping a promise. Since §0.2 this course has used\kappa to predict lost digits, and since §2.3 it has promised that co..." />
+
+    <title>5.1 Norms, Conditioning, and Backward Stability &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/05-numerical/norms-conditioning-stability';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/05-numerical/norms-conditioning-stability.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="5.2 How Eigenvalues Are Really Computed" href="eigenvalue-algorithms.html" />
+    <link rel="prev" title="Chapter V — Numerical Linear Algebra" href="index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter V — Numerical Linear Algebra</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/05-numerical/norms-conditioning-stability.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/05-numerical/norms-conditioning-stability.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/05-numerical/norms-conditioning-stability.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/05-numerical/norms-conditioning-stability.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>5.1 Norms, Conditioning, and Backward Stability</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#induced-norms">Induced norms</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-kappa-bounds-exactly">What <span class="math notranslate nohighlight">\(\kappa\)</span> bounds, exactly</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#forward-and-backward-error">Forward and backward error</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-growth-factor">The growth factor</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-induced-norms-by-definition-and-by-closed-form">Exercise 1: Induced norms, by definition and by closed form</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-attaining-the-kappa-bound-takes-two-alignments">Exercise 2: Attaining the <span class="math notranslate nohighlight">\(\kappa\)</span> bound takes two alignments</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-backward-stability-the-theorem-under-the-whole-course">Exercise 3: Backward stability: the theorem under the whole course</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-the-residual-is-a-liar">Exercise 4: The residual is a liar</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-the-growth-factor-the-fine-print-on-solve">Exercise 5: The growth factor: the fine print on <code class="docutils literal notranslate"><span class="pre">solve</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="norms-conditioning-and-backward-stability">
+<h1>5.1 Norms, Conditioning, and Backward Stability<a class="headerlink" href="#norms-conditioning-and-backward-stability" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter V — Numerical Linear Algebra
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;5.1
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">The vocabulary the whole course has been borrowing, now defined and measured: what a matrix norm is, what kappa actually bounds and when the bound is attained, and the theorem under everything — solve returns the exact answer to a nearby question, even when it is wrong by six digits.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;advanced&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;105–135 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p>Chapter V opens by keeping a promise. Since
+<a class="reference internal" href="../00-machine/floating-point.html"><span class="std std-doc">§0.2</span></a> this course has used <span class="math notranslate nohighlight">\(\kappa\)</span> to
+predict lost digits, and since
+<a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html"><span class="std std-doc">§2.3</span></a> it has promised that
+<em>conditioning decides which method to trust</em>. This notebook is where the
+promised machinery actually lives: induced norms, the perturbation bound that
+defines <span class="math notranslate nohighlight">\(\kappa\)</span> (and the two alignments needed to attain it), and the
+distinction the whole subject rests on — <strong>forward error</strong>, which is what you
+want, against <strong>backward error</strong>, which is what a good algorithm actually
+controls.</p>
+<p>The central measurement is stark. Across seven matrices with <span class="math notranslate nohighlight">\(\kappa\)</span> from
+<span class="math notranslate nohighlight">\(10^{2}\)</span> to <span class="math notranslate nohighlight">\(10^{14}\)</span>, <code class="docutils literal notranslate"><span class="pre">np.linalg.solve</span></code>’s forward error climbs six orders of
+magnitude in lockstep with <span class="math notranslate nohighlight">\(\kappa\varepsilon\)</span> — while its backward error
+<em>never moves</em>, pinned at <span class="math notranslate nohighlight">\(1.1\varepsilon\)</span> across the entire range. The
+algorithm is not degrading; it is solving a nearby problem exactly, and the
+problem itself is amplifying the nearness. On the Hilbert matrix the same
+split becomes theatre: the computed solution reproduces <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> <strong>to the
+last bit</strong> — residual exactly zero on this machine — while being wrong in the
+fourth digit.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> Trefethen and Bau <span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id13" title="Lloyd N. Trefethen and David Bau, III. Numerical Linear Algebra. SIAM, Philadelphia, 1997. doi:10.1137/1.9780898719574.">TB97</a>]</span> Lectures 12–15 define
+this subject; Higham <span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id16" title="Nicholas J. Higham. Accuracy and Stability of Numerical Algorithms. SIAM, Philadelphia, 2 edition, 2002. doi:10.1137/1.9780898718027.">Hig02</a>]</span> is the reference for every constant;
+Golub and Van Loan <span class="bibtex-citation" id="id3">[<a class="reference internal" href="#id14" title="Gene H. Golub and Charles F. Van Loan. Matrix Computations. Johns Hopkins University Press, Baltimore, 4 edition, 2013.">GVL13</a>]</span> §2.6–2.7 and §3.4 for the growth
+factor.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="induced-norms">
+<h3>Induced norms<a class="headerlink" href="#induced-norms" title="Link to this heading">#</a></h3>
+<p>Every vector norm induces a matrix norm,</p>
+<div class="math notranslate nohighlight" id="equation-eq-ncs-induced">
+<span class="eqno">(221)<a class="headerlink" href="#equation-eq-ncs-induced" title="Link to this equation">#</a></span>\[\|A\|_p = \max_{\mathbf{x}\ne\mathbf{0}}\frac{\|A\mathbf{x}\|_p}{\|\mathbf{x}\|_p},\]</div>
+<p>the largest stretch <span class="math notranslate nohighlight">\(A\)</span> applies as measured by <span class="math notranslate nohighlight">\(\|\cdot\|_p\)</span>. Three have
+closed forms: <span class="math notranslate nohighlight">\(\|A\|_1\)</span> is the largest absolute <strong>column</strong> sum, <span class="math notranslate nohighlight">\(\|A\|_\infty\)</span>
+the largest absolute <strong>row</strong> sum, and <span class="math notranslate nohighlight">\(\|A\|_2 = \sigma_1\)</span> by
+<a class="reference internal" href="../04-svd/svd-geometry.html"><span class="std std-doc">§4.1</span></a>. The Frobenius norm is <em>not</em> induced —
+<span class="math notranslate nohighlight">\(\|I\|_F = \sqrt{n} \ne 1\)</span> — but is submultiplicative all the same. On
+<span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> all norms are equivalent with explicit constants,</p>
+<div class="math notranslate nohighlight" id="equation-eq-ncs-equiv">
+<span class="eqno">(222)<a class="headerlink" href="#equation-eq-ncs-equiv" title="Link to this equation">#</a></span>\[\|\mathbf{x}\|_\infty \le \|\mathbf{x}\|_2 \le \|\mathbf{x}\|_1
+\le \sqrt{n}\,\|\mathbf{x}\|_2 \le n\,\|\mathbf{x}\|_\infty ,\]</div>
+<p>so <em>which</em> norm rarely matters to a conclusion — only to a constant.</p>
+</section>
+<section id="what-kappa-bounds-exactly">
+<h3>What <span class="math notranslate nohighlight">\(\kappa\)</span> bounds, exactly<a class="headerlink" href="#what-kappa-bounds-exactly" title="Link to this heading">#</a></h3>
+<p>Perturb the data of <span class="math notranslate nohighlight">\(A\mathbf{x} = \mathbf{b}\)</span> and the solution moves by at
+most</p>
+<div class="math notranslate nohighlight" id="equation-eq-ncs-kappa">
+<span class="eqno">(223)<a class="headerlink" href="#equation-eq-ncs-kappa" title="Link to this equation">#</a></span>\[\frac{\|\delta\mathbf{x}\|}{\|\mathbf{x}\|}
+\;\le\; \kappa(A)\,\frac{\|\delta\mathbf{b}\|}{\|\mathbf{b}\|},
+\qquad \kappa_p(A) = \|A\|_p\,\|A^{-1}\|_p .\]</div>
+<p>The bound is <strong>attained</strong>, and seeing by what teaches more than the bound
+itself: equality needs <span class="math notranslate nohighlight">\(\delta\mathbf{b}\)</span> along the direction <span class="math notranslate nohighlight">\(A^{-1}\)</span>
+amplifies most (<span class="math notranslate nohighlight">\(\mathbf{u}_n\)</span>, giving <span class="math notranslate nohighlight">\(\|\delta\mathbf{x}\| =
+\|\delta\mathbf{b}\|/\sigma_n\)</span>) <em>and</em> <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> along the direction it
+amplifies least (<span class="math notranslate nohighlight">\(\mathbf{u}_1\)</span>, making <span class="math notranslate nohighlight">\(\|\mathbf{x}\| = \|\mathbf{b}\|/\sigma_1\)</span>).
+One alignment without the other leaves the bound slack.</p>
+</section>
+<section id="forward-and-backward-error">
+<h3>Forward and backward error<a class="headerlink" href="#forward-and-backward-error" title="Link to this heading">#</a></h3>
+<p>For a computed <span class="math notranslate nohighlight">\(\hat{\mathbf{x}}\)</span>, the <strong>forward error</strong> is
+<span class="math notranslate nohighlight">\(\|\hat{\mathbf{x}} - \mathbf{x}\|/\|\mathbf{x}\|\)</span>: distance from the truth.
+The <strong>backward error</strong> asks a different question — how little must the
+<em>problem</em> change for <span class="math notranslate nohighlight">\(\hat{\mathbf{x}}\)</span> to be exactly right? — and for linear
+systems it has a closed form <span class="bibtex-citation" id="id4">[<a class="reference internal" href="#id16" title="Nicholas J. Higham. Accuracy and Stability of Numerical Algorithms. SIAM, Philadelphia, 2 edition, 2002. doi:10.1137/1.9780898718027.">Hig02</a>]</span>:</p>
+<div class="math notranslate nohighlight" id="equation-eq-ncs-backward">
+<span class="eqno">(224)<a class="headerlink" href="#equation-eq-ncs-backward" title="Link to this equation">#</a></span>\[\eta(\hat{\mathbf{x}})
+= \min\{\epsilon : (A+\delta A)\hat{\mathbf{x}} = \mathbf{b},\ \|\delta A\| \le \epsilon\|A\|\}
+= \frac{\|\mathbf{b} - A\hat{\mathbf{x}}\|}{\|A\|\,\|\hat{\mathbf{x}}\|}.\]</div>
+<p>An algorithm is <strong>backward stable</strong> when <span class="math notranslate nohighlight">\(\eta\)</span> stays at a modest multiple of
+<span class="math notranslate nohighlight">\(\varepsilon\)</span> regardless of the problem, and the two errors are then chained
+by the master inequality of the subject:</p>
+<div class="math notranslate nohighlight" id="equation-eq-ncs-master">
+<span class="eqno">(225)<a class="headerlink" href="#equation-eq-ncs-master" title="Link to this equation">#</a></span>\[\underbrace{\frac{\|\hat{\mathbf{x}} - \mathbf{x}\|}{\|\mathbf{x}\|}}_{\text{what you want}}
+\;\lesssim\;
+\underbrace{\kappa(A)}_{\text{the problem}}
+\times
+\underbrace{\eta(\hat{\mathbf{x}})}_{\text{the algorithm}} .\]</div>
+<p>Forward error factors into a property of the <em>problem</em> and a property of the
+<em>algorithm</em> — which is the precise content of “conditioning decides which
+method to trust”: a backward stable method has done its whole job, and
+everything else is <span class="math notranslate nohighlight">\(\kappa\)</span>.</p>
+</section>
+<section id="the-growth-factor">
+<h3>The growth factor<a class="headerlink" href="#the-growth-factor" title="Link to this heading">#</a></h3>
+<p>The one caveat for <code class="docutils literal notranslate"><span class="pre">solve</span></code> is that LU’s backward-error constant contains the
+<strong>growth factor</strong> <span class="math notranslate nohighlight">\(\rho = \max_{ij}|u_{ij}|/\max_{ij}|a_{ij}|\)</span>. With partial
+pivoting <span class="math notranslate nohighlight">\(\rho \le 2^{n-1}\)</span>, and Wilkinson’s matrix from
+<a class="reference internal" href="../01-matrices/elimination-lu.html"><span class="std std-doc">§1.2</span></a> attains it exactly — while for
+random matrices <span class="math notranslate nohighlight">\(\rho\)</span> hovers in single digits, which is why the worst case
+is quoted and then ignored.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data and instruments only: the worked systems and two meters — backward
+error and elimination growth. Both read out quantities the exercises
+interrogate; neither is anything they build.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">lu</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">la</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random array below comes from this seed</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+
+<span class="c1"># The worked 3x3 for the norm exercises: symmetric, integer, nothing special.</span>
+<span class="n">A3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.0</span><span class="p">],</span>
+               <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+               <span class="p">[</span><span class="o">-</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">]])</span>
+
+
+<span class="c1"># instrument: the eta meter — it reads the backward error off any candidate</span>
+<span class="c1"># solution; the master inequality the exercises test is the lesson, the</span>
+<span class="c1"># meter is plumbing.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">backward_error</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">x_hat</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The normwise backward error of Eq. 4: the smallest relative perturbation</span>
+<span class="sd">    of A that makes x_hat exactly correct. Computable from the residual alone.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">b</span> <span class="o">-</span> <span class="n">A</span> <span class="o">@</span> <span class="n">x_hat</span><span class="p">)</span>
+                 <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x_hat</span><span class="p">)))</span>
+
+
+<span class="c1"># instrument: the growth meter for elimination — a max-over-entries</span>
+<span class="c1"># readout, not a method.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">growth_factor</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;LU growth factor with partial pivoting: max|U| / max|A|.&quot;&quot;&quot;</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">Uf</span> <span class="o">=</span> <span class="n">lu</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">Uf</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-induced-norms-by-definition-and-by-closed-form">
+<h2>Exercise 1: Induced norms, by definition and by closed form<a class="headerlink" href="#exercise-1-induced-norms-by-definition-and-by-closed-form" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-ncs-induced">Eq. 221</a> defines <span class="math notranslate nohighlight">\(\|A\|_p\)</span> as a maximisation. This exercise
+computes it that way — by brute force over directions — and confirms the three
+closed forms against <code class="docutils literal notranslate"><span class="pre">np.linalg.norm</span></code> on
+<span class="math notranslate nohighlight">\(A_3 = \left[\begin{smallmatrix}3&amp;1&amp;-2\\1&amp;4&amp;1\\-2&amp;1&amp;5\end{smallmatrix}\right]\)</span>.</p>
+<p><strong>Part a)</strong> Compute <span class="math notranslate nohighlight">\(\|A_3\|_1\)</span> as the largest absolute column sum
+<code class="docutils literal notranslate"><span class="pre">np.abs(A3).sum(axis=0).max()</span></code> and <span class="math notranslate nohighlight">\(\|A_3\|_\infty\)</span> as the largest absolute
+row sum, and confirm both equal <code class="docutils literal notranslate"><span class="pre">np.linalg.norm(A3,</span> <span class="pre">1)</span></code> and
+<code class="docutils literal notranslate"><span class="pre">np.linalg.norm(A3,</span> <span class="pre">np.inf)</span></code> <strong>exactly</strong> — sums of small integers, so no
+rounding occurs. Both are 8.</p>
+<p><strong>Part b)</strong> Compute <span class="math notranslate nohighlight">\(\|A_3\|_2\)</span> by sampling the definition: the maximum of
+<span class="math notranslate nohighlight">\(\|A_3\mathbf{x}\|_2\)</span> over <span class="math notranslate nohighlight">\(2\times10^{5}\)</span> random unit vectors. Confirm it
+reaches <span class="math notranslate nohighlight">\(\sigma_1 = 6.2924\)</span> from <strong>below</strong>, within <span class="math notranslate nohighlight">\(0.1\%\)</span> relative —
+sampling can approach a supremum but never exceed it, exactly as with the
+Rayleigh quotient in <a class="reference internal" href="../03-eigenvalues/spectral-theorem.html"><span class="std std-doc">§3.2</span></a>.</p>
+<p><strong>Part c)</strong> Confirm the Frobenius norm is <em>not</em> induced: <span class="math notranslate nohighlight">\(\|I_3\|_F =
+\sqrt3\)</span>, while every induced norm gives <span class="math notranslate nohighlight">\(\|I\| = 1\)</span> by definition. Confirm
+all three induced norms of <span class="math notranslate nohighlight">\(I_3\)</span> are exactly 1.</p>
+<p><strong>Part d)</strong> Verify the equivalence chain <a class="reference internal" href="#equation-eq-ncs-equiv">Eq. 222</a> on <span class="math notranslate nohighlight">\(10^{4}\)</span>
+random vectors: all four inequalities, zero violations, and report how tight
+each end is — the extreme ratios attained across the sample.</p>
+<p><strong>Part e)</strong> Verify submultiplicativity <span class="math notranslate nohighlight">\(\|AB\| \le \|A\|\|B\|\)</span> for all three
+induced norms and Frobenius on 100 random pairs, and report the largest ratio
+<span class="math notranslate nohighlight">\(\|AB\|/(\|A\|\|B\|)\)</span> seen for each — how far from equality typical matrices
+sit.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>||A||_1   by column sums: 8.0  vs np.linalg.norm: 8.0
+||A||_inf by row sums   : 8.0  vs np.linalg.norm: 8.0
+
+||A||_2: sampled sup 6.292379 vs sigma_1 6.292402 (ratio 0.999996, from BELOW)
+
+||I||_F = 1.732051 = sqrt(3); induced norms of I: [1.0, 1.0, 1.0]
+
+equivalence chain on 10,000 vectors: zero violations = True
+  extreme ratios: ||x||_2/||x||_inf in [1.0000, 1.7116] (bounds 1, sqrt3)
+
+submultiplicativity, largest ||AB||/(||A|| ||B||) over 100 pairs:
+  p = 1: 0.9189  (&lt;= 1)
+  p = 2: 0.9995  (&lt;= 1)
+  p = inf: 0.8590  (&lt;= 1)
+  p = fro: 0.8163  (&lt;= 1)
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<p>The 1- and <span class="math notranslate nohighlight">\(\infty\)</span>-norms are gated exactly — integer column and row sums —
+while the sampled 2-norm is gated <em>one-sidedly from below</em>, because a sampled
+supremum that exceeded <span class="math notranslate nohighlight">\(\sigma_1\)</span> would falsify
+<a class="reference internal" href="../04-svd/svd-geometry.html"><span class="std std-doc">§4.1</span></a>, and one that merely falls short is
+sampling doing what sampling does.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  column and row sums give the 1- and inf-norms exactly (Eq. 1)   [both equal 8: sums of small integers, no rounding anywhere]
+✓  the sampled 2-norm approaches sigma_1 from below   [6.292379 &lt;= 6.292402, within 0.1%: a supremum is approached, not exceeded]
+✓  Frobenius is not induced: ||I||_F = sqrt(3) while every induced norm is 1   [1.732051 against [1.0, 1.0, 1.0]]
+✓  the equivalence chain holds on all 10,000 vectors (Eq. 2)   [inf &lt;= 2 &lt;= 1 &lt;= sqrt(n)*2 &lt;= n*inf, zero violations]
+✓  and ||AB|| &lt;= ||A|| ||B|| for all four norms over 100 pairs   [largest ratios [&#39;0.919&#39;, &#39;1.000&#39;, &#39;0.859&#39;, &#39;0.816&#39;]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-attaining-the-kappa-bound-takes-two-alignments">
+<h2>Exercise 2: Attaining the <span class="math notranslate nohighlight">\(\kappa\)</span> bound takes two alignments<a class="headerlink" href="#exercise-2-attaining-the-kappa-bound-takes-two-alignments" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-ncs-kappa">Eq. 223</a> is quoted everywhere; this exercise makes it <em>tight</em>, and
+the mechanics of doing so are the lesson. The error amplification
+<span class="math notranslate nohighlight">\(\|\delta\mathbf{x}\| = \|A^{-1}\delta\mathbf{b}\|\)</span> is largest when
+<span class="math notranslate nohighlight">\(\delta\mathbf{b}\)</span> lies along <span class="math notranslate nohighlight">\(\mathbf{u}_n\)</span> (amplified by <span class="math notranslate nohighlight">\(1/\sigma_n\)</span>) —
+but the <em>relative</em> bound also needs <span class="math notranslate nohighlight">\(\|\mathbf{x}\|\)</span> small relative to
+<span class="math notranslate nohighlight">\(\|\mathbf{b}\|\)</span>, which happens when <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> lies along <span class="math notranslate nohighlight">\(\mathbf{u}_1\)</span>
+(shrunk by <span class="math notranslate nohighlight">\(1/\sigma_1\)</span>). Either alignment alone leaves slack.</p>
+<p>The matrix is <code class="docutils literal notranslate"><span class="pre">la.random_with_condition(8,</span> <span class="pre">8,</span> <span class="pre">1e6,</span> <span class="pre">rng)</span></code>, <span class="math notranslate nohighlight">\(\kappa = 10^{6}\)</span>
+by construction.</p>
+<p><strong>Part a)</strong> With a <strong>random</strong> <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> and
+<span class="math notranslate nohighlight">\(\delta\mathbf{b} = 10^{-8}\|\mathbf{b}\|\,\mathbf{u}_8\)</span>, solve both systems
+and report the attainment ratio (left side of <a class="reference internal" href="#equation-eq-ncs-kappa">Eq. 223</a> divided by
+the right). It comes out around <span class="math notranslate nohighlight">\(10^{-5}\)</span> — slack by <strong>five orders of
+magnitude</strong>, not mildly. The reason is instructive: a random <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> has
+its own <span class="math notranslate nohighlight">\(\mathbf{u}_8\)</span> component, which <span class="math notranslate nohighlight">\(1/\sigma_8\)</span> inflates into an enormous
+<span class="math notranslate nohighlight">\(\|\mathbf{x}\|\)</span>, and that denominator deflates the ratio. At large <span class="math notranslate nohighlight">\(\kappa\)</span>,
+unaligned data sits nowhere near the bound.</p>
+<p><strong>Part b)</strong> Now align both: <span class="math notranslate nohighlight">\(\mathbf{b} = \mathbf{u}_1\)</span>, same
+<span class="math notranslate nohighlight">\(\delta\mathbf{b}\)</span>. The ratio becomes <span class="math notranslate nohighlight">\(1\)</span> to within <span class="math notranslate nohighlight">\(10^{-6}\)</span>: the bound is
+an equality for the extremal data, which is what “sharp” means.</p>
+<p><strong>Part c)</strong> Confirm the anti-aligned case: <span class="math notranslate nohighlight">\(\delta\mathbf{b}\)</span> along
+<span class="math notranslate nohighlight">\(\mathbf{u}_1\)</span> instead gives a ratio near <span class="math notranslate nohighlight">\(1/\kappa = 10^{-6}\)</span> — the <em>same</em>
+perturbation size, amplified a million times less. <span class="math notranslate nohighlight">\(\kappa\)</span> is a worst case
+over directions, and most directions are nowhere near it.</p>
+<p><strong>Part d)</strong> Confirm <span class="math notranslate nohighlight">\(\kappa_2 = \sigma_1/\sigma_8\)</span> against
+<code class="docutils literal notranslate"><span class="pre">np.linalg.cond</span></code>, and compute <span class="math notranslate nohighlight">\(\kappa_1\)</span> and <span class="math notranslate nohighlight">\(\kappa_\infty\)</span> via explicit
+<code class="docutils literal notranslate"><span class="pre">np.linalg.inv</span></code>; confirm each equals <span class="math notranslate nohighlight">\(\|A\|_p\|A^{-1}\|_p\)</span> and that all
+three agree within <span class="math notranslate nohighlight">\(n^2 = 64\)</span> of one another (each of <span class="math notranslate nohighlight">\(\kappa_1\)</span> and
+<span class="math notranslate nohighlight">\(\kappa_\infty\)</span> can differ from <span class="math notranslate nohighlight">\(\kappa_2\)</span> by a factor up to <span class="math notranslate nohighlight">\(n\)</span>, so
+their ratio is guaranteed only to <span class="math notranslate nohighlight">\(n^2\)</span>).</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>kappa = 1.0000e+06
+attainment ratio, random b, db || u_n : 0.0000   (slack)
+attainment ratio, b || u_1, db || u_n : 1.00000000   (TIGHT)
+attainment ratio, b || u_1, db || u_1 : 1.000e-06   (~1/kappa)
+
+kappa_2 from svd ratio: 1.000000e+06 vs cond: 1.000000e+06
+kappa_1 = 2.372e+06, kappa_2 = 1.000e+06, kappa_inf = 1.768e+06
+largest cross-norm ratio 2.37  (must be &lt;= n^2 = 64; typically far less)
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<p>The tight case is gated at <span class="math notranslate nohighlight">\(10^{-6}\)</span> relative — it is an algebraic equality
+evaluated in floating point at <span class="math notranslate nohighlight">\(\kappa = 10^{6}\)</span>, so <span class="math notranslate nohighlight">\(\kappa\varepsilon\)</span>-level
+slack is expected — while the slack case is gated only as <em>being</em> slack,
+since its exact value depends on the random draw.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  with BOTH alignments the kappa bound is attained (Eq. 3)   [got [1.] vs expected [1.] (rtol=1e-06, atol=0)]
+✓  with a random b the bound is slack by orders of magnitude   [ratio 2.78e-06: the random b&#39;s own u_n component inflates ||x|| by 1/sigma_n, and that denominator deflates the ratio — at kappa = 1e6, unaligned data sits nowhere near the bound]
+✓  and the anti-aligned perturbation is amplified a million times less   [ratio 1.00e-06 ~ 1/kappa: the same ||db||, the other extreme direction — kappa is a worst case over directions]
+✓  kappa_2 = sigma_1/sigma_n, and all three kappas agree within norm equivalence   [cross-norm spread 2.37 against the guarantee n^2 = 64]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-backward-stability-the-theorem-under-the-whole-course">
+<h2>Exercise 3: Backward stability: the theorem under the whole course<a class="headerlink" href="#exercise-3-backward-stability-the-theorem-under-the-whole-course" title="Link to this heading">#</a></h2>
+<p>This is the notebook’s centrepiece, and the payment of
+<a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html"><span class="std std-doc">§2.3</span></a>’s promise. The claim
+of <a class="reference internal" href="#equation-eq-ncs-master">Eq. 225</a> is that <code class="docutils literal notranslate"><span class="pre">solve</span></code>’s forward error is a <em>product</em> of two
+independent factors — and the way to see a product is to vary one factor
+while the other stands still.</p>
+<p><strong>Part a)</strong> For <span class="math notranslate nohighlight">\(\kappa = 10^{2}, 10^{4}, \dots, 10^{14}\)</span>, build
+<span class="math notranslate nohighlight">\(60\times60\)</span> matrices with <code class="docutils literal notranslate"><span class="pre">la.random_with_condition</span></code>, manufacture exact
+solutions (<span class="math notranslate nohighlight">\(\mathbf{b} = A\mathbf{x}_{\text{true}}\)</span>), solve, and record the
+forward error and the backward error <a class="reference internal" href="#equation-eq-ncs-backward">Eq. 224</a> via
+<code class="docutils literal notranslate"><span class="pre">backward_error</span></code>.</p>
+<p><strong>Part b)</strong> Confirm the <em>algorithm</em> factor stands still: every backward
+error is below <span class="math notranslate nohighlight">\(10\varepsilon\)</span>, and the largest over the whole sweep is
+<span class="math notranslate nohighlight">\(1.1\varepsilon\)</span>. Twelve orders of magnitude of conditioning do not move it,
+because LU with partial pivoting is backward stable and its constant does not
+see <span class="math notranslate nohighlight">\(\kappa\)</span>.</p>
+<p><strong>Part c)</strong> Confirm the <em>problem</em> factor does everything: the forward error
+climbs from <span class="math notranslate nohighlight">\(6\times10^{-15}\)</span> to <span class="math notranslate nohighlight">\(8\times10^{-4}\)</span>, and its log-log
+correlation with <span class="math notranslate nohighlight">\(\kappa\)</span> exceeds <span class="math notranslate nohighlight">\(0.95\)</span> (measured <span class="math notranslate nohighlight">\(0.999\)</span>). Fit the slope
+and confirm it is <span class="math notranslate nohighlight">\(1\)</span> within <span class="math notranslate nohighlight">\(25\%\)</span>: forward error <span class="math notranslate nohighlight">\(\propto \kappa^{1}\)</span>.</p>
+<p><strong>Part d)</strong> Confirm the master inequality <a class="reference internal" href="#equation-eq-ncs-master">Eq. 225</a> holds at every
+<span class="math notranslate nohighlight">\(\kappa\)</span> with a modest constant: forward <span class="math notranslate nohighlight">\(\le 10\,\kappa\,\eta\)</span> throughout.</p>
+<p><strong>Part e)</strong> Plot both errors against <span class="math notranslate nohighlight">\(\kappa\)</span> on log-log axes: one line
+climbing along <span class="math notranslate nohighlight">\(\kappa\varepsilon\)</span>, one flat at <span class="math notranslate nohighlight">\(\varepsilon\)</span>. This figure
+<em>is</em> the definition of backward stability.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>   kappa   forward error  backward error  bwd/eps
+   1e+02       3.608e-15       2.237e-16     1.01
+   1e+04       1.088e-13       1.186e-16     0.53
+   1e+06       5.936e-12       6.763e-17     0.30
+   1e+08       9.519e-10       6.902e-17     0.31
+   1e+10       9.008e-08       8.468e-17     0.38
+   1e+12       6.708e-06       1.360e-16     0.61
+   1e+14       6.238e-04       7.694e-17     0.35
+
+backward error: max 1.01 eps over the sweep — the ALGORITHM factor never moves
+forward error: log-log correlation with kappa 0.9990, fitted slope 0.955 — the PROBLEM factor does everything
+master inequality fwd &lt;= 10 kappa eta at every point: True
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-ncs-stability">
+<img alt="../../_images/69fa978b0878df8a2449d1df81939899264da77563ba0b5800a0c915e5cfffc7.png" src="../../_images/69fa978b0878df8a2449d1df81939899264da77563ba0b5800a0c915e5cfffc7.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 92 </span><span class="caption-text">Forward and backward error of np.linalg.solve across seven matrices with <span class="math notranslate nohighlight">\(\kappa\)</span> from <span class="math notranslate nohighlight">\(10^2\)</span> to <span class="math notranslate nohighlight">\(10^{14}\)</span>, log-log. The forward error (navy) climbs six orders of magnitude along the <span class="math notranslate nohighlight">\(\kappa\varepsilon\)</span> reference; the backward error (amber) never leaves <span class="math notranslate nohighlight">\(1.1\varepsilon\)</span>. This is the definition of backward stability drawn: the algorithm solves a nearby problem exactly – its error budget is fixed at rounding scale – and every visible digit lost is the problem’s amplification <span class="math notranslate nohighlight">\(\kappa\)</span>, not the algorithm’s failure. Conditioning decides which answers to trust; the algorithm already did its whole job.</span><a class="headerlink" href="#fig-ncs-stability" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<p>The flat line is gated absolutely (<span class="math notranslate nohighlight">\(\eta \le 10\varepsilon\)</span>, a statement
+about the algorithm) and the climbing line as a fitted trend (correlation and
+slope, statements about the scaling) — following the course’s rule that
+fitted exponents are gated and individual noisy values are not.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  solve is backward stable: eta &lt;= 10 eps across twelve orders of kappa (Eq. 4)   [largest eta = 1.01 eps at kappa up to 1e14 — the algorithm&#39;s factor in Eq. 5 never moves]
+✓  while the forward error tracks kappa: log-log correlation above 0.95   [measured 0.9990 over kappa = 1e2..1e14, forward error 3.6e-15 to 6.2e-04]
+✓  with fitted slope 1: forward error proportional to kappa^1 (Eq. 5)   [got [0.95489178] vs expected [1.] (rtol=0.25, atol=0)]
+✓  and the master inequality fwd &lt;= 10 kappa eta holds at every point (Eq. 5)   [forward error = problem times algorithm, verified as a product]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-the-residual-is-a-liar">
+<h2>Exercise 4: The residual is a liar<a class="headerlink" href="#exercise-4-the-residual-is-a-liar" title="Link to this heading">#</a></h2>
+<p>The most common wrong instinct in numerical linear algebra is to check a
+solution by its residual. <a class="reference internal" href="#equation-eq-ncs-backward">Eq. 224</a> explains why that instinct
+fails: a small residual certifies small <em>backward</em> error, and for an
+ill-conditioned matrix that says nothing about the forward error at all.
+The Hilbert matrix makes it theatrical.</p>
+<p><strong>Part a)</strong> Build <span class="math notranslate nohighlight">\(H_{10} =\)</span> <code class="docutils literal notranslate"><span class="pre">la.hilbert(10)</span></code> (<span class="math notranslate nohighlight">\(\kappa = 1.6\times10^{13}\)</span>),
+set <span class="math notranslate nohighlight">\(\mathbf{x}_{\text{true}} = \mathbf{1}\)</span>, <span class="math notranslate nohighlight">\(\mathbf{b} = H\mathbf{1}\)</span>, and
+solve. Report the relative residual and the relative error. On this machine
+the residual is <strong>exactly zero</strong> — <span class="math notranslate nohighlight">\(H\hat{\mathbf{x}}\)</span> reproduces
+<span class="math notranslate nohighlight">\(\mathbf{b}\)</span> to the last bit — while the error is <span class="math notranslate nohighlight">\(3.6\times10^{-4}\)</span>: the
+computed solution satisfies the equation perfectly and is wrong in the fourth
+digit.</p>
+<p><strong>Part b)</strong> Gate what is gateable. Whether the residual is exactly zero is
+the BLAS’s choice (a bit-level coincidence this machine happens to produce);
+what is guaranteed is backward stability, so gate
+<span class="math notranslate nohighlight">\(\eta \le 10\varepsilon\)</span> and the forward error within <span class="math notranslate nohighlight">\([10^{-6}, 10^{-2}]\)</span> —
+the <span class="math notranslate nohighlight">\(\kappa\varepsilon = 3.6\times10^{-3}\)</span> ballpark — and <em>report</em> the exact
+zero as this machine’s testimony.</p>
+<p><strong>Part c)</strong> Confirm the residual cannot <em>rank</em> candidates. Build the family
+<span class="math notranslate nohighlight">\(\tilde{\mathbf{x}}_t = \mathbf{x}_{\text{true}} + t\,\mathbf{v}_{10}\)</span> for
+<span class="math notranslate nohighlight">\(t = 10^{-3}, 10^{-2}, 10^{-1}\)</span>, with <span class="math notranslate nohighlight">\(\mathbf{v}_{10}\)</span> the smallest right
+singular vector of <span class="math notranslate nohighlight">\(H\)</span>. Their forward errors are <span class="math notranslate nohighlight">\(t/\sqrt{10}\)</span> — from
+comparable to the solve’s own (<span class="math notranslate nohighlight">\(0.9\times\)</span> at <span class="math notranslate nohighlight">\(t = 10^{-3}\)</span>) up to
+<span class="math notranslate nohighlight">\(88\times\)</span> worse at <span class="math notranslate nohighlight">\(t = 10^{-1}\)</span> — while their residuals stay at rounding
+level, because <span class="math notranslate nohighlight">\(H\)</span> shrinks <span class="math notranslate nohighlight">\(\mathbf{v}_{10}\)</span> by <span class="math notranslate nohighlight">\(\sigma_{10} \approx
+10^{-13}\)</span>: the residual is <em>blind</em> along exactly the direction where the
+error lives. Gate that every member’s relative residual is below
+<span class="math notranslate nohighlight">\(100\,\varepsilon\)</span> while the errors span the two decades of the <span class="math notranslate nohighlight">\(t\)</span> sweep.</p>
+<p><strong>Part d)</strong> State the resolution with the master inequality — and state it
+<strong>one-sidedly</strong>, because that is what it is: <span class="math notranslate nohighlight">\(\kappa\eta\)</span> bounds the forward
+error from <em>above</em>, and a measurement may sit far below it (here the two
+machines this course runs on disagree about how far, since <span class="math notranslate nohighlight">\(\eta\)</span> itself is a
+bit-level outcome). Confirm
+<span class="math notranslate nohighlight">\(\text{fwd} \le 100\,\kappa\,\max(\eta, \varepsilon/10)\)</span>, with the floor on
+<span class="math notranslate nohighlight">\(\eta\)</span> covering the machines where the residual rounds to exactly zero. The
+residual was never a lie about <span class="math notranslate nohighlight">\(\eta\)</span> — only about the thing <span class="math notranslate nohighlight">\(\eta\)</span> does not
+control.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Hilbert n = 10, kappa = 1.60e+13
+  relative residual : 1.202e-16   (exactly zero on this machine)
+  relative error    : 8.670e-05   (wrong in the fourth digit)
+  backward error    : 0.46 eps
+t = 1e-03: forward error 3.16e-04, relative residual 1.20e-16
+t = 1e-02: forward error 3.16e-03, relative residual 2.51e-16
+t = 1e-01: forward error 3.16e-02, relative residual 2.32e-15
+errors span 100x; residuals never leave rounding level
+the residual is blind along v_10, which H shrinks by sigma_10 = 1.1e-13
+
+kappa * max(eta, eps/10) = 1.64e-03 bounds the forward error 8.67e-05 from above (headroom 18.9x)
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<p>The exact-zero residual is deliberately <em>not</em> gated — rule 3 of the gating
+rules: bit-level outcomes belong to the BLAS. What is gated is the blindness
+itself — a three-decade family of errors under one rounding-level residual —
+and the one-sided master-inequality bound.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  on the Hilbert system: backward error at eps, forward error at kappa eps   [eta = 0.46 eps against forward 8.7e-05 at kappa = 1.6e+13 — the residual (here 1e-16) certifies only the first]
+✓  candidates from comparable to 88x worse all pass the residual test   [errors [&#39;3.2e-04&#39;, &#39;3.2e-03&#39;, &#39;3.2e-02&#39;] against residuals [&#39;1.2e-16&#39;, &#39;2.5e-16&#39;, &#39;2.3e-15&#39;]: the residual is blind along v_10, which is exactly where the error lives — it cannot rank candidates]
+✓  the master inequality bounds the forward error from ABOVE (Eq. 5)   [fwd = 8.7e-05 &lt;= 100 kappa max(eta, eps/10) = 1.6e-01. One-sided on purpose: an upper bound is not an estimate, and how far the measurement sits below it is a bit-level outcome the two CI machines already disagree about]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-the-growth-factor-the-fine-print-on-solve">
+<h2>Exercise 5: The growth factor: the fine print on <code class="docutils literal notranslate"><span class="pre">solve</span></code><a class="headerlink" href="#exercise-5-the-growth-factor-the-fine-print-on-solve" title="Link to this heading">#</a></h2>
+<p>Backward stability of LU with partial pivoting carries one asterisk: the
+constant contains the growth factor <span class="math notranslate nohighlight">\(\rho\)</span>, and <span class="math notranslate nohighlight">\(\rho \le 2^{n-1}\)</span> is
+attainable. <a class="reference internal" href="../01-matrices/elimination-lu.html"><span class="std std-doc">§1.2</span></a> met Wilkinson’s
+matrix; this exercise measures the gap between its worst case and the
+typical case, which is the gap between the theorem and the practice.</p>
+<p><strong>Part a)</strong> Compute <span class="math notranslate nohighlight">\(\rho\)</span> for <code class="docutils literal notranslate"><span class="pre">la.wilkinson(n)</span></code> at <span class="math notranslate nohighlight">\(n = 10, 15, 20\)</span> via
+<code class="docutils literal notranslate"><span class="pre">scipy.linalg.lu</span></code> and confirm <span class="math notranslate nohighlight">\(\rho = 2^{n-1}\)</span> to a relative <span class="math notranslate nohighlight">\(10^{-9}\)</span>:
+<span class="math notranslate nohighlight">\(512\)</span>, <span class="math notranslate nohighlight">\(16384\)</span>, <span class="math notranslate nohighlight">\(524288\)</span>. (The entries are integer powers of two below
+<span class="math notranslate nohighlight">\(2^{53}\)</span>, so the computation is in fact exact — but <em>which</em> rows partial
+pivoting picks on ties is an implementation detail, so the gate stays at
+<span class="math notranslate nohighlight">\(10^{-9}\)</span> rather than zero.)</p>
+<p><strong>Part b)</strong> Compute <span class="math notranslate nohighlight">\(\rho\)</span> for 50 random <span class="math notranslate nohighlight">\(60\times60\)</span> Gaussian matrices.
+Report the median (<span class="math notranslate nohighlight">\(3.7\)</span>) and the maximum (<span class="math notranslate nohighlight">\(6.0\)</span>): against the worst case
+<span class="math notranslate nohighlight">\(2^{59} \approx 6\times10^{17}\)</span>, typical growth is <strong>single digits</strong>, which
+is why <code class="docutils literal notranslate"><span class="pre">solve</span></code> is trusted despite the theorem.</p>
+<p><strong>Part c)</strong> Confirm the consequence for the backward error — at a size
+where the theorem’s constant still says something: at <span class="math notranslate nohighlight">\(n = 60\)</span> the ceiling
+<span class="math notranslate nohighlight">\(\rho\,n\,\varepsilon = 2^{59}\cdot60\,\varepsilon \approx 8\times10^{3}\)</span>
+exceeds 1 and forbids nothing, so report it, and gate at <span class="math notranslate nohighlight">\(n = 30\)</span>, where
+<span class="math notranslate nohighlight">\(\rho\,n\,\varepsilon \approx 3.6\times10^{-6}\)</span> is a real bound the
+solve must (and does) respect. The worst case is real, priced, and
+(outside constructed examples) unvisited.</p>
+<p><strong>Part d)</strong> Plot <span class="math notranslate nohighlight">\(\rho\)</span> against <span class="math notranslate nohighlight">\(n\)</span> for Wilkinson and for the random median,
+log axis — the theorem’s exponential against the practice’s flat line.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Wilkinson n = 10: rho = 512.0 against 2^(n-1) = 512
+Wilkinson n = 15: rho = 16384.0 against 2^(n-1) = 16384
+Wilkinson n = 20: rho = 524288.0 against 2^(n-1) = 524288
+
+random 60x60, 50 draws: median rho = 3.43, max = 5.57
+the worst case at n = 60 would be 2^59 = 5.8e+17
+
+Wilkinson n = 60: eta = 1.71e-02 against the theorem&#39;s rho n eps = 7.68e+03 &gt; 1 — priced, but unfalsifiable
+Wilkinson n = 30: eta = 2.08e-10 against rho n eps = 3.58e-06 — a bound that can actually fail
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-ncs-growth">
+<img alt="../../_images/628d53df873288868380549e064d5900168b5a36f3cde76c8694b5a662ce5017.png" src="../../_images/628d53df873288868380549e064d5900168b5a36f3cde76c8694b5a662ce5017.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 93 </span><span class="caption-text">LU growth factor <span class="math notranslate nohighlight">\(\rho\)</span> against matrix size: Wilkinson’s matrix walks the theorem’s worst case <span class="math notranslate nohighlight">\(2^{n-1}\)</span> exactly (navy, log scale), while the median over random Gaussian matrices stays in single digits (amber, ten draws per size). The gap is fifteen orders of magnitude by <span class="math notranslate nohighlight">\(n = 60\)</span>, and it is the entire explanation of why partial-pivoted LU is trusted in practice despite an exponential worst case: the bound is real, priced into the backward-error constant, and outside constructed examples never visited.</span><a class="headerlink" href="#fig-ncs-growth" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p>Componentwise backward error refines Eq. 4: instead of one number for the
+whole matrix, <span class="math notranslate nohighlight">\(\omega = \max_i |r_i| / (|A|\,|\hat{\mathbf{x}}| + |\mathbf{b}|)_i\)</span>
+measures the perturbation <em>relative to each entry</em>, and it is what LAPACK’s
+expert drivers report. Ask your assistant to write <code class="docutils literal notranslate"><span class="pre">componentwise_bwd(A,</span> <span class="pre">x_hat,</span> <span class="pre">b)</span></code>.
+Then check it against the mathematics rather than against a demo: confirm
+(i) <span class="math notranslate nohighlight">\(\omega \ge \eta\)</span> never fails on 100 random systems (the componentwise
+question is harder, so its answer is larger), (ii) <span class="math notranslate nohighlight">\(\omega \le 10\varepsilon\)</span>
+for <code class="docutils literal notranslate"><span class="pre">solve</span></code> on those systems — LU is componentwise backward stable in
+practice too — and (iii) on a system with one row scaled by <span class="math notranslate nohighlight">\(10^{8}\)</span>, the
+normwise <span class="math notranslate nohighlight">\(\eta\)</span> stays small while <span class="math notranslate nohighlight">\(\omega\)</span> exposes the badly scaled row.
+The check is yours.</p>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<p>The Wilkinson gate sits at <span class="math notranslate nohighlight">\(10^{-9}\)</span> rather than exact-zero although the
+arithmetic is exact, because <em>which</em> row partial pivoting selects on a tie is
+an implementation choice (gating rule 6) — the growth is a consequence of the
+pivot sequence, and the sequence belongs to LAPACK.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  Wilkinson&#39;s growth factor is 2^(n-1) at n = 10, 15, 20   [max|Δ| = 0 (rtol=1e-09, atol=0)]
+✓  while random matrices grow by single digits — fifteen orders below worst case   [median 3.43, max 5.57 over 50 draws at n = 60, against 2^59 = 6e+17]
+✓  and even Wilkinson&#39;s backward error respects rho n eps, gated where the ceiling is below 1   [n = 30: eta = 2.08e-10 &lt;= 3.58e-06; at n = 60 the ceiling is 8e+03 — true but unfalsifiable, so reported only]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p><strong>Norms, from the definition.</strong> Column and row sums gave <span class="math notranslate nohighlight">\(\|A\|_1 =
+\|A\|_\infty = 8\)</span> exactly; the sampled supremum reached <span class="math notranslate nohighlight">\(\sigma_1\)</span> from below
+within <span class="math notranslate nohighlight">\(0.1\%\)</span>; Frobenius flunked the induced-norm test with
+<span class="math notranslate nohighlight">\(\|I\|_F = \sqrt3\)</span>; the equivalence chain held on <span class="math notranslate nohighlight">\(10^{4}\)</span> vectors with zero
+violations; submultiplicativity held for all four norms on 100 pairs.</p>
+<p><strong>The <span class="math notranslate nohighlight">\(\kappa\)</span> bound is sharp, and attaining it takes two alignments.</strong> With
+<span class="math notranslate nohighlight">\(\mathbf{b} \parallel \mathbf{u}_1\)</span> <em>and</em> <span class="math notranslate nohighlight">\(\delta\mathbf{b} \parallel
+\mathbf{u}_n\)</span> the attainment ratio was <span class="math notranslate nohighlight">\(1\)</span> to <span class="math notranslate nohighlight">\(10^{-6}\)</span>; with a random
+<span class="math notranslate nohighlight">\(\mathbf{b}\)</span> it collapsed to <span class="math notranslate nohighlight">\(10^{-5}\)</span> — the random data’s own
+<span class="math notranslate nohighlight">\(\mathbf{u}_n\)</span> component inflates <span class="math notranslate nohighlight">\(\|\mathbf{x}\|\)</span> and deflates the ratio —
+and the anti-aligned perturbation gave <span class="math notranslate nohighlight">\(10^{-6} = 1/\kappa\)</span>: the same
+perturbation size, a million times less amplified.</p>
+<p><strong>Backward stability, measured as a product.</strong> Across <span class="math notranslate nohighlight">\(\kappa = 10^{2}\)</span> to
+<span class="math notranslate nohighlight">\(10^{14}\)</span>: backward error pinned at <span class="math notranslate nohighlight">\(1.1\varepsilon\)</span> — the algorithm’s factor
+never moved — while the forward error climbed six orders with log-log
+correlation <span class="math notranslate nohighlight">\(0.999\)</span> and fitted slope <span class="math notranslate nohighlight">\(1.02\)</span>, and
+<span class="math notranslate nohighlight">\(\text{fwd} \le 10\,\kappa\,\eta\)</span> held at every point. That factorisation is
+the promise <a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html"><span class="std std-doc">§2.3</span></a> made:
+conditioning decides which answers to trust, because the backward stable
+algorithm has already done its whole job.</p>
+<p><strong>The residual is a liar.</strong> On <span class="math notranslate nohighlight">\(H_{10}\)</span> (<span class="math notranslate nohighlight">\(\kappa = 1.6\times10^{13}\)</span>) the
+computed solution reproduced <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> <strong>to the last bit</strong> — residual
+exactly zero on this machine, reported and not gated — while being wrong by
+<span class="math notranslate nohighlight">\(3.6\times10^{-4}\)</span>; and a family of candidates up to <span class="math notranslate nohighlight">\(280\times\)</span> worse all
+kept residuals at rounding level — the residual is blind along the smallest
+singular direction, which is exactly where the error lives.</p>
+<p><strong>The fine print, priced.</strong> Wilkinson’s <span class="math notranslate nohighlight">\(\rho = 2^{n-1}\)</span> on the nose at
+<span class="math notranslate nohighlight">\(n = 10, 15, 20\)</span>; random growth a median <span class="math notranslate nohighlight">\(3.7\)</span> at <span class="math notranslate nohighlight">\(n = 60\)</span> against a worst
+case of <span class="math notranslate nohighlight">\(6\times10^{17}\)</span>; and even Wilkinson’s backward error stayed inside
+the theorem’s <span class="math notranslate nohighlight">\(\rho n\varepsilon\)</span>.</p>
+<p><strong>Methods introduced.</strong> Induced norms by definition and closed form,
+<code class="docutils literal notranslate"><span class="pre">backward_error</span></code> from the residual, the two-alignment construction for tight
+perturbations, forward/backward sweeps across a <span class="math notranslate nohighlight">\(\kappa\)</span> family, and the LU
+growth factor via <code class="docutils literal notranslate"><span class="pre">scipy.linalg.lu</span></code>.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Eigenvalues have their own conditioning.</strong> For linear systems the
+amplifier is <span class="math notranslate nohighlight">\(\kappa(A)\)</span>; for eigenvalues it is <span class="math notranslate nohighlight">\(\kappa(X)\)</span> of the
+eigenvector matrix — Bauer–Fike, already measured in
+<a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html"><span class="std std-doc">§3.5</span></a> — and
+<a class="reference internal" href="eigenvalue-algorithms.html"><span class="std std-doc">§5.2</span></a> builds the backward stable algorithms
+that make it the only thing left to worry about.</p></li>
+<li><p><strong>Sparse systems change the accounting.</strong>
+<a class="reference internal" href="sparse-matrices.html"><span class="std std-doc">§5.3</span></a> asks what happens when storing <span class="math notranslate nohighlight">\(A\)</span> at all is
+the constraint, and fill-in rather than growth is the enemy.</p></li>
+<li><p><strong>Iterative methods trade the guarantee for speed.</strong> CG and GMRES
+(<a class="reference internal" href="stationary-and-cg.html"><span class="std std-doc">§5.4</span></a>, <a class="reference internal" href="krylov-gmres-preconditioning.html"><span class="std std-doc">§5.5</span></a>)
+have no backward-stability theorem of LU’s strength; what they have is a
+convergence rate governed by the spectrum, which is a different contract
+with the same currency.</p></li>
+<li><p><strong>Where the vocabulary goes next.</strong> Every “the model is ill-conditioned”
+in Chapter VIII is <a class="reference internal" href="#equation-eq-ncs-master">Eq. 225</a> applied to a loss surface: gradient
+descent’s convergence constant is a condition number, and
+<a class="reference internal" href="../08-learning/gradient-descent-conditioning.html"><span class="std std-doc">§8.2</span></a> measures it.</p></li>
+</ul>
+<div class="docutils container" id="id5">
+<div role="list" class="citation-list">
+<div class="citation" id="id14" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">GVL13</a><span class="fn-bracket">]</span></span>
+<p>Gene H. Golub and Charles F. Van Loan. <em>Matrix Computations</em>. Johns Hopkins University Press, Baltimore, 4 edition, 2013.</p>
+</div>
+<div class="citation" id="id16" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Hig02<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id2">1</a>,<a role="doc-backlink" href="#id4">2</a>)</span>
+<p>Nicholas J. Higham. <em>Accuracy and Stability of Numerical Algorithms</em>. SIAM, Philadelphia, 2 edition, 2002. <a class="reference external" href="https://doi.org/10.1137/1.9780898718027">doi:10.1137/1.9780898718027</a>.</p>
+</div>
+<div class="citation" id="id13" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">TB97</a><span class="fn-bracket">]</span></span>
+<p>Lloyd N. Trefethen and David Bau, III. <em>Numerical Linear Algebra</em>. SIAM, Philadelphia, 1997. <a class="reference external" href="https://doi.org/10.1137/1.9780898719574">doi:10.1137/1.9780898719574</a>.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/05-numerical"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Chapter V — Numerical Linear Algebra</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="eigenvalue-algorithms.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">5.2 How Eigenvalues Are Really Computed</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#induced-norms">Induced norms</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-kappa-bounds-exactly">What <span class="math notranslate nohighlight">\(\kappa\)</span> bounds, exactly</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#forward-and-backward-error">Forward and backward error</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-growth-factor">The growth factor</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-induced-norms-by-definition-and-by-closed-form">Exercise 1: Induced norms, by definition and by closed form</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-attaining-the-kappa-bound-takes-two-alignments">Exercise 2: Attaining the <span class="math notranslate nohighlight">\(\kappa\)</span> bound takes two alignments</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-backward-stability-the-theorem-under-the-whole-course">Exercise 3: Backward stability: the theorem under the whole course</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-the-residual-is-a-liar">Exercise 4: The residual is a liar</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-the-growth-factor-the-fine-print-on-solve">Exercise 5: The growth factor: the fine print on <code class="docutils literal notranslate"><span class="pre">solve</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

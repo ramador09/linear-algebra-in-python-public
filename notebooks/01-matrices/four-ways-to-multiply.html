@@ -1,0 +1,1638 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="1.1 Matrices as Linear Maps: Four Ways to Multiply" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/01-matrices/four-ways-to-multiply.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: There is one sentence to take from this notebook, and the rest of Chapter I is its consequences: A\mathbf{x} is a linear combination of th..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: There is one sentence to take from this notebook, and the rest of Chapter I is its consequences: A\mathbf{x} is a linear combination of th..." />
+
+    <title>1.1 Matrices as Linear Maps: Four Ways to Multiply &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/01-matrices/four-ways-to-multiply';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/01-matrices/four-ways-to-multiply.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="1.2 Elimination, Pivoting, and A = LU" href="elimination-lu.html" />
+    <link rel="prev" title="Chapter I — Matrices, Elimination, and Subspaces" href="index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/01-matrices/four-ways-to-multiply.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/01-matrices/four-ways-to-multiply.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/01-matrices/four-ways-to-multiply.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/01-matrices/four-ways-to-multiply.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>1.1 Matrices as Linear Maps: Four Ways to Multiply</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-column-picture">The column picture</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#linearity-and-what-a-matrix-is-for">Linearity, and what a matrix is for</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#four-ways-to-write-the-same-product">Four ways to write the same product</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arithmetic-intensity-and-why-level-3-wins">Arithmetic intensity, and why level 3 wins</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-the-column-picture-drawn">Exercise 1: The column picture, drawn</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-column-space-and-a-dependent-column">Exercise 2: The column space, and a dependent column</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-four-ways-to-write-one-product">Exercise 3: Four ways to write one product</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-composition-non-commutativity-and-the-commutator">Exercise 4: Composition, non-commutativity, and the commutator</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-blocks-the-form-every-fast-algorithm-is-written-in">Exercise 5: Blocks: the form every fast algorithm is written in</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-arithmetic-intensity-and-why-level-3-wins">Exercise 6: Arithmetic intensity, and why level 3 wins</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="matrices-as-linear-maps-four-ways-to-multiply">
+<h1>1.1 Matrices as Linear Maps: Four Ways to Multiply<a class="headerlink" href="#matrices-as-linear-maps-four-ways-to-multiply" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter I — Matrices, Elimination, and Subspaces
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;1.1
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">Ax is a combination of the columns of A. Everything in this chapter follows from that sentence: the column space, the rank, composition, and why matrix-matrix products run sixty times faster than vector ones.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;introductory&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;75–105 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p>There is one sentence to take from this notebook, and the rest of Chapter I is
+its consequences: <strong><span class="math notranslate nohighlight">\(A\mathbf{x}\)</span> is a linear combination of the columns of
+<span class="math notranslate nohighlight">\(A\)</span>, with the entries of <span class="math notranslate nohighlight">\(\mathbf{x}\)</span> as the coefficients.</strong></p>
+<p>Read that way, questions that look like separate topics become the same
+question. Which vectors can <span class="math notranslate nohighlight">\(A\)</span> produce? All combinations of its columns — the
+<strong>column space</strong>. When does <span class="math notranslate nohighlight">\(A\mathbf{x} = \mathbf{b}\)</span> have a solution?
+Exactly when <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> is such a combination. How many genuinely different
+directions can <span class="math notranslate nohighlight">\(A\)</span> reach? The number of independent columns, which is the
+<strong>rank</strong>. The Prologue’s matrix had a column equal to the sum of two others,
+and every factorization there detected it; here we see why they all had to.</p>
+<p>The second half is about <em>products of matrices</em>, which turn out to be
+expressible four different ways — as a grid of inner products, as a sum of
+outer products, as a block computation, and as an index contraction. All four
+compute identical numbers, and each makes a different theorem obvious. The
+outer-product form is the one that explains low-rank approximation in Chapter
+IV; the block form is how every fast algorithm in Chapter V is actually written;
+the index form is how attention is written in Chapter VIII.</p>
+<p>The notebook closes with a measurement that governs the rest of the course. The
+three levels of the BLAS — vector–vector, matrix–vector, matrix–matrix — reach
+wildly different fractions of a machine’s peak speed, and the reason is not
+implementation quality but <strong>arithmetic intensity</strong>: how many operations each
+byte moved from memory can support. Matrix–matrix products win by a factor of
+sixty, which is why algorithms that can be phrased as matrix–matrix products
+are, and why the ones that cannot are slow no matter how few operations they
+perform.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> The column picture is Strang’s <span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id6" title="Gilbert Strang. Introduction to Linear Algebra. Wellesley-Cambridge Press, Wellesley, MA, 6 edition, 2023. ISBN 978-1-7331466-7-8.">Str23</a>]</span>, Chapter 1, and
+this notebook is a computational retelling of it. For the four forms of the
+product and the BLAS hierarchy, Golub and Van Loan <span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id14" title="Gene H. Golub and Charles F. Van Loan. Matrix Computations. Johns Hopkins University Press, Baltimore, 4 edition, 2013.">GVL13</a>]</span>,
+Chapter 1.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="the-column-picture">
+<h3>The column picture<a class="headerlink" href="#the-column-picture" title="Link to this heading">#</a></h3>
+<p>Write <span class="math notranslate nohighlight">\(A \in \mathbb{R}^{m\times n}\)</span> by its columns,
+<span class="math notranslate nohighlight">\(A = [\,\mathbf{a}_1\ \mathbf{a}_2\ \cdots\ \mathbf{a}_n\,]\)</span>. Then for
+<span class="math notranslate nohighlight">\(\mathbf{x} \in \mathbb{R}^n\)</span>,</p>
+<div class="math notranslate nohighlight" id="equation-eq-multiply-column-picture">
+<span class="eqno">(38)<a class="headerlink" href="#equation-eq-multiply-column-picture" title="Link to this equation">#</a></span>\[A\mathbf{x} \;=\; x_1\mathbf{a}_1 + x_2\mathbf{a}_2 + \cdots + x_n\mathbf{a}_n .\]</div>
+<p>There is a second, equally valid reading. Writing <span class="math notranslate nohighlight">\(A\)</span> by its rows
+<span class="math notranslate nohighlight">\(\mathbf{r}_1^{\top},\dots,\mathbf{r}_m^{\top}\)</span>,</p>
+<div class="math notranslate nohighlight" id="equation-eq-multiply-row-picture">
+<span class="eqno">(39)<a class="headerlink" href="#equation-eq-multiply-row-picture" title="Link to this equation">#</a></span>\[(A\mathbf{x})_i \;=\; \mathbf{r}_i^{\top}\mathbf{x},\]</div>
+<p>so the result is the stack of <span class="math notranslate nohighlight">\(m\)</span> inner products. The two give the same vector,
+and both are useful, but they answer different questions. The row picture
+<a class="reference internal" href="#equation-eq-multiply-row-picture">Eq. 39</a> is how you <em>compute</em> an entry; the column picture
+<a class="reference internal" href="#equation-eq-multiply-column-picture">Eq. 38</a> is how you <em>think</em> about what the map can
+reach. This course leads with the column picture, and where the two disagree
+about which is more illuminating, the column picture wins.</p>
+</section>
+<section id="linearity-and-what-a-matrix-is-for">
+<h3>Linearity, and what a matrix is for<a class="headerlink" href="#linearity-and-what-a-matrix-is-for" title="Link to this heading">#</a></h3>
+<p>A map <span class="math notranslate nohighlight">\(T : \mathbb{R}^n \to \mathbb{R}^m\)</span> is <strong>linear</strong> when
+<span class="math notranslate nohighlight">\(T(\alpha\mathbf{x} + \beta\mathbf{y}) = \alpha T(\mathbf{x}) + \beta
+T(\mathbf{y})\)</span>. Every such map is <span class="math notranslate nohighlight">\(\mathbf{x} \mapsto A\mathbf{x}\)</span> for exactly
+one matrix, whose <span class="math notranslate nohighlight">\(j\)</span>-th column is <span class="math notranslate nohighlight">\(T(\mathbf{e}_j)\)</span> — feed the map each basis
+vector in turn and record what comes out. That is the entire content of
+“matrices represent linear maps”, and
+<a class="reference internal" href="linear-maps-change-of-basis.html"><span class="std std-doc">§1.6</span></a> develops what changes when the basis
+does.</p>
+<p>The product <span class="math notranslate nohighlight">\(AB\)</span> is then defined so that it represents the <strong>composition</strong>:</p>
+<div class="math notranslate nohighlight" id="equation-eq-multiply-composition">
+<span class="eqno">(40)<a class="headerlink" href="#equation-eq-multiply-composition" title="Link to this equation">#</a></span>\[A(B\mathbf{x}) = (AB)\mathbf{x} \quad\text{for every } \mathbf{x} .\]</div>
+<p>Matrix multiplication is not an arbitrary rule to memorise; it is the unique
+rule that makes <a class="reference internal" href="#equation-eq-multiply-composition">Eq. 40</a> true.</p>
+</section>
+<section id="four-ways-to-write-the-same-product">
+<h3>Four ways to write the same product<a class="headerlink" href="#four-ways-to-write-the-same-product" title="Link to this heading">#</a></h3>
+<p>For <span class="math notranslate nohighlight">\(A \in \mathbb{R}^{m\times k}\)</span> and <span class="math notranslate nohighlight">\(B \in \mathbb{R}^{k\times n}\)</span>:</p>
+<ol class="arabic">
+<li><p><strong>Inner products.</strong> <span class="math notranslate nohighlight">\((AB)_{ij} = \mathbf{r}_i^{\top}\mathbf{c}_j\)</span>, row <span class="math notranslate nohighlight">\(i\)</span> of
+<span class="math notranslate nohighlight">\(A\)</span> against column <span class="math notranslate nohighlight">\(j\)</span> of <span class="math notranslate nohighlight">\(B\)</span>. One number at a time.</p></li>
+<li><p><strong>Sum of outer products.</strong> Writing <span class="math notranslate nohighlight">\(\mathbf{a}_p\)</span> for the <span class="math notranslate nohighlight">\(p\)</span>-th column of
+<span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(\mathbf{b}_p^{\top}\)</span> for the <span class="math notranslate nohighlight">\(p\)</span>-th row of <span class="math notranslate nohighlight">\(B\)</span>,</p>
+<div class="math notranslate nohighlight" id="equation-eq-multiply-outer">
+<span class="eqno">(41)<a class="headerlink" href="#equation-eq-multiply-outer" title="Link to this equation">#</a></span>\[AB \;=\; \sum_{p=1}^{k} \mathbf{a}_p\,\mathbf{b}_p^{\top} ,\]</div>
+<p>a sum of <span class="math notranslate nohighlight">\(k\)</span> matrices each of <strong>rank one</strong>. This is the form that matters
+most later: it says every product is a sum of <span class="math notranslate nohighlight">\(k\)</span> rank-one pieces, so
+truncating the sum gives a low-rank approximation, which is exactly what
+<a class="reference internal" href="../04-svd/low-rank-eckart-young.html"><span class="std std-doc">§4.2</span></a> does with the SVD.</p>
+</li>
+<li><p><strong>Blocks.</strong> Partition both matrices conformably and multiply the blocks as
+if they were scalars, respecting the order. This is how every
+cache-efficient implementation is written.</p></li>
+<li><p><strong>Indices.</strong> <span class="math notranslate nohighlight">\((AB)_{ij} = \sum_p A_{ip}B_{pj}\)</span>, which is
+<code class="docutils literal notranslate"><span class="pre">np.einsum(&quot;ip,pj-&gt;ij&quot;,</span> <span class="pre">A,</span> <span class="pre">B)</span></code>.</p></li>
+</ol>
+</section>
+<section id="arithmetic-intensity-and-why-level-3-wins">
+<h3>Arithmetic intensity, and why level 3 wins<a class="headerlink" href="#arithmetic-intensity-and-why-level-3-wins" title="Link to this heading">#</a></h3>
+<p>The three levels of the BLAS are vector–vector (level 1, e.g.
+<span class="math notranslate nohighlight">\(\alpha\mathbf{x} + \mathbf{y}\)</span>), matrix–vector (level 2, <span class="math notranslate nohighlight">\(A\mathbf{x}\)</span>), and
+matrix–matrix (level 3, <span class="math notranslate nohighlight">\(AB\)</span>). Their flop counts and their memory traffic scale
+differently, and the ratio</p>
+<div class="math notranslate nohighlight" id="equation-eq-multiply-intensity">
+<span class="eqno">(42)<a class="headerlink" href="#equation-eq-multiply-intensity" title="Link to this equation">#</a></span>\[\text{arithmetic intensity} = \frac{\text{flops}}{\text{bytes moved}}\]</div>
+<p>is <span class="math notranslate nohighlight">\(O(1)\)</span> for level 1, <span class="math notranslate nohighlight">\(O(1)\)</span> for level 2, and <span class="math notranslate nohighlight">\(O(n)\)</span> for level 3. Since a
+modern processor can perform far more arithmetic per second than its memory
+system can supply operands, low intensity means the arithmetic units sit idle
+waiting for data. Level 3 is the only one that escapes, which is why “recast
+the algorithm in terms of matrix–matrix products” is the single most effective
+optimisation in numerical linear algebra <span class="bibtex-citation" id="id3">[<a class="reference internal" href="#id14" title="Gene H. Golub and Charles F. Van Loan. Matrix Computations. Johns Hopkins University Press, Baltimore, 4 edition, 2013.">GVL13</a>]</span>.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data and instruments only: the worked matrices and the timing meter of
+<a class="reference internal" href="../00-machine/arrays-and-vectorization.html"><span class="std std-doc">§0.1</span></a>.
+Nothing here is any exercise’s lesson.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">draw</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">la</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random matrix below comes from this seed</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+
+
+<span class="c1"># instrument: the timing meter of §0.1 — plumbing for every race in the</span>
+<span class="c1"># course, not any exercise&#39;s lesson.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">bench</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">repeats</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Median wall-clock time of a zero-argument call, in seconds.</span>
+
+<span class="sd">    The same helper as section 0.1: a median over a few repeats, reported as a</span>
+<span class="sd">    ratio rather than an absolute, because absolute times do not transfer</span>
+<span class="sd">    between machines while ratios and scaling exponents do.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fn : callable</span>
+<span class="sd">        Zero-argument callable to time; called once first to warm any cache.</span>
+<span class="sd">    repeats : int, default 5</span>
+<span class="sd">        Number of timed repetitions.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float</span>
+<span class="sd">        Median elapsed time in seconds.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fn</span><span class="p">()</span>
+    <span class="n">times</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">repeats</span><span class="p">):</span>
+        <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+        <span class="n">fn</span><span class="p">()</span>
+        <span class="n">times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">times</span><span class="p">))</span>
+
+
+<span class="c1"># The worked example of this notebook: a 3x4 matrix whose third column is the</span>
+<span class="c1"># sum of the first two, exactly as in the Prologue, so the column picture has</span>
+<span class="c1"># something to reveal.</span>
+<span class="n">A_demo</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="p">[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">],</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-the-column-picture-drawn">
+<h2>Exercise 1: The column picture, drawn<a class="headerlink" href="#exercise-1-the-column-picture-drawn" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-multiply-column-picture">Eq. 38</a> says <span class="math notranslate nohighlight">\(A\mathbf{x}\)</span> is a weighted sum of the
+columns. In two dimensions that is a statement you can draw, so we draw it.</p>
+<p>Take the explicit matrix and vector</p>
+<div class="math notranslate nohighlight" id="equation-eq-multiply-2d-example">
+<span class="eqno">(43)<a class="headerlink" href="#equation-eq-multiply-2d-example" title="Link to this equation">#</a></span>\[\begin{split}M = \begin{bmatrix} 2 &amp; -1 \\ 1 &amp; 3 \end{bmatrix},
+\qquad \mathbf{x} = \begin{pmatrix} 1.5 \\ 1 \end{pmatrix},\end{split}\]</div>
+<p>whose columns are <span class="math notranslate nohighlight">\(\mathbf{m}_1 = (2,1)^{\top}\)</span> and
+<span class="math notranslate nohighlight">\(\mathbf{m}_2 = (-1,3)^{\top}\)</span>. Then <a class="reference internal" href="#equation-eq-multiply-column-picture">Eq. 38</a> gives
+<span class="math notranslate nohighlight">\(M\mathbf{x} = 1.5\,\mathbf{m}_1 + 1\,\mathbf{m}_2 = (3,1.5)^{\top} +
+(-1,3)^{\top} = (2, 4.5)^{\top}\)</span>, which is the diagonal of the parallelogram
+built from the two scaled columns. The row picture
+<a class="reference internal" href="#equation-eq-multiply-row-picture">Eq. 39</a> gets the same answer by a different route:
+<span class="math notranslate nohighlight">\((2\cdot1.5 + (-1)\cdot1,\ 1\cdot1.5 + 3\cdot1) = (2, 4.5)\)</span>.</p>
+<p>The picture also makes the reach of the map visible. As <span class="math notranslate nohighlight">\(\mathbf{x}\)</span> ranges
+over all of <span class="math notranslate nohighlight">\(\mathbb{R}^2\)</span>, the combinations <span class="math notranslate nohighlight">\(x_1\mathbf{m}_1 + x_2\mathbf{m}_2\)</span>
+fill the whole plane exactly when <span class="math notranslate nohighlight">\(\mathbf{m}_1\)</span> and <span class="math notranslate nohighlight">\(\mathbf{m}_2\)</span> are not
+parallel. If they were parallel, every <span class="math notranslate nohighlight">\(M\mathbf{x}\)</span> would lie on one line, and
+the matrix would be singular — which is what <span class="math notranslate nohighlight">\(\det M = 0\)</span> detects, and
+<a class="reference internal" href="determinants.html"><span class="std std-doc">§1.7</span></a> makes quantitative.</p>
+<p><strong>Part a)</strong> Compute <span class="math notranslate nohighlight">\(M\mathbf{x}\)</span> three ways for
+<a class="reference internal" href="#equation-eq-multiply-2d-example">Eq. 43</a>: as <code class="docutils literal notranslate"><span class="pre">M</span> <span class="pre">&#64;</span> <span class="pre">x</span></code>, as the column combination
+<code class="docutils literal notranslate"><span class="pre">x[0]</span> <span class="pre">*</span> <span class="pre">M[:,</span> <span class="pre">0]</span> <span class="pre">+</span> <span class="pre">x[1]</span> <span class="pre">*</span> <span class="pre">M[:,</span> <span class="pre">1]</span></code> of <a class="reference internal" href="#equation-eq-multiply-column-picture">Eq. 38</a>, and as
+the stacked inner products <code class="docutils literal notranslate"><span class="pre">np.array([M[0]</span> <span class="pre">&#64;</span> <span class="pre">x,</span> <span class="pre">M[1]</span> <span class="pre">&#64;</span> <span class="pre">x])</span></code> of
+<a class="reference internal" href="#equation-eq-multiply-row-picture">Eq. 39</a>. All three must give exactly <span class="math notranslate nohighlight">\((2, 4.5)^{\top}\)</span>.</p>
+<p><strong>Part b)</strong> Draw the column picture: the two columns as arrows from the origin,
+their scaled copies <span class="math notranslate nohighlight">\(1.5\mathbf{m}_1\)</span> and <span class="math notranslate nohighlight">\(1\mathbf{m}_2\)</span>, and the result
+<span class="math notranslate nohighlight">\(M\mathbf{x}\)</span> as the diagonal of the parallelogram they close.</p>
+<p><strong>Part c)</strong> Confirm linearity numerically on <a class="reference internal" href="#equation-eq-multiply-2d-example">Eq. 43</a>: for
+500 random pairs <span class="math notranslate nohighlight">\(\mathbf{u}, \mathbf{v}\)</span> and random scalars <span class="math notranslate nohighlight">\(\alpha, \beta\)</span>
+from <code class="docutils literal notranslate"><span class="pre">rng.standard_normal</span></code>, check
+<span class="math notranslate nohighlight">\(M(\alpha\mathbf{u} + \beta\mathbf{v}) = \alpha M\mathbf{u} + \beta M\mathbf{v}\)</span>
+to <span class="math notranslate nohighlight">\(10^{-13}\)</span>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>M @ x                         = [2.  4.5]
+x1*m1 + x2*m2  (Eq. 1)        = [2.  4.5]
+stacked row products (Eq. 2)  = [2.  4.5]
+all exactly (2, 4.5): True
+
+linearity over 500 random combinations: max defect 3.553e-15
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-multiply-column-picture">
+<img alt="../../_images/8d57a448a89a48bfd441848d73f768d44d1e7623e0ed10502e3930c8673b9c20.png" src="../../_images/8d57a448a89a48bfd441848d73f768d44d1e7623e0ed10502e3930c8673b9c20.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 17 </span><span class="caption-text">The column picture of Eq. 1 for the matrix <span class="math notranslate nohighlight">\(M\)</span> and vector <span class="math notranslate nohighlight">\(\mathbf{x}\)</span> of Eq. 6: the columns <span class="math notranslate nohighlight">\(\mathbf{m}_1 = (2,1)^{\top}\)</span> and <span class="math notranslate nohighlight">\(\mathbf{m}_2 = (-1,3)^{\top}\)</span> in grey, their scaled copies <span class="math notranslate nohighlight">\(1.5\,\mathbf{m}_1\)</span> and <span class="math notranslate nohighlight">\(1\,\mathbf{m}_2\)</span> in amber, and the result <span class="math notranslate nohighlight">\(M\mathbf{x} = (2, 4.5)^{\top}\)</span> in ink as the diagonal of the parallelogram the scaled columns close.</span><a class="headerlink" href="#fig-multiply-column-picture" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<p>The three routes are checked for exact equality, since the entries of
+<a class="reference internal" href="#equation-eq-multiply-2d-example">Eq. 43</a> are exactly representable and all three perform
+the same two multiplications and one addition per component. Linearity is
+checked over a sample rather than on one example, which is the difference
+between an illustration and a verification.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  M x = (2, 4.5) exactly   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  the column combination of Eq. 1 gives the same vector   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  and so does the stack of row inner products of Eq. 2   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  the map is linear: M(au + bv) = a Mu + b Mv over 500 pairs   [max|Δ| = 3.55271e-15 (rtol=0, atol=1e-13)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-the-column-space-and-a-dependent-column">
+<h2>Exercise 2: The column space, and a dependent column<a class="headerlink" href="#exercise-2-the-column-space-and-a-dependent-column" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-multiply-column-picture">Eq. 38</a> answers a question that looks harder than it
+is: which vectors <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> can <span class="math notranslate nohighlight">\(A\mathbf{x}\)</span> produce? Exactly the
+combinations of the columns. That set is the <strong>column space</strong> <span class="math notranslate nohighlight">\(C(A)\)</span>, and its
+dimension is the <strong>rank</strong>.</p>
+<p>The <span class="math notranslate nohighlight">\(3\times4\)</span> matrix</p>
+<div class="math notranslate nohighlight" id="equation-eq-multiply-demo-matrix">
+<span class="eqno">(44)<a class="headerlink" href="#equation-eq-multiply-demo-matrix" title="Link to this equation">#</a></span>\[\begin{split}A = \begin{bmatrix}
+2 &amp; 1 &amp; 3 &amp; 0\\ 3 &amp; 4 &amp; 7 &amp; 0\\ 1 &amp; 2 &amp; 3 &amp; -1
+\end{bmatrix}\end{split}\]</div>
+<p>from the setup cell — the Prologue’s matrix with its last row dropped — has
+<span class="math notranslate nohighlight">\(\mathbf{a}_3 = \mathbf{a}_1 + \mathbf{a}_2\)</span>, so the third column contributes
+nothing new: any combination using it can be rewritten without it. The column
+space is therefore spanned by <span class="math notranslate nohighlight">\(\{\mathbf{a}_1, \mathbf{a}_2, \mathbf{a}_4\}\)</span>,
+three vectors in <span class="math notranslate nohighlight">\(\mathbb{R}^3\)</span>, and they turn out to be independent, so
+<span class="math notranslate nohighlight">\(C(A) = \mathbb{R}^3\)</span> and the rank is 3.</p>
+<p>The consequence is a fact about solutions that <a class="reference internal" href="#equation-eq-multiply-column-picture">Eq. 38</a>
+makes obvious and the row picture does not. Since <span class="math notranslate nohighlight">\(\mathbf{a}_3\)</span> is redundant,
+the vector <span class="math notranslate nohighlight">\(\mathbf{n} = (1, 1, -1, 0)^{\top}\)</span> satisfies <span class="math notranslate nohighlight">\(A\mathbf{n} =
+\mathbf{a}_1 + \mathbf{a}_2 - \mathbf{a}_3 = \mathbf{0}\)</span>: there is a nonzero
+input the matrix sends to zero. Every solution of <span class="math notranslate nohighlight">\(A\mathbf{x} = \mathbf{b}\)</span>
+therefore comes with a whole line of other solutions,
+<span class="math notranslate nohighlight">\(\mathbf{x} + t\mathbf{n}\)</span>. That line is the <strong>null space</strong>, and
+<a class="reference internal" href="four-subspaces.html"><span class="std std-doc">§1.4</span></a> shows it is one of four subspaces that between
+them describe everything a matrix does.</p>
+<p><strong>Part a)</strong> For <span class="math notranslate nohighlight">\(A\)</span> of <a class="reference internal" href="#equation-eq-multiply-demo-matrix">Eq. 44</a>, confirm
+<span class="math notranslate nohighlight">\(\mathbf{a}_3 = \mathbf{a}_1 + \mathbf{a}_2\)</span> exactly, and that
+<span class="math notranslate nohighlight">\(\mathbf{n} = (1,1,-1,0)^{\top}\)</span> satisfies <span class="math notranslate nohighlight">\(A\mathbf{n} = \mathbf{0}\)</span> exactly.</p>
+<p><strong>Part b)</strong> Show the column space is all of <span class="math notranslate nohighlight">\(\mathbb{R}^3\)</span>: draw <span class="math notranslate nohighlight">\(10^4\)</span> random
+<span class="math notranslate nohighlight">\(\mathbf{x}\)</span> from <code class="docutils literal notranslate"><span class="pre">rng.standard_normal((10_000,</span> <span class="pre">4))</span></code>, form <span class="math notranslate nohighlight">\(A\mathbf{x}\)</span>, and
+confirm the resulting cloud has full rank 3 via <code class="docutils literal notranslate"><span class="pre">np.linalg.matrix_rank</span></code>. Then
+show that dropping <span class="math notranslate nohighlight">\(\mathbf{a}_3\)</span> changes nothing, by checking that
+<span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(A[:, [0,1,3]]\)</span> have the same rank.</p>
+<p><strong>Part c)</strong> Show the redundancy directly: for 200 random <span class="math notranslate nohighlight">\(\mathbf{x}\)</span>, rewrite
+each product without the third column as
+<span class="math notranslate nohighlight">\(A\mathbf{x} = (x_1 + x_3)\mathbf{a}_1 + (x_2 + x_3)\mathbf{a}_2 +
+x_4\mathbf{a}_4\)</span>, and confirm it reproduces <span class="math notranslate nohighlight">\(A\mathbf{x}\)</span> to <span class="math notranslate nohighlight">\(10^{-13}\)</span>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>a1 + a2 - a3 = [0. 0. 0.]  (exactly zero: True)
+A n         = [0. 0. 0.]  (exactly zero: True)
+
+rank of 10,000 outputs A x : 3
+rank of A                  : 3
+rank of A without column 3 : 3
+
+rewriting without column 3: max defect 3.553e-15
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<p>The dependence and the null vector are checked exactly — these are small
+integers — and the rank claims are checked in two independent ways: from the
+matrix itself and from the cloud of its outputs. The rewriting check is the
+sharp one: it demonstrates that the third column carries no information by
+reproducing every product without it.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  column 3 is exactly the sum of columns 1 and 2   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  n = (1, 1, -1, 0) is exactly in the null space   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  the outputs span all of R^3, so the rank is 3   [four columns, but only three independent directions]
+✓  dropping the dependent column does not change the rank   [the column space is spanned by columns 1, 2 and 4 alone]
+✓  every product can be rewritten without the third column   [max|Δ| = 3.55271e-15 (rtol=0, atol=1e-13)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-four-ways-to-write-one-product">
+<h2>Exercise 3: Four ways to write one product<a class="headerlink" href="#exercise-3-four-ways-to-write-one-product" title="Link to this heading">#</a></h2>
+<p>The four forms listed in the theory section compute identical numbers by
+different routes. Establishing that here is not pedantry: each form is the one
+that makes a different later result obvious, and it is worth having seen all
+four agree before any of them is relied on.</p>
+<p>The one to watch is the <strong>sum of outer products</strong> <a class="reference internal" href="#equation-eq-multiply-outer">Eq. 41</a>. Each
+term <span class="math notranslate nohighlight">\(\mathbf{a}_p\mathbf{b}_p^{\top}\)</span> is an <span class="math notranslate nohighlight">\(m\times n\)</span> matrix of rank one —
+every column is a multiple of <span class="math notranslate nohighlight">\(\mathbf{a}_p\)</span>. So a product of an <span class="math notranslate nohighlight">\(m\times k\)</span>
+with a <span class="math notranslate nohighlight">\(k\times n\)</span> matrix is a sum of exactly <span class="math notranslate nohighlight">\(k\)</span> rank-one matrices, which
+immediately bounds the rank of a product by <span class="math notranslate nohighlight">\(k\)</span>, and suggests that keeping only
+the <em>largest</em> few terms might be a good approximation. That suggestion, made
+precise, is the singular value decomposition, and
+<a class="reference internal" href="../04-svd/low-rank-eckart-young.html"><span class="std std-doc">§4.2</span></a> proves it is the best possible
+one.</p>
+<p>Use the explicit matrices</p>
+<div class="math notranslate nohighlight" id="equation-eq-multiply-ab-example">
+<span class="eqno">(45)<a class="headerlink" href="#equation-eq-multiply-ab-example" title="Link to this equation">#</a></span>\[\begin{split}X = \begin{bmatrix} 1 &amp; 2 \\ 0 &amp; -1 \\ 3 &amp; 1 \end{bmatrix},
+\qquad
+Y = \begin{bmatrix} 2 &amp; 0 &amp; 1 \\ 1 &amp; -1 &amp; 4 \end{bmatrix},\end{split}\]</div>
+<p>of shapes <span class="math notranslate nohighlight">\(3\times2\)</span> and <span class="math notranslate nohighlight">\(2\times3\)</span>, so <span class="math notranslate nohighlight">\(XY\)</span> is <span class="math notranslate nohighlight">\(3\times3\)</span> and is a sum of
+<strong>two</strong> rank-one matrices — hence has rank at most 2, and is therefore singular
+despite being square.</p>
+<p><strong>Part a)</strong> Compute <span class="math notranslate nohighlight">\(XY\)</span> for <a class="reference internal" href="#equation-eq-multiply-ab-example">Eq. 45</a> four ways: entry by
+entry with <code class="docutils literal notranslate"><span class="pre">X[i]</span> <span class="pre">&#64;</span> <span class="pre">Y[:,</span> <span class="pre">j]</span></code>; as the sum <a class="reference internal" href="#equation-eq-multiply-outer">Eq. 41</a> using
+<code class="docutils literal notranslate"><span class="pre">np.outer(X[:,</span> <span class="pre">p],</span> <span class="pre">Y[p,</span> <span class="pre">:])</span></code>; with <code class="docutils literal notranslate"><span class="pre">np.einsum(&quot;ip,pj-&gt;ij&quot;,</span> <span class="pre">X,</span> <span class="pre">Y)</span></code>; and with
+<code class="docutils literal notranslate"><span class="pre">X</span> <span class="pre">&#64;</span> <span class="pre">Y</span></code>. Confirm all four agree exactly.</p>
+<p><strong>Part b)</strong> Confirm the rank consequence: each <code class="docutils literal notranslate"><span class="pre">np.outer</span></code> term has rank 1, the
+sum has rank at most 2, and <code class="docutils literal notranslate"><span class="pre">np.linalg.matrix_rank(X</span> <span class="pre">&#64;</span> <span class="pre">Y)</span></code> is 2 even though
+<span class="math notranslate nohighlight">\(XY\)</span> is <span class="math notranslate nohighlight">\(3\times3\)</span> — so <span class="math notranslate nohighlight">\(\det(XY) = 0\)</span>.</p>
+<p><strong>Part c)</strong> Draw the accumulation: show <span class="math notranslate nohighlight">\(\mathbf{x}_1\mathbf{y}_1^{\top}\)</span>,
+<span class="math notranslate nohighlight">\(\mathbf{x}_2\mathbf{y}_2^{\top}\)</span>, and their sum as three heatmaps with
+<code class="docutils literal notranslate"><span class="pre">ecp.linalg.matrix_heatmap</span></code>, so the rank-one structure of each term is visible
+as the proportionality of its columns.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>X Y =
+ [[ 4. -2.  9.]
+ [-1.  1. -4.]
+ [ 7. -1.  7.]]
+
+entry by entry     identical: True
+sum of outer (Eq.5) identical: True
+einsum             identical: True
+
+rank of each outer term : [1, 1]
+rank of X Y             : 2
+det(X Y)                : 0.000e+00
+XY is 3x3 but a sum of only 2 rank-one terms, so it must be singular
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-multiply-outer">
+<img alt="../../_images/e9a097af561bc9c528b993d21de5da1a4fb25a7575976c161254cd9ad51d7927.png" src="../../_images/e9a097af561bc9c528b993d21de5da1a4fb25a7575976c161254cd9ad51d7927.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 18 </span><span class="caption-text">The product <span class="math notranslate nohighlight">\(XY\)</span> of Eq. 8 as the sum of outer products of Eq. 4: the two rank-one terms <span class="math notranslate nohighlight">\(\mathbf{x}_1\mathbf{y}_1^{\top}\)</span> and <span class="math notranslate nohighlight">\(\mathbf{x}_2\mathbf{y}_2^{\top}\)</span>, each of whose columns are multiples of a single vector, and their sum. Two rank-one terms cannot exceed rank 2, so the <span class="math notranslate nohighlight">\(3\times3\)</span> product is singular.</span><a class="headerlink" href="#fig-multiply-outer" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<p>All four forms are checked for exact equality, which is possible because the
+entries of <a class="reference internal" href="#equation-eq-multiply-ab-example">Eq. 45</a> are small integers and every partial
+sum is representable. The rank statements are then checked as consequences of
+<a class="reference internal" href="#equation-eq-multiply-outer">Eq. 41</a> rather than as separate facts.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  entry-by-entry equals X @ Y exactly   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  the sum of outer products of Eq. 4 equals X @ Y exactly   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  and so does einsum(&#39;ip,pj-&gt;ij&#39;)   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  each outer-product term has rank exactly 1   [every column of a b^T is a multiple of a]
+✓  so the 3x3 product has rank at most 2 (and exactly 2 here)   [rank(AB) &lt;= min(rank A, rank B) &lt;= inner dimension]
+✓  and is therefore singular: det(XY) = 0   [got 0 vs expected 0 (rtol=0, atol=1e-12)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-composition-non-commutativity-and-the-commutator">
+<h2>Exercise 4: Composition, non-commutativity, and the commutator<a class="headerlink" href="#exercise-4-composition-non-commutativity-and-the-commutator" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-multiply-composition">Eq. 40</a> says the product represents the composition, and
+that immediately explains why order matters: doing <span class="math notranslate nohighlight">\(B\)</span> then <span class="math notranslate nohighlight">\(A\)</span> is not the same
+as doing <span class="math notranslate nohighlight">\(A\)</span> then <span class="math notranslate nohighlight">\(B\)</span>, any more than “put on socks, then shoes” is the same as
+the reverse.</p>
+<p>The cleanest demonstration uses two matrices that each destroy information in a
+different direction. Take</p>
+<div class="math notranslate nohighlight" id="equation-eq-multiply-noncommuting">
+<span class="eqno">(46)<a class="headerlink" href="#equation-eq-multiply-noncommuting" title="Link to this equation">#</a></span>\[\begin{split}P = \begin{bmatrix} 0 &amp; 1 \\ 0 &amp; 0 \end{bmatrix},
+\qquad
+Q = \begin{bmatrix} 0 &amp; 0 \\ 1 &amp; 0 \end{bmatrix} .\end{split}\]</div>
+<p>Both are nilpotent (<span class="math notranslate nohighlight">\(P^2 = Q^2 = 0\)</span>), yet
+<span class="math notranslate nohighlight">\(PQ = \operatorname{diag}(1,0)\)</span> and <span class="math notranslate nohighlight">\(QP = \operatorname{diag}(0,1)\)</span>, so their
+<strong>commutator</strong></p>
+<div class="math notranslate nohighlight" id="equation-eq-multiply-commutator">
+<span class="eqno">(47)<a class="headerlink" href="#equation-eq-multiply-commutator" title="Link to this equation">#</a></span>\[\begin{split}[P, Q] = PQ - QP = \begin{bmatrix} 1 &amp; 0 \\ 0 &amp; -1 \end{bmatrix}\end{split}\]</div>
+<p>is as far from zero as a <span class="math notranslate nohighlight">\(2\times2\)</span> matrix of unit entries can be. That matrix
+is the Pauli <span class="math notranslate nohighlight">\(\sigma_z\)</span>, and the triple <span class="math notranslate nohighlight">\((P, Q, [P,Q])\)</span> is the raising and
+lowering pair of quantum angular momentum, which
+<a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html"><span class="std std-doc">§3.4</span></a> meets again.</p>
+<p>Some pairs <em>do</em> commute, and the cases are worth naming because they are
+exactly the cases where a matrix can be simplified. Diagonal matrices commute
+with each other; every matrix commutes with its own powers and with its
+inverse; and — the deep one — two diagonalisable matrices commute precisely
+when they share an eigenvector basis, which is the fact
+<a class="reference internal" href="../03-eigenvalues/spectral-theorem.html"><span class="std std-doc">§3.2</span></a> turns into the simultaneous
+diagonalisation of commuting observables.</p>
+<p><strong>Part a)</strong> For <a class="reference internal" href="#equation-eq-multiply-noncommuting">Eq. 46</a>, compute <span class="math notranslate nohighlight">\(P^2\)</span>, <span class="math notranslate nohighlight">\(Q^2\)</span>, <span class="math notranslate nohighlight">\(PQ\)</span>,
+<span class="math notranslate nohighlight">\(QP\)</span> and the commutator <a class="reference internal" href="#equation-eq-multiply-commutator">Eq. 47</a>, and confirm each against
+the values stated above, exactly.</p>
+<p><strong>Part b)</strong> Verify <a class="reference internal" href="#equation-eq-multiply-composition">Eq. 40</a> numerically on random
+matrices: for <span class="math notranslate nohighlight">\(A\)</span> of shape <span class="math notranslate nohighlight">\((4,3)\)</span>, <span class="math notranslate nohighlight">\(B\)</span> of shape <span class="math notranslate nohighlight">\((3,5)\)</span> and 100 random
+<span class="math notranslate nohighlight">\(\mathbf{x} \in \mathbb{R}^5\)</span>, check <span class="math notranslate nohighlight">\(A(B\mathbf{x}) = (AB)\mathbf{x}\)</span> to
+<span class="math notranslate nohighlight">\(10^{-13}\)</span>.</p>
+<p><strong>Part c)</strong> Confirm the three commuting cases: two diagonal matrices
+<span class="math notranslate nohighlight">\(\operatorname{diag}(1,2,3)\)</span> and <span class="math notranslate nohighlight">\(\operatorname{diag}(4,5,6)\)</span>; a random
+<span class="math notranslate nohighlight">\(R \in \mathbb{R}^{4\times4}\)</span> with <span class="math notranslate nohighlight">\(R^2\)</span>; and <span class="math notranslate nohighlight">\(R\)</span> with <span class="math notranslate nohighlight">\(R^{-1}\)</span>. Then confirm
+that two <em>random</em> matrices essentially never commute, by reporting
+<span class="math notranslate nohighlight">\(\|[R, S]\|_F / (\|R\|_F\|S\|_F)\)</span> for a random pair.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>P^2 =
+ [[0. 0.]
+ [0. 0.]]
+Q^2 =
+ [[0. 0.]
+ [0. 0.]]
+PQ  =
+ [[1. 0.]
+ [0. 0.]]
+QP  =
+ [[0. 0.]
+ [0. 1.]]
+[P, Q] = PQ - QP =
+ [[ 1.  0.]
+ [ 0. -1.]]    &lt;- the Pauli sigma_z
+
+A(Bx) == (AB)x over 100 vectors: max defect 3.553e-15
+
+  two diagonals    commute: True
+  R with R^2       commute: True
+  R with R^-1      commute: True
+  two random 4x4:  ||[R,S]||_F / (||R||_F ||S||_F) = 0.551
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<p>The nilpotency and the commutator are checked exactly against
+<a class="reference internal" href="#equation-eq-multiply-commutator">Eq. 47</a>. Associativity is checked over a sample of
+vectors, and the commuting cases are checked at a tolerance appropriate to each
+— exactly for the diagonals, and to <span class="math notranslate nohighlight">\(10^{-11}\)</span> where an inverse was computed,
+since that involves a solve and inherits its conditioning.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  P is nilpotent: P^2 = 0 exactly   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  [P, Q] = diag(1, -1), the Pauli sigma_z   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  PQ != QP: matrix multiplication does not commute   [the product represents composition, and order of composition matters]
+✓  A(Bx) = (AB)x for 100 random vectors (Eq. 3)   [max|Δ| = 3.55271e-15 (rtol=0, atol=1e-13)]
+✓  diagonal matrices commute exactly   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  a matrix commutes with its inverse   [max|Δ| = 6.42764e-16 (rtol=0, atol=1e-11)]
+✓  two random matrices are far from commuting   [relative commutator norm 0.551; commuting is exceptional]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-blocks-the-form-every-fast-algorithm-is-written-in">
+<h2>Exercise 5: Blocks: the form every fast algorithm is written in<a class="headerlink" href="#exercise-5-blocks-the-form-every-fast-algorithm-is-written-in" title="Link to this heading">#</a></h2>
+<p>The third of the four forms partitions the matrices and multiplies the pieces
+as though they were scalars. For a conformable <span class="math notranslate nohighlight">\(2\times2\)</span> partition,</p>
+<div class="math notranslate nohighlight" id="equation-eq-multiply-blocks">
+<span class="eqno">(48)<a class="headerlink" href="#equation-eq-multiply-blocks" title="Link to this equation">#</a></span>\[\begin{split}\begin{bmatrix} A_{11} &amp; A_{12}\\ A_{21} &amp; A_{22}\end{bmatrix}
+\begin{bmatrix} B_{11} &amp; B_{12}\\ B_{21} &amp; B_{22}\end{bmatrix}
+=
+\begin{bmatrix}
+A_{11}B_{11} + A_{12}B_{21} &amp; A_{11}B_{12} + A_{12}B_{22}\\
+A_{21}B_{11} + A_{22}B_{21} &amp; A_{21}B_{12} + A_{22}B_{22}
+\end{bmatrix},\end{split}\]</div>
+<p>which is the scalar rule with the blocks kept in order, since blocks do not
+commute.</p>
+<p>This is not a notational convenience. It is why matrix multiplication is fast.
+A processor’s arithmetic units are far quicker than its memory, so a
+computation that streams a large matrix through once per operation is limited
+by bandwidth rather than arithmetic. Splitting into blocks small enough to sit
+in cache lets each block be loaded once and used many times, and the whole
+product becomes a sequence of small products on resident data. Every level-3
+BLAS routine is written this way, and Exercise 6 measures what it buys.</p>
+<p>Block reasoning also proves things. Partitioning <span class="math notranslate nohighlight">\(A = [\,C \ \ D\,]\)</span> by columns
+and <span class="math notranslate nohighlight">\(B\)</span> conformably by rows gives <span class="math notranslate nohighlight">\(AB = CB_{\text{top}} + DB_{\text{bot}}\)</span>,
+which is <a class="reference internal" href="#equation-eq-multiply-outer">Eq. 41</a> in disguise. And a <strong>block triangular</strong> matrix
+has a determinant equal to the product of its diagonal blocks’ determinants —
+a fact <a class="reference internal" href="determinants.html"><span class="std std-doc">§1.7</span></a> uses and which is invisible entry by entry.</p>
+<p><strong>Part a)</strong> For random <span class="math notranslate nohighlight">\(A, B \in \mathbb{R}^{6\times6}\)</span> from
+<code class="docutils literal notranslate"><span class="pre">rng.standard_normal((6,</span> <span class="pre">6))</span></code>, split each into four <span class="math notranslate nohighlight">\(3\times3\)</span> blocks, form the
+product by <a class="reference internal" href="#equation-eq-multiply-blocks">Eq. 48</a> using <code class="docutils literal notranslate"><span class="pre">np.block</span></code>, and confirm it matches
+<code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">&#64;</span> <span class="pre">B</span></code> to <span class="math notranslate nohighlight">\(10^{-13}\)</span>.</p>
+<p><strong>Part b)</strong> Confirm blocks do not commute: show that the <em>wrong</em> order
+<span class="math notranslate nohighlight">\(B_{11}A_{11} + B_{21}A_{12}\)</span> differs from the correct top-left block
+<span class="math notranslate nohighlight">\(A_{11}B_{11} + A_{12}B_{21}\)</span>.</p>
+<p><strong>Part c)</strong> Verify the block-triangular determinant rule on the explicit
+<span class="math notranslate nohighlight">\(4\times4\)</span> built from <code class="docutils literal notranslate"><span class="pre">np.block([[T11,</span> <span class="pre">T12],</span> <span class="pre">[np.zeros((2,</span> <span class="pre">2)),</span> <span class="pre">T22]])</span></code> with
+<span class="math notranslate nohighlight">\(T_{11} = [[2,1],[0,3]]\)</span>, <span class="math notranslate nohighlight">\(T_{12}\)</span> random, and <span class="math notranslate nohighlight">\(T_{22} = [[4,0],[1,5]]\)</span>:
+check <span class="math notranslate nohighlight">\(\det = \det(T_{11})\det(T_{22}) = 6 \times 20 = 120\)</span>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>block product matches A @ B to 4.441e-16
+wrong block order differs by 4.836  &lt;- blocks do not commute
+
+block triangular T:
+[[ 2.      1.      1.0543 -0.4082]
+ [ 0.      3.      1.6101  0.1943]
+ [ 0.      0.      4.      0.    ]
+ [ 0.      0.      1.      5.    ]]
+det T                     = 120.000000
+det(T11) * det(T22)       = 120.000000   (= 6 x 20 = 120)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-multiply-blocks">
+<img alt="../../_images/b57e9e995f6895893521a9492d6691dd0d0cff0bd713b916ddc051eeb3ebfb4b.png" src="../../_images/b57e9e995f6895893521a9492d6691dd0d0cff0bd713b916ddc051eeb3ebfb4b.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 19 </span><span class="caption-text">Shape schematic of the block product of Eq. 11: two <span class="math notranslate nohighlight">\(6\times6\)</span> matrices partitioned into <span class="math notranslate nohighlight">\(3\times3\)</span> blocks, with the four products contributing to the top-left block of the result highlighted. Each block is small enough to remain in cache while it is reused, which is the entire reason level-3 operations reach a large fraction of peak speed.</span><a class="headerlink" href="#fig-multiply-blocks" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<p>The block product is checked against the direct one, the wrong ordering is
+checked to be genuinely different (so the ordering in
+<a class="reference internal" href="#equation-eq-multiply-blocks">Eq. 48</a> is doing work), and the block-triangular determinant
+is checked against the exact integer 120.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the block product of Eq. 11 reproduces A @ B   [max|Δ| = 4.44089e-16 (rtol=0, atol=1e-13)]
+✓  reversing the block order gives a different answer   [blocks obey the scalar rule only if their order is preserved]
+✓  a block triangular determinant is the product of the diagonal blocks   [got 120 vs expected 120 (rtol=1e-10, atol=0)]
+✓  and equals 6 x 20 = 120 exactly   [got 120 vs expected 120 (rtol=1e-10, atol=0)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-6-arithmetic-intensity-and-why-level-3-wins">
+<h2>Exercise 6: Arithmetic intensity, and why level 3 wins<a class="headerlink" href="#exercise-6-arithmetic-intensity-and-why-level-3-wins" title="Link to this heading">#</a></h2>
+<p>The last exercise measures the fact that shapes the rest of the course.</p>
+<p>Compare three operations on data of the same order of size, all of them
+implemented by the same tuned BLAS library:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>operation</p></th>
+<th class="head"><p>level</p></th>
+<th class="head"><p>flops</p></th>
+<th class="head"><p>bytes moved</p></th>
+<th class="head"><p>intensity</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\alpha\mathbf{x} + \mathbf{y}\)</span></p></td>
+<td><p>1</p></td>
+<td><p><span class="math notranslate nohighlight">\(2n\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(24n\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(O(1)\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(A\mathbf{x}\)</span></p></td>
+<td><p>2</p></td>
+<td><p><span class="math notranslate nohighlight">\(2n^2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(8n^2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(O(1)\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(AB\)</span></p></td>
+<td><p>3</p></td>
+<td><p><span class="math notranslate nohighlight">\(2n^3\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(24n^2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(O(n)\)</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The flop counts differ, so comparing times is meaningless; what to compare is
+the <strong>rate</strong>, flops per second, which measures how well each keeps the
+arithmetic units busy. By <a class="reference internal" href="#equation-eq-multiply-intensity">Eq. 42</a> the first two move a
+constant number of bytes per operation, so they run at the speed of memory. The
+third moves <span class="math notranslate nohighlight">\(O(1/n)\)</span> bytes per operation, so for large <span class="math notranslate nohighlight">\(n\)</span> it runs at the speed
+of arithmetic — and on a current machine those two speeds differ by more than a
+factor of fifty.</p>
+<p>This is why “reduce the flop count” is not, on its own, good advice. An
+algorithm doing <span class="math notranslate nohighlight">\(2n^3\)</span> operations as one matrix–matrix product routinely beats
+one doing <span class="math notranslate nohighlight">\(n^3\)</span> operations as a sequence of matrix–vector products.
+<a class="reference internal" href="../05-numerical/sparse-matrices.html"><span class="std std-doc">§5.3</span></a> meets the other side of the same
+coin: a sparse matrix–vector product has almost no reuse at all, which is why
+sparse solvers are bandwidth-bound and their design is dominated by memory
+layout rather than by operation count.</p>
+<p><strong>Part a)</strong> At <span class="math notranslate nohighlight">\(n = 1500\)</span>, with <code class="docutils literal notranslate"><span class="pre">A</span></code>, <code class="docutils literal notranslate"><span class="pre">B</span></code> from <code class="docutils literal notranslate"><span class="pre">rng.standard_normal((n,</span> <span class="pre">n))</span></code> and
+<code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code> from <code class="docutils literal notranslate"><span class="pre">rng.standard_normal(n)</span></code>, time <code class="docutils literal notranslate"><span class="pre">2.0</span> <span class="pre">*</span> <span class="pre">x</span> <span class="pre">+</span> <span class="pre">y</span></code>, <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">&#64;</span> <span class="pre">x</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">&#64;</span> <span class="pre">B</span></code> with the <code class="docutils literal notranslate"><span class="pre">bench</span></code> helper. Report each time, each flop count from
+<code class="docutils literal notranslate"><span class="pre">ecp.linalg.flops</span></code>, and each achieved rate in GFLOP/s.</p>
+<p><strong>Part b)</strong> Compute the arithmetic intensity <a class="reference internal" href="#equation-eq-multiply-intensity">Eq. 42</a> for
+each using the byte counts in the table above; gate the intensity
+<em>ordering</em> — a counted model — and report whether today’s rates follow it.</p>
+<p><strong>Part c)</strong> Plot achieved rate against arithmetic intensity on log axes — the
+roofline picture — and report the level-3/level-1 rate ratio beside the
+counted intensity ratio (on this machine it exceeds ten; the clocks are
+testimony, never a gate).</p>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p>Ask for a routine that computes <span class="math notranslate nohighlight">\(A B\)</span> by explicit <span class="math notranslate nohighlight">\(b \times b\)</span> blocks with a
+tunable block size, using <a class="reference internal" href="#equation-eq-multiply-blocks">Eq. 48</a> and NumPy only for the small
+block products. Then check it yourself: it must agree with <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">&#64;</span> <span class="pre">B</span></code> to
+<span class="math notranslate nohighlight">\(10^{-11}\)</span> at <span class="math notranslate nohighlight">\(n = 480\)</span> for every block size dividing <span class="math notranslate nohighlight">\(n\)</span>, and its running time
+as a function of <span class="math notranslate nohighlight">\(b\)</span> should be U-shaped, with the minimum at a block that fits
+in cache. The check is yours.</p>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>n = 1500
+operation      level         time           flops   GFLOP/s   intensity
+axpy  2x + y       1        2.9 us           3,000      1.03       0.083
+gemv  A x          2      328.7 us       4,500,000     13.69       0.250
+gemm  A B          3   156121.9 us   6,750,000,000     43.24     125.000
+
+level 3 beats level 1 by 42x in rate, with 1,500x the arithmetic intensity
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-multiply-roofline">
+<img alt="../../_images/2e6e23431eb953519f87bc80d36a8d9f16bbd312293f4152ad66e758f7aec81a.png" src="../../_images/2e6e23431eb953519f87bc80d36a8d9f16bbd312293f4152ad66e758f7aec81a.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 20 </span><span class="caption-text">Achieved rate in GFLOP/s against arithmetic intensity (flops per byte moved, Eq. 5) for the three BLAS levels at <span class="math notranslate nohighlight">\(n = 1500\)</span>: the vector update \texttt{axpy}, the matrix-vector product \texttt{gemv}, and the matrix-matrix product \texttt{gemm}. Only level 3 has intensity growing with <span class="math notranslate nohighlight">\(n\)</span>, and only level 3 escapes the memory system to run at a large fraction of the machine’s arithmetic peak.</span><a class="headerlink" href="#fig-multiply-roofline" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-6">
+<h3>Validation 6<a class="headerlink" href="#validation-6" title="Link to this heading">#</a></h3>
+<p>The flop counts are exact and are checked against their closed forms, and
+the intensity ordering — a counted model — is gated. The achieved rates are
+machine-dependent and are <em>reported only</em>: even their ordering belongs to
+the machine, since a threaded runner can hand neighbouring levels different
+fractions of itself. The products themselves are checked too, so a fast
+wrong answer cannot pass.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the level-2 and level-3 flop counts are 2n^2 and 2n^3   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  arithmetic intensity increases with BLAS level — the counted ordering   [0.08 &lt; 0.25 &lt; 125.0 flops per byte: only level 3&#39;s intensity grows with n, which is the counted fact behind the roofline]
+achieved rates, reported and never gated: 1.0 / 13.7 / 43.2 GFLOP/s — level-3/level-1 ratio 42x today, against a counted intensity ratio of 1,500x
+✓  and the fast route computes the right answer   [max|Δ| = 2.13163e-13 (rtol=0, atol=1e-10)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p>One sentence, and its consequences: <span class="math notranslate nohighlight">\(A\mathbf{x}\)</span> is a combination of the
+columns of <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<p>The concrete results:</p>
+<ul class="simple">
+<li><p>for <span class="math notranslate nohighlight">\(M = [[2,-1],[1,3]]\)</span> and <span class="math notranslate nohighlight">\(\mathbf{x} = (1.5, 1)^{\top}\)</span>, the column
+combination <a class="reference internal" href="#equation-eq-multiply-column-picture">Eq. 38</a>, the stacked row products
+<a class="reference internal" href="#equation-eq-multiply-row-picture">Eq. 39</a>, and <code class="docutils literal notranslate"><span class="pre">M</span> <span class="pre">&#64;</span> <span class="pre">x</span></code> all gave <strong>exactly</strong> <span class="math notranslate nohighlight">\((2, 4.5)\)</span>,
+and linearity held to <span class="math notranslate nohighlight">\(10^{-13}\)</span> over 500 random combinations;</p></li>
+<li><p>the <span class="math notranslate nohighlight">\(3\times4\)</span> matrix of <a class="reference internal" href="#equation-eq-multiply-demo-matrix">Eq. 44</a> has
+<span class="math notranslate nohighlight">\(\mathbf{a}_3 = \mathbf{a}_1 + \mathbf{a}_2\)</span> exactly, so
+<span class="math notranslate nohighlight">\(\mathbf{n} = (1,1,-1,0)^{\top}\)</span> lies exactly in its null space, its rank is
+3, dropping the dependent column changes nothing, and every product can be
+rewritten without that column;</p></li>
+<li><p>the four forms of <span class="math notranslate nohighlight">\(XY\)</span> for the <span class="math notranslate nohighlight">\(3\times2\)</span> and <span class="math notranslate nohighlight">\(2\times3\)</span> matrices of
+<a class="reference internal" href="#equation-eq-multiply-ab-example">Eq. 45</a> agreed <strong>exactly</strong>, each outer-product term had
+rank exactly 1, and the <span class="math notranslate nohighlight">\(3\times3\)</span> product came out with rank 2 and
+<span class="math notranslate nohighlight">\(\det = 0\)</span> — singular because it is a sum of only two rank-one pieces;</p></li>
+<li><p><span class="math notranslate nohighlight">\(P\)</span> and <span class="math notranslate nohighlight">\(Q\)</span> of <a class="reference internal" href="#equation-eq-multiply-noncommuting">Eq. 46</a> are both nilpotent yet
+<span class="math notranslate nohighlight">\([P,Q] = \operatorname{diag}(1,-1)\)</span>, the Pauli <span class="math notranslate nohighlight">\(\sigma_z\)</span>, while diagonal
+matrices, a matrix with its powers, and a matrix with its inverse all commute;</p></li>
+<li><p>the block product <a class="reference internal" href="#equation-eq-multiply-blocks">Eq. 48</a> reproduced <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">&#64;</span> <span class="pre">B</span></code> to <span class="math notranslate nohighlight">\(10^{-13}\)</span>,
+reversing the block order did not, and the block-triangular determinant came
+out exactly <span class="math notranslate nohighlight">\(6 \times 20 = 120\)</span>;</p></li>
+<li><p>and the three BLAS levels at <span class="math notranslate nohighlight">\(n = 1500\)</span> reached rates increasing with
+arithmetic intensity, with level 3 outrunning level 1 by more than a factor
+of ten on identical hardware and identical library.</p></li>
+</ul>
+<p>Methods met: the column and row pictures, <code class="docutils literal notranslate"><span class="pre">np.outer</span></code> and the rank-one
+decomposition <a class="reference internal" href="#equation-eq-multiply-outer">Eq. 41</a>, <code class="docutils literal notranslate"><span class="pre">np.block</span></code> and block partitioning,
+<code class="docutils literal notranslate"><span class="pre">np.einsum(&quot;ip,pj-&gt;ij&quot;)</span></code>, <code class="docutils literal notranslate"><span class="pre">np.linalg.matrix_rank</span></code>, the commutator, and
+<code class="docutils literal notranslate"><span class="pre">ecp.linalg.flops</span></code> with the arithmetic-intensity model.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Elimination.</strong> We have said what <span class="math notranslate nohighlight">\(A\mathbf{x} = \mathbf{b}\)</span> <em>means</em> without
+solving one. <a class="reference internal" href="elimination-lu.html"><span class="std std-doc">§1.2</span></a> does, by writing Gaussian
+elimination out and discovering that recording what it did produces the
+factorization <span class="math notranslate nohighlight">\(PA = LU\)</span>.</p></li>
+<li><p><strong>The four subspaces.</strong> The column space and the null space appeared here as
+two natural objects. There are two more, obtained by asking the same
+questions of <span class="math notranslate nohighlight">\(A^{\top}\)</span>, and together the four completely describe the map.
+That is <a class="reference internal" href="four-subspaces.html"><span class="std std-doc">§1.4</span></a>.</p></li>
+<li><p><strong>Truncating the rank-one sum.</strong> <a class="reference internal" href="#equation-eq-multiply-outer">Eq. 41</a> writes any product
+as <span class="math notranslate nohighlight">\(k\)</span> rank-one pieces. If the pieces could be <em>ordered by importance</em>,
+keeping the first few would be a principled approximation. Ordering them is
+exactly what the SVD does, and
+<a class="reference internal" href="../04-svd/low-rank-eckart-young.html"><span class="std std-doc">§4.2</span></a> proves the truncation is the
+best approximation of its rank that exists.</p></li>
+<li><p><strong>Blocks all the way down.</strong> Exercise 5 partitioned once. Partitioning
+recursively gives Strassen’s algorithm, which multiplies in
+<span class="math notranslate nohighlight">\(O(n^{2.807})\)</span> operations by trading one multiplication for fourteen
+additions — and is a rare case where a lower flop count really does win, once
+<span class="math notranslate nohighlight">\(n\)</span> is large enough <span class="bibtex-citation" id="id4">[<a class="reference internal" href="#id14" title="Gene H. Golub and Charles F. Van Loan. Matrix Computations. Johns Hopkins University Press, Baltimore, 4 edition, 2013.">GVL13</a>]</span>.</p></li>
+</ul>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h3>
+<div class="docutils container" id="id5">
+<div role="list" class="citation-list">
+<div class="citation" id="id14" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>GVL13<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id2">1</a>,<a role="doc-backlink" href="#id3">2</a>,<a role="doc-backlink" href="#id4">3</a>)</span>
+<p>Gene H. Golub and Charles F. Van Loan. <em>Matrix Computations</em>. Johns Hopkins University Press, Baltimore, 4 edition, 2013.</p>
+</div>
+<div class="citation" id="id6" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">Str23</a><span class="fn-bracket">]</span></span>
+<p>Gilbert Strang. <em>Introduction to Linear Algebra</em>. Wellesley-Cambridge Press, Wellesley, MA, 6 edition, 2023. ISBN 978-1-7331466-7-8.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/01-matrices"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Chapter I — Matrices, Elimination, and Subspaces</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="elimination-lu.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">1.2 Elimination, Pivoting, and A = LU</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-column-picture">The column picture</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#linearity-and-what-a-matrix-is-for">Linearity, and what a matrix is for</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#four-ways-to-write-the-same-product">Four ways to write the same product</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arithmetic-intensity-and-why-level-3-wins">Arithmetic intensity, and why level 3 wins</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-the-column-picture-drawn">Exercise 1: The column picture, drawn</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-column-space-and-a-dependent-column">Exercise 2: The column space, and a dependent column</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-four-ways-to-write-one-product">Exercise 3: Four ways to write one product</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-composition-non-commutativity-and-the-commutator">Exercise 4: Composition, non-commutativity, and the commutator</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-blocks-the-form-every-fast-algorithm-is-written-in">Exercise 5: Blocks: the form every fast algorithm is written in</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-arithmetic-intensity-and-why-level-3-wins">Exercise 6: Arithmetic intensity, and why level 3 wins</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

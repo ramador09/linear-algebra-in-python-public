@@ -1,0 +1,1352 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/07-tensors/unfoldings-tucker-hosvd.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: §7.1 gave tensors a language; this notebook gives them a decomposition. The bridge is the mode- n unfolding — reshape the 3-way array into..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: §7.1 gave tensors a language; this notebook gives them a decomposition. The bridge is the mode- n unfolding — reshape the 3-way array into..." />
+
+    <title>7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/07-tensors/unfoldings-tucker-hosvd';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/07-tensors/unfoldings-tucker-hosvd.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="7.3 Tensor Trains and Matrix Product States" href="tensor-trains-mps.html" />
+    <link rel="prev" title="7.1 Index Notation and einsum: Contraction as a Language" href="einsum-contraction.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/07-tensors/unfoldings-tucker-hosvd.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/07-tensors/unfoldings-tucker-hosvd.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/07-tensors/unfoldings-tucker-hosvd.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/07-tensors/unfoldings-tucker-hosvd.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#unfoldings-three-ways-to-be-a-matrix">Unfoldings: three ways to be a matrix</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tucker-and-hosvd">Tucker and HOSVD</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#truncation-and-the-theorem-with-a-constant-in-it">Truncation, and the theorem with a constant in it</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-unfoldings-written-by-hand-gated-exactly">Exercise 1: Unfoldings: written by hand, gated exactly</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-mode-products-and-the-algebra-they-obey">Exercise 2: Mode products, and the algebra they obey</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-hosvd-chapter-iv-three-times">Exercise 3: HOSVD: Chapter IV, three times</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-the-three-spectra-and-the-ranks-they-advertise">Exercise 4: The three spectra, and the ranks they advertise</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-truncation-the-theorem-with-sqrt-3-in-it">Exercise 5: Truncation: the theorem with <span class="math notranslate nohighlight">\(\sqrt{3}\)</span> in it</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-the-whole-price-list-error-over-the-rank-grid">Exercise 6: The whole price list: error over the rank grid</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="tensors-unfoldings-and-the-tucker-hosvd-decompositions">
+<h1>7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions<a class="headerlink" href="#tensors-unfoldings-and-the-tucker-hosvd-decompositions" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter VII — Multilinear Algebra and Tensor Networks
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;7.2
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">A three-way array has three ways to be a matrix, and each unfolding brings the whole of Chapter IV to bear: three SVDs give the higher-order SVD, a small core carries the joint structure, and a quasi-optimality theorem — gated, with its sqrt-3 constant — says how much is lost by truncating each mode on its own.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;advanced&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;120–150 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="einsum-contraction.html"><span class="std std-doc">§7.1</span></a> gave tensors a language; this notebook
+gives them a decomposition. The bridge is the <strong>mode-<span class="math notranslate nohighlight">\(n\)</span> unfolding</strong> —
+reshape the 3-way array into a matrix by making one index the rows —
+written by hand here (<code class="docutils literal notranslate"><span class="pre">np.moveaxis</span></code> plus <code class="docutils literal notranslate"><span class="pre">reshape</span></code>, gated to round-trip
+<em>exactly</em>, since reshapes move no numbers). Unfoldings make the
+<strong>multilinear rank</strong> three ordinary matrix ranks, and they make the
+<strong>mode product</strong> ordinary matrix multiplication, whose commutation
+across distinct modes is gated at <span class="math notranslate nohighlight">\(10^{-12}\)</span> scaled.</p>
+<p>Then Chapter IV returns in triplicate. The <strong>HOSVD</strong>
+<span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id38" title="Lieven De Lathauwer, Bart De Moor, and Joos Vandewalle. A multilinear singular value decomposition. SIAM Journal on Matrix Analysis and Applications, 21(4):1253–1278, 2000. doi:10.1137/S0895479896305696.">DLDMV00</a>]</span> runs one SVD per unfolding: orthonormal factors
+(gated <span class="math notranslate nohighlight">\(10^{-13}\)</span>), a core with the SVD’s <em>all-orthogonality</em> inherited
+in every mode (gated), and exact reconstruction at full multilinear
+rank. Truncation is where tensors part company with matrices: cutting
+each mode’s basis separately is <strong>not</strong> optimal — no Eckart–Young holds
+— but the quasi-optimality theorem bounds the loss at <span class="math notranslate nohighlight">\(\sqrt{3}\)</span> of the
+best possible, and the measurement shows both regimes: at the planted
+ranks <span class="math notranslate nohighlight">\((3,4,2)\)</span> the alternating <strong>HOOI</strong> iteration cannot improve on
+HOSVD at all (ratio 1.0000 — the structure is recovered outright),
+while at the harsh ranks <span class="math notranslate nohighlight">\((2,2,2)\)</span> HOOI’s provably monotone sweeps beat
+truncated HOSVD by 16%, comfortably inside the <span class="math notranslate nohighlight">\(\sqrt{3} = 1.73\)</span>
+ceiling. A <span class="math notranslate nohighlight">\(960\)</span>-entry tensor rides home in <span class="math notranslate nohighlight">\(116\)</span> numbers — the
+compression ledger, counted — and the error surface over the whole
+multilinear-rank grid is drawn as the price list it is.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> De Lathauwer, De Moor and Vandewalle <span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id38" title="Lieven De Lathauwer, Bart De Moor, and Joos Vandewalle. A multilinear singular value decomposition. SIAM Journal on Matrix Analysis and Applications, 21(4):1253–1278, 2000. doi:10.1137/S0895479896305696.">DLDMV00</a>]</span>
+for the HOSVD and HOOI; Kolda and Bader <span class="bibtex-citation" id="id3">[<a class="reference internal" href="#id37" title="Tamara G. Kolda and Brett W. Bader. Tensor decompositions and applications. SIAM Review, 51(3):455–500, 2009. doi:10.1137/07070111X.">KB09</a>]</span> for
+notation and the survey view. The SVD facts are
+<a class="reference internal" href="../04-svd/svd-geometry.html"><span class="std std-doc">§4.1</span></a>–<a class="reference internal" href="../04-svd/low-rank-eckart-young.html"><span class="std std-doc">§4.2</span></a>’s,
+applied three times.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="unfoldings-three-ways-to-be-a-matrix">
+<h3>Unfoldings: three ways to be a matrix<a class="headerlink" href="#unfoldings-three-ways-to-be-a-matrix" title="Link to this heading">#</a></h3>
+<p>For <span class="math notranslate nohighlight">\(\mathcal{T} \in \mathbb{R}^{d_1\times d_2\times d_3}\)</span> the mode-<span class="math notranslate nohighlight">\(n\)</span>
+unfolding <span class="math notranslate nohighlight">\(T_{(n)}\)</span> makes index <span class="math notranslate nohighlight">\(n\)</span> the rows and flattens the rest:</p>
+<div class="math notranslate nohighlight" id="equation-eq-tk-unfold">
+<span class="eqno">(272)<a class="headerlink" href="#equation-eq-tk-unfold" title="Link to this equation">#</a></span>\[T_{(n)} \in \mathbb{R}^{d_n \times \prod_{m\ne n} d_m},
+\qquad
+\operatorname{rank}_{\text{ml}}(\mathcal{T})
+= \bigl(\operatorname{rank} T_{(1)},
+\operatorname{rank} T_{(2)}, \operatorname{rank} T_{(3)}\bigr),\]</div>
+<p>and the <strong>mode product</strong> <span class="math notranslate nohighlight">\(\mathcal{T}\times_n A\)</span> is <span class="math notranslate nohighlight">\(A\,T_{(n)}\)</span>
+refolded. Products along <em>different</em> modes commute; along the same mode
+they compose: <span class="math notranslate nohighlight">\((\mathcal{T}\times_n A)\times_n B =
+\mathcal{T}\times_n(BA)\)</span>.</p>
+</section>
+<section id="tucker-and-hosvd">
+<h3>Tucker and HOSVD<a class="headerlink" href="#tucker-and-hosvd" title="Link to this heading">#</a></h3>
+<p>The Tucker form is a small core lit by one basis per mode,</p>
+<div class="math notranslate nohighlight" id="equation-eq-tk-tucker">
+<span class="eqno">(273)<a class="headerlink" href="#equation-eq-tk-tucker" title="Link to this equation">#</a></span>\[\mathcal{T} \;=\; \mathcal{G}\times_1 U_1\times_2 U_2\times_3 U_3 ,\]</div>
+<p>and the <strong>HOSVD</strong> chooses <span class="math notranslate nohighlight">\(U_n\)</span> as the left singular vectors of
+<span class="math notranslate nohighlight">\(T_{(n)}\)</span>: three matrix SVDs, no iteration. The core
+<span class="math notranslate nohighlight">\(\mathcal{G} = \mathcal{T}\times_1 U_1^{\top}\times_2 U_2^{\top}
+\times_3 U_3^{\top}\)</span> then inherits <em>all-orthogonality</em> — its slices
+along each mode are mutually orthogonal, the tensor echo of the SVD’s
+diagonal <span class="math notranslate nohighlight">\(\Sigma\)</span>.</p>
+</section>
+<section id="truncation-and-the-theorem-with-a-constant-in-it">
+<h3>Truncation, and the theorem with a constant in it<a class="headerlink" href="#truncation-and-the-theorem-with-a-constant-in-it" title="Link to this heading">#</a></h3>
+<p>Keeping <span class="math notranslate nohighlight">\(r_n\)</span> columns per mode is <strong>not</strong> the best rank-<span class="math notranslate nohighlight">\((r_1,r_2,r_3)\)</span>
+approximation — Eckart–Young does not survive the third index. What
+survives is quasi-optimality,</p>
+<div class="math notranslate nohighlight" id="equation-eq-tk-quasi">
+<span class="eqno">(274)<a class="headerlink" href="#equation-eq-tk-quasi" title="Link to this equation">#</a></span>\[\lVert \mathcal{T} - \widehat{\mathcal{T}}_{\text{HOSVD}}\rVert
+\;\le\; \sqrt{3}\;
+\lVert \mathcal{T} - \mathcal{T}_{\text{best}}\rVert ,\]</div>
+<p>and <strong>HOOI</strong> — alternating: fix two bases, optimize the third by an
+SVD of the partially projected tensor — descends monotonically from
+the HOSVD start toward a local optimum. Since
+<span class="math notranslate nohighlight">\(\lVert\mathcal{T}-\mathcal{T}_{\text{best}}\rVert \le
+\lVert\mathcal{T}-\widehat{\mathcal{T}}_{\text{HOOI}}\rVert\)</span>, the
+computable form of <a class="reference internal" href="#equation-eq-tk-quasi">Eq. 274</a> — HOSVD error at most
+<span class="math notranslate nohighlight">\(\sqrt3\,\times\)</span> HOOI error — is gateable one-sidedly, and is.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data only: the dimensions, the smooth cosine factors, and the planted
+working tensor (assembled with the einsum sentence of
+<a class="reference internal" href="einsum-contraction.html"><span class="std std-doc">§7.1</span></a>). unfold/fold are
+built in Exercise 1, the mode product in Exercise 2.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">draw</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random array below comes from this seed</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+
+<span class="n">DIMS</span> <span class="o">=</span> <span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<span class="n">CORE_R</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+
+
+
+
+<span class="c1"># The working tensor: a planted Tucker structure with SMOOTH factors</span>
+<span class="c1"># (orthonormalized cosine profiles), so truncation is visible to the eye</span>
+<span class="c1"># in Exercise 5&#39;s slices, plus 1e-3 noise so no rank is exact.</span>
+<span class="c1"># data: the smooth factor profiles the plant is built from.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">cosine_basis</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">/</span> <span class="n">d</span>
+    <span class="n">Q</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">r</span><span class="p">))))</span>
+    <span class="k">return</span> <span class="n">Q</span>
+
+
+<span class="n">G_PLANT</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">(</span><span class="n">CORE_R</span><span class="p">)</span>
+<span class="n">U_PLANT</span> <span class="o">=</span> <span class="p">[</span><span class="n">cosine_basis</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">DIMS</span><span class="p">,</span> <span class="n">CORE_R</span><span class="p">)]</span>
+<span class="c1"># data: assembled with the einsum sentence of §7.1 — the mode-product</span>
+<span class="c1"># spelling of this same assembly is Exercise 2&#39;s build.</span>
+<span class="n">T_clean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s2">&quot;abc,ia,jb,kc-&gt;ijk&quot;</span><span class="p">,</span> <span class="n">G_PLANT</span><span class="p">,</span> <span class="o">*</span><span class="n">U_PLANT</span><span class="p">)</span>
+<span class="n">T_work</span> <span class="o">=</span> <span class="n">T_clean</span> <span class="o">+</span> <span class="mf">1e-3</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">(</span><span class="n">DIMS</span><span class="p">)</span>
+<span class="n">NORM_T</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">T_work</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-unfoldings-written-by-hand-gated-exactly">
+<h2>Exercise 1: Unfoldings: written by hand, gated exactly<a class="headerlink" href="#exercise-1-unfoldings-written-by-hand-gated-exactly" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">unfold(T,</span> <span class="pre">mode)</span></code> and <code class="docutils literal notranslate"><span class="pre">fold(M,</span> <span class="pre">mode,</span> <span class="pre">shape)</span></code> with
+<code class="docutils literal notranslate"><span class="pre">np.moveaxis</span></code> and <code class="docutils literal notranslate"><span class="pre">reshape</span></code> — and <em>derive</em> what they do on the
+<span class="math notranslate nohighlight">\(2\times3\times2\)</span> counting tensor (entries <span class="math notranslate nohighlight">\(1\dots12\)</span>): print all three
+unfoldings and check the first row of <span class="math notranslate nohighlight">\(T_{(1)}\)</span> by eye against the
+definition.</p>
+<p><strong>Write this one yourself</strong> — every later formula calls it.</p>
+<p><strong>Part b)</strong> Gate the round trips <strong>exactly</strong>: <code class="docutils literal notranslate"><span class="pre">fold(unfold(T,</span> <span class="pre">m),</span> <span class="pre">m)</span></code>
+returns the working tensor bit for bit for every mode — reshapes and
+axis moves copy numbers, they never compute
+(<a class="reference internal" href="../05-numerical/sparse-matrices.html"><span class="std std-doc">§5.3</span></a>’s format rule, one
+dimension up).</p>
+<p><strong>Part c)</strong> The multilinear rank from <a class="reference internal" href="#equation-eq-tk-unfold">Eq. 272</a>: on the
+<em>noise-free</em> planted tensor, gate
+<code class="docutils literal notranslate"><span class="pre">np.linalg.matrix_rank</span></code> of the three unfoldings equal to <span class="math notranslate nohighlight">\((3, 4, 2)\)</span> —
+integer ranks with <span class="math notranslate nohighlight">\(O(1)\)</span> spectral gaps, safely countable.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>mode-1 unfolding, shape (2, 6):
+[[ 1  2  3  4  5  6]
+ [ 7  8  9 10 11 12]]
+mode-2 unfolding, shape (3, 4):
+[[ 1  2  7  8]
+ [ 3  4  9 10]
+ [ 5  6 11 12]]
+mode-3 unfolding, shape (2, 6):
+[[ 1  3  5  7  9 11]
+ [ 2  4  6  8 10 12]]
+
+round trips exact in all three modes: True
+multilinear rank of the noise-free tensor: (3, 4, 2) (planted (3, 4, 2))
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  unfold and fold are exact inverses, bitwise (Eq. 1)   [moveaxis and reshape copy numbers without arithmetic — the format rule of 5.3, one dimension up]
+✓  and the multilinear rank is three matrix ranks, counted   [(3, 4, 2) from the three unfoldings of the noise-free tensor: integer ranks over O(1) spectral gaps]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-mode-products-and-the-algebra-they-obey">
+<h2>Exercise 2: Mode products, and the algebra they obey<a class="headerlink" href="#exercise-2-mode-products-and-the-algebra-they-obey" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">mode_prod(T,</span> <span class="pre">A,</span> <span class="pre">mode)</span></code> — multiply the unfolding,
+refold — every Tucker formula below calls it. Then gate the commutation
+of <a class="reference internal" href="#equation-eq-tk-unfold">Eq. 272</a>’s product across
+<em>distinct</em> modes at <span class="math notranslate nohighlight">\(10^{-12}\)</span> scaled:
+<span class="math notranslate nohighlight">\((\mathcal{T}\times_1 A)\times_2 B = (\mathcal{T}\times_2 B)\times_1 A\)</span>
+on random <span class="math notranslate nohighlight">\(5\times12\)</span> and <span class="math notranslate nohighlight">\(6\times10\)</span> factors.</p>
+<p><strong>Part b)</strong> Gate the same-mode <em>composition</em>:
+<span class="math notranslate nohighlight">\((\mathcal{T}\times_1 A)\times_1 C = \mathcal{T}\times_1 (CA)\)</span> — order
+matters within a mode exactly as matrix multiplication demands.</p>
+<p><strong>Part c)</strong> Connect to <a class="reference internal" href="einsum-contraction.html"><span class="std std-doc">§7.1</span></a>: the mode-1
+product is the einsum sentence <code class="docutils literal notranslate"><span class="pre">&quot;abc,ia-&gt;ibc&quot;</span></code> — gate the two
+spellings against each other, and note the unfolding is only a
+<em>storage</em> choice; the contraction is the mathematics.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>distinct-mode commutation: 1.8e-16
+same-mode composition: 1.9e-16
+mode product vs einsum sentence: 2.5e-16
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  mode products commute across modes and compose within one   [2e-16 and 2e-16: the two identities every Tucker manipulation silently uses]
+✓  and the mode product is one einsum sentence   [abc,ia-&gt;ibc — the unfolding is a storage choice; the contraction is the mathematics (7.1&#39;s grammar) [2.498e-16 &lt; 1e-12]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-hosvd-chapter-iv-three-times">
+<h2>Exercise 3: HOSVD: Chapter IV, three times<a class="headerlink" href="#exercise-3-hosvd-chapter-iv-three-times" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">hosvd(T,</span> <span class="pre">ranks=None)</span></code>: one
+<code class="docutils literal notranslate"><span class="pre">np.linalg.svd(unfold(T,</span> <span class="pre">m))</span></code> per mode for the factors, then the core
+by three transposed mode products. Gate factor orthonormality at
+<span class="math notranslate nohighlight">\(10^{-13}\)</span> (each <span class="math notranslate nohighlight">\(U_n^{\top}U_n = I\)</span>).</p>
+<p><strong>Part b)</strong> Gate exactness at full multilinear rank: reconstructing
+from the full core and factors returns the working tensor to
+<span class="math notranslate nohighlight">\(10^{-12}\)</span> relative — three orthogonal changes of basis and back.</p>
+<p><strong>Part c)</strong> Gate the core’s <strong>all-orthogonality</strong> at <span class="math notranslate nohighlight">\(10^{-11}\)</span> scaled:
+for each mode, <span class="math notranslate nohighlight">\(G_{(m)}G_{(m)}^{\top}\)</span> is diagonal — the slices of the
+core along every mode are mutually orthogonal, <span class="math notranslate nohighlight">\(\Sigma\)</span>’s diagonality
+echoed three ways. (Its diagonal entries are the squared mode-<span class="math notranslate nohighlight">\(m\)</span>
+singular values — print them and watch Exercise 4’s spectra appear.)</p>
+<p><strong>Part d)</strong> Draw the Tucker diagram: a square core node with three
+factor nodes on its legs, each carrying one free index — the picture of
+<a class="reference internal" href="#equation-eq-tk-tucker">Eq. 273</a>, in the notation <a class="reference internal" href="einsum-contraction.html"><span class="std std-doc">§7.1</span></a>
+introduced.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>factor orthonormality, worst mode: 1.3e-15
+full-rank reconstruction: 1.4e-15 relative
+mode-1 core Gram diagonal (= squared singular values): [1.0511e+01 4.2588e+00 2.8292e+00 1.0000e-04 1.0000e-04] ...
+core all-orthogonality, worst off-diagonal: 2.3e-16 (relative to ||T||^2)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-tk-diagram">
+<img alt="../../_images/b7387d39bbe54be69f386cf14558a626cfd420e6d0e8fc54ddc087446c9bb9c3.png" src="../../_images/b7387d39bbe54be69f386cf14558a626cfd420e6d0e8fc54ddc087446c9bb9c3.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 134 </span><span class="caption-text">The Tucker decomposition of Eq. 2 as a tensor diagram: a three-legged core <span class="math notranslate nohighlight">\(\mathcal{G}\)</span> (square – it is small, <span class="math notranslate nohighlight">\(3\times4\times2\)</span> here) contracted with one orthonormal factor per mode, each factor carrying one free leg out to the full dimensions 12, 10, 8. Counting dangling legs: three, so the network IS a 3-way tensor – 960 entries represented by 24 core numbers and three thin factors. The HOSVD fills this picture with 7.1’s grammar: each factor from one SVD of one unfolding, the core from three transposed mode products.</span><a class="headerlink" href="#fig-tk-diagram" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the HOSVD factors are orthonormal in every mode   [three SVDs, three orthonormal bases — Chapter IV&#39;s guarantee, thrice [1.33227e-15 &lt; 1e-13]]
+✓  full-rank HOSVD reconstructs the tensor exactly (Eq. 2)   [1e-15 relative: three orthogonal changes of basis and back, rounding only]
+✓  and the core is all-orthogonal: Sigma&#39;s diagonality, echoed per mode   [worst off-diagonal of any G_(m) G_(m)&#39; at 2e-16 of ||T||^2 — with the diagonals the squared mode singular values]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-the-three-spectra-and-the-ranks-they-advertise">
+<h2>Exercise 4: The three spectra, and the ranks they advertise<a class="headerlink" href="#exercise-4-the-three-spectra-and-the-ranks-they-advertise" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> Compute the singular values of the three unfoldings and
+draw them on one log axis: each mode’s spectrum falls off a cliff at
+its planted rank — after 3, 4 and 2 values respectively — onto a noise
+shelf near <span class="math notranslate nohighlight">\(10^{-3}\)</span>.</p>
+<p><strong>Part b)</strong> Gate the cliffs as ratios (safe, per the course’s rules on
+counting versus thresholding): for each mode,
+<span class="math notranslate nohighlight">\(\sigma_{r}/\sigma_{r+1} &gt; 30\)</span> at the planted <span class="math notranslate nohighlight">\(r\)</span>, while
+<span class="math notranslate nohighlight">\(\sigma_1/\sigma_r &lt; 30\)</span> — the gap <em>is</em> at the advertised position and
+nowhere before it.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>mode 1: sigma_3/sigma_4 = 144, sigma_1/sigma_3 = 1.9
+mode 2: sigma_4/sigma_5 = 58, sigma_1/sigma_4 = 5.2
+mode 3: sigma_2/sigma_3 = 164, sigma_1/sigma_2 = 1.7
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-tk-spectra">
+<img alt="../../_images/7c9db8447da89dc4929a46625f026df3480dfc89869d1f6f4a13f11fba601426.png" src="../../_images/7c9db8447da89dc4929a46625f026df3480dfc89869d1f6f4a13f11fba601426.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 135 </span><span class="caption-text">Singular values of the three unfoldings on one log axis. Each mode’s spectrum falls off a cliff at its planted multilinear rank – after 3 values (mode 1), 4 (mode 2), 2 (mode 3) – onto the shared noise shelf near <span class="math notranslate nohighlight">\(10^{-3}\)</span>. The multilinear rank of Eq. 1 is literally three matrix ranks, and these are their pictures; the cliffs are gated as ratios at the advertised positions rather than by counting values above a threshold, which 5.3’s lessons showed to be machine-dependent.</span><a class="headerlink" href="#fig-tk-spectra" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  each unfolding&#39;s spectrum cliffs exactly at its planted rank   [gap ratios above 30 at the advertised position, below 30 before it — ratios, not threshold counts, per the reproducibility lessons]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-truncation-the-theorem-with-sqrt-3-in-it">
+<h2>Exercise 5: Truncation: the theorem with <span class="math notranslate nohighlight">\(\sqrt{3}\)</span> in it<a class="headerlink" href="#exercise-5-truncation-the-theorem-with-sqrt-3-in-it" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> Truncated HOSVD at the planted ranks <span class="math notranslate nohighlight">\((3,4,2)\)</span>: relative
+error <span class="math notranslate nohighlight">\(7\times10^{-3}\)</span> — the noise floor, since the planted structure
+is exactly recoverable. Run <strong>HOOI</strong> (write-yourself: fix two factors,
+project, SVD the third’s unfolding; sweep eight times) from the HOSVD
+start: gate its error <em>monotonically non-increasing</em> (a theorem —
+alternating maximization never backtracks) and its final error
+<span class="math notranslate nohighlight">\(\le\)</span> HOSVD’s plus rounding: here the ratio is <strong>1.0000</strong>, because at
+the true ranks there is nothing left to improve.</p>
+<p><strong>Part b)</strong> The regime with daylight: harsh ranks <span class="math notranslate nohighlight">\((2,2,2)\)</span>. Truncated
+HOSVD: 0.494. HOOI: 0.425 — a 16% improvement, and the quasi-optimality
+gate <a class="reference internal" href="#equation-eq-tk-quasi">Eq. 274</a> in its computable form: HOSVD error
+<span class="math notranslate nohighlight">\(\le \sqrt{3}\times\)</span> HOOI error (measured ratio 1.16 against the
+ceiling 1.73). Both regimes gated; the pair <em>is</em> the lesson — HOSVD is
+cheap and near-optimal when the ranks are honest, and HOOI buys real
+accuracy only when truncation actually bites.</p>
+<p><strong>Part c)</strong> The compression ledger, counted: <span class="math notranslate nohighlight">\((3,4,2)\)</span> Tucker storage
+is <span class="math notranslate nohighlight">\(24 + 36 + 40 + 16 = 116\)</span> numbers against <span class="math notranslate nohighlight">\(960\)</span> — a factor 8.3 at
+the noise floor.</p>
+<p><strong>Part d)</strong> Draw a mode-3 slice of the original beside its <span class="math notranslate nohighlight">\((3,4,2)\)</span>
+and <span class="math notranslate nohighlight">\((2,2,2)\)</span> reconstructions: visually identical at the honest ranks,
+visibly smoothed at the harsh ones — the error numbers, as pictures.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>honest ranks (3, 4, 2): HOSVD 0.006932, HOOI 0.006932 (ratio 1.0000), monotone True
+harsh ranks (2, 2, 2): HOSVD 0.4941, HOOI 0.4247 (ratio 1.1632 vs sqrt(3) = 1.732), monotone True
+compression: 116 numbers vs 960 (8.3x) at the noise floor
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-tk-slices">
+<img alt="../../_images/2fa359457b0d92a6192322a1579f384a694a61484062e00ef5d6a2b0e0409300.png" src="../../_images/2fa359457b0d92a6192322a1579f384a694a61484062e00ef5d6a2b0e0409300.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 136 </span><span class="caption-text">One mode-3 slice of the working tensor (left), its rank-<span class="math notranslate nohighlight">\((3,4,2)\)</span> Tucker reconstruction (centre), and its rank-<span class="math notranslate nohighlight">\((2,2,2)\)</span> one (right), on a shared colour scale. At the honest ranks the reconstruction is visually identical – the 0.7% error is the planted noise floor, and 960 entries ride in 116 numbers. At the harsh ranks the smooth cosine structure is coarsened – the 42% error has a shape, not just a size: whole modes of variation are gone, which is what cutting a Tucker rank means.</span><a class="headerlink" href="#fig-tk-slices" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  HOOI descends monotonically in both regimes   [alternating maximization never backtracks — the theorem, measured over eight sweeps twice]
+✓  and never loses to its truncated-HOSVD start   [ratio 1.0000 at the honest ranks (nothing to improve — the structure is recovered), 1.16 at the harsh ones (16% bought by iteration): the pair is the lesson]
+✓  with quasi-optimality holding at its sqrt(3) constant (Eq. 3)   [HOSVD 0.494 &lt;= sqrt(3) x HOOI 0.425 — the computable one-sided form, since HOOI upper-bounds the unknown best]
+✓  and the compression ledger is counted arithmetic   [24 core + 92 factor numbers against 960 — an 8.3x ratio at a 0.7% error that IS the noise floor]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-6-the-whole-price-list-error-over-the-rank-grid">
+<h2>Exercise 6: The whole price list: error over the rank grid<a class="headerlink" href="#exercise-6-the-whole-price-list-error-over-the-rank-grid" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> For every <span class="math notranslate nohighlight">\((r_1, r_2) \in \{1,\dots,6\}^2\)</span> at <span class="math notranslate nohighlight">\(r_3 = 2\)</span>,
+compute the truncated-HOSVD relative error and draw the <span class="math notranslate nohighlight">\(6\times6\)</span>
+grid as a heatmap. Gate the two facts the surface must show:
+monotonicity (increasing any rank never increases the error — nested
+subspaces, gated across the full grid in both directions) and the
+floor (the error at <span class="math notranslate nohighlight">\((3, 4)\)</span> and beyond equals the noise level within
+a factor of 2).</p>
+<p><strong>Part b)</strong> Read the surface: the steep wall below the planted ranks
+and the flat floor beyond them is <a class="reference internal" href="../04-svd/low-rank-eckart-young.html"><span class="std std-doc">§4.2</span></a>’s
+scree logic in two dimensions — and choosing Tucker ranks in practice
+is exactly walking this surface with a budget.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>monotone in r1: True, in r2: True
+error at the planted corner (3,4): 0.0069 (noise level 1e-3 x sqrt(960)/||T|| = 0.0074)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-tk-grid">
+<img alt="../../_images/7fdc8280aa231955ca6e746fc4b7f3ffdbfb4c779a494fb27d0193f81cb6db1b.png" src="../../_images/7fdc8280aa231955ca6e746fc4b7f3ffdbfb4c779a494fb27d0193f81cb6db1b.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 137 </span><span class="caption-text">Relative truncated-HOSVD error over the <span class="math notranslate nohighlight">\((r_1, r_2)\)</span> grid at <span class="math notranslate nohighlight">\(r_3 = 2\)</span>, log colour scale. The surface has exactly two features: a steep wall wherever either rank sits below its planted value (3 and 4, dashed lines), and a flat floor at the noise level beyond both. Monotonicity is gated across the whole grid – raising a rank never hurts, because the subspaces are nested – and the floor is gated against the known noise. Choosing Tucker ranks in practice means walking this surface with a storage budget; the scree plots of 4.2 are its one-dimensional shadows.</span><a class="headerlink" href="#fig-tk-grid" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p>The grid of Exercise 6 cost 36 full HOSVDs; the <em>sequentially
+truncated</em> HOSVD (ST-HOSVD) computes truncations far cheaper by
+shrinking the tensor after each mode. Ask your assistant for
+<code class="docutils literal notranslate"><span class="pre">st_hosvd(T,</span> <span class="pre">ranks)</span></code>, then check it against the mathematics rather
+than a demo: (i) its factors are orthonormal to <span class="math notranslate nohighlight">\(10^{-13}\)</span>; (ii) its
+error is within the same <span class="math notranslate nohighlight">\(\sqrt{3}\)</span> quasi-optimality ceiling of HOOI’s
+on both rank regimes of Exercise 5; (iii) its flop count — count the
+SVD costs on the shrinking unfoldings — is strictly below plain
+truncated HOSVD’s for every rank tuple in Exercise 6’s grid. The
+check is yours.</p>
+</div>
+<section id="validation-6">
+<h3>Validation 6<a class="headerlink" href="#validation-6" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the error surface is monotone in every rank direction   [nested subspaces: raising a rank never hurts — gated across all 36 grid points in both directions]
+✓  and the floor beyond the planted corner is the noise, priced   [0.0069 against the expected noise fraction — the surface has a wall and a floor, and both are where the construction put them]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p><strong>Unfoldings are storage, gated as such.</strong> The hand-written
+<code class="docutils literal notranslate"><span class="pre">unfold</span></code>/<code class="docutils literal notranslate"><span class="pre">fold</span></code> round-tripped bitwise in all three modes; the counting
+tensor’s unfoldings were printed against the definition; the
+multilinear rank came out <span class="math notranslate nohighlight">\((3,4,2)\)</span> as three ordinary matrix ranks.
+Mode products commuted across modes and composed within one at
+<span class="math notranslate nohighlight">\(10^{-15}\)</span>, and equalled their einsum sentence.</p>
+<p><strong>HOSVD is Chapter IV three times.</strong> Orthonormal factors at
+<span class="math notranslate nohighlight">\(10^{-15}\)</span>, exact full-rank reconstruction at <span class="math notranslate nohighlight">\(10^{-15}\)</span> relative, and
+the core all-orthogonal in every mode with the squared mode singular
+values on its Gram diagonals. The three unfolding spectra cliffed at
+3, 4 and 2 — gated as gap <em>ratios</em> at the advertised positions, not as
+threshold counts.</p>
+<p><strong>Truncation carries a theorem with a constant.</strong> At the honest ranks,
+HOOI could not improve on truncated HOSVD (ratio 1.0000 — the planted
+structure is simply recovered, error = noise floor, 960 numbers in
+116). At harsh ranks HOOI’s monotone sweeps beat HOSVD by 16%, inside
+quasi-optimality’s <span class="math notranslate nohighlight">\(\sqrt{3}\)</span> ceiling — both regimes gated, and the
+pair is the practical rule: trust cheap HOSVD when the spectra cliff
+where you cut; pay for HOOI when they don’t.</p>
+<p><strong>The price list is a surface.</strong> Error over the <span class="math notranslate nohighlight">\((r_1, r_2)\)</span> grid was
+monotone in every direction (nested subspaces, gated at all 36 points)
+with a steep wall below the planted ranks and a noise-level floor
+beyond them — <a class="reference internal" href="../04-svd/low-rank-eckart-young.html"><span class="std std-doc">§4.2</span></a>’s scree
+logic, two-dimensional.</p>
+<p><strong>Methods introduced.</strong> <code class="docutils literal notranslate"><span class="pre">unfold</span></code>/<code class="docutils literal notranslate"><span class="pre">fold</span></code>/<code class="docutils literal notranslate"><span class="pre">mode_prod</span></code>, multilinear rank
+by unfolding ranks, <code class="docutils literal notranslate"><span class="pre">hosvd</span></code> with cores and all-orthogonality checks,
+cliff-ratio gating of spectra, <code class="docutils literal notranslate"><span class="pre">hooi</span></code> with monotonicity certificates,
+quasi-optimality in computable form, compression ledgers, and
+rank-grid error surfaces.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>The train leaves next.</strong> Tucker’s core still grows as
+<span class="math notranslate nohighlight">\(r^3\)</span>; <a class="reference internal" href="tensor-trains-mps.html"><span class="std std-doc">§7.3</span></a> chains order-3 cores instead
+— the tensor train — and a <span class="math notranslate nohighlight">\(2^{50}\)</span>-entry tensor becomes a product
+of small ones, with 7.1’s contraction orders as the whole cost
+model.</p></li>
+<li><p><strong>CP is the other classic.</strong> Rank-one terms summed
+(<code class="docutils literal notranslate"><span class="pre">parafac</span></code>) trade Tucker’s orthogonality for interpretability — and
+lose the SVD’s guarantees entirely: best-rank-<span class="math notranslate nohighlight">\(r\)</span> may not even
+exist. Kolda and Bader <span class="bibtex-citation" id="id4">[<a class="reference internal" href="#id37" title="Tamara G. Kolda and Brett W. Bader. Tensor decompositions and applications. SIAM Review, 51(3):455–500, 2009. doi:10.1137/07070111X.">KB09</a>]</span> map the territory.</p></li>
+<li><p><strong>Compression in the wild.</strong> Scientific data (simulation grids,
+hyperspectral cubes) ships in exactly Exercise 5’s ledger; the
+rank-grid surface with a storage budget is the production decision,
+automated.</p></li>
+<li><p><strong>Learning reads this chapter too.</strong> Weight tensors of convolutions
+and attention factor along modes; <a class="reference internal" href="../08-learning/low-rank-lora-quantization.html"><span class="std std-doc">§8.6</span></a>’s
+LoRA is a rank decision on a weight matrix, and its tensor variants
+are rank decisions on this notebook’s objects.</p></li>
+</ul>
+<div class="docutils container" id="id5">
+<div role="list" class="citation-list">
+<div class="citation" id="id38" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>DLDMV00<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id2">2</a>)</span>
+<p>Lieven De Lathauwer, Bart De Moor, and Joos Vandewalle. A multilinear singular value decomposition. <em>SIAM Journal on Matrix Analysis and Applications</em>, 21(4):1253–1278, 2000. <a class="reference external" href="https://doi.org/10.1137/S0895479896305696">doi:10.1137/S0895479896305696</a>.</p>
+</div>
+<div class="citation" id="id37" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>KB09<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id3">1</a>,<a role="doc-backlink" href="#id4">2</a>)</span>
+<p>Tamara G. Kolda and Brett W. Bader. Tensor decompositions and applications. <em>SIAM Review</em>, 51(3):455–500, 2009. <a class="reference external" href="https://doi.org/10.1137/07070111X">doi:10.1137/07070111X</a>.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/07-tensors"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="einsum-contraction.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">7.1 Index Notation and einsum: Contraction as a Language</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="tensor-trains-mps.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">7.3 Tensor Trains and Matrix Product States</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#unfoldings-three-ways-to-be-a-matrix">Unfoldings: three ways to be a matrix</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tucker-and-hosvd">Tucker and HOSVD</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#truncation-and-the-theorem-with-a-constant-in-it">Truncation, and the theorem with a constant in it</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-unfoldings-written-by-hand-gated-exactly">Exercise 1: Unfoldings: written by hand, gated exactly</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-mode-products-and-the-algebra-they-obey">Exercise 2: Mode products, and the algebra they obey</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-hosvd-chapter-iv-three-times">Exercise 3: HOSVD: Chapter IV, three times</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-the-three-spectra-and-the-ranks-they-advertise">Exercise 4: The three spectra, and the ranks they advertise</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-truncation-the-theorem-with-sqrt-3-in-it">Exercise 5: Truncation: the theorem with <span class="math notranslate nohighlight">\(\sqrt{3}\)</span> in it</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-the-whole-price-list-error-over-the-rank-grid">Exercise 6: The whole price list: error over the rank grid</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

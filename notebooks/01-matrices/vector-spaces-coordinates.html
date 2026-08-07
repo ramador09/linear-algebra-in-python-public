@@ -1,0 +1,1618 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="1.5 Vector Spaces, Bases, and Coordinates" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/01-matrices/vector-spaces-coordinates.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: Everything so far has been about columns of numbers. This notebook takes the word “vector” away from them. The move is not decoration. Alm..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: Everything so far has been about columns of numbers. This notebook takes the word “vector” away from them. The move is not decoration. Alm..." />
+
+    <title>1.5 Vector Spaces, Bases, and Coordinates &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/01-matrices/vector-spaces-coordinates';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/01-matrices/vector-spaces-coordinates.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="1.6 Linear Maps and Change of Basis" href="linear-maps-change-of-basis.html" />
+    <link rel="prev" title="1.4 The Four Fundamental Subspaces" href="four-subspaces.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/01-matrices/vector-spaces-coordinates.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/01-matrices/vector-spaces-coordinates.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/01-matrices/vector-spaces-coordinates.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/01-matrices/vector-spaces-coordinates.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>1.5 Vector Spaces, Bases, and Coordinates</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-definition-and-why-it-is-so-short">The definition, and why it is so short</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#independence-basis-dimension">Independence, basis, dimension</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#coordinates">Coordinates</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#changing-basis">Changing basis</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#when-a-basis-is-a-bad-idea">When a basis is a bad idea</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-the-axioms-and-two-things-that-fail-them">Exercise 1: The axioms, and two things that fail them</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-independence-without-entries">Exercise 2: Independence without entries</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-one-polynomial-two-columns-of-numbers">Exercise 3: One polynomial, two columns of numbers</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-the-change-of-basis-matrix">Exercise 4: The change-of-basis matrix</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-dimension-by-decomposition">Exercise 5: Dimension by decomposition</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-why-the-basis-matters">Exercise 6: Why the basis matters</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="vector-spaces-bases-and-coordinates">
+<h1>1.5 Vector Spaces, Bases, and Coordinates<a class="headerlink" href="#vector-spaces-bases-and-coordinates" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter I — Matrices, Elimination, and Subspaces
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;1.5
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">Vectors that are not columns of numbers: polynomials, matrices, functions. What survives the generalisation, what a basis really buys, and why the wrong one costs six digits.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;intermediate&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;90–120 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p>Everything so far has been about columns of numbers. This notebook takes the
+word “vector” away from them.</p>
+<p>The move is not decoration. Almost nothing in Chapters I to IV used the fact
+that a vector is a list — the arguments needed only that vectors can be added
+and scaled, and that those operations behave sensibly. Anything with those
+operations is a <strong>vector space</strong>, and every theorem proved so far applies
+verbatim. Polynomials form one. Matrices form one. Continuous functions form
+one. So “the space of cubic polynomials has dimension 4” and “the derivative is
+a linear map on it with a <span class="math notranslate nohighlight">\(4\times4\)</span> matrix” are ordinary statements, and
+once you can say them, a great deal of analysis becomes linear algebra.</p>
+<p>The practical content is <strong>coordinates</strong>. Choosing a basis turns an abstract
+vector into a column of numbers, which is what lets a computer touch it at all.
+Different bases give different columns for the same object, and switching
+between them is a matrix multiplication. That is the whole mechanism, and
+<a class="reference internal" href="linear-maps-change-of-basis.html"><span class="std std-doc">§1.6</span></a> will use it to make matrices simple
+by choosing the basis well.</p>
+<p>The notebook ends with the reason any of this matters numerically. The cubic
+polynomial <span class="math notranslate nohighlight">\(p(x) = 3x^3 - 2x + 1\)</span> has coordinates <span class="math notranslate nohighlight">\((1, -2, 0, 3)\)</span> in the
+monomial basis and <span class="math notranslate nohighlight">\((1, -\tfrac15, 0, \tfrac65)\)</span> in the Legendre basis. Same
+polynomial, same space, two columns of numbers. But the monomials are a <em>badly
+conditioned</em> basis: their Gram matrix has <span class="math notranslate nohighlight">\(\kappa \approx 1.7\times10^{6}\)</span> at
+degree 9, while the Legendre Gram matrix has <span class="math notranslate nohighlight">\(\kappa = 19\)</span> — exactly <span class="math notranslate nohighlight">\(2d+1\)</span>,
+growing linearly rather than exponentially. Fitting a degree-9 polynomial in
+the monomial basis therefore throws away six digits before the data is even
+consulted, and <a class="reference internal" href="../02-orthogonality/function-space-bases.html"><span class="std std-doc">§2.5</span></a> is
+largely about the repair.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own. Several checks in this
+notebook are made in <strong>exact rational arithmetic</strong> with SymPy and therefore
+carry no tolerance at all.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> The abstract treatment is Axler <span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id6" title="Sheldon Axler. Linear Algebra Done Right. Undergraduate Texts in Mathematics. Springer, 4 edition, 2024. doi:10.1007/978-3-031-41026-0.">Axl24</a>]</span>, Chapters 1–3,
+which develops the whole subject without coordinates for as long as
+possible. For the numerical consequences of basis choice, Trefethen and Bau
+<span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id11" title="Lloyd N. Trefethen and David Bau, III. Numerical Linear Algebra. SIAM, Philadelphia, 1997. doi:10.1137/1.9780898719574.">TB97</a>]</span>, Lecture 11.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="the-definition-and-why-it-is-so-short">
+<h3>The definition, and why it is so short<a class="headerlink" href="#the-definition-and-why-it-is-so-short" title="Link to this heading">#</a></h3>
+<p>A <strong>vector space</strong> over <span class="math notranslate nohighlight">\(\mathbb{R}\)</span> is a set <span class="math notranslate nohighlight">\(V\)</span> with an addition and a scalar
+multiplication satisfying eight axioms: addition is commutative and
+associative, has an identity <span class="math notranslate nohighlight">\(\mathbf{0}\)</span> and inverses; scalar multiplication
+is associative and has identity 1; and the two distribute over each other.
+That is the entire definition. There is no mention of length, angle,
+dimension, or coordinates — those come later, and some of them need extra
+structure.</p>
+<p>The shortness is the point. Anything satisfying it inherits every theorem, and
+a great many things satisfy it:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>, the familiar case;</p></li>
+<li><p><span class="math notranslate nohighlight">\(P_d\)</span>, polynomials of degree at most <span class="math notranslate nohighlight">\(d\)</span>, with the usual addition;</p></li>
+<li><p><span class="math notranslate nohighlight">\(\mathbb{R}^{m\times n}\)</span>, matrices, added entrywise;</p></li>
+<li><p><span class="math notranslate nohighlight">\(C[a,b]\)</span>, continuous functions on an interval;</p></li>
+<li><p>the solution set of any homogeneous linear system or linear differential
+equation.</p></li>
+</ul>
+<p>The last one is why this abstraction earns its keep: “the solutions of
+<span class="math notranslate nohighlight">\(y'' + y = 0\)</span> form a two-dimensional space with basis <span class="math notranslate nohighlight">\(\{\cos x, \sin x\}\)</span>” is
+a complete description of an infinite family, and it is a linear-algebra
+statement.</p>
+</section>
+<section id="independence-basis-dimension">
+<h3>Independence, basis, dimension<a class="headerlink" href="#independence-basis-dimension" title="Link to this heading">#</a></h3>
+<p>Vectors <span class="math notranslate nohighlight">\(\mathbf{v}_1,\dots,\mathbf{v}_k\)</span> are <strong>independent</strong> when the only
+combination giving <span class="math notranslate nohighlight">\(\mathbf{0}\)</span> is the trivial one. A <strong>basis</strong> is an
+independent set that spans, and every basis of a given space has the same size,
+which is the <strong>dimension</strong>. In <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> independence is checked by
+elimination; in a function space there are no entries to eliminate, so we need
+a different instrument.</p>
+<p>The instrument is the <strong>Gram matrix</strong>. Given an inner product — for functions on
+<span class="math notranslate nohighlight">\([-1,1]\)</span> the natural one is</p>
+<div class="math notranslate nohighlight" id="equation-eq-spaces-l2-inner">
+<span class="eqno">(79)<a class="headerlink" href="#equation-eq-spaces-l2-inner" title="Link to this equation">#</a></span>\[\langle f, g \rangle = \int_{-1}^{1} f(x)\,g(x)\,\mathrm{d}x ,\]</div>
+<p>form <span class="math notranslate nohighlight">\(G_{ij} = \langle v_i, v_j \rangle\)</span>. Then <span class="math notranslate nohighlight">\(\det G \neq 0\)</span> if and only if
+the <span class="math notranslate nohighlight">\(v_i\)</span> are independent, because <span class="math notranslate nohighlight">\(G\mathbf{c} = \mathbf{0}\)</span> exactly when the
+combination <span class="math notranslate nohighlight">\(\sum c_i v_i\)</span> has zero inner product with everything in the span,
+hence is zero. So independence becomes a determinant, which is something a
+computer can evaluate. This is <a class="reference internal" href="../00-machine/vectors-norms-inner-products.html"><span class="std std-doc">§0.3</span></a>’s
+inner product doing structural work.</p>
+</section>
+<section id="coordinates">
+<h3>Coordinates<a class="headerlink" href="#coordinates" title="Link to this heading">#</a></h3>
+<p>Fix a basis <span class="math notranslate nohighlight">\(B = (b_1,\dots,b_n)\)</span> of <span class="math notranslate nohighlight">\(V\)</span>. Every <span class="math notranslate nohighlight">\(v \in V\)</span> has a <strong>unique</strong>
+expression <span class="math notranslate nohighlight">\(v = \sum_i c_i b_i\)</span>, and the column <span class="math notranslate nohighlight">\([v]_B = (c_1,\dots,c_n)^{\top}\)</span>
+is its <strong>coordinate vector</strong>. Uniqueness is what independence buys, and it is
+what makes the map <span class="math notranslate nohighlight">\(v \mapsto [v]_B\)</span> well defined. That map is an isomorphism
+<span class="math notranslate nohighlight">\(V \to \mathbb{R}^n\)</span>: it turns any <span class="math notranslate nohighlight">\(n\)</span>-dimensional real vector space into
+<span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>, which is why <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> was never really a special case.</p>
+</section>
+<section id="changing-basis">
+<h3>Changing basis<a class="headerlink" href="#changing-basis" title="Link to this heading">#</a></h3>
+<p>Given two bases <span class="math notranslate nohighlight">\(B\)</span> and <span class="math notranslate nohighlight">\(C\)</span>, write each <span class="math notranslate nohighlight">\(c_j\)</span> in the <span class="math notranslate nohighlight">\(B\)</span> basis and collect the
+results as columns of a matrix <span class="math notranslate nohighlight">\(M\)</span>. Then for every <span class="math notranslate nohighlight">\(v\)</span>,</p>
+<div class="math notranslate nohighlight" id="equation-eq-spaces-change-of-basis">
+<span class="eqno">(80)<a class="headerlink" href="#equation-eq-spaces-change-of-basis" title="Link to this equation">#</a></span>\[[v]_B = M\,[v]_C, \qquad [v]_C = M^{-1}[v]_B ,\]</div>
+<p>so changing coordinates is a matrix multiplication and <span class="math notranslate nohighlight">\(M\)</span> is invertible
+because both are bases. Nothing about <span class="math notranslate nohighlight">\(v\)</span> changed; only its description did.
+<a class="reference internal" href="linear-maps-change-of-basis.html"><span class="std std-doc">§1.6</span></a> applies the same idea to the matrix
+of a <em>map</em>, where it becomes <span class="math notranslate nohighlight">\(B^{-1}AB\)</span> and the whole of Chapter III.</p>
+</section>
+<section id="when-a-basis-is-a-bad-idea">
+<h3>When a basis is a bad idea<a class="headerlink" href="#when-a-basis-is-a-bad-idea" title="Link to this heading">#</a></h3>
+<p>All bases describe the same space, but they are not numerically equal. The
+quality of a basis is measured by the conditioning of its Gram matrix: if
+<span class="math notranslate nohighlight">\(\kappa(G)\)</span> is large, then nearly-parallel basis vectors make the coordinates
+of a given vector wildly sensitive to perturbation. For the monomials on
+<span class="math notranslate nohighlight">\([-1,1]\)</span>, <span class="math notranslate nohighlight">\(\kappa(G)\)</span> grows exponentially in the degree — the entries
+<span class="math notranslate nohighlight">\(\int x^{i+j}\)</span> produce a Hilbert-like matrix, and
+<a class="reference internal" href="../00-machine/floating-point.html"><span class="std std-doc">§0.2</span></a> showed what those do. For the
+<strong>Legendre polynomials</strong> the Gram matrix is <em>diagonal</em>, so</p>
+<div class="math notranslate nohighlight" id="equation-eq-spaces-legendre-kappa">
+<span class="eqno">(81)<a class="headerlink" href="#equation-eq-spaces-legendre-kappa" title="Link to this equation">#</a></span>\[\kappa(G_{\text{Legendre}}) = \frac{2}{2/(2d+1)} = 2d + 1 ,\]</div>
+<p>linear in the degree. Exercise 6 measures both.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data and instruments only: sympy symbols, the demo polynomials, and an
+exact L2 inner product. The Gram-matrix assembly is built in Exercise 2,
+where independence-without-entries is the lesson.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sympy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">draw</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">la</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random object below comes from this seed</span>
+
+<span class="n">xs</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">symbols</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>  <span class="c1"># the symbol every polynomial in this notebook is built on</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">110</span><span class="p">)</span>
+
+
+<span class="c1"># instrument: an exact integral, not a construction — sympy does the calculus</span>
+<span class="c1"># so every Gram matrix in the notebook is rational and independence can be</span>
+<span class="c1"># decided by an exact determinant; no exercise&#39;s lesson is inside it.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">l2_inner</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">a</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Exact L2 inner product of two polynomials on [a, b], via Eq. 1.</span>
+
+<span class="sd">    Integrating symbolically rather than numerically keeps every Gram matrix in</span>
+<span class="sd">    this notebook exact, so independence can be decided by a determinant that is</span>
+<span class="sd">    a rational number rather than a float near zero. That distinction is the</span>
+<span class="sd">    whole reason SymPy appears here: &quot;is this determinant zero?&quot; is a decidable</span>
+<span class="sd">    question over the rationals and a tolerance question in floating point.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    f, g : sympy.Expr</span>
+<span class="sd">        Polynomials in the global symbol ``xs``.</span>
+<span class="sd">    a, b : float, default -1, 1</span>
+<span class="sd">        Interval endpoints.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    sympy.Expr</span>
+<span class="sd">        The exact integral, as a rational number when the inputs are rational.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">sp</span><span class="o">.</span><span class="n">integrate</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">f</span> <span class="o">*</span> <span class="n">g</span><span class="p">),</span> <span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">))</span>
+
+
+
+<span class="n">MONOMIALS</span> <span class="o">=</span> <span class="p">[</span><span class="n">xs</span><span class="o">**</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)]</span>                 <span class="c1"># 1, x, x^2, x^3</span>
+<span class="n">LEGENDRE</span> <span class="o">=</span> <span class="p">[</span><span class="n">sp</span><span class="o">.</span><span class="n">legendre</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">xs</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)]</span>     <span class="c1"># 1, x, (3x^2-1)/2, (5x^3-3x)/2</span>
+<span class="n">P_DEMO</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">xs</span><span class="o">**</span><span class="mi">3</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">xs</span> <span class="o">+</span> <span class="mi">1</span>                       <span class="c1"># the polynomial of Exercises 3-4</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-the-axioms-and-two-things-that-fail-them">
+<h2>Exercise 1: The axioms, and two things that fail them<a class="headerlink" href="#exercise-1-the-axioms-and-two-things-that-fail-them" title="Link to this heading">#</a></h2>
+<p>The definition is worth testing rather than reading, and the instructive part
+is the failures: a set can look like a natural collection of vectors and still
+not be a vector space, always for a specific, nameable reason.</p>
+<p>Test three genuine spaces:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\mathbb{R}^3\)</span> with the usual operations;</p></li>
+<li><p><span class="math notranslate nohighlight">\(P_3\)</span>, real polynomials of degree at most 3, added coefficientwise;</p></li>
+<li><p><span class="math notranslate nohighlight">\(\mathbb{R}^{2\times2}\)</span>, matrices added entrywise.</p></li>
+</ul>
+<p>And two impostors, each of which fails exactly one axiom:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\mathrm{GL}_2\)</span>, the <strong>invertible</strong> <span class="math notranslate nohighlight">\(2\times2\)</span> matrices. It has no zero
+element (the zero matrix is not invertible) and is not closed under addition:
+<span class="math notranslate nohighlight">\(I + (-I) = 0\)</span>, and both summands are invertible while the sum is not.</p></li>
+<li><p>The <strong>first quadrant</strong> <span class="math notranslate nohighlight">\(Q = \{\mathbf{x} \in \mathbb{R}^2 : x_1 \ge 0,\,
+x_2 \ge 0\}\)</span>. It is closed under addition and contains <span class="math notranslate nohighlight">\(\mathbf{0}\)</span>, but not
+closed under scalar multiplication: <span class="math notranslate nohighlight">\((-1)\cdot(1,1)^{\top} = (-1,-1)^{\top}\)</span>
+leaves it. Equivalently, it has no additive inverses.</p></li>
+</ul>
+<p>The second is the more interesting failure, because it is closed under
+<em>addition</em> — the property people usually check — and fails only on negative
+scalars. Closure must be tested for both operations.</p>
+<p><strong>Part a)</strong> Verify closure under addition and scalar multiplication, and the
+distributive law <span class="math notranslate nohighlight">\(\alpha(u + v) = \alpha u + \alpha v\)</span>, on all three genuine
+spaces, using 200 random elements each: <code class="docutils literal notranslate"><span class="pre">rng.standard_normal(3)</span></code> for
+<span class="math notranslate nohighlight">\(\mathbb{R}^3\)</span>, random integer coefficient vectors for <span class="math notranslate nohighlight">\(P_3\)</span> (compared
+symbolically with <code class="docutils literal notranslate"><span class="pre">sympy.expand</span></code>), and <code class="docutils literal notranslate"><span class="pre">rng.standard_normal((2,2))</span></code> for the
+matrices.</p>
+<p><strong>Part b)</strong> Exhibit the failure of <span class="math notranslate nohighlight">\(\mathrm{GL}_2\)</span>: show <span class="math notranslate nohighlight">\(I\)</span> and <span class="math notranslate nohighlight">\(-I\)</span> are both
+invertible (nonzero determinant) while <span class="math notranslate nohighlight">\(I + (-I)\)</span> is not, so addition escapes
+the set.</p>
+<p><strong>Part c)</strong> Exhibit the failure of <span class="math notranslate nohighlight">\(Q\)</span>: show <span class="math notranslate nohighlight">\((1,1)^{\top} \in Q\)</span> but
+<span class="math notranslate nohighlight">\((-1)\cdot(1,1)^{\top} \notin Q\)</span>, and confirm that <span class="math notranslate nohighlight">\(Q\)</span> <em>is</em> closed under
+addition, so the failure is specifically in scalar multiplication.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  R^3 add                True
+  R^3 scale              True
+  R^3 distributive       True
+  P_3 add                True
+  P_3 scale              True
+  P_3 distributive       True
+  R^{2x2} add            True
+  R^{2x2} scale          True
+  R^{2x2} distributive   True
+
+GL_2:  det(I) = 1.0,  det(-I) = 1.0,  det(I + (-I)) = 0.0
+  both summands invertible, the sum is not: NOT closed under addition
+
+first quadrant Q: (1,1) in Q: True;  (-1)*(1,1) = [-1. -1.] in Q: False
+  Q IS closed under addition (True), and fails only on negative scalars
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<p>The three genuine spaces are checked for closure under both operations and for
+distributivity. The two impostors are checked to fail at the <strong>named</strong> axiom
+and — importantly for the quadrant — to <em>satisfy</em> the other one, so the failure
+is located rather than merely observed.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  R^3, P_3 and R^{2x2} are closed under both operations and distribute   [9 properties checked over 200 random elements each]
+✓  GL_2 fails closure under addition: I + (-I) is singular   [and it has no zero element either, since the zero matrix is not invertible]
+✓  the first quadrant fails closure under scalar multiplication   [(-1)*(1,1) leaves the set, so there are no additive inverses]
+✓  but it IS closed under addition, so the failure is specifically the scalars   [closure must be tested for both operations, not just the obvious one]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-independence-without-entries">
+<h2>Exercise 2: Independence without entries<a class="headerlink" href="#exercise-2-independence-without-entries" title="Link to this heading">#</a></h2>
+<p>In <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> independence is decided by elimination. In <span class="math notranslate nohighlight">\(P_3\)</span> there are no
+entries to eliminate: the “vectors” <span class="math notranslate nohighlight">\(1, x, x^2, x^3\)</span> are functions. The Gram
+matrix of <a class="reference internal" href="#equation-eq-spaces-l2-inner">Eq. 79</a> supplies the missing instrument — and
+assembling it, entry by exact entry, is this exercise’s first move: write
+<code class="docutils literal notranslate"><span class="pre">gram(basis)</span></code> as the double loop over <code class="docutils literal notranslate"><span class="pre">l2_inner</span></code> pairs.</p>
+<p>For the monomials on <span class="math notranslate nohighlight">\([-1,1]\)</span>,</p>
+<div class="math notranslate nohighlight" id="equation-eq-spaces-monomial-gram">
+<span class="eqno">(82)<a class="headerlink" href="#equation-eq-spaces-monomial-gram" title="Link to this equation">#</a></span>\[\begin{split}G_{ij} = \int_{-1}^{1} x^{i+j}\,\mathrm{d}x
+= \begin{cases} \dfrac{2}{i+j+1}, &amp; i+j \text{ even},\\[4pt] 0, &amp; i+j \text{ odd},\end{cases}\end{split}\]</div>
+<p>giving a matrix of rationals whose determinant is <span class="math notranslate nohighlight">\(256/23625 \neq 0\)</span>. Exactly,
+with no rounding anywhere: the monomials are independent, and the computation
+proving it is arithmetic on fractions.</p>
+<p>The same construction on the <strong>Legendre</strong> polynomials <span class="math notranslate nohighlight">\(P_0,\dots,P_3\)</span> gives
+something better. Their Gram matrix is <em>diagonal</em>, with entries <span class="math notranslate nohighlight">\(2/(2k+1)\)</span>,
+because distinct Legendre polynomials are orthogonal under
+<a class="reference internal" href="#equation-eq-spaces-l2-inner">Eq. 79</a>. They are therefore not merely independent but
+mutually perpendicular, which is what makes the coordinate formula of
+Exercise 3 a single integral rather than a linear solve.</p>
+<p><strong>Part a)</strong> Build the exact Gram matrix of <span class="math notranslate nohighlight">\(\{1, x, x^2, x^3\}\)</span> on <span class="math notranslate nohighlight">\([-1,1]\)</span>
+with the <code class="docutils literal notranslate"><span class="pre">gram</span></code> helper, print it, and confirm the entries match
+<a class="reference internal" href="#equation-eq-spaces-monomial-gram">Eq. 82</a> and that <span class="math notranslate nohighlight">\(\det G = 256/23625\)</span> <strong>exactly</strong>, as a
+<code class="docutils literal notranslate"><span class="pre">sympy.Rational</span></code>.</p>
+<p><strong>Part b)</strong> Build the Gram matrix of <span class="math notranslate nohighlight">\(\{P_0, P_1, P_2, P_3\}\)</span> and confirm it is
+diagonal with entries exactly <span class="math notranslate nohighlight">\(2/(2k+1)\)</span>, so the Legendre polynomials are
+orthogonal.</p>
+<p><strong>Part c)</strong> Confirm what non-singularity means: solve <span class="math notranslate nohighlight">\(G\mathbf{c} = \mathbf{0}\)</span>
+exactly and check the only solution is <span class="math notranslate nohighlight">\(\mathbf{c} = \mathbf{0}\)</span>, then verify
+directly that <span class="math notranslate nohighlight">\(\sum_k c_k x^k = 0\)</span> as a polynomial forces every <span class="math notranslate nohighlight">\(c_k = 0\)</span>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Gram matrix of {1, x, x^2, x^3} on [-1, 1]:
+⎡ 2    0   2/3   0 ⎤
+⎢                  ⎥
+⎢ 0   2/3   0   2/5⎥
+⎢                  ⎥
+⎢2/3   0   2/5   0 ⎥
+⎢                  ⎥
+⎣ 0   2/5   0   2/7⎦
+
+det = 256/23625   (exactly 256/23625: True)
+matches the closed form of Eq. 4: True
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Gram matrix of the Legendre polynomials:
+⎡2   0    0    0 ⎤
+⎢                ⎥
+⎢0  2/3   0    0 ⎥
+⎢                ⎥
+⎢0   0   2/5   0 ⎥
+⎢                ⎥
+⎣0   0    0   2/7⎦
+diagonal: True
+entries are 2/(2k+1): [True, True, True, True]
+
+nullspace of the monomial Gram matrix: []  (empty, so independent)
+sum c_k x^k = 0 forces: [{c0: 0, c1: 0, c2: 0, c3: 0}]
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<p>Every check here is exact: the Gram matrices are matrices of rationals, their
+determinants are rationals, and “is this determinant zero?” is therefore a
+decidable question rather than a tolerance question. That is precisely what
+floating point cannot offer, and it is why the exact track exists.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the monomial Gram matrix matches the closed form of Eq. 4 exactly   [rational arithmetic throughout; no tolerance involved]
+✓  its determinant is exactly 256/23625, hence nonzero   [so {1, x, x^2, x^3} is independent, proved rather than measured]
+✓  the Legendre Gram matrix is exactly diagonal with entries 2/(2k+1)   [distinct Legendre polynomials are orthogonal under Eq. 1]
+✓  the Gram matrix has trivial null space   [which is equivalent to independence of the basis]
+✓  and directly: sum c_k x^k = 0 as a polynomial forces every c_k = 0   [solver returned [{c0: 0, c1: 0, c2: 0, c3: 0}]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-one-polynomial-two-columns-of-numbers">
+<h2>Exercise 3: One polynomial, two columns of numbers<a class="headerlink" href="#exercise-3-one-polynomial-two-columns-of-numbers" title="Link to this heading">#</a></h2>
+<p>Coordinates are where the abstraction becomes computable, and where it becomes
+clear that a “vector” of numbers is a <em>description</em>, not the thing itself.</p>
+<p>Take the concrete cubic</p>
+<div class="math notranslate nohighlight" id="equation-eq-spaces-demo-poly">
+<span class="eqno">(83)<a class="headerlink" href="#equation-eq-spaces-demo-poly" title="Link to this equation">#</a></span>\[p(x) = 3x^3 - 2x + 1 .\]</div>
+<p>In the monomial basis <span class="math notranslate nohighlight">\((1, x, x^2, x^3)\)</span> its coordinates are read straight off:
+<span class="math notranslate nohighlight">\([p]_M = (1, -2, 0, 3)^{\top}\)</span>.</p>
+<p>In the Legendre basis they are not obvious, but because that basis is
+<em>orthogonal</em> they are given by a formula rather than by solving a system. If
+<span class="math notranslate nohighlight">\(\{b_k\}\)</span> are mutually orthogonal then taking <span class="math notranslate nohighlight">\(\langle \cdot, b_k\rangle\)</span> of
+<span class="math notranslate nohighlight">\(p = \sum_j c_j b_j\)</span> kills every term but one, leaving</p>
+<div class="math notranslate nohighlight" id="equation-eq-spaces-orthogonal-coords">
+<span class="eqno">(84)<a class="headerlink" href="#equation-eq-spaces-orthogonal-coords" title="Link to this equation">#</a></span>\[c_k = \frac{\langle p,\, b_k\rangle}{\langle b_k,\, b_k\rangle} ,\]</div>
+<p>which is exactly the projection formula of
+<a class="reference internal" href="../00-machine/vectors-norms-inner-products.html"><span class="std std-doc">§0.3</span></a>, applied one basis
+vector at a time. Working it out gives
+<span class="math notranslate nohighlight">\([p]_L = (1, -\tfrac15, 0, \tfrac65)^{\top}\)</span>.</p>
+<p>Both columns describe the same polynomial. Neither is more correct. And notice
+that <a class="reference internal" href="#equation-eq-spaces-orthogonal-coords">Eq. 84</a> needs orthogonality: in the monomial
+basis, which is not orthogonal, finding coordinates from inner products would
+require solving <span class="math notranslate nohighlight">\(G\mathbf{c} = \mathbf{b}\)</span> with the ill-conditioned <span class="math notranslate nohighlight">\(G\)</span> of
+Exercise 2 — which is Exercise 6’s whole point.</p>
+<p><strong>Part a)</strong> Read <span class="math notranslate nohighlight">\([p]_M\)</span> off <a class="reference internal" href="#equation-eq-spaces-demo-poly">Eq. 83</a> with
+<code class="docutils literal notranslate"><span class="pre">sympy.Poly(p,</span> <span class="pre">xs).coeff_monomial</span></code>, and confirm it is <span class="math notranslate nohighlight">\((1, -2, 0, 3)\)</span> exactly.</p>
+<p><strong>Part b)</strong> Compute <span class="math notranslate nohighlight">\([p]_L\)</span> from <a class="reference internal" href="#equation-eq-spaces-orthogonal-coords">Eq. 84</a> using the
+<code class="docutils literal notranslate"><span class="pre">l2_inner</span></code> helper, and confirm it is <span class="math notranslate nohighlight">\((1, -1/5, 0, 6/5)\)</span> exactly as rationals.</p>
+<p><strong>Part c)</strong> Confirm both reconstruct <span class="math notranslate nohighlight">\(p\)</span>: expand <span class="math notranslate nohighlight">\(\sum_k [p]_{M,k}x^k\)</span> and
+<span class="math notranslate nohighlight">\(\sum_k [p]_{L,k}P_k(x)\)</span> and check each equals <span class="math notranslate nohighlight">\(p\)</span> identically. Plot <span class="math notranslate nohighlight">\(p\)</span>
+together with its two coordinate columns as bar charts.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>p(x) = 3*x**3 - 2*x + 1
+
+[p]_monomial = [1, -2, 0, 3]
+[p]_Legendre = [1, -1/5, 0, 6/5]
+  exactly (1, -1/5, 0, 6/5): True
+
+rebuilt from the monomial coordinates: 3*x**3 - 2*x + 1
+rebuilt from the Legendre coordinates: 3*x**3 - 2*x + 1
+both equal p identically: True
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-spaces-coordinates">
+<img alt="../../_images/72d6221669237a1b43084ec2b04417db8304ea506f30df8445765afec92981da.png" src="../../_images/72d6221669237a1b43084ec2b04417db8304ea506f30df8445765afec92981da.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 31 </span><span class="caption-text">The single polynomial <span class="math notranslate nohighlight">\(p(x) = 3x^3 - 2x + 1\)</span> of Eq. 5 (left, drawn on <span class="math notranslate nohighlight">\([-1,1]\)</span>) described by two different coordinate columns: in the monomial basis <span class="math notranslate nohighlight">\((1, x, x^2, x^3)\)</span> it is <span class="math notranslate nohighlight">\((1, -2, 0, 3)\)</span>, and in the Legendre basis <span class="math notranslate nohighlight">\((P_0, P_1, P_2, P_3)\)</span> it is <span class="math notranslate nohighlight">\((1, -\tfrac15, 0, \tfrac65)\)</span>. Same vector, same space, two descriptions, neither more correct than the other.</span><a class="headerlink" href="#fig-spaces-coordinates" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<p>Both coordinate columns are checked as exact rationals, and both are required
+to reconstruct <span class="math notranslate nohighlight">\(p\)</span> <strong>identically</strong> — not to within a tolerance, but as an
+equality of polynomials, which SymPy can decide. The orthogonal formula
+<a class="reference internal" href="#equation-eq-spaces-orthogonal-coords">Eq. 84</a> is checked against the definition it came
+from.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the monomial coordinates of p are exactly (1, -2, 0, 3)   [read straight off the polynomial]
+✓  the Legendre coordinates are exactly (1, -1/5, 0, 6/5)   [from the orthogonal projection formula of Eq. 6]
+✓  the monomial coordinates reconstruct p identically   [an equality of polynomials, decided symbolically]
+✓  and so do the Legendre coordinates: two descriptions, one vector   [neither column is more correct than the other]
+✓  the formula of Eq. 6 is licensed: the basis really is orthogonal   [every off-diagonal inner product vanishes exactly]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-the-change-of-basis-matrix">
+<h2>Exercise 4: The change-of-basis matrix<a class="headerlink" href="#exercise-4-the-change-of-basis-matrix" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-spaces-change-of-basis">Eq. 80</a> says the two columns of Exercise 3 are related
+by a matrix. Building it is mechanical: write each basis vector of one basis in
+terms of the other, and stack the results as columns.</p>
+<p>Writing each Legendre polynomial in the monomial basis,</p>
+<div class="math notranslate nohighlight">
+\[
+P_0 = 1, \quad P_1 = x, \quad P_2 = -\tfrac12 + \tfrac32 x^2,
+\quad P_3 = -\tfrac32 x + \tfrac52 x^3 ,
+\]</div>
+<p>and putting those coordinate columns side by side gives</p>
+<div class="math notranslate nohighlight" id="equation-eq-spaces-m">
+<span class="eqno">(85)<a class="headerlink" href="#equation-eq-spaces-m" title="Link to this equation">#</a></span>\[\begin{split}M = \begin{bmatrix}
+1 &amp; 0 &amp; -\tfrac12 &amp; 0\\
+0 &amp; 1 &amp; 0 &amp; -\tfrac32\\
+0 &amp; 0 &amp; \tfrac32 &amp; 0\\
+0 &amp; 0 &amp; 0 &amp; \tfrac52
+\end{bmatrix},
+\qquad [p]_M = M\,[p]_L .\end{split}\]</div>
+<p>It is upper triangular because <span class="math notranslate nohighlight">\(P_k\)</span> has degree exactly <span class="math notranslate nohighlight">\(k\)</span>, so it involves no
+monomial above <span class="math notranslate nohighlight">\(x^k\)</span> — a structural fact about the basis, visible in the
+matrix. Its determinant is <span class="math notranslate nohighlight">\(\tfrac{15}{4}\)</span>, the product of the leading
+coefficients, which is nonzero precisely because both are bases.</p>
+<p><strong>Part a)</strong> Build <span class="math notranslate nohighlight">\(M\)</span> from <a class="reference internal" href="#equation-eq-spaces-m">Eq. 85</a> by extracting the monomial
+coordinates of each Legendre polynomial, and confirm it matches the stated
+matrix exactly and is upper triangular.</p>
+<p><strong>Part b)</strong> Confirm <span class="math notranslate nohighlight">\([p]_M = M[p]_L\)</span> and <span class="math notranslate nohighlight">\([p]_L = M^{-1}[p]_M\)</span> exactly, using
+the two columns from Exercise 3.</p>
+<p><strong>Part c)</strong> Confirm <span class="math notranslate nohighlight">\(\det M = 15/4\)</span> exactly and that it equals the product of
+the leading coefficients of <span class="math notranslate nohighlight">\(P_0,\dots,P_3\)</span>, then check the round trip
+<span class="math notranslate nohighlight">\(M^{-1}M = I\)</span> exactly over the rationals.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>M (columns = the Legendre polynomials in monomial coordinates):
+⎡1  0  -1/2   0  ⎤
+⎢                ⎥
+⎢0  1   0    -3/2⎥
+⎢                ⎥
+⎢0  0  3/2    0  ⎥
+⎢                ⎥
+⎣0  0   0    5/2 ⎦
+
+matches Eq. 7 exactly: True
+upper triangular      : True
+
+M [p]_L      = [1, -2, 0, 3]
+[p]_M        = [1, -2, 0, 3]
+equal exactly: True
+M^-1 [p]_M   = [1, -1/5, 0, 6/5]
+equals [p]_L : True
+
+det M = 15/4   product of leading coefficients = 15/4   equal: True
+M^-1 M = I exactly: True
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<p>The change-of-basis relation is checked in <strong>both directions</strong> with exact
+rational arithmetic, so the inverse is verified rather than assumed. The
+determinant is checked against an independent expression — the product of the
+leading coefficients — which the construction of <span class="math notranslate nohighlight">\(M\)</span> never used.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the change-of-basis matrix is exactly the M of Eq. 7   [each column is one Legendre polynomial in monomial coordinates]
+✓  it is upper triangular, because P_k has degree exactly k   [a structural property of the basis, visible in the matrix]
+✓  [p]_M = M [p]_L exactly (Eq. 2)   [the two coordinate columns of Exercise 3 are related by M]
+✓  and [p]_L = M^-1 [p]_M, so the relation is invertible   [as it must be, since both are bases]
+✓  det M = 15/4, equal to the product of the leading coefficients   [an independent route to the same number]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-dimension-by-decomposition">
+<h2>Exercise 5: Dimension by decomposition<a class="headerlink" href="#exercise-5-dimension-by-decomposition" title="Link to this heading">#</a></h2>
+<p>Dimension is a counting argument, and the cleanest way to count is often to
+split the space.</p>
+<p>Every square matrix decomposes uniquely as a symmetric part plus an
+antisymmetric part:</p>
+<div class="math notranslate nohighlight" id="equation-eq-spaces-sym-split">
+<span class="eqno">(86)<a class="headerlink" href="#equation-eq-spaces-sym-split" title="Link to this equation">#</a></span>\[A = \underbrace{\tfrac12\big(A + A^{\top}\big)}_{\text{symmetric}}
+  + \underbrace{\tfrac12\big(A - A^{\top}\big)}_{\text{antisymmetric}} .\]</div>
+<p>The two pieces live in subspaces that intersect only at <span class="math notranslate nohighlight">\(\mathbf{0}\)</span> — a matrix
+both symmetric and antisymmetric satisfies <span class="math notranslate nohighlight">\(A = -A\)</span> — and together they span
+everything, so</p>
+<div class="math notranslate nohighlight" id="equation-eq-spaces-dimension-count">
+<span class="eqno">(87)<a class="headerlink" href="#equation-eq-spaces-dimension-count" title="Link to this equation">#</a></span>\[\dim\mathrm{Sym}_n + \dim\mathrm{Skew}_n
+= \frac{n(n+1)}{2} + \frac{n(n-1)}{2} = n^2 = \dim \mathbb{R}^{n\times n}.\]</div>
+<p>The counts come from the free entries: a symmetric matrix is determined by its
+diagonal and upper triangle, an antisymmetric one by its strict upper triangle
+with a forced zero diagonal.</p>
+<p>This is the same <span class="math notranslate nohighlight">\(\mathbb{R}^n = U \oplus U^{\perp}\)</span> pattern
+<a class="reference internal" href="four-subspaces.html"><span class="std std-doc">§1.4</span></a> met, and in fact it <em>is</em> an orthogonal
+decomposition, under the Frobenius inner product
+<span class="math notranslate nohighlight">\(\langle A, B\rangle = \operatorname{tr}(A^{\top}B)\)</span> — a fact worth verifying,
+because it means the split is a projection and Pythagoras applies.</p>
+<p><strong>Part a)</strong> For <span class="math notranslate nohighlight">\(n = 2, 3, 4, 5\)</span> construct explicit bases of <span class="math notranslate nohighlight">\(\mathrm{Sym}_n\)</span>
+(the matrices <span class="math notranslate nohighlight">\(E_{ii}\)</span> and <span class="math notranslate nohighlight">\(E_{ij} + E_{ji}\)</span> for <span class="math notranslate nohighlight">\(i &lt; j\)</span>) and <span class="math notranslate nohighlight">\(\mathrm{Skew}_n\)</span>
+(the matrices <span class="math notranslate nohighlight">\(E_{ij} - E_{ji}\)</span> for <span class="math notranslate nohighlight">\(i &lt; j\)</span>), and confirm the counts of
+<a class="reference internal" href="#equation-eq-spaces-dimension-count">Eq. 87</a> by checking <code class="docutils literal notranslate"><span class="pre">np.linalg.matrix_rank</span></code> of the
+flattened bases.</p>
+<p><strong>Part b)</strong> Confirm <a class="reference internal" href="#equation-eq-spaces-sym-split">Eq. 86</a> on 200 random <span class="math notranslate nohighlight">\(4\times4\)</span>
+matrices: the two parts have the stated symmetry to <span class="math notranslate nohighlight">\(10^{-14}\)</span> and sum back to
+<span class="math notranslate nohighlight">\(A\)</span> to <span class="math notranslate nohighlight">\(10^{-14}\)</span>. Note the recombination is <em>not</em> bit-exact: halving is exact
+in binary, but <span class="math notranslate nohighlight">\(A + A^{\top}\)</span> and <span class="math notranslate nohighlight">\(A - A^{\top}\)</span> are each rounded sums, so the
+two roundings need not cancel.</p>
+<p><strong>Part c)</strong> Confirm the split is <strong>orthogonal</strong> under the Frobenius inner
+product: <span class="math notranslate nohighlight">\(\operatorname{tr}(S^{\top}K) = 0\)</span> for the symmetric and antisymmetric
+parts, and Pythagoras <span class="math notranslate nohighlight">\(\|A\|_F^2 = \|S\|_F^2 + \|K\|_F^2\)</span> holds to <span class="math notranslate nohighlight">\(10^{-13}\)</span>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  n   dim Sym   n(n+1)/2   dim Skew   n(n-1)/2   sum   n^2
+  2         3          3          1          1     4     4
+  3         6          6          3          3     9     9
+  4        10         10          6          6    16    16
+  5        15         15         10         10    25    25
+
+over 200 random 4x4 matrices:
+  |S - S^T|                       : 0.000e+00
+  |K + K^T|                       : 0.000e+00
+  |A - (S + K)|                   : 4.441e-16
+  |tr(S^T K)|  (Frobenius product): 8.882e-16   &lt;- orthogonal
+  Pythagoras defect               : 5.773e-15
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-spaces-sym-split">
+<img alt="../../_images/37bbcb5bd1085177d9f1e0c400daf0e3ee2f60d95dae45da45cd8051a0d0a624.png" src="../../_images/37bbcb5bd1085177d9f1e0c400daf0e3ee2f60d95dae45da45cd8051a0d0a624.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 32 </span><span class="caption-text">The decomposition of Eq. 8 for one random <span class="math notranslate nohighlight">\(4\times4\)</span> matrix, on a diverging colour scale centred at zero: the symmetric part (mirror-image across the diagonal, <span class="math notranslate nohighlight">\(\dim = 10\)</span>), the antisymmetric part (mirror-image with a sign flip and a forced zero diagonal, <span class="math notranslate nohighlight">\(\dim = 6\)</span>), and their sum, which reproduces <span class="math notranslate nohighlight">\(A\)</span> to machine precision. The two subspaces are orthogonal under the Frobenius inner product, so the split is a projection and Pythagoras applies.</span><a class="headerlink" href="#fig-spaces-sym-split" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<p>The dimension counts are checked by computing the <strong>rank of the flattened
+bases</strong>, which confirms independence rather than merely counting how many
+matrices were constructed. The orthogonality check is the one that upgrades the
+statement from “a decomposition” to “an orthogonal decomposition”, and it is
+what licenses Pythagoras.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  dim Sym + dim Skew = n(n+1)/2 + n(n-1)/2 = n^2 for n = 2..5 (Eq. 9)   [ranks of the flattened bases, so independence is verified too]
+✓  the two parts of Eq. 8 have the stated symmetries   [|S - S^T| = 0.0e+00, |K + K^T| = 0.0e+00]
+✓  and they sum back to A to machine precision   [max|Δ| = 4.44089e-16 (rtol=0, atol=1e-14)]
+✓  the two subspaces are orthogonal under the Frobenius product   [largest |tr(S^T K)| = 8.9e-16 over 200 matrices]
+✓  so Pythagoras holds: ||A||_F^2 = ||S||_F^2 + ||K||_F^2   [the split is an orthogonal projection, as in section 1.4]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-6-why-the-basis-matters">
+<h2>Exercise 6: Why the basis matters<a class="headerlink" href="#exercise-6-why-the-basis-matters" title="Link to this heading">#</a></h2>
+<p>All bases describe the same space. They do not all describe it <em>equally well</em>
+on a machine, and the difference is measured by the conditioning of the Gram
+matrix.</p>
+<p>The reason is exactly the projection story of
+<a class="reference internal" href="../00-machine/vectors-norms-inner-products.html"><span class="std std-doc">§0.3</span></a>. Finding coordinates
+in a general basis means solving <span class="math notranslate nohighlight">\(G\mathbf{c} = \mathbf{b}\)</span> where <span class="math notranslate nohighlight">\(G\)</span> is the
+Gram matrix. If <span class="math notranslate nohighlight">\(\kappa(G)\)</span> is large, then by
+<a class="reference internal" href="../00-machine/floating-point.html"><span class="std std-doc">§0.2</span></a> the coordinates lose
+<span class="math notranslate nohighlight">\(\log_{10}\kappa\)</span> digits, and — worse — small changes in the vector produce
+large changes in its description.</p>
+<p>For the monomials on <span class="math notranslate nohighlight">\([-1,1]\)</span>, <a class="reference internal" href="#equation-eq-spaces-monomial-gram">Eq. 82</a> produces a
+Hilbert-like matrix and <span class="math notranslate nohighlight">\(\kappa\)</span> grows <em>exponentially</em> in the degree: about
+<span class="math notranslate nohighlight">\(68\)</span> at degree 3, <span class="math notranslate nohighlight">\(1.9\times10^{3}\)</span> at degree 5, <span class="math notranslate nohighlight">\(5.5\times10^{4}\)</span> at degree 7,
+<span class="math notranslate nohighlight">\(1.7\times10^{6}\)</span> at degree 9. The Legendre Gram matrix is diagonal, so by
+<a class="reference internal" href="#equation-eq-spaces-legendre-kappa">Eq. 81</a> its condition number is exactly <span class="math notranslate nohighlight">\(2d+1\)</span>: <span class="math notranslate nohighlight">\(7\)</span>,
+<span class="math notranslate nohighlight">\(11\)</span>, <span class="math notranslate nohighlight">\(15\)</span>, <span class="math notranslate nohighlight">\(19\)</span>. Linear against exponential.</p>
+<p>The visible consequence is that high-degree monomials become nearly
+indistinguishable as functions on <span class="math notranslate nohighlight">\([-1,1]\)</span>: <span class="math notranslate nohighlight">\(x^8\)</span> and <span class="math notranslate nohighlight">\(x^{10}\)</span> have a
+normalised inner product above <span class="math notranslate nohighlight">\(0.99\)</span>, so a combination of them can be huge in
+coefficients and tiny as a function. That is what an ill-conditioned basis
+<em>is</em>.</p>
+<p><strong>Part a)</strong> For degrees <span class="math notranslate nohighlight">\(d = 3, 5, 7, 9\)</span>, build both Gram matrices exactly and
+report <span class="math notranslate nohighlight">\(\kappa\)</span> of each, confirming the Legendre value equals <span class="math notranslate nohighlight">\(2d+1\)</span> to
+<span class="math notranslate nohighlight">\(10^{-10}\)</span> and the monomial value exceeds <span class="math notranslate nohighlight">\(10^{5}\)</span> by degree 9.</p>
+<p><strong>Part b)</strong> Confirm the mechanism: compute the normalised inner product
+(the cosine of <a class="reference internal" href="../00-machine/vectors-norms-inner-products.html#equation-eq-vectors-angle">Eq. 28</a>) between <span class="math notranslate nohighlight">\(x^8\)</span> and <span class="math notranslate nohighlight">\(x^{10}\)</span> on <span class="math notranslate nohighlight">\([-1,1]\)</span>,
+and between <span class="math notranslate nohighlight">\(P_8\)</span> and <span class="math notranslate nohighlight">\(P_{10}\)</span>, and confirm the first exceeds <span class="math notranslate nohighlight">\(0.99\)</span> while the
+second is exactly 0.</p>
+<p><strong>Part c)</strong> Plot <span class="math notranslate nohighlight">\(\kappa\)</span> against degree for both bases on a log axis, with the
+<span class="math notranslate nohighlight">\(2d+1\)</span> line drawn over the Legendre points.</p>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p>Ask for a routine that, given any basis of polynomials and an interval,
+performs Gram–Schmidt on it under <a class="reference internal" href="#equation-eq-spaces-l2-inner">Eq. 79</a> and returns an
+orthonormal basis. Then check it yourself: applied to the monomials on
+<span class="math notranslate nohighlight">\([-1,1]\)</span>, the resulting Gram matrix must be the identity to <span class="math notranslate nohighlight">\(10^{-12}\)</span>, each
+output must be a scalar multiple of the corresponding Legendre polynomial
+(check <span class="math notranslate nohighlight">\(|\cos| = 1\)</span> under the inner product), and the condition number must
+drop to 1. The check is yours — and it is the construction
+<a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html"><span class="std std-doc">§2.2</span></a> builds properly.</p>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  d   kappa(monomial Gram)   kappa(Legendre Gram)   2d+1
+  3             6.7604e+01                 7.0000      7
+  5             1.8704e+03                11.0000     11
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  7             5.5218e+04                15.0000     15
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  9             1.6852e+06                19.0000     19
+
+cos(x^8, x^10)   = 0.994444   &lt;- nearly parallel as functions
+&lt;P_8, P_10&gt;      = 0.000e+00   &lt;- exactly orthogonal
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-spaces-conditioning">
+<img alt="../../_images/41501382ccf30c46aaa09e142fe4b50142380cacf64cb6d843d863c9609d54b4.png" src="../../_images/41501382ccf30c46aaa09e142fe4b50142380cacf64cb6d843d863c9609d54b4.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 33 </span><span class="caption-text">Condition number of the Gram matrix against polynomial degree on <span class="math notranslate nohighlight">\([-1,1]\)</span>, on a logarithmic axis: the monomial basis (ink) grows exponentially, reaching <span class="math notranslate nohighlight">\(1.7\times10^{6}\)</span> by degree 9, while the Legendre basis (amber) grows linearly and sits exactly on the line <span class="math notranslate nohighlight">\(2d+1\)</span> predicted by Eq. 3 because its Gram matrix is diagonal. Both describe the same space of polynomials; only one of them lets a machine find coordinates in it.</span><a class="headerlink" href="#fig-spaces-conditioning" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-6">
+<h3>Validation 6<a class="headerlink" href="#validation-6" title="Link to this heading">#</a></h3>
+<p>The Legendre condition number is checked against the <strong>closed form</strong>
+<a class="reference internal" href="#equation-eq-spaces-legendre-kappa">Eq. 81</a> rather than merely observed to be small, and the
+monomial one against a growth threshold. The cosine check explains <em>why</em>: it
+shows the two bases differ because high monomials are nearly the same function
+while high Legendre polynomials are exactly perpendicular.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the Legendre Gram condition number is exactly 2d+1 (Eq. 3)   [max|Δ| = 0 (rtol=1e-10, atol=0)]
+✓  while the monomial Gram condition number exceeds 1e5 by degree 9   [1.685e+06, against 19 for Legendre]
+✓  and it grows monotonically and far faster than linearly   [[&#39;6.8e+01&#39;, &#39;1.9e+03&#39;, &#39;5.5e+04&#39;, &#39;1.7e+06&#39;] against [&#39;7&#39;, &#39;11&#39;, &#39;15&#39;, &#39;19&#39;]]
+✓  the mechanism: x^8 and x^10 have cosine above 0.99 on [-1, 1]   [0.994444 — nearly the same function, so their coefficients are nearly indeterminate]
+✓  whereas P_8 and P_10 are exactly orthogonal   [got 0 vs expected 0 (rtol=0, atol=1e-14)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p>A vector space is anything you can add and scale sensibly, and once a basis is
+chosen it becomes <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> — but not all bases are equally usable.</p>
+<p>The concrete results:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\mathbb{R}^3\)</span>, <span class="math notranslate nohighlight">\(P_3\)</span> and <span class="math notranslate nohighlight">\(\mathbb{R}^{2\times2}\)</span> satisfied closure and
+distributivity over 200 random elements each; <span class="math notranslate nohighlight">\(\mathrm{GL}_2\)</span> failed closure
+under <strong>addition</strong> (<span class="math notranslate nohighlight">\(I + (-I)\)</span> is singular) and the first quadrant failed
+closure under <strong>scalar multiplication</strong> while satisfying it for addition — two
+different axioms, each located rather than merely observed;</p></li>
+<li><p>the exact Gram matrix of <span class="math notranslate nohighlight">\(\{1, x, x^2, x^3\}\)</span> on <span class="math notranslate nohighlight">\([-1,1]\)</span> matched the closed
+form <a class="reference internal" href="#equation-eq-spaces-monomial-gram">Eq. 82</a> and had determinant exactly
+<span class="math notranslate nohighlight">\(256/23625 \neq 0\)</span>, proving independence in rational arithmetic, while the
+Legendre Gram matrix came out exactly diagonal with entries <span class="math notranslate nohighlight">\(2/(2k+1)\)</span>;</p></li>
+<li><p><span class="math notranslate nohighlight">\(p(x) = 3x^3 - 2x + 1\)</span> had coordinates exactly <span class="math notranslate nohighlight">\((1, -2, 0, 3)\)</span> in the
+monomial basis and exactly <span class="math notranslate nohighlight">\((1, -\tfrac15, 0, \tfrac65)\)</span> in the Legendre
+basis, both reconstructing <span class="math notranslate nohighlight">\(p\)</span> <strong>identically</strong> as polynomials;</p></li>
+<li><p>the change-of-basis matrix <a class="reference internal" href="#equation-eq-spaces-m">Eq. 85</a> was upper triangular with
+<span class="math notranslate nohighlight">\(\det M = 15/4\)</span>, equal to the product of the leading coefficients by an
+independent route, and converted between the two columns exactly in both
+directions;</p></li>
+<li><p>the symmetric/antisymmetric split gave <span class="math notranslate nohighlight">\(\dim\mathrm{Sym}_n + \dim\mathrm{Skew}_n
+= n^2\)</span> for <span class="math notranslate nohighlight">\(n = 2,\dots,5\)</span> verified by the <strong>rank</strong> of the flattened bases,
+and turned out to be an <em>orthogonal</em> decomposition under the Frobenius inner
+product, so Pythagoras held to <span class="math notranslate nohighlight">\(10^{-13}\)</span> (the recombination itself is not
+bit-exact, since <span class="math notranslate nohighlight">\(A \pm A^{\top}\)</span> are rounded sums);</p></li>
+<li><p>and the two bases of the same space differed by six orders of magnitude in
+conditioning at degree 9 — <span class="math notranslate nohighlight">\(1.7\times10^{6}\)</span> against exactly <span class="math notranslate nohighlight">\(2d+1 = 19\)</span> —
+because <span class="math notranslate nohighlight">\(x^8\)</span> and <span class="math notranslate nohighlight">\(x^{10}\)</span> have cosine <span class="math notranslate nohighlight">\(0.9944\)</span> on <span class="math notranslate nohighlight">\([-1,1]\)</span> while <span class="math notranslate nohighlight">\(P_8\)</span> and
+<span class="math notranslate nohighlight">\(P_{10}\)</span> are exactly perpendicular.</p></li>
+</ul>
+<p>Methods met: the vector-space axioms as testable properties, the Gram matrix as
+the instrument for independence without entries, <code class="docutils literal notranslate"><span class="pre">sympy.integrate</span></code> for exact
+inner products, the orthogonal coordinate formula
+<a class="reference internal" href="#equation-eq-spaces-orthogonal-coords">Eq. 84</a>, <code class="docutils literal notranslate"><span class="pre">sympy.legendre</span></code>, the change-of-basis matrix
+and its exact inverse, and <span class="math notranslate nohighlight">\(\kappa\)</span> of a Gram matrix as the measure of a
+basis’s quality.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Maps, not just vectors.</strong> Having coordinates for vectors, the next step is
+coordinates for <em>maps</em>: the derivative on <span class="math notranslate nohighlight">\(P_3\)</span> is linear, so it has a
+<span class="math notranslate nohighlight">\(4\times4\)</span> matrix, and changing basis changes that matrix by <span class="math notranslate nohighlight">\(B^{-1}AB\)</span>.
+<a class="reference internal" href="linear-maps-change-of-basis.html"><span class="std std-doc">§1.6</span></a> does this, and finding the basis
+that makes the matrix simplest is the whole of Chapter III.</p></li>
+<li><p><strong>Building a good basis.</strong> Exercise 6 showed the monomials are a bad basis
+and the Legendre polynomials a good one, without saying where the good one
+came from. It comes from running Gram–Schmidt on the monomials, which is
+<a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html"><span class="std std-doc">§2.2</span></a> in <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> and
+<a class="reference internal" href="../02-orthogonality/function-space-bases.html"><span class="std std-doc">§2.5</span></a> in function space.</p></li>
+<li><p><strong>Fitting in the bad basis.</strong> The conditioning penalty is not hypothetical:
+fitting a degree-9 polynomial to data through the monomial basis loses six
+digits before the data is consulted.
+<a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html"><span class="std std-doc">§2.3</span></a> measures exactly
+that, and finds the damage is worse still, since least squares squares the
+condition number.</p></li>
+<li><p><strong>Infinite dimensions.</strong> <span class="math notranslate nohighlight">\(P_3\)</span> was finite-dimensional by construction. The
+space of all continuous functions on <span class="math notranslate nohighlight">\([-1,1]\)</span> is not, and yet
+<a class="reference internal" href="#equation-eq-spaces-orthogonal-coords">Eq. 84</a> still produces coefficients — an infinite
+sequence of them. Whether that series converges back to the function is the
+subject of Fourier analysis, and
+<a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html"><span class="std std-doc">§6.3</span></a> meets its discrete,
+finite, entirely computable shadow.</p></li>
+</ul>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h3>
+<div class="docutils container" id="id3">
+<div role="list" class="citation-list">
+<div class="citation" id="id6" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">Axl24</a><span class="fn-bracket">]</span></span>
+<p>Sheldon Axler. <em>Linear Algebra Done Right</em>. Undergraduate Texts in Mathematics. Springer, 4 edition, 2024. <a class="reference external" href="https://doi.org/10.1007/978-3-031-41026-0">doi:10.1007/978-3-031-41026-0</a>.</p>
+</div>
+<div class="citation" id="id11" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">TB97</a><span class="fn-bracket">]</span></span>
+<p>Lloyd N. Trefethen and David Bau, III. <em>Numerical Linear Algebra</em>. SIAM, Philadelphia, 1997. <a class="reference external" href="https://doi.org/10.1137/1.9780898719574">doi:10.1137/1.9780898719574</a>.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/01-matrices"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="four-subspaces.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">1.4 The Four Fundamental Subspaces</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="linear-maps-change-of-basis.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">1.6 Linear Maps and Change of Basis</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-definition-and-why-it-is-so-short">The definition, and why it is so short</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#independence-basis-dimension">Independence, basis, dimension</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#coordinates">Coordinates</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#changing-basis">Changing basis</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#when-a-basis-is-a-bad-idea">When a basis is a bad idea</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-the-axioms-and-two-things-that-fail-them">Exercise 1: The axioms, and two things that fail them</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-independence-without-entries">Exercise 2: Independence without entries</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-one-polynomial-two-columns-of-numbers">Exercise 3: One polynomial, two columns of numbers</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-the-change-of-basis-matrix">Exercise 4: The change-of-basis matrix</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-dimension-by-decomposition">Exercise 5: Dimension by decomposition</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-why-the-basis-matters">Exercise 6: Why the basis matters</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

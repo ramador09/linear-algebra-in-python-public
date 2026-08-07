@@ -1,0 +1,1833 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="1.2 Elimination, Pivoting, and A = LU" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/01-matrices/elimination-lu.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: Everybody learns to solve A\mathbf{x} = \mathbf{b} by elimination: subtract multiples of one row from the others until the system is trian..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: Everybody learns to solve A\mathbf{x} = \mathbf{b} by elimination: subtract multiples of one row from the others until the system is trian..." />
+
+    <title>1.2 Elimination, Pivoting, and A = LU &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/01-matrices/elimination-lu';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/01-matrices/elimination-lu.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="1.3 Inverses, Rank, and A = CR" href="inverses-rank-cr.html" />
+    <link rel="prev" title="1.1 Matrices as Linear Maps: Four Ways to Multiply" href="four-ways-to-multiply.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/01-matrices/elimination-lu.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/01-matrices/elimination-lu.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/01-matrices/elimination-lu.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/01-matrices/elimination-lu.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>1.2 Elimination, Pivoting, and A = LU</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#elimination-as-a-sequence-of-row-operations">Elimination as a sequence of row operations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-the-factorization-is-worth-having">Why the factorization is worth having</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pivoting">Pivoting</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#growth-and-the-honest-caveat">Growth, and the honest caveat</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-elimination-one-step-at-a-time">Exercise 1: Elimination, one step at a time</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-multipliers-are-l">Exercise 2: The multipliers are <span class="math notranslate nohighlight">\(L\)</span></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-matrix-that-breaks-it-and-the-one-line-repair">Exercise 3: The matrix that breaks it, and the one-line repair</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-solving-and-the-cost-of-doing-it-twice">Exercise 4: Solving, and the cost of doing it twice</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-what-elimination-costs-counted-and-measured">Exercise 5: What elimination costs, counted and measured</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-factor-once-solve-many">Exercise 6: Factor once, solve many</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-7-growth-and-the-matrix-that-defeats-partial-pivoting">Exercise 7: Growth, and the matrix that defeats partial pivoting</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-7">Validation 7</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-8-what-the-pivots-tell-you">Exercise 8: What the pivots tell you</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-8">Validation 8</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="elimination-pivoting-and-a-lu">
+<h1>1.2 Elimination, Pivoting, and A = LU<a class="headerlink" href="#elimination-pivoting-and-a-lu" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter I — Matrices, Elimination, and Subspaces
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;1.2
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">Write Gaussian elimination out, keep a record of what it did, and the record is a factorization. Then find the matrix where forgetting to pivot destroys every digit of the answer.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;intermediate&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;90–120 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p>Everybody learns to solve <span class="math notranslate nohighlight">\(A\mathbf{x} = \mathbf{b}\)</span> by elimination: subtract
+multiples of one row from the others until the system is triangular, then work
+backwards. The idea is two thousand years old and it is still, essentially
+unchanged, what your computer does.</p>
+<p>What is worth an hour is the bookkeeping. If you write down <em>which</em> multiples
+you subtracted, those numbers assemble into a lower triangular matrix <span class="math notranslate nohighlight">\(L\)</span>, the
+triangular system you were left with is <span class="math notranslate nohighlight">\(U\)</span>, and together they satisfy
+<span class="math notranslate nohighlight">\(A = LU\)</span>. Elimination and factorization are not two topics. The factorization
+is simply elimination that kept a receipt, and the receipt is what lets you
+solve fifty different right-hand sides for the price of one elimination plus
+fifty cheap triangular sweeps. We measure that: it comes out about thirty times
+faster.</p>
+<p>The other half of the notebook is about a decision the textbook version glosses
+over. At each step you divide by the <strong>pivot</strong>, the diagonal entry, and nothing
+guarantees it is not tiny. We build the matrix where the natural pivot is
+<span class="math notranslate nohighlight">\(10^{-18}\)</span>, watch the unpivoted algorithm return <span class="math notranslate nohighlight">\(\mathbf{x} = (0, 1)\)</span> where
+the true answer is <span class="math notranslate nohighlight">\((1, 1)\)</span> — not inaccurate, <em>entirely wrong</em> — and then watch
+<strong>partial pivoting</strong>, which is nothing more than “swap in the largest available
+entry first”, return the exact answer. It costs a comparison per step and it is
+the difference between a working algorithm and a broken one.</p>
+<p>Two things here are measured rather than asserted, and both come out slightly
+against the textbook. The operation count of elimination is exactly
+<span class="math notranslate nohighlight">\(n(n-1)(4n+1)/6\)</span>, which approaches <span class="math notranslate nohighlight">\(\tfrac23 n^3\)</span> but is <span class="math notranslate nohighlight">\(0.4\%\)</span> below it even
+at <span class="math notranslate nohighlight">\(n = 200\)</span>; and the <em>measured</em> running time of LAPACK’s factorization scales
+closer to <span class="math notranslate nohighlight">\(n^{2.5}\)</span> than <span class="math notranslate nohighlight">\(n^3\)</span> at any size you can comfortably run, for reasons
+that are about memory rather than arithmetic and that
+<a class="reference internal" href="four-ways-to-multiply.html"><span class="std std-doc">§1.1</span></a> already explained.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume — here, mostly the
+reconstruction <span class="math notranslate nohighlight">\(PA = LU\)</span>, which the factorization routine was never asked to
+satisfy. A ✗ flags a mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> The definitive treatment of pivoting and growth is Higham
+<span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id15" title="Nicholas J. Higham. Accuracy and Stability of Numerical Algorithms. SIAM, Philadelphia, 2 edition, 2002. doi:10.1137/1.9780898718027.">Hig02</a>]</span>, Chapters 9 and 22; Trefethen and Bau
+<span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id12" title="Lloyd N. Trefethen and David Bau, III. Numerical Linear Algebra. SIAM, Philadelphia, 1997. doi:10.1137/1.9780898719574.">TB97</a>]</span>, Lectures 20–22, give the shorter version with the
+stability argument this notebook follows.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="elimination-as-a-sequence-of-row-operations">
+<h3>Elimination as a sequence of row operations<a class="headerlink" href="#elimination-as-a-sequence-of-row-operations" title="Link to this heading">#</a></h3>
+<p>Given <span class="math notranslate nohighlight">\(A \in \mathbb{R}^{n\times n}\)</span>, step <span class="math notranslate nohighlight">\(k\)</span> of elimination uses row <span class="math notranslate nohighlight">\(k\)</span> to
+clear the entries below the diagonal in column <span class="math notranslate nohighlight">\(k\)</span>. For each row <span class="math notranslate nohighlight">\(i &gt; k\)</span> it
+forms the <strong>multiplier</strong></p>
+<div class="math notranslate nohighlight" id="equation-eq-lu-multiplier">
+<span class="eqno">(49)<a class="headerlink" href="#equation-eq-lu-multiplier" title="Link to this equation">#</a></span>\[\ell_{ik} = \frac{a_{ik}}{a_{kk}}\]</div>
+<p>and replaces row <span class="math notranslate nohighlight">\(i\)</span> by row <span class="math notranslate nohighlight">\(i\)</span> minus <span class="math notranslate nohighlight">\(\ell_{ik}\)</span> times row <span class="math notranslate nohighlight">\(k\)</span>. The divisor
+<span class="math notranslate nohighlight">\(a_{kk}\)</span> is the <strong>pivot</strong>. After <span class="math notranslate nohighlight">\(n-1\)</span> such steps the matrix is upper
+triangular; call it <span class="math notranslate nohighlight">\(U\)</span>.</p>
+<p>Each row operation is itself a matrix multiplication. Clearing column <span class="math notranslate nohighlight">\(k\)</span> is
+left-multiplication by an elementary matrix <span class="math notranslate nohighlight">\(E_k\)</span> that is the identity with the
+multipliers of <a class="reference internal" href="#equation-eq-lu-multiplier">Eq. 49</a> placed in column <span class="math notranslate nohighlight">\(k\)</span> below the diagonal,
+negated. So <span class="math notranslate nohighlight">\(E_{n-1}\cdots E_1 A = U\)</span>, and therefore
+<span class="math notranslate nohighlight">\(A = E_1^{-1}\cdots E_{n-1}^{-1} U\)</span>. The pleasant surprise is that the inverse
+of such an <span class="math notranslate nohighlight">\(E_k\)</span> is the same matrix with the signs flipped, and that the
+product of all of them is just the collection of multipliers assembled in
+place. Writing <span class="math notranslate nohighlight">\(L\)</span> for that product,</p>
+<div class="math notranslate nohighlight" id="equation-eq-lu-factorization">
+<span class="eqno">(50)<a class="headerlink" href="#equation-eq-lu-factorization" title="Link to this equation">#</a></span>\[A = LU,\]</div>
+<p>with <span class="math notranslate nohighlight">\(L\)</span> <strong>unit lower triangular</strong> (ones on the diagonal, the multipliers
+<span class="math notranslate nohighlight">\(\ell_{ik}\)</span> below it) and <span class="math notranslate nohighlight">\(U\)</span> upper triangular. No work beyond the elimination
+itself is needed to obtain <span class="math notranslate nohighlight">\(L\)</span>: you simply store each multiplier where the zero
+it created would have gone.</p>
+</section>
+<section id="why-the-factorization-is-worth-having">
+<h3>Why the factorization is worth having<a class="headerlink" href="#why-the-factorization-is-worth-having" title="Link to this heading">#</a></h3>
+<p>Once <span class="math notranslate nohighlight">\(A = LU\)</span>, solving <span class="math notranslate nohighlight">\(A\mathbf{x} = \mathbf{b}\)</span> splits into two triangular
+solves,</p>
+<div class="math notranslate nohighlight" id="equation-eq-lu-two-solves">
+<span class="eqno">(51)<a class="headerlink" href="#equation-eq-lu-two-solves" title="Link to this equation">#</a></span>\[L\mathbf{y} = \mathbf{b} \quad\text{(forward)}, \qquad
+U\mathbf{x} = \mathbf{y} \quad\text{(backward)},\]</div>
+<p>each costing <span class="math notranslate nohighlight">\(n^2\)</span> operations against the <span class="math notranslate nohighlight">\(\sim\tfrac23 n^3\)</span> of the
+factorization. For one right-hand side that is no saving. For many — which is
+the normal situation, in least squares, in time-stepping, in Newton iterations
+— it is a factor of <span class="math notranslate nohighlight">\(O(n)\)</span>, and it is the entire reason numerical software is
+organised around factorizations rather than around solvers.</p>
+</section>
+<section id="pivoting">
+<h3>Pivoting<a class="headerlink" href="#pivoting" title="Link to this heading">#</a></h3>
+<p><a class="reference internal" href="#equation-eq-lu-multiplier">Eq. 49</a> divides by <span class="math notranslate nohighlight">\(a_{kk}\)</span>, and two things can go wrong. If the
+pivot is exactly zero the algorithm stops. If it is merely <em>small</em>, the
+multipliers are large, the elimination adds large multiples of one row to
+another, and the original entries are swamped: information is destroyed by
+cancellation, exactly as in
+<a class="reference internal" href="../00-machine/floating-point.html"><span class="std std-doc">§0.2</span></a>.</p>
+<p><strong>Partial pivoting</strong> fixes both. Before clearing column <span class="math notranslate nohighlight">\(k\)</span>, find the largest
+entry in that column at or below the diagonal and swap its row into position
+<span class="math notranslate nohighlight">\(k\)</span>. Every multiplier then satisfies <span class="math notranslate nohighlight">\(|\ell_{ik}| \le 1\)</span> by construction. The
+row swaps are recorded in a permutation matrix <span class="math notranslate nohighlight">\(P\)</span>, and the factorization
+becomes</p>
+<div class="math notranslate nohighlight" id="equation-eq-lu-pivoted">
+<span class="eqno">(52)<a class="headerlink" href="#equation-eq-lu-pivoted" title="Link to this equation">#</a></span>\[PA = LU .\]</div>
+<p>This is what <code class="docutils literal notranslate"><span class="pre">scipy.linalg.lu_factor</span></code> computes and what every general-purpose
+dense solver in existence uses.</p>
+</section>
+<section id="growth-and-the-honest-caveat">
+<h3>Growth, and the honest caveat<a class="headerlink" href="#growth-and-the-honest-caveat" title="Link to this heading">#</a></h3>
+<p>Bounded multipliers do not by themselves bound the <em>entries of <span class="math notranslate nohighlight">\(U\)</span></em>. The
+relevant quantity is the <strong>growth factor</strong></p>
+<div class="math notranslate nohighlight" id="equation-eq-lu-growth">
+<span class="eqno">(53)<a class="headerlink" href="#equation-eq-lu-growth" title="Link to this equation">#</a></span>\[\rho = \frac{\max_{i,j,k} |a_{ij}^{(k)}|}{\max_{i,j}|a_{ij}|},\]</div>
+<p>the largest entry appearing anywhere during the elimination, relative to the
+largest entry of <span class="math notranslate nohighlight">\(A\)</span>. The backward error of the computed solution is
+proportional to <span class="math notranslate nohighlight">\(\rho\)</span>, so a large <span class="math notranslate nohighlight">\(\rho\)</span> means the answer, though it solves a
+nearby problem, may solve one that is not near enough.</p>
+<p>In practice <span class="math notranslate nohighlight">\(\rho\)</span> is almost always modest — of order <span class="math notranslate nohighlight">\(n^{1/2}\)</span> or so on random
+matrices. But partial pivoting does not <em>guarantee</em> it: Wilkinson’s matrix,
+built in Exercise 7, attains <span class="math notranslate nohighlight">\(\rho = 2^{n-1}\)</span> exactly, which at <span class="math notranslate nohighlight">\(n = 60\)</span>
+exceeds <span class="math notranslate nohighlight">\(10^{17}\)</span> and destroys every digit. That the worst case is
+catastrophic while the average case is benign, with no satisfying explanation
+of why practice is so much kinder than theory, is one of the genuine open
+embarrassments of the subject <span class="bibtex-citation" id="id3">[<a class="reference internal" href="#id15" title="Nicholas J. Higham. Accuracy and Stability of Numerical Algorithms. SIAM, Philadelphia, 2 edition, 2002. doi:10.1137/1.9780898718027.">Hig02</a>]</span>.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data and instruments only: the worked matrices and the timing meter of
+<a class="reference internal" href="../00-machine/arrays-and-vectorization.html"><span class="std std-doc">§0.1</span></a>.
+The elimination step and the LU factorizer are built in Exercises 1-3,
+where they are the lesson.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">lu</span><span class="p">,</span> <span class="n">lu_factor</span><span class="p">,</span> <span class="n">lu_solve</span><span class="p">,</span> <span class="n">solve</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">la</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random matrix below comes from this seed</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+
+
+<span class="c1"># instrument: the timing meter of §0.1 — plumbing for every race in the</span>
+<span class="c1"># course, not any exercise&#39;s lesson.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">bench</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">repeats</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Median wall-clock time of a zero-argument call, in seconds.</span>
+
+<span class="sd">    The same helper as sections 0.1 and 1.1. Timings are reported as ratios or</span>
+<span class="sd">    fitted exponents, never as absolute seconds, because absolutes do not</span>
+<span class="sd">    transfer between machines.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fn : callable</span>
+<span class="sd">        Zero-argument callable to time; called once first to warm any cache.</span>
+<span class="sd">    repeats : int, default 3</span>
+<span class="sd">        Number of timed repetitions.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float</span>
+<span class="sd">        Median elapsed time in seconds.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fn</span><span class="p">()</span>
+    <span class="n">times</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">repeats</span><span class="p">):</span>
+        <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+        <span class="n">fn</span><span class="p">()</span>
+        <span class="n">times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">times</span><span class="p">))</span>
+
+
+<span class="c1"># The worked 3x3 of Exercises 1-2, chosen so that every multiplier and every</span>
+<span class="c1"># entry of U is a small integer and the whole elimination can be checked by eye.</span>
+<span class="n">A3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="p">[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.0</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.0</span><span class="p">],</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+<span class="n">b3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">11.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">])</span>  <span class="c1"># chosen so the exact solution is (1, 2, 1)</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-elimination-one-step-at-a-time">
+<h2>Exercise 1: Elimination, one step at a time<a class="headerlink" href="#exercise-1-elimination-one-step-at-a-time" title="Link to this heading">#</a></h2>
+<p>We begin by doing it by hand, on a matrix small enough that every number is an
+integer and any slip is visible.</p>
+<div class="math notranslate nohighlight" id="equation-eq-lu-example">
+<span class="eqno">(54)<a class="headerlink" href="#equation-eq-lu-example" title="Link to this equation">#</a></span>\[\begin{split}A = \begin{bmatrix} 2 &amp; 1 &amp; -1\\ 4 &amp; 5 &amp; -3\\ -2 &amp; 5 &amp; -2 \end{bmatrix},
+\qquad
+\mathbf{b} = \begin{pmatrix} 3\\ 11\\ 6 \end{pmatrix},\end{split}\]</div>
+<p>whose exact solution is <span class="math notranslate nohighlight">\(\mathbf{x} = (1, 2, 1)^{\top}\)</span>, since
+<span class="math notranslate nohighlight">\(\mathbf{b} = A\mathbf{x}\)</span> by construction.</p>
+<p>Step 1 uses the pivot <span class="math notranslate nohighlight">\(a_{11} = 2\)</span>. The multipliers from
+<a class="reference internal" href="#equation-eq-lu-multiplier">Eq. 49</a> are <span class="math notranslate nohighlight">\(\ell_{21} = 4/2 = 2\)</span> and
+<span class="math notranslate nohighlight">\(\ell_{31} = -2/2 = -1\)</span>; subtracting <span class="math notranslate nohighlight">\(\ell_{21}\)</span> times row 1 from row 2 and
+<span class="math notranslate nohighlight">\(\ell_{31}\)</span> times row 1 from row 3 clears the first column. Step 2 uses the new
+pivot <span class="math notranslate nohighlight">\(a_{22} = 3\)</span> and the single multiplier <span class="math notranslate nohighlight">\(\ell_{32} = 6/3 = 2\)</span>. What is
+left is upper triangular:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+U = \begin{bmatrix} 2 &amp; 1 &amp; -1\\ 0 &amp; 3 &amp; -1\\ 0 &amp; 0 &amp; -1 \end{bmatrix}.
+\end{split}\]</div>
+<p>Every multiplier and every entry of <span class="math notranslate nohighlight">\(U\)</span> is an integer, so the whole
+computation is exact in <code class="docutils literal notranslate"><span class="pre">float64</span></code> and can be checked without any tolerance at
+all. That is unusual and deliberate: it lets Exercise 2 make an <em>exact</em> claim
+about the factorization before Exercise 3 introduces anything approximate.</p>
+<p><strong>Part a)</strong> Apply the two elimination steps to <span class="math notranslate nohighlight">\(A\)</span> of <a class="reference internal" href="#equation-eq-lu-example">Eq. 54</a> with
+explicit array slicing (<code class="docutils literal notranslate"><span class="pre">M[i,</span> <span class="pre">k:]</span> <span class="pre">-=</span> <span class="pre">mult</span> <span class="pre">*</span> <span class="pre">M[k,</span> <span class="pre">k:]</span></code>), printing the working
+matrix after each step, and confirm the result equals the <span class="math notranslate nohighlight">\(U\)</span> above exactly.</p>
+<p><strong>Part b)</strong> Apply the identical operations to <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> and confirm the
+reduced right-hand side is <span class="math notranslate nohighlight">\((3, 5, -1)^{\top}\)</span>.</p>
+<p><strong>Part c)</strong> Draw the two tableaux with
+<code class="docutils literal notranslate"><span class="pre">ecp.linalg.elimination_tableau(ax,</span> <span class="pre">M,</span> <span class="pre">b,</span> <span class="pre">pivot=...,</span> <span class="pre">eliminated=...)</span></code>,
+highlighting the active pivot and the entries just driven to zero.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>after step 1  (pivot 2, multipliers [&#39;2&#39;, &#39;-1&#39;]):
+[[ 2.  1. -1.  3.]
+ [ 0.  3. -1.  5.]
+ [ 0.  6. -3.  9.]] 
+
+after step 2  (pivot 3, multipliers [&#39;2&#39;]):
+[[ 2.  1. -1.  3.]
+ [ 0.  3. -1.  5.]
+ [ 0.  0. -1. -1.]] 
+
+U matches the stated matrix exactly: True
+reduced right-hand side: [ 3.  5. -1.]  (exactly (3, 5, -1): True)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-lu-tableau">
+<img alt="../../_images/b9e851692ed6a8a97ad4955cc56b45b56e3cdfabfa44d5036c54a186ad18f0d2.png" src="../../_images/b9e851692ed6a8a97ad4955cc56b45b56e3cdfabfa44d5036c54a186ad18f0d2.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 21 </span><span class="caption-text">The augmented tableau <span class="math notranslate nohighlight">\([A \mid \mathbf{b}]\)</span> of Eq. 3 at the start and after each of the two elimination steps, with the active pivot shaded amber and the entries just driven to zero drawn faint; the multipliers used are <span class="math notranslate nohighlight">\(\ell_{21}=2\)</span>, <span class="math notranslate nohighlight">\(\ell_{31}=-1\)</span> at the first step and <span class="math notranslate nohighlight">\(\ell_{32}=2\)</span> at the second.</span><a class="headerlink" href="#fig-lu-tableau" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<p>Every check here is exact, with <code class="docutils literal notranslate"><span class="pre">rtol=0</span></code> and <code class="docutils literal notranslate"><span class="pre">atol=0</span></code>. The entries of
+<a class="reference internal" href="#equation-eq-lu-example">Eq. 54</a> were chosen so that no rounding occurs anywhere in the
+elimination, so any deviation would be a genuine error in the arithmetic rather
+than a floating-point artefact.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  elimination produces the stated U exactly   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  and reduces b to (3, 5, -1) exactly   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  the three multipliers of Eq. 1 are 2, -1, 2   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  U is upper triangular: nothing below the diagonal   [max|Δ| = 0 (rtol=0, atol=0)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-the-multipliers-are-l">
+<h2>Exercise 2: The multipliers are <span class="math notranslate nohighlight">\(L\)</span><a class="headerlink" href="#exercise-2-the-multipliers-are-l" title="Link to this heading">#</a></h2>
+<p>Here is the observation that turns an algorithm into a factorization. The three
+multipliers of Exercise 1 were <span class="math notranslate nohighlight">\(\ell_{21} = 2\)</span>, <span class="math notranslate nohighlight">\(\ell_{31} = -1\)</span>,
+<span class="math notranslate nohighlight">\(\ell_{32} = 2\)</span>. Place them below the diagonal of an identity matrix, in the
+positions of the zeros they created:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+L = \begin{bmatrix} 1 &amp; 0 &amp; 0\\ 2 &amp; 1 &amp; 0\\ -1 &amp; 2 &amp; 1 \end{bmatrix}.
+\end{split}\]</div>
+<p>Then <span class="math notranslate nohighlight">\(LU = A\)</span> exactly, which is <a class="reference internal" href="#equation-eq-lu-factorization">Eq. 50</a>. Nothing was computed
+to obtain <span class="math notranslate nohighlight">\(L\)</span> beyond the elimination itself; the multipliers were already
+there, and storing them costs nothing because the space they occupy is exactly
+the space the zeros would have occupied. Production implementations store <span class="math notranslate nohighlight">\(L\)</span>
+and <span class="math notranslate nohighlight">\(U\)</span> in a single array for that reason, and <code class="docutils literal notranslate"><span class="pre">scipy.linalg.lu_factor</span></code> returns
+precisely such a packed array.</p>
+<p>The reason it works is worth a sentence. Each elimination step is
+left-multiplication by an elementary matrix, and the inverse of such a matrix
+is obtained by flipping the signs of its multipliers. Undoing the steps in
+reverse order therefore assembles the multipliers with their original signs,
+with no interference between columns — which is a small miracle that fails as
+soon as row swaps are introduced, and is why Exercise 3 has to be careful.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">lu_no_pivot(A)</span></code> returning <span class="math notranslate nohighlight">\((L, U)\)</span>: run the elimination of
+Exercise 1 for general <span class="math notranslate nohighlight">\(n\)</span>, storing each multiplier from
+<a class="reference internal" href="#equation-eq-lu-multiplier">Eq. 49</a> into <code class="docutils literal notranslate"><span class="pre">L[i,</span> <span class="pre">k]</span></code> as it is formed.</p>
+<p><strong>Write this one yourself</strong> — the implementation is the lesson.</p>
+<p><strong>Part b)</strong> Run it on <span class="math notranslate nohighlight">\(A\)</span> of <a class="reference internal" href="#equation-eq-lu-example">Eq. 54</a> and confirm <span class="math notranslate nohighlight">\(L\)</span> equals the
+matrix above exactly, that <span class="math notranslate nohighlight">\(L\)</span> is unit lower triangular under <code class="docutils literal notranslate"><span class="pre">np.tril</span></code> and
+<code class="docutils literal notranslate"><span class="pre">np.diag</span></code>, and that <span class="math notranslate nohighlight">\(LU = A\)</span> exactly.</p>
+<p><strong>Part c)</strong> Confirm it agrees with the library on a case where no pivoting is
+needed: for the symmetric positive definite <code class="docutils literal notranslate"><span class="pre">la.random_spd(6,</span> <span class="pre">rng)</span></code> — which
+never requires a row swap — check that <code class="docutils literal notranslate"><span class="pre">lu_no_pivot</span></code> reproduces
+<code class="docutils literal notranslate"><span class="pre">scipy.linalg.lu</span></code> to <span class="math notranslate nohighlight">\(10^{-12}\)</span>, and that <span class="math notranslate nohighlight">\(\det A = \prod_i u_{ii}\)</span>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>L =
+ [[ 1.  0.  0.]
+ [ 2.  1.  0.]
+ [-1.  2.  1.]]
+U =
+ [[ 2.  1. -1.]
+ [ 0.  3. -1.]
+ [ 0.  0. -1.]]
+
+L matches exactly          : True
+L is unit lower triangular : True
+L @ U == A exactly         : True
+det A = prod(diag U)       : -6.0 (np.linalg.det gives -6.0)
+
+on a 6x6 SPD matrix (no swaps needed):
+  our L vs scipy&#39;s : 2.776e-17
+  our U vs scipy&#39;s : 2.220e-16
+  scipy needed no row swaps: True
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-lu-factors">
+<img alt="../../_images/55574f0edec6a0f1de1db93025c924f5894df63fabc7f1bd4c472716a5c80d65.png" src="../../_images/55574f0edec6a0f1de1db93025c924f5894df63fabc7f1bd4c472716a5c80d65.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 22 </span><span class="caption-text">The factors of <span class="math notranslate nohighlight">\(A = LU\)</span> for the matrix of Eq. 3, on a diverging colour scale centred at zero: <span class="math notranslate nohighlight">\(L\)</span> carries ones on the diagonal and the three multipliers <span class="math notranslate nohighlight">\(2, -1, 2\)</span> below it, exactly in the positions of the zeros they created, and <span class="math notranslate nohighlight">\(U\)</span> is the upper triangular matrix elimination left behind. Their product reproduces <span class="math notranslate nohighlight">\(A\)</span> with no rounding at all.</span><a class="headerlink" href="#fig-lu-factors" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<p>The reconstruction <span class="math notranslate nohighlight">\(LU = A\)</span> is the check that matters, and it is independent:
+the factorization routine was asked to eliminate, not to reproduce <span class="math notranslate nohighlight">\(A\)</span>. On
+<a class="reference internal" href="#equation-eq-lu-example">Eq. 54</a> it holds exactly; on the SPD matrix it is compared against
+an independent implementation, and the determinant identity provides a third,
+unrelated confirmation.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  L holds the multipliers, exactly as stated   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  L has a unit diagonal   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  L is lower triangular   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  L @ U reproduces A exactly (Eq. 2)   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  det A = product of the pivots = -6   [got -6 vs expected -6 (rtol=0, atol=1e-12)]
+✓  and on a 6x6 SPD matrix the reconstruction holds to 1e-12   [max|Δ| = 2.22045e-16 (rtol=0, atol=1e-12)]
+✓  our L agrees with scipy.linalg.lu   [max|Δ| = 2.77556e-17 (rtol=0, atol=1e-12)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-the-matrix-that-breaks-it-and-the-one-line-repair">
+<h2>Exercise 3: The matrix that breaks it, and the one-line repair<a class="headerlink" href="#exercise-3-the-matrix-that-breaks-it-and-the-one-line-repair" title="Link to this heading">#</a></h2>
+<p>Everything so far assumed the pivot was a reasonable number. This exercise
+builds the case where it is not, and it is worth doing carefully because the
+failure is not a loss of a few digits. It is total.</p>
+<p>Consider the <span class="math notranslate nohighlight">\(2\times2\)</span> system</p>
+<div class="math notranslate nohighlight" id="equation-eq-lu-tiny-pivot">
+<span class="eqno">(55)<a class="headerlink" href="#equation-eq-lu-tiny-pivot" title="Link to this equation">#</a></span>\[\begin{split}\begin{bmatrix} \delta &amp; 1\\ 1 &amp; 1 \end{bmatrix}
+\begin{pmatrix} x_1\\ x_2 \end{pmatrix}
+= \begin{pmatrix} 1 + \delta\\ 2 \end{pmatrix},
+\qquad \delta = 10^{-18},\end{split}\]</div>
+<p>whose exact solution is <span class="math notranslate nohighlight">\(\mathbf{x} = (1, 1)^{\top}\)</span> for every <span class="math notranslate nohighlight">\(\delta\)</span>, as
+substitution confirms. The matrix is perfectly well conditioned:
+<span class="math notranslate nohighlight">\(\kappa \approx 2.6\)</span>, so <a class="reference internal" href="../00-machine/floating-point.html"><span class="std std-doc">§0.2</span></a> entitles us
+to essentially all sixteen digits.</p>
+<p>Eliminate without pivoting. The multiplier is <span class="math notranslate nohighlight">\(\ell_{21} = 1/\delta = 10^{18}\)</span>,
+and the second row becomes <span class="math notranslate nohighlight">\((0,\ 1 - 10^{18})\)</span> with right-hand side
+<span class="math notranslate nohighlight">\(2 - 10^{18}(1+\delta)\)</span>. Both of those are, in <code class="docutils literal notranslate"><span class="pre">float64</span></code>, indistinguishable
+from <span class="math notranslate nohighlight">\(-10^{18}\)</span>, because adding 1 to <span class="math notranslate nohighlight">\(10^{18}\)</span> changes nothing: the spacing
+there is 128. So <span class="math notranslate nohighlight">\(x_2\)</span> comes out as <span class="math notranslate nohighlight">\(1\)</span> — correct, by luck — and then back
+substitution computes
+<span class="math notranslate nohighlight">\(x_1 = (1 + \delta - x_2)/\delta = (1 + \delta - 1)/\delta\)</span>, in which the
+numerator suffers complete cancellation and returns <span class="math notranslate nohighlight">\(0\)</span>. The computed answer is
+<span class="math notranslate nohighlight">\((0, 1)^{\top}\)</span>: the first component has no correct digits, and not because the
+problem was hard.</p>
+<p>Partial pivoting swaps the rows before eliminating. The multiplier becomes
+<span class="math notranslate nohighlight">\(\delta\)</span> rather than <span class="math notranslate nohighlight">\(1/\delta\)</span>, nothing is swamped, and the computed answer is
+exactly <span class="math notranslate nohighlight">\((1, 1)^{\top}\)</span>. The cost is one comparison per column.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">lu_pivot(A)</span></code> returning <span class="math notranslate nohighlight">\((p, L, U, \rho)\)</span>: the same
+elimination, but at each step select the row with the largest <span class="math notranslate nohighlight">\(|a_{ik}|\)</span> for
+<span class="math notranslate nohighlight">\(i \ge k\)</span>, swap it into place, record the permutation as an index array <code class="docutils literal notranslate"><span class="pre">p</span></code>,
+swap the already-computed part of <span class="math notranslate nohighlight">\(L\)</span> along with it, and track the growth
+factor <a class="reference internal" href="#equation-eq-lu-growth">Eq. 53</a>.</p>
+<p><strong>Write this one yourself</strong> — the implementation is the lesson.</p>
+<p><strong>Part b)</strong> Solve <a class="reference internal" href="#equation-eq-lu-tiny-pivot">Eq. 55</a> at <span class="math notranslate nohighlight">\(\delta = 10^{-18}\)</span> both ways,
+using the forward and back substitutions defined at the top of this
+solution (Exercise 4 puts them through their paces), and report the computed <span class="math notranslate nohighlight">\(\mathbf{x}\)</span> and the error against
+<span class="math notranslate nohighlight">\((1,1)^{\top}\)</span>. Confirm <span class="math notranslate nohighlight">\(\kappa(A) &lt; 3\)</span>, so the problem is not to blame.</p>
+<p><strong>Part c)</strong> Sweep <span class="math notranslate nohighlight">\(\delta\)</span> from <span class="math notranslate nohighlight">\(10^{-1}\)</span> down to <span class="math notranslate nohighlight">\(10^{-20}\)</span> and plot the
+relative error of both routes. Confirm that every multiplier produced by
+<code class="docutils literal notranslate"><span class="pre">lu_pivot</span></code> satisfies <span class="math notranslate nohighlight">\(|\ell_{ik}| \le 1\)</span>, over 200 random matrices of random
+sizes.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>delta = 1e-18,  exact solution (1, 1),  kappa(A) = 2.618
+  without pivoting : x = [0. 1.]   max error 1.000e+00
+  with pivoting    : x = [1. 1.]   max error 0.000e+00
+
+  multiplier without pivoting : 1.000e+18
+  multiplier with pivoting    : 1.000e-18
+
+200 random matrices: largest multiplier 0.999163, worst relative |PA - LU| 3.54e-16
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-lu-pivoting">
+<img alt="../../_images/4a4f7bba4db7d69f282ccd07163fa347b159536a2d34a2d37979a9c7de901f9d.png" src="../../_images/4a4f7bba4db7d69f282ccd07163fa347b159536a2d34a2d37979a9c7de901f9d.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 23 </span><span class="caption-text">Relative error in the computed solution of the <span class="math notranslate nohighlight">\(2\times2\)</span> system of Eq. 7 as the pivot <span class="math notranslate nohighlight">\(\delta\)</span> shrinks, with (amber) and without (ink) partial pivoting. The matrix stays well conditioned throughout (<span class="math notranslate nohighlight">\(\kappa \approx 2.6\)</span>), so the unpivoted failure is entirely the algorithm’s doing; the dotted line marks 100% relative error, at which no digit of the answer survives.</span><a class="headerlink" href="#fig-lu-pivoting" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<p>The pivoted answer is checked to be exactly <span class="math notranslate nohighlight">\((1,1)\)</span>, and the unpivoted one to
+have <em>no</em> correct digits — both are exact statements about what correctly
+rounded arithmetic produces here, not estimates. The conditioning check is what
+makes the comparison fair: it rules out the possibility that the problem, not
+the algorithm, was at fault.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  with pivoting the answer is exactly (1, 1)   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  without pivoting the relative error is 100%: no correct digits   [computed x = [0. 1.], exact (1, 1)]
+✓  and the matrix is well conditioned, so the problem is not to blame   [kappa = 2.618: this failure is the algorithm&#39;s]
+✓  pivoting stays accurate across the whole sweep while no-pivoting collapses   [pivoted worst 2.22e-16; unpivoted worst 1.22e+00]
+✓  every multiplier from lu_pivot satisfies |l_ik| &lt;= 1 (200 random matrices)   [largest observed 0.999163: that bound is what pivoting buys]
+✓  and PA = LU holds to 1e-14 relative on all 200   [worst 3.54e-16]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-solving-and-the-cost-of-doing-it-twice">
+<h2>Exercise 4: Solving, and the cost of doing it twice<a class="headerlink" href="#exercise-4-solving-and-the-cost-of-doing-it-twice" title="Link to this heading">#</a></h2>
+<p>With <span class="math notranslate nohighlight">\(PA = LU\)</span> in hand, <a class="reference internal" href="#equation-eq-lu-two-solves">Eq. 51</a> reduces a solve to two
+triangular sweeps. The forward and back substitutions were defined in Exercise
+3 because that exercise needed them; here we check them properly and count what
+they cost.</p>
+<p>The counts are exact, not asymptotic. A triangular solve computes <span class="math notranslate nohighlight">\(x_i\)</span> from
+one subtraction of an inner product of length <span class="math notranslate nohighlight">\(i\)</span> and one division, so the
+total is</p>
+<div class="math notranslate nohighlight" id="equation-eq-lu-triangular-count">
+<span class="eqno">(56)<a class="headerlink" href="#equation-eq-lu-triangular-count" title="Link to this equation">#</a></span>\[\sum_{i=0}^{n-1}\big(1 + 2i\big) = n^2\]</div>
+<p>operations — exactly <span class="math notranslate nohighlight">\(n^2\)</span>, with no leading-order hedge. Two of them cost
+<span class="math notranslate nohighlight">\(2n^2\)</span>, against the <span class="math notranslate nohighlight">\(\sim\tfrac23 n^3\)</span> of the factorization, so the solve is
+free once the factorization exists.</p>
+<p><strong>Part a)</strong> Verify the substitutions on the system <a class="reference internal" href="#equation-eq-lu-example">Eq. 54</a>: solve
+<span class="math notranslate nohighlight">\(L\mathbf{y} = \mathbf{b}\)</span> and then <span class="math notranslate nohighlight">\(U\mathbf{x} = \mathbf{y}\)</span> with the
+factors from Exercise 2, and confirm <span class="math notranslate nohighlight">\(\mathbf{x} = (1,2,1)^{\top}\)</span> exactly and
+<span class="math notranslate nohighlight">\(\mathbf{y} = (3,5,-1)^{\top}\)</span>, matching the reduced right-hand side Exercise 1
+produced by eliminating <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> alongside <span class="math notranslate nohighlight">\(A\)</span> — the two routes must agree,
+because they are the same arithmetic in a different order.</p>
+<p><strong>Part b)</strong> Verify against the library on a <span class="math notranslate nohighlight">\(200\times200\)</span> random system:
+factor with <code class="docutils literal notranslate"><span class="pre">lu_pivot</span></code>, solve, and compare with <code class="docutils literal notranslate"><span class="pre">scipy.linalg.solve</span></code> to
+<span class="math notranslate nohighlight">\(10^{-11}\)</span>. Also confirm the residual <span class="math notranslate nohighlight">\(\|A\mathbf{x} - \mathbf{b}\|_\infty\)</span> is
+a small multiple of <span class="math notranslate nohighlight">\(\varepsilon\|A\|_\infty\|\mathbf{x}\|_\infty\)</span>, which is
+the backward-error statement of
+<a class="reference internal" href="../00-machine/floating-point.html"><span class="std std-doc">§0.2</span></a> Rule 2.</p>
+<p><strong>Part c)</strong> Count the operations. Instrument a triangular solve with a counter
+and confirm it performs exactly <span class="math notranslate nohighlight">\(n^2\)</span> operations for <span class="math notranslate nohighlight">\(n = 5, 10, 50, 200\)</span>,
+matching <a class="reference internal" href="#equation-eq-lu-triangular-count">Eq. 56</a>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>L y = b  -&gt;  y = [ 3.  5. -1.]   (matches the reduced RHS of Exercise 1: True)
+U x = y  -&gt;  x = [1. 2. 1.]   (exactly (1, 2, 1): True)
+
+200x200 random system:
+  our solve vs scipy.linalg.solve : 1.299e-13
+  residual ||Ax - b||_inf         : 2.025e-13
+  eps ||A||_inf ||x||_inf         : 1.176e-13
+  backward error in units of eps  : 1.72
+  growth factor rho               : 6.92
+
+   n   counted ops    n^2
+   5            25   25
+  10           100   100
+  50         2,500   2,500
+ 200        40,000   40,000
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<p>The small system is checked exactly, and — the more interesting check — the
+intermediate <span class="math notranslate nohighlight">\(\mathbf{y}\)</span> is required to equal the reduced right-hand side that
+Exercise 1 obtained by eliminating <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> alongside <span class="math notranslate nohighlight">\(A\)</span>. Those are two
+genuinely different routes to the same vector. The large system is checked both
+against an independent library solve and, separately, by its backward error,
+which does not reference any other solution at all.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the two triangular sweeps recover x = (1, 2, 1) exactly   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  and y equals the right-hand side Exercise 1 reduced by elimination   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  on a 200x200 system our solve matches scipy.linalg.solve   [max|Δ| = 1.29924e-13 (rtol=0, atol=1e-11)]
+✓  and its backward error is a small multiple of eps ||A|| ||x||   [1.7 eps: the solve is backward stable (section 0.2, Rule 2)]
+✓  a triangular solve costs exactly n^2 operations (Eq. 8)   [max|Δ| = 0 (rtol=0, atol=0)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-what-elimination-costs-counted-and-measured">
+<h2>Exercise 5: What elimination costs, counted and measured<a class="headerlink" href="#exercise-5-what-elimination-costs-counted-and-measured" title="Link to this heading">#</a></h2>
+<p>The famous figure is <span class="math notranslate nohighlight">\(\tfrac23 n^3\)</span>. It is worth being precise about what that
+is: a leading-order approximation to a count that can be written exactly.</p>
+<p>Step <span class="math notranslate nohighlight">\(k\)</span> of the elimination touches <span class="math notranslate nohighlight">\(n-k-1\)</span> rows, and for each it performs one
+division and <span class="math notranslate nohighlight">\(2(n-k-1)\)</span> multiply-subtract operations across the remaining
+entries. Summing over <span class="math notranslate nohighlight">\(k\)</span> gives</p>
+<div class="math notranslate nohighlight" id="equation-eq-lu-exact-count">
+<span class="eqno">(57)<a class="headerlink" href="#equation-eq-lu-exact-count" title="Link to this equation">#</a></span>\[\sum_{k=0}^{n-2} (n-k-1)\big(1 + 2(n-k-1)\big)
+= \frac{n(n-1)(4n+1)}{6}
+\;\longrightarrow\; \frac{2}{3}n^3 .\]</div>
+<p>The exact count is <span class="math notranslate nohighlight">\(0.4\%\)</span> below <span class="math notranslate nohighlight">\(\tfrac23 n^3\)</span> at <span class="math notranslate nohighlight">\(n = 200\)</span> and converges
+slowly, so quoting <span class="math notranslate nohighlight">\(\tfrac23 n^3\)</span> is right and quoting it as <em>the</em> count is
+not.</p>
+<p>The measurement is more interesting than the count, because it does not agree
+with it. Timing <code class="docutils literal notranslate"><span class="pre">scipy.linalg.lu_factor</span></code> across <span class="math notranslate nohighlight">\(n = 400\)</span> to <span class="math notranslate nohighlight">\(2400\)</span> and fitting
+a power law gives an exponent near <span class="math notranslate nohighlight">\(2.5\)</span>, not <span class="math notranslate nohighlight">\(3\)</span>. Nothing is wrong: LAPACK’s
+<code class="docutils literal notranslate"><span class="pre">getrf</span></code> is <strong>blocked</strong>, recasting most of the work as matrix–matrix products
+exactly as <a class="reference internal" href="four-ways-to-multiply.html"><span class="std std-doc">§1.1</span></a> recommends, and it is
+multithreaded. At small <span class="math notranslate nohighlight">\(n\)</span> the run is dominated by overhead and memory
+traffic; as <span class="math notranslate nohighlight">\(n\)</span> grows more of the work becomes level-3 and more cores engage,
+so the <em>effective</em> exponent climbs toward 3 from below rather than sitting at
+it. Fitting a clean <span class="math notranslate nohighlight">\(n^3\)</span> would require sizes large enough to leave cache
+behind entirely, which is not a comfortable thing to run inside a notebook.</p>
+<p><strong>Part a)</strong> Confirm <a class="reference internal" href="#equation-eq-lu-exact-count">Eq. 57</a> by instrumenting <code class="docutils literal notranslate"><span class="pre">lu_no_pivot</span></code>
+with an operation counter, for <span class="math notranslate nohighlight">\(n = 5, 10, 20, 50\)</span>, and check the counts
+against the closed form <span class="math notranslate nohighlight">\(n(n-1)(4n+1)/6\)</span> exactly and against <span class="math notranslate nohighlight">\(\tfrac23 n^3\)</span> as
+a ratio approaching 1.</p>
+<p><strong>Part b)</strong> Time <code class="docutils literal notranslate"><span class="pre">scipy.linalg.lu_factor</span></code> at $n = 400, 800, 1200, 1600, 2000,
+2400<code class="docutils literal notranslate"><span class="pre">,</span> <span class="pre">fit</span> <span class="pre">an</span> <span class="pre">exponent</span> <span class="pre">by</span> <span class="pre">least</span> <span class="pre">squares</span> <span class="pre">on</span> <span class="pre">the</span> <span class="pre">logs</span> <span class="pre">with</span> </code>np.polyfit`, and
+report both the global fit and the local exponent between consecutive sizes.</p>
+<p><strong>Part c)</strong> Plot the timings against <span class="math notranslate nohighlight">\(n\)</span> on log axes with the <span class="math notranslate nohighlight">\(n^3\)</span> and <span class="math notranslate nohighlight">\(n^2\)</span>
+reference slopes, and state honestly which the data resembles.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>   n     counted    n(n-1)(4n+1)/6      2n^3/3    counted / (2n^3/3)
+   5          70              70          83          0.8400
+  10         615             615         667          0.9225
+  20       5,130           5,130       5,333          0.9619
+  50      82,075          82,075      83,333          0.9849
+ 200   5,313,300       5,313,300   5,333,333          0.9962
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>    n    time (ms)   local exponent
+  400        2.1           
+  800       12.3       2.51
+ 1200       36.1       2.66
+ 1600       81.0       2.81
+ 2000      151.6       2.81
+ 2400      257.6       2.91
+
+global fitted exponent: 2.67   (the operation count says 3)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-lu-cost">
+<img alt="../../_images/0ac0afebdd381f473f81f7919e07e52fddd12b8bf64d10a68b125c7fc0940a01.png" src="../../_images/0ac0afebdd381f473f81f7919e07e52fddd12b8bf64d10a68b125c7fc0940a01.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 24 </span><span class="caption-text">Median time of \texttt{scipy.linalg.lu_factor} against matrix size <span class="math notranslate nohighlight">\(n\)</span> on log axes, with <span class="math notranslate nohighlight">\(n^3\)</span> and <span class="math notranslate nohighlight">\(n^2\)</span> reference slopes anchored at the smallest size. The operation count of Eq. 9 is <span class="math notranslate nohighlight">\(\sim\frac{2}{3}n^3\)</span>, but the measured curve sits between the two references because LAPACK’s factorization is blocked and multithreaded, so the effective exponent climbs toward 3 from below as more of the work becomes level-3 BLAS.</span><a class="headerlink" href="#fig-lu-cost" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<p>The operation counts are exact integers and are gated exactly, against a closed
+form derived independently of the enumeration. The measured exponent is gated
+only to a wide band, because it is a property of this machine’s cache and core
+count rather than of the algorithm — and the notebook says so rather than
+fitting a curve that flatters the textbook.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the enumerated operation count equals the closed form of Eq. 9   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  and it approaches 2n^3/3 from below (0.4% short at n = 200)   [ratio 0.9962]
+fitted timing exponent, reported never gated: 2.67 (blocking and threading bend it; even its ordering against the references belongs to the machine)
+✓  and the time grows strongly with n across the sweep   [119.9x from the smallest n to the largest. Checked as growth across the whole sweep rather than pair-by-pair monotonicity: adjacent timings on a shared runner can invert on noise alone, and a check that fails intermittently is worse than one that is slightly weaker]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-6-factor-once-solve-many">
+<h2>Exercise 6: Factor once, solve many<a class="headerlink" href="#exercise-6-factor-once-solve-many" title="Link to this heading">#</a></h2>
+<p>This is the payoff, and it is the reason numerical libraries expose
+<code class="docutils literal notranslate"><span class="pre">lu_factor</span></code> and <code class="docutils literal notranslate"><span class="pre">lu_solve</span></code> as separate calls rather than only <code class="docutils literal notranslate"><span class="pre">solve</span></code>.</p>
+<p>Suppose you must solve <span class="math notranslate nohighlight">\(A\mathbf{x}_j = \mathbf{b}_j\)</span> for fifty different
+right-hand sides with the same <span class="math notranslate nohighlight">\(A\)</span> — the situation in every implicit
+time-stepping scheme, every Newton iteration with a frozen Jacobian, and every
+multi-target least-squares problem. Calling a general solver fifty times
+repeats the <span class="math notranslate nohighlight">\(\sim\tfrac23 n^3\)</span> elimination fifty times. Factoring once and then
+running fifty pairs of triangular sweeps costs <span class="math notranslate nohighlight">\(\tfrac23 n^3 + 50 \cdot 2n^2\)</span>,
+and by <a class="reference internal" href="#equation-eq-lu-triangular-count">Eq. 56</a> the second term is negligible.</p>
+<p>The predicted speedup is therefore roughly</p>
+<div class="math notranslate nohighlight" id="equation-eq-lu-reuse-speedup">
+<span class="eqno">(58)<a class="headerlink" href="#equation-eq-lu-reuse-speedup" title="Link to this equation">#</a></span>\[\frac{50 \cdot \tfrac23 n^3}{\tfrac23 n^3 + 50\cdot 2n^2}
+\;\approx\; \frac{50}{1 + 150/n},\]</div>
+<p>which at <span class="math notranslate nohighlight">\(n = 800\)</span> predicts about <span class="math notranslate nohighlight">\(42\)</span>. The measured figure comes in lower,
+around <span class="math notranslate nohighlight">\(30\)</span>, because the triangular solves are level-2 operations with poor
+arithmetic intensity while the factorization is largely level 3 — the same
+effect <a class="reference internal" href="four-ways-to-multiply.html"><span class="std std-doc">§1.1</span></a> measured, showing up here as a
+correction to a textbook estimate.</p>
+<p><strong>Part a)</strong> Build <span class="math notranslate nohighlight">\(A\)</span> of size <span class="math notranslate nohighlight">\(800\times800\)</span> and <span class="math notranslate nohighlight">\(B\)</span> of shape <span class="math notranslate nohighlight">\((800, 50)\)</span> from
+<code class="docutils literal notranslate"><span class="pre">rng.standard_normal</span></code>. Time fifty separate <code class="docutils literal notranslate"><span class="pre">scipy.linalg.solve(A,</span> <span class="pre">B[:,</span> <span class="pre">j])</span></code>
+calls against one <code class="docutils literal notranslate"><span class="pre">lu_factor</span></code> plus fifty <code class="docutils literal notranslate"><span class="pre">lu_solve</span></code> calls.</p>
+<p><strong>Part b)</strong> Report the measured speedup and compare it against the prediction
+<a class="reference internal" href="#equation-eq-lu-reuse-speedup">Eq. 58</a>. Confirm both routes give the same solutions to
+<span class="math notranslate nohighlight">\(10^{-10}\)</span>.</p>
+<p><strong>Part c)</strong> Show that <code class="docutils literal notranslate"><span class="pre">lu_factor</span></code> returns <span class="math notranslate nohighlight">\(L\)</span> and <span class="math notranslate nohighlight">\(U\)</span> <strong>packed into one array</strong>:
+print the shape of its first return value, extract <span class="math notranslate nohighlight">\(L\)</span> and <span class="math notranslate nohighlight">\(U\)</span> from it with
+<code class="docutils literal notranslate"><span class="pre">np.tril(lu_arr,</span> <span class="pre">-1)</span> <span class="pre">+</span> <span class="pre">np.eye(n)</span></code> and <code class="docutils literal notranslate"><span class="pre">np.triu(lu_arr)</span></code>, and confirm they
+reconstruct the row-permuted <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p>Ask for a version of <code class="docutils literal notranslate"><span class="pre">lu_pivot</span></code> that overwrites its input in place and packs
+<span class="math notranslate nohighlight">\(L\)</span> and <span class="math notranslate nohighlight">\(U\)</span> into that single array, the way LAPACK does, returning only the
+array and the pivot indices. Then check it yourself against
+<code class="docutils literal notranslate"><span class="pre">scipy.linalg.lu_factor</span></code> on <code class="docutils literal notranslate"><span class="pre">la.random_with_condition(120,</span> <span class="pre">120,</span> <span class="pre">1e6,</span> <span class="pre">rng)</span></code>: the
+unpacked factors must satisfy <span class="math notranslate nohighlight">\(\|A[p] - LU\|_\infty \le 100\,\varepsilon
+\|A\|_\infty\)</span>, and no entry of the packed array may differ from SciPy’s by more
+than <span class="math notranslate nohighlight">\(10^{-12}\)</span> once both are put in the same pivot order. The check is yours.</p>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>n = 800, 50 right-hand sides
+  50 full solves            :    778.7 ms
+  1 factorization           :     12.1 ms
+  50 triangular solve pairs :      7.7 ms
+  measured speedup          :     39.3x
+  predicted by Eq. 10       :     42.1x
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  the two routes agree to   : 0.000e+00
+
+lu_factor returns one array of shape (800, 800), holding both factors:
+  || A[p] - L U ||_max = 5.596e-14
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-6">
+<h3>Validation 6<a class="headerlink" href="#validation-6" title="Link to this heading">#</a></h3>
+<p>The reconstruction from the <em>packed</em> array is the independent check: it
+unpacks two factors from one array using nothing but <code class="docutils literal notranslate"><span class="pre">np.tril</span></code> and <code class="docutils literal notranslate"><span class="pre">np.triu</span></code>,
+and requires them to reproduce the row-permuted matrix. The measured speedup
+is reported, never gated — it depends on the machine’s threading — and the
+flop model’s prediction is the gated arithmetic beside it.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  reusing one factorization gives the same 50 solutions   [max|Δ| = 0 (rtol=0, atol=1e-10)]
+factor-once speedup, reported never gated: measured 39.3x against the flop model&#39;s 42.1x
+✓  the flop model predicts at least a 5x win for factor-once here   [Eq. 10 gives 42.1x — arithmetic about the counts; the measured gap to it is the poor arithmetic intensity of the level-2 triangular sweeps]
+✓  L and U unpacked from lu_factor&#39;s single array reconstruct A[p]   [max|Δ| = 5.59552e-14 (rtol=0, atol=1e-11)]
+✓  the unpacked L has a unit diagonal, as the packing convention assumes   [max|Δ| = 0 (rtol=0, atol=0)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-7-growth-and-the-matrix-that-defeats-partial-pivoting">
+<h2>Exercise 7: Growth, and the matrix that defeats partial pivoting<a class="headerlink" href="#exercise-7-growth-and-the-matrix-that-defeats-partial-pivoting" title="Link to this heading">#</a></h2>
+<p>Partial pivoting bounds the multipliers by 1. It does <strong>not</strong> bound the entries
+of <span class="math notranslate nohighlight">\(U\)</span>, and the quantity that controls the backward error is the growth factor
+<a class="reference internal" href="#equation-eq-lu-growth">Eq. 53</a>, not the multipliers.</p>
+<p>On random matrices <span class="math notranslate nohighlight">\(\rho\)</span> is small — typically a few, growing slowly with <span class="math notranslate nohighlight">\(n\)</span> —
+and that empirical fact is why partial pivoting is trusted in practice.
+Wilkinson’s matrix shows the guarantee is not there. Take</p>
+<div class="math notranslate nohighlight" id="equation-eq-lu-wilkinson">
+<span class="eqno">(59)<a class="headerlink" href="#equation-eq-lu-wilkinson" title="Link to this equation">#</a></span>\[\begin{split}W_{ij} = \begin{cases}
+1 &amp; i = j \text{ or } j = n-1,\\
+-1 &amp; i &gt; j,\\
+0 &amp; \text{otherwise,}
+\end{cases}\end{split}\]</div>
+<p>unit diagonal, <span class="math notranslate nohighlight">\(-1\)</span> everywhere below it, and a final column of ones. Every
+column already has its largest entry on the diagonal, so partial pivoting never
+swaps a row and never notices anything wrong. But each elimination step doubles
+the last column, and after <span class="math notranslate nohighlight">\(n-1\)</span> steps the corner entry is <span class="math notranslate nohighlight">\(2^{n-1}\)</span>: the
+growth factor attains its theoretical maximum <strong>exactly</strong>.</p>
+<p>At <span class="math notranslate nohighlight">\(n = 24\)</span> that is <span class="math notranslate nohighlight">\(8.4\times10^6\)</span>, harmless. At <span class="math notranslate nohighlight">\(n = 60\)</span> it is <span class="math notranslate nohighlight">\(5.8\times
+10^{17}\)</span>, larger than <span class="math notranslate nohighlight">\(1/\varepsilon\)</span>, and every digit of the solution is gone.
+Nothing in the algorithm reports a problem.</p>
+<p><strong>Part a)</strong> Build <span class="math notranslate nohighlight">\(W\)</span> with <code class="docutils literal notranslate"><span class="pre">ecp.linalg.wilkinson(n)</span></code> for <span class="math notranslate nohighlight">\(n = 8, 16, 24\)</span>,
+factor with <code class="docutils literal notranslate"><span class="pre">lu_pivot</span></code>, and confirm the growth factor equals <span class="math notranslate nohighlight">\(2^{n-1}\)</span> exactly
+and that the permutation is the identity — partial pivoting made no swap.</p>
+<p><strong>Part b)</strong> Compare against random matrices of the same sizes: report the mean
+growth factor over 20 draws each, and confirm it stays below 10 while
+Wilkinson’s is exponential.</p>
+<p><strong>Part c)</strong> Solve <span class="math notranslate nohighlight">\(W\mathbf{x} = W\mathbf{1}\)</span> at <span class="math notranslate nohighlight">\(n = 30, 45, 60\)</span> and report
+the accuracy alongside <span class="math notranslate nohighlight">\(\kappa(W)\)</span>, so it is clear the loss is growth and not
+conditioning. The result is a <strong>cliff rather than a slope</strong>: the solution is
+exact to the last bit at <span class="math notranslate nohighlight">\(n = 30\)</span> and <span class="math notranslate nohighlight">\(n = 45\)</span>, then collapses completely at
+<span class="math notranslate nohighlight">\(n = 60\)</span>. The threshold is predictable — accuracy survives while
+<span class="math notranslate nohighlight">\(\rho &lt; 1/\varepsilon \approx 4.5\times10^{15}\)</span> and is destroyed once
+<span class="math notranslate nohighlight">\(\rho\)</span> passes it, and <span class="math notranslate nohighlight">\(2^{44} = 1.8\times10^{13}\)</span> sits below while
+<span class="math notranslate nohighlight">\(2^{59} = 5.8\times10^{17}\)</span> sits above. Plot growth against <span class="math notranslate nohighlight">\(n\)</span> for both
+families on a log axis, with <span class="math notranslate nohighlight">\(1/\varepsilon\)</span> marked.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>   n   growth rho     2^(n-1)      ratio   swaps made
+   8   1.280000e+02  1.280000e+02   1.000000   0
+  16   3.276800e+04  3.276800e+04   1.000000   0
+  24   8.388608e+06  8.388608e+06   1.000000   0
+
+   n   mean rho (20 random)   Wilkinson rho
+   8                 1.365   1.280e+02
+  16                 1.797   3.277e+04
+  24                 2.558   8.389e+06
+
+   n     kappa(W)      rho = 2^(n-1)   rho vs 1/eps   correct digits
+  30     1.33e+01        5.369e+08          below       18.0
+  45     2.01e+01        1.759e+13          below       18.0
+  60     2.68e+01        5.765e+17          above       -0.0
+
+1/eps = 4.504e+15: accuracy survives below it and is destroyed above
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-lu-growth">
+<img alt="../../_images/61d37fd89ad270a1eb9982a0f204deab87d717cf43d508bf2ab1c8c43de30ebb.png" src="../../_images/61d37fd89ad270a1eb9982a0f204deab87d717cf43d508bf2ab1c8c43de30ebb.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 25 </span><span class="caption-text">The growth factor of Eq. 6 under partial pivoting, for Wilkinson’s matrix of Eq. 15 (ink, with the <span class="math notranslate nohighlight">\(2^{n-1}\)</span> reference dotted) and for random matrices (amber, mean over 20 draws), against size <span class="math notranslate nohighlight">\(n\)</span> on a logarithmic axis. Partial pivoting bounds the multipliers by 1 in both cases and makes no row swap at all on Wilkinson’s matrix, yet its growth attains the theoretical maximum exactly while the random growth stays below ten.</span><a class="headerlink" href="#fig-lu-growth" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-7">
+<h3>Validation 7<a class="headerlink" href="#validation-7" title="Link to this heading">#</a></h3>
+<p>The growth factor is checked against <span class="math notranslate nohighlight">\(2^{n-1}\)</span> <em>exactly</em> — this is an integer
+identity that holds in floating point because every quantity in the elimination
+is a power of two — and the absence of row swaps is checked directly, which is
+what makes the example alarming rather than merely large. The random comparison
+establishes that the failure is special rather than typical.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  Wilkinson&#39;s growth factor equals 2^(n-1) exactly   [max|Δ| = 0 (rtol=0, atol=1e-09)]
+✓  and partial pivoting makes no row swap at all on it   [every column&#39;s largest entry already sits on the diagonal]
+✓  while random matrices of the same sizes grow by less than a factor of 10   [largest mean growth 2.56: the worst case is not the usual case]
+✓  at n = 60 the solution loses nearly every digit, with kappa still under 30   [-0.0 correct digits at kappa = 26.8: growth, not conditioning]
+✓  yet at n = 30 and n = 45 the same solve is exact: this is a cliff, not a slope   [digits [&#39;18.0&#39;, &#39;18.0&#39;, &#39;-0.0&#39;] at n = 30, 45, 60]
+✓  and the cliff sits exactly where the growth factor crosses 1/eps   [rho(45) = 1.76e+13 &lt; 1/eps = 4.50e+15 &lt; rho(60) = 5.76e+17]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-8-what-the-pivots-tell-you">
+<h2>Exercise 8: What the pivots tell you<a class="headerlink" href="#exercise-8-what-the-pivots-tell-you" title="Link to this heading">#</a></h2>
+<p>Elimination is usually presented as a way to solve a system. It is also a
+diagnostic: the pivots it produces answer several questions at once, and
+reading them is free once the factorization exists.</p>
+<p><strong>The determinant.</strong> Since <span class="math notranslate nohighlight">\(L\)</span> has a unit diagonal and <span class="math notranslate nohighlight">\(P\)</span> is a permutation,
+taking determinants through <a class="reference internal" href="#equation-eq-lu-pivoted">Eq. 52</a> gives</p>
+<div class="math notranslate nohighlight" id="equation-eq-lu-determinant">
+<span class="eqno">(60)<a class="headerlink" href="#equation-eq-lu-determinant" title="Link to this equation">#</a></span>\[\det A = (-1)^{s} \prod_{i} u_{ii},\]</div>
+<p>with <span class="math notranslate nohighlight">\(s\)</span> the number of row swaps. This is how <code class="docutils literal notranslate"><span class="pre">np.linalg.det</span></code> is computed —
+there is no cofactor expansion anywhere in a numerical library, for reasons
+<a class="reference internal" href="determinants.html"><span class="std std-doc">§1.7</span></a> makes vivid.</p>
+<p><strong>Singularity.</strong> A zero pivot means the elimination ran out of independent
+rows, so <span class="math notranslate nohighlight">\(\det A = 0\)</span>. In floating point “zero” becomes “negligible relative to
+the others”, which is the same tolerance question
+<a class="reference internal" href="../00-machine/floating-point.html"><span class="std std-doc">§0.2</span></a> settled and
+<a class="reference internal" href="inverses-rank-cr.html"><span class="std std-doc">§1.3</span></a> takes up again for rank.</p>
+<p><strong>Conditioning, cheaply.</strong> The ratio <span class="math notranslate nohighlight">\(\max_i|u_{ii}| / \min_i|u_{ii}|\)</span> is a
+crude but nearly free estimate of <span class="math notranslate nohighlight">\(\kappa(A)\)</span>, and it orders ordinary matrices
+correctly. It can also be badly wrong, and Wilkinson’s matrix shows which way:
+its pivots run from <span class="math notranslate nohighlight">\(1\)</span> to <span class="math notranslate nohighlight">\(2^{n-1}\)</span>, so at <span class="math notranslate nohighlight">\(n = 60\)</span> the ratio reports
+<span class="math notranslate nohighlight">\(5.8\times10^{17}\)</span> while the true <span class="math notranslate nohighlight">\(\kappa\)</span> is about <span class="math notranslate nohighlight">\(27\)</span> — an overestimate by
+sixteen orders of magnitude. The diagnostic cries wolf rather than missing a
+problem, which is the safer of the two failure modes but is still a reason not
+to trust it as a number. Serious condition estimators refine the idea properly,
+and <code class="docutils literal notranslate"><span class="pre">scipy.linalg.lu_factor</span></code> ships one.</p>
+<p>Test all three on the Prologue’s singular matrix</p>
+<div class="math notranslate nohighlight" id="equation-eq-lu-prologue-matrix">
+<span class="eqno">(61)<a class="headerlink" href="#equation-eq-lu-prologue-matrix" title="Link to this equation">#</a></span>\[\begin{split}A_P = \begin{bmatrix}
+2 &amp; 1 &amp; 3 &amp; 0\\ 3 &amp; 4 &amp; 7 &amp; 0\\ 1 &amp; 2 &amp; 3 &amp; -1\\ 0 &amp; 1 &amp; 1 &amp; 2
+\end{bmatrix},\end{split}\]</div>
+<p>whose third column is the sum of the first two, so it has rank 3 and one pivot
+must vanish.</p>
+<p><strong>Part a)</strong> Factor <a class="reference internal" href="#equation-eq-lu-prologue-matrix">Eq. 61</a> with <code class="docutils literal notranslate"><span class="pre">lu_pivot</span></code>, print
+<span class="math notranslate nohighlight">\(\operatorname{diag}(U)\)</span>, and identify the negligible pivot. Confirm
+<a class="reference internal" href="#equation-eq-lu-determinant">Eq. 60</a> against <code class="docutils literal notranslate"><span class="pre">np.linalg.det</span></code>, and that both are zero.</p>
+<p><strong>Part b)</strong> Confirm the diagnostic on three matrices with known character: the
+Hilbert matrix <code class="docutils literal notranslate"><span class="pre">la.hilbert(8)</span></code> (very ill conditioned), a random matrix, and the
+identity. For each, report the pivot ratio beside the true <span class="math notranslate nohighlight">\(\kappa_2\)</span>, and
+check that the ratio <em>orders</em> the three correctly. Then evaluate it on
+<code class="docutils literal notranslate"><span class="pre">la.wilkinson(60)</span></code> and confirm it overestimates <span class="math notranslate nohighlight">\(\kappa\)</span> by more than ten
+orders of magnitude.</p>
+<p><strong>Part c)</strong> Show the tolerance question is unavoidable here too: perturb
+<a class="reference internal" href="#equation-eq-lu-prologue-matrix">Eq. 61</a> by <span class="math notranslate nohighlight">\(10^{-12}\)</span> as the Prologue did, and confirm the
+smallest pivot moves from exactly zero to about <span class="math notranslate nohighlight">\(10^{-13}\)</span> — small, nonzero,
+and meaningful only relative to a noise level you have to supply.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>diag(U) = [ 3.      -1.66667  0.       2.5    ]
+smallest |pivot| = 4.441e-16  at position 2
+
+det from Eq. 12 : 5.551e-15
+np.linalg.det   : 5.551e-15
+reconstruction  : ||A[p] - LU||_max = 0.000e+00
+
+  matrix              pivot ratio      true kappa_2
+  hilbert(8)            8.562e+08        1.526e+10
+  random 8x8            6.712e+00        1.951e+01
+  identity 8x8          1.000e+00        1.000e+00
+
+perturbed by 1e-12: smallest |pivot| = 1.095e-12  (was exactly 4.4e-16)
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-8">
+<h3>Validation 8<a class="headerlink" href="#validation-8" title="Link to this heading">#</a></h3>
+<p>The determinant identity <a class="reference internal" href="#equation-eq-lu-determinant">Eq. 60</a> is checked against
+<code class="docutils literal notranslate"><span class="pre">np.linalg.det</span></code>, which is an independent implementation of the same idea, and
+both are checked to vanish. The pivot-ratio diagnostic is checked as an
+<em>ordering</em> rather than an estimate, because that is all it is entitled to
+claim, and the Wilkinson counterexample is included so the limitation is on the
+record.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  det A = (-1)^s prod(pivots), matching np.linalg.det (Eq. 12)   [got 5.55112e-15 vs expected 5.55112e-15 (rtol=0, atol=1e-12)]
+✓  and both are zero: the matrix is singular   [its third column is the sum of the first two]
+✓  exactly one pivot is negligible, so the rank is 3   [smallest |pivot| 4.44e-16 against largest 3.00]
+✓  PA = LU holds for the singular matrix too   [max|Δ| = 0 (rtol=0, atol=1e-13)]
+✓  the pivot ratio orders the three matrices by conditioning correctly   [identity &lt; random &lt; Hilbert, which is the ordering of their true kappa]
+✓  but on Wilkinson&#39;s matrix it overestimates kappa by &gt;10 orders of magnitude   [ratio 5.76e+17 against kappa 26.8: it cries wolf, which is the safer failure but still not a number to trust]
+✓  and a 1e-12 perturbation lifts the zero pivot to about 1e-13   [small, nonzero, and meaningful only against a noise level you supply]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p>Elimination that keeps a receipt is a factorization, and the receipt costs
+nothing to keep.</p>
+<p>The concrete results:</p>
+<ul class="simple">
+<li><p>on the <span class="math notranslate nohighlight">\(3\times3\)</span> matrix of <a class="reference internal" href="#equation-eq-lu-example">Eq. 54</a> the three multipliers came
+out <span class="math notranslate nohighlight">\(2, -1, 2\)</span>, the factors
+<span class="math notranslate nohighlight">\(L = [[1,0,0],[2,1,0],[-1,2,1]]\)</span> and <span class="math notranslate nohighlight">\(U = [[2,1,-1],[0,3,-1],[0,0,-1]]\)</span> were
+exact integers, <span class="math notranslate nohighlight">\(LU = A\)</span> held <strong>bit for bit</strong>, and the two triangular sweeps
+recovered <span class="math notranslate nohighlight">\(\mathbf{x} = (1,2,1)\)</span> exactly — with the intermediate
+<span class="math notranslate nohighlight">\(\mathbf{y} = (3,5,-1)\)</span> equal to the right-hand side that elimination had
+reduced by a completely different route;</p></li>
+<li><p>on the well-conditioned system <a class="reference internal" href="#equation-eq-lu-tiny-pivot">Eq. 55</a> with <span class="math notranslate nohighlight">\(\delta =
+10^{-18}\)</span> and <span class="math notranslate nohighlight">\(\kappa = 2.6\)</span>, elimination <strong>without</strong> pivoting returned
+<span class="math notranslate nohighlight">\(\mathbf{x} = (0,1)\)</span> against an exact <span class="math notranslate nohighlight">\((1,1)\)</span> — a 100% error with no correct
+digits — while partial pivoting returned <span class="math notranslate nohighlight">\((1,1)\)</span> exactly;</p></li>
+<li><p>over 200 random matrices every multiplier produced with pivoting satisfied
+<span class="math notranslate nohighlight">\(|\ell_{ik}| \le 1\)</span> and <span class="math notranslate nohighlight">\(PA = LU\)</span> held to <span class="math notranslate nohighlight">\(4\times10^{-16}\)</span> relative;</p></li>
+<li><p>the operation counts are exact: elimination performs <span class="math notranslate nohighlight">\(n(n-1)(4n+1)/6\)</span>
+operations, which is <span class="math notranslate nohighlight">\(0.4\%\)</span> below <span class="math notranslate nohighlight">\(\tfrac23 n^3\)</span> at <span class="math notranslate nohighlight">\(n = 200\)</span>, and a
+triangular solve performs exactly <span class="math notranslate nohighlight">\(n^2\)</span>;</p></li>
+<li><p>the <em>measured</em> exponent of <code class="docutils literal notranslate"><span class="pre">lu_factor</span></code> came out near <span class="math notranslate nohighlight">\(2.5\)</span> rather than 3,
+because LAPACK’s factorization is blocked and multithreaded — the operation
+count is right and the naive extrapolation from it is not;</p></li>
+<li><p>factoring once and reusing it for 50 right-hand sides ran about <span class="math notranslate nohighlight">\(30\times\)</span>
+faster than 50 independent solves, below the <span class="math notranslate nohighlight">\(42\times\)</span> that
+<a class="reference internal" href="#equation-eq-lu-reuse-speedup">Eq. 58</a> predicts, the shortfall being the poor arithmetic
+intensity of the level-2 triangular sweeps;</p></li>
+<li><p>Wilkinson’s matrix attained the growth factor <span class="math notranslate nohighlight">\(2^{n-1}\)</span> <strong>exactly</strong>, with
+partial pivoting making no row swap at all, and the resulting accuracy was a
+<strong>cliff rather than a slope</strong>: exact to the last bit at <span class="math notranslate nohighlight">\(n = 30\)</span> and <span class="math notranslate nohighlight">\(n = 45\)</span>,
+then destroyed at <span class="math notranslate nohighlight">\(n = 60\)</span>, with the threshold sitting precisely where <span class="math notranslate nohighlight">\(\rho\)</span>
+crosses <span class="math notranslate nohighlight">\(1/\varepsilon\)</span> — while <span class="math notranslate nohighlight">\(\kappa\)</span> stayed near 27 throughout, and
+random matrices of the same sizes grew by less than a factor of ten;</p></li>
+<li><p>and on the Prologue’s singular matrix exactly one pivot vanished, giving
+<span class="math notranslate nohighlight">\(\det A = 0\)</span> through <a class="reference internal" href="#equation-eq-lu-determinant">Eq. 60</a>, with a <span class="math notranslate nohighlight">\(10^{-12}\)</span> perturbation
+lifting that pivot to <span class="math notranslate nohighlight">\(10^{-13}\)</span> and handing the tolerance question straight
+back. The pivot-ratio diagnostic ordered Hilbert, random and identity
+correctly, and overestimated <span class="math notranslate nohighlight">\(\kappa(W_{60})\)</span> by sixteen orders of
+magnitude.</p></li>
+</ul>
+<p>Methods met: elimination with and without pivoting written from scratch,
+forward and back substitution, <code class="docutils literal notranslate"><span class="pre">scipy.linalg.lu</span></code>, <code class="docutils literal notranslate"><span class="pre">lu_factor</span></code> and <code class="docutils literal notranslate"><span class="pre">lu_solve</span></code>
+with their packed single-array convention, the growth factor, the determinant
+from the pivots, and the pivot ratio as a free condition diagnostic.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Symmetry halves the work.</strong> If <span class="math notranslate nohighlight">\(A\)</span> is symmetric positive definite, no
+pivoting is needed at all and the factorization can be written
+<span class="math notranslate nohighlight">\(A = R^{\top}R\)</span> at half the cost. That is Cholesky, and
+<a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html"><span class="std std-doc">§3.3</span></a> builds it, with
+the five equivalent tests for when it applies.</p></li>
+<li><p><strong>Orthogonal elimination.</strong> Elimination uses row operations that can amplify
+error, which is why pivoting is needed at all. Replacing them by <em>orthogonal</em>
+operations, which cannot amplify anything, gives <span class="math notranslate nohighlight">\(QR\)</span> — more expensive, and
+immune to the failure of Exercise 3.
+<a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html"><span class="std std-doc">§2.2</span></a> builds it three ways.</p></li>
+<li><p><strong>When <span class="math notranslate nohighlight">\(A\)</span> is mostly zeros.</strong> Elimination on a sparse matrix creates nonzeros
+where there were none, and the amount of this <strong>fill-in</strong> depends
+dramatically on the row ordering — a different pivoting question, answered by
+graph algorithms rather than by magnitude.
+<a class="reference internal" href="../05-numerical/sparse-matrices.html"><span class="std std-doc">§5.3</span></a> measures both.</p></li>
+<li><p><strong>Why the residual was small but the answer might not be.</strong> Exercise 4 found
+a backward error of a few <span class="math notranslate nohighlight">\(\varepsilon\)</span> even where the solution could be
+badly wrong. That gap between residual and error is the whole subject of
+<a class="reference internal" href="../05-numerical/norms-conditioning-stability.html"><span class="std std-doc">§5.1</span></a>.</p></li>
+</ul>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h3>
+<div class="docutils container" id="id4">
+<div role="list" class="citation-list">
+<div class="citation" id="id15" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Hig02<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id3">2</a>)</span>
+<p>Nicholas J. Higham. <em>Accuracy and Stability of Numerical Algorithms</em>. SIAM, Philadelphia, 2 edition, 2002. <a class="reference external" href="https://doi.org/10.1137/1.9780898718027">doi:10.1137/1.9780898718027</a>.</p>
+</div>
+<div class="citation" id="id12" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">TB97</a><span class="fn-bracket">]</span></span>
+<p>Lloyd N. Trefethen and David Bau, III. <em>Numerical Linear Algebra</em>. SIAM, Philadelphia, 1997. <a class="reference external" href="https://doi.org/10.1137/1.9780898719574">doi:10.1137/1.9780898719574</a>.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/01-matrices"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="four-ways-to-multiply.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">1.1 Matrices as Linear Maps: Four Ways to Multiply</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="inverses-rank-cr.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">1.3 Inverses, Rank, and A = CR</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#elimination-as-a-sequence-of-row-operations">Elimination as a sequence of row operations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-the-factorization-is-worth-having">Why the factorization is worth having</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pivoting">Pivoting</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#growth-and-the-honest-caveat">Growth, and the honest caveat</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-elimination-one-step-at-a-time">Exercise 1: Elimination, one step at a time</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-multipliers-are-l">Exercise 2: The multipliers are <span class="math notranslate nohighlight">\(L\)</span></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-matrix-that-breaks-it-and-the-one-line-repair">Exercise 3: The matrix that breaks it, and the one-line repair</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-solving-and-the-cost-of-doing-it-twice">Exercise 4: Solving, and the cost of doing it twice</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-what-elimination-costs-counted-and-measured">Exercise 5: What elimination costs, counted and measured</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-factor-once-solve-many">Exercise 6: Factor once, solve many</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-7-growth-and-the-matrix-that-defeats-partial-pivoting">Exercise 7: Growth, and the matrix that defeats partial pivoting</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-7">Validation 7</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-8-what-the-pivots-tell-you">Exercise 8: What the pivots tell you</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-8">Validation 8</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

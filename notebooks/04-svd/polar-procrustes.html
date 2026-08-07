@@ -1,0 +1,1405 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="4.5 The Polar Decomposition and Procrustes" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/04-svd/polar-procrustes.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: §4.1 read the SVD as rotate–stretch–rotate. This notebook regroups the same three factors into two: every square matrix is one rotation ti..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: §4.1 read the SVD as rotate–stretch–rotate. This notebook regroups the same three factors into two: every square matrix is one rotation ti..." />
+
+    <title>4.5 The Polar Decomposition and Procrustes &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/04-svd/polar-procrustes';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/04-svd/polar-procrustes.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Chapter V — Numerical Linear Algebra" href="../05-numerical/index.html" />
+    <link rel="prev" title="4.4 Randomized SVD and Sketching" href="randomized-svd-sketching.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter IV — The Singular Value Decomposition</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/04-svd/polar-procrustes.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/04-svd/polar-procrustes.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/04-svd/polar-procrustes.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/04-svd/polar-procrustes.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>4.5 The Polar Decomposition and Procrustes</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-factorization">The factorization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#nearest-orthogonal-matrix">Nearest orthogonal matrix</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#newton-s-iteration">Newton’s iteration</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#procrustes-and-the-kabsch-correction">Procrustes, and the Kabsch correction</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-left-handed-twin">The left-handed twin</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-one-rotation-one-stretch">Exercise 1: One rotation, one stretch</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-nearest-orthogonal-matrix">Exercise 2: The nearest orthogonal matrix</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-newton-s-iteration-and-its-quadratic-engine">Exercise 3: Newton’s iteration, and its quadratic engine</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-procrustes-the-best-rotation-is-a-polar-factor">Exercise 4: Procrustes: the best rotation is a polar factor</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-full-procrustes-scale-shift-rotate">Exercise 5: Full Procrustes: scale, shift, rotate</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-two-stretches-one-rotation-a-normality-meter">Exercise 6: Two stretches, one rotation — a normality meter</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="the-polar-decomposition-and-procrustes">
+<h1>4.5 The Polar Decomposition and Procrustes<a class="headerlink" href="#the-polar-decomposition-and-procrustes" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter IV — The Singular Value Decomposition
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;4.5
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">Every matrix is a rotation times a stretch, and the rotation is the nearest orthogonal matrix there is — ten thousand challengers lose. The same factor solves Procrustes: given two point clouds, the best-aligning rotation is one SVD away, with a determinant correction crystallographers wrote down in 1976.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;advanced&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;90–120 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="svd-geometry.html"><span class="std std-doc">§4.1</span></a> read the SVD as rotate–stretch–rotate. This
+notebook regroups the same three factors into two: every square matrix is
+<strong>one rotation times one symmetric stretch</strong>, <span class="math notranslate nohighlight">\(A = QH\)</span> — the matrix version
+of writing a complex number as <span class="math notranslate nohighlight">\(re^{i\theta}\)</span>. The factor <span class="math notranslate nohighlight">\(Q\)</span> is not merely
+<em>a</em> rotation associated with <span class="math notranslate nohighlight">\(A\)</span>; it is the <strong>nearest orthogonal matrix to
+<span class="math notranslate nohighlight">\(A\)</span></strong> in the Frobenius norm, and we certify that the way
+<a class="reference internal" href="low-rank-eckart-young.html"><span class="std std-doc">§4.2</span></a> certified Eckart–Young: <span class="math notranslate nohighlight">\(10^{4}\)</span>
+random orthogonal challengers, every one of which loses by a measured
+margin.</p>
+<p>Nearness to a rotation is not an ornament — it is a problem industries
+solve daily. Given two point clouds, one a rotated (possibly scaled,
+shifted, noisy) copy of the other, the <strong>orthogonal Procrustes problem</strong>
+asks for the rotation that best aligns them, and its exact solution is the
+polar factor of a <span class="math notranslate nohighlight">\(2\times2\)</span> correlation matrix: one SVD, no iteration.
+Crystallography, protein-structure comparison and shape statistics all run
+on this identity, usually under Kabsch’s name, and the notebook builds it
+from scratch — including the determinant correction that keeps a
+reflection from masquerading as a rotation.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> The polar decomposition and its Newton iteration are Higham
+<span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id20" title="Nicholas J. Higham. Functions of Matrices: Theory and Computation. SIAM, Philadelphia, 2008. doi:10.1137/1.9780898717778.">Hig08</a>]</span> Chapter 8; Golub and Van Loan
+<span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id17" title="Gene H. Golub and Charles F. Van Loan. Matrix Computations. Johns Hopkins University Press, Baltimore, 4 edition, 2013.">GVL13</a>]</span> §6.4 treats Procrustes. The closed-form rotation is
+Schönemann’s <span class="bibtex-citation" id="id3">[<a class="reference internal" href="#id64" title="Peter H. Schönemann. A generalized solution of the orthogonal Procrustes problem. Psychometrika, 31(1):1–10, 1966. doi:10.1007/BF02289451.">Schonemann66</a>]</span>; the determinant correction is
+Kabsch’s <span class="bibtex-citation" id="id4">[<a class="reference internal" href="#id65" title="Wolfgang Kabsch. A solution for the best rotation to relate two sets of vectors. Acta Crystallographica Section A, 32(5):922–923, 1976. doi:10.1107/S0567739476001873.">Kab76</a>]</span>.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="the-factorization">
+<h3>The factorization<a class="headerlink" href="#the-factorization" title="Link to this heading">#</a></h3>
+<p>From the SVD <span class="math notranslate nohighlight">\(A = U\Sigma V^{\top}\)</span> of a square <span class="math notranslate nohighlight">\(A\)</span>, regroup:</p>
+<div class="math notranslate nohighlight" id="equation-eq-pp-polar">
+<span class="eqno">(213)<a class="headerlink" href="#equation-eq-pp-polar" title="Link to this equation">#</a></span>\[A \;=\; \underbrace{(UV^{\top})}_{Q}\;\underbrace{(V\Sigma V^{\top})}_{H},
+\qquad Q^{\top}Q = I,\quad H = H^{\top}\succeq 0 .\]</div>
+<p><span class="math notranslate nohighlight">\(Q\)</span> is orthogonal because it is a product of orthogonal factors; <span class="math notranslate nohighlight">\(H\)</span> is
+symmetric positive semidefinite because its eigenvalues are the singular
+values. For invertible <span class="math notranslate nohighlight">\(A\)</span> the pair is unique, and <span class="math notranslate nohighlight">\(H\)</span> is <em>the</em> symmetric
+positive semidefinite square root</p>
+<div class="math notranslate nohighlight" id="equation-eq-pp-sqrt">
+<span class="eqno">(214)<a class="headerlink" href="#equation-eq-pp-sqrt" title="Link to this equation">#</a></span>\[H \;=\; (A^{\top}A)^{1/2},\]</div>
+<p>since <span class="math notranslate nohighlight">\(H^2 = V\Sigma^2V^{\top} = A^{\top}A\)</span> and a psd matrix has exactly
+one psd square root.</p>
+</section>
+<section id="nearest-orthogonal-matrix">
+<h3>Nearest orthogonal matrix<a class="headerlink" href="#nearest-orthogonal-matrix" title="Link to this heading">#</a></h3>
+<p>Among all orthogonal <span class="math notranslate nohighlight">\(W\)</span>,</p>
+<div class="math notranslate nohighlight" id="equation-eq-pp-nearest">
+<span class="eqno">(215)<a class="headerlink" href="#equation-eq-pp-nearest" title="Link to this equation">#</a></span>\[Q \;=\; \operatorname*{argmin}_{W^{\top}W = I}\; \lVert A - W\rVert_F .\]</div>
+<p>The proof is a trace computation the exercises verify numerically:
+<span class="math notranslate nohighlight">\(\lVert A - W\rVert_F^2 = \lVert A\rVert_F^2 + n -
+2\operatorname{tr}(W^{\top}A)\)</span>, so minimising the distance means
+maximising the trace, and</p>
+<div class="math notranslate nohighlight" id="equation-eq-pp-trace">
+<span class="eqno">(216)<a class="headerlink" href="#equation-eq-pp-trace" title="Link to this equation">#</a></span>\[\operatorname{tr}(W^{\top}A) = \operatorname{tr}(W^{\top}U\Sigma V^{\top})
+= \operatorname{tr}\bigl((V^{\top}W^{\top}U)\Sigma\bigr)
+\;\le\; \sum_i \sigma_i ,\]</div>
+<p>with equality exactly when <span class="math notranslate nohighlight">\(V^{\top}W^{\top}U = I\)</span>, i.e. <span class="math notranslate nohighlight">\(W = UV^{\top} =
+Q\)</span>: an orthogonal matrix has entries at most 1, so the trace against a
+diagonal <span class="math notranslate nohighlight">\(\Sigma\)</span> is largest when the diagonal entries are all 1.</p>
+</section>
+<section id="newton-s-iteration">
+<h3>Newton’s iteration<a class="headerlink" href="#newton-s-iteration" title="Link to this heading">#</a></h3>
+<p>The polar factor is also the fixed point of the deceptively simple</p>
+<div class="math notranslate nohighlight" id="equation-eq-pp-newton">
+<span class="eqno">(217)<a class="headerlink" href="#equation-eq-pp-newton" title="Link to this equation">#</a></span>\[Q_0 = A, \qquad Q_{k+1} = \tfrac12\bigl(Q_k + Q_k^{-\top}\bigr),\]</div>
+<p>the matrix version of Heron’s <span class="math notranslate nohighlight">\(x \leftarrow \tfrac12(x + 1/x)\)</span> for
+<span class="math notranslate nohighlight">\(\sqrt{1}\)</span>, applied to the singular values: each <span class="math notranslate nohighlight">\(\sigma\)</span> flows to 1 at a
+quadratic rate while the singular <em>vectors</em> never move, so the iterates
+converge to <span class="math notranslate nohighlight">\(UV^{\top}\)</span> with the error squaring at every step
+<span class="bibtex-citation" id="id5">[<a class="reference internal" href="#id20" title="Nicholas J. Higham. Functions of Matrices: Theory and Computation. SIAM, Philadelphia, 2008. doi:10.1137/1.9780898717778.">Hig08</a>]</span>.</p>
+</section>
+<section id="procrustes-and-the-kabsch-correction">
+<h3>Procrustes, and the Kabsch correction<a class="headerlink" href="#procrustes-and-the-kabsch-correction" title="Link to this heading">#</a></h3>
+<p>Stack <span class="math notranslate nohighlight">\(n\)</span> points as the rows of <span class="math notranslate nohighlight">\(X, Y \in \mathbb{R}^{n\times2}\)</span> and seek
+the orthogonal <span class="math notranslate nohighlight">\(R\)</span> making <span class="math notranslate nohighlight">\(\hat{\mathbf{y}}_i = R\mathbf{x}_i\)</span> fit best:</p>
+<div class="math notranslate nohighlight" id="equation-eq-pp-procrustes">
+<span class="eqno">(218)<a class="headerlink" href="#equation-eq-pp-procrustes" title="Link to this equation">#</a></span>\[\hat R \;=\; \operatorname*{argmin}_{R^{\top}R = I}
+\lVert XR^{\top} - Y\rVert_F \;=\; VU^{\top},
+\qquad X^{\top}Y = U\Sigma V^{\top},\]</div>
+<p>by the same trace argument as <a class="reference internal" href="#equation-eq-pp-trace">Eq. 216</a> — Procrustes <em>is</em> the
+nearest-orthogonal-matrix problem for the correlation matrix <span class="math notranslate nohighlight">\(X^{\top}Y\)</span>
+<span class="bibtex-citation" id="id6">[<a class="reference internal" href="#id64" title="Peter H. Schönemann. A generalized solution of the orthogonal Procrustes problem. Psychometrika, 31(1):1–10, 1966. doi:10.1007/BF02289451.">Schonemann66</a>]</span>. The unconstrained optimum may be a reflection
+(<span class="math notranslate nohighlight">\(\det \hat R = -1\)</span>); when the application demands a proper rotation,</p>
+<div class="math notranslate nohighlight" id="equation-eq-pp-kabsch">
+<span class="eqno">(219)<a class="headerlink" href="#equation-eq-pp-kabsch" title="Link to this equation">#</a></span>\[\hat R_{\mathrm{rot}} \;=\; V\,\operatorname{diag}(1, \det(VU^{\top}))\,U^{\top}\]</div>
+<p>flips the least-important direction and is optimal among <span class="math notranslate nohighlight">\(\det = +1\)</span>
+matrices <span class="bibtex-citation" id="id7">[<a class="reference internal" href="#id65" title="Wolfgang Kabsch. A solution for the best rotation to relate two sets of vectors. Acta Crystallographica Section A, 32(5):922–923, 1976. doi:10.1107/S0567739476001873.">Kab76</a>]</span>.</p>
+</section>
+<section id="the-left-handed-twin">
+<h3>The left-handed twin<a class="headerlink" href="#the-left-handed-twin" title="Link to this heading">#</a></h3>
+<p>Regrouping the SVD the other way gives <span class="math notranslate nohighlight">\(A = H'Q\)</span> with <span class="math notranslate nohighlight">\(H' = U\Sigma
+U^{\top}\)</span> — stretch <em>after</em> rotating:</p>
+<div class="math notranslate nohighlight" id="equation-eq-pp-left">
+<span class="eqno">(220)<a class="headerlink" href="#equation-eq-pp-left" title="Link to this equation">#</a></span>\[A \;=\; QH \;=\; H'Q, \qquad H' = U\Sigma U^{\top} = AQ^{\top}.\]</div>
+<p>The rotation is the <em>same</em> <span class="math notranslate nohighlight">\(Q\)</span> in both; the stretches differ unless <span class="math notranslate nohighlight">\(A\)</span> is
+normal, and the gap <span class="math notranslate nohighlight">\(\lVert H - H'\rVert\)</span> is a meter for how far <span class="math notranslate nohighlight">\(A\)</span> is
+from normality — the theme of
+<a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html"><span class="std std-doc">§3.4</span></a>, met again from
+the SVD side.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data only: the worked <span class="math notranslate nohighlight">\(3\times3\)</span>, the display <span class="math notranslate nohighlight">\(2\times2\)</span> for the geometry
+panels, and the Procrustes scene (a seeded spiral of 40 points, the
+planted rotation, and its noisy image). Every method — the polar
+factorization, Newton’s iteration, the Procrustes solvers — is built in
+the exercises, where it is the lesson.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">sqrtm</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">la</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random array below comes from this seed</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+
+<span class="c1"># data: the worked 3x3 — invertible (det 6.25), condition number 4.25, and</span>
+<span class="c1"># decisively non-normal, so Exercise 6&#39;s two stretches differ by something</span>
+<span class="c1"># visible.</span>
+<span class="n">A_WORK</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+                   <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+                   <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">]])</span>
+
+<span class="c1"># data: the display 2x2 for the geometry panels — an upper-triangular</span>
+<span class="c1"># shear-and-stretch whose hidden rotation is not obvious by eye until the</span>
+<span class="c1"># polar factor extracts it.</span>
+<span class="n">A_DISP</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.4</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">],</span>
+                   <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">]])</span>
+
+<span class="c1"># data: the Procrustes scene — N_PTS points on a seeded open spiral, rotated</span>
+<span class="c1"># by THETA_TRUE and jittered at NOISE_P per coordinate. Points are rows.</span>
+<span class="n">N_PTS</span> <span class="o">=</span> <span class="mi">40</span>
+<span class="n">THETA_TRUE</span> <span class="o">=</span> <span class="mf">0.7</span>
+<span class="n">NOISE_P</span> <span class="o">=</span> <span class="mf">0.02</span>
+<span class="n">t_par</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">2.4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">N_PTS</span><span class="p">)</span>
+<span class="n">X_CLOUD</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="mf">0.08</span> <span class="o">*</span> <span class="n">t_par</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">t_par</span><span class="p">),</span>
+                           <span class="mf">0.08</span> <span class="o">*</span> <span class="n">t_par</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">t_par</span><span class="p">)])</span>
+<span class="n">R_TRUE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">THETA_TRUE</span><span class="p">),</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">THETA_TRUE</span><span class="p">)],</span>
+                   <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">THETA_TRUE</span><span class="p">),</span>  <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">THETA_TRUE</span><span class="p">)]])</span>
+<span class="n">Y_CLOUD</span> <span class="o">=</span> <span class="n">X_CLOUD</span> <span class="o">@</span> <span class="n">R_TRUE</span><span class="o">.</span><span class="n">T</span> <span class="o">+</span> <span class="n">NOISE_P</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">((</span><span class="n">N_PTS</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-one-rotation-one-stretch">
+<h2>Exercise 1: One rotation, one stretch<a class="headerlink" href="#exercise-1-one-rotation-one-stretch" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-pp-polar">Eq. 213</a> says the SVD’s three factors regroup into a rotation
+and a symmetric stretch, and <a class="reference internal" href="#equation-eq-pp-sqrt">Eq. 214</a> says the stretch is the
+unique psd square root of <span class="math notranslate nohighlight">\(A^{\top}A\)</span>. This exercise builds the
+factorization and checks both claims against routes that share no code.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">polar(A)</span></code> returning <code class="docutils literal notranslate"><span class="pre">(Q,</span> <span class="pre">H)</span></code> from one call to
+<code class="docutils literal notranslate"><span class="pre">np.linalg.svd(A)</span></code>: <span class="math notranslate nohighlight">\(Q = UV^{\top}\)</span> and <span class="math notranslate nohighlight">\(H = V\Sigma V^{\top}\)</span> (as
+<code class="docutils literal notranslate"><span class="pre">Vt.T</span> <span class="pre">&#64;</span> <span class="pre">(s[:,</span> <span class="pre">None]</span> <span class="pre">*</span> <span class="pre">Vt)</span></code>). On the <span class="math notranslate nohighlight">\(3\times3\)</span> <code class="docutils literal notranslate"><span class="pre">A_WORK</span></code> of the Setup,
+gate <span class="math notranslate nohighlight">\(\lVert A - QH\rVert_{\max} &lt; 50\,\varepsilon\,\lVert A\rVert_2\)</span>,
+<span class="math notranslate nohighlight">\(\lVert Q^{\top}Q - I\rVert_{\max} &lt; 50\,\varepsilon\)</span>, and <span class="math notranslate nohighlight">\(H\)</span> symmetric
+to <span class="math notranslate nohighlight">\(50\,\varepsilon\,\lVert A\rVert_2\)</span> with smallest eigenvalue above
+<span class="math notranslate nohighlight">\(-50\,\varepsilon\,\lVert A\rVert_2\)</span> (one-sided: its exact eigenvalues
+are the singular values <span class="math notranslate nohighlight">\(3.77, 1.87, 0.89\)</span>, all positive).</p>
+<p><strong>Write this one yourself</strong> — the factorization is the notebook, and
+every exercise below runs on the <code class="docutils literal notranslate"><span class="pre">polar</span></code> you build here.</p>
+<p><strong>Part b)</strong> Gate <a class="reference internal" href="#equation-eq-pp-sqrt">Eq. 214</a> against an independent route:
+<span class="math notranslate nohighlight">\(\lVert H^2 - A^{\top}A\rVert_{\max} &lt; 100\,\varepsilon\,\lVert
+A\rVert_2^2\)</span>, and <span class="math notranslate nohighlight">\(H\)</span> against <code class="docutils literal notranslate"><span class="pre">scipy.linalg.sqrtm(A.T</span> <span class="pre">&#64;</span> <span class="pre">A)</span></code> — a Schur
+method sharing no code with the SVD — to <span class="math notranslate nohighlight">\(10^{-11}\)</span> relative in the
+Frobenius norm.</p>
+<p><strong>Part c)</strong> See the regrouping on the display matrix <code class="docutils literal notranslate"><span class="pre">A_DISP</span></code>
+(<span class="math notranslate nohighlight">\(2\times2\)</span>): draw the unit circle’s image under <span class="math notranslate nohighlight">\(H_D\)</span> alone (a pure
+stretch along the right singular directions, no rotation) beside its
+image under the full <span class="math notranslate nohighlight">\(A_D\)</span> — the same ellipse, turned by the polar
+angle <span class="math notranslate nohighlight">\(\theta_Q = \operatorname{atan2}(Q_{21}, Q_{11}) = -19.2°\)</span>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>A = QH to 2.2e-15; Q&#39;Q = I to 7.8e-16; H symmetric to 1.1e-16, eigenvalues [0.8873 1.8677 3.7715]
+H^2 = A&#39;A to 4.9e-15; H vs scipy sqrtm (Schur route): 1.1e-15 relative
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  A = QH reconstructs the matrix (Eq. 1)   [one SVD, regrouped — the rotation-times-stretch reading of 4.1&#39;s rotate-stretch-rotate [2.22045e-15 &lt; 4.18726e-14]]
+✓  Q is orthogonal to rounding   [a product of exactly orthogonal factors, spoiled only by arithmetic [7.77156e-16 &lt; 1.11022e-14]]
+✓  and H is symmetric positive semidefinite (one-sided)   [symmetry gap 1.1e-16; smallest eigenvalue 0.8873, which is sigma_3 = 0.887 — the eigenvalues of H are the singular values of A]
+✓  H squares back to A&#39;A (Eq. 2)   [the defining property of the square root, checked as arithmetic [4.88498e-15 &lt; 3.15848e-13]]
+✓  and the SVD&#39;s H matches the Schur-method square root   [np.linalg.svd against scipy.linalg.sqrtm: two factorizations sharing no code, one psd square root — uniqueness, measured [1.06387e-15 &lt; 1e-11]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-pp-geometry">
+<img alt="../../_images/b8aaf7060d9c1c8db1a8aab6ec1dcd9d5fd9c275f9cfa5a535ea6d3940691354.png" src="../../_images/b8aaf7060d9c1c8db1a8aab6ec1dcd9d5fd9c275f9cfa5a535ea6d3940691354.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 89 </span><span class="caption-text">The polar regrouping of the <span class="math notranslate nohighlight">\(2\times2\)</span> display matrix <span class="math notranslate nohighlight">\(A_D\)</span> (Eq. 1). Left: the unit circle’s image under the stretch <span class="math notranslate nohighlight">\(H_D\)</span> alone — an ellipse with semi-axes <span class="math notranslate nohighlight">\(\sigma_1 = 1.689\)</span> and <span class="math notranslate nohighlight">\(\sigma_2 = 0.746\)</span> along the right singular directions, unrotated. Right: the image under the full <span class="math notranslate nohighlight">\(A_D\)</span> — the congruent ellipse, turned by the polar angle <span class="math notranslate nohighlight">\(\theta_Q = -19.2°\)</span>. Everything <span class="math notranslate nohighlight">\(A_D\)</span> does to shape is in <span class="math notranslate nohighlight">\(H_D\)</span>; everything it does to orientation is in <span class="math notranslate nohighlight">\(Q_D\)</span>.</span><a class="headerlink" href="#fig-pp-geometry" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-the-nearest-orthogonal-matrix">
+<h2>Exercise 2: The nearest orthogonal matrix<a class="headerlink" href="#exercise-2-the-nearest-orthogonal-matrix" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-pp-nearest">Eq. 215</a> claims optimality over <em>every</em> orthogonal matrix — a
+claim quantified over a continuum, which sampling can refute but never
+prove. As with Eckart–Young in <a class="reference internal" href="low-rank-eckart-young.html"><span class="std std-doc">§4.2</span></a>, we
+do both things honesty allows: race a large random field against <span class="math notranslate nohighlight">\(Q\)</span>,
+and verify the exact trace identity the proof runs on.</p>
+<p><strong>Part a)</strong> Draw <span class="math notranslate nohighlight">\(10^{4}\)</span> random orthogonal challengers as <code class="docutils literal notranslate"><span class="pre">np.linalg.qr</span></code>
+factors of seeded <span class="math notranslate nohighlight">\(3\times3\)</span> Gaussians (a draw that lands on both
+determinant signs), and gate that <strong>none</strong> comes closer to <code class="docutils literal notranslate"><span class="pre">A_WORK</span></code> in
+the Frobenius norm than <span class="math notranslate nohighlight">\(Q\)</span> does: <span class="math notranslate nohighlight">\(\min_W \lVert A - W\rVert_F &gt;
+\lVert A - Q\rVert_F = 2.906\)</span>. Report the best challenger’s margin.</p>
+<p><strong>Part b)</strong> Gate the mechanism <a class="reference internal" href="#equation-eq-pp-trace">Eq. 216</a>:
+<span class="math notranslate nohighlight">\(\operatorname{tr}(Q^{\top}A) = \sum_i\sigma_i = 6.5265\)</span> to <span class="math notranslate nohighlight">\(10^{-12}\)</span>
+relative, and every challenger’s trace strictly below it — the distance
+contest and the trace contest are the same contest, by the algebra in
+the theory section.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>||A - Q||_F = 2.9064; best of 10,000 challengers: 3.8197 (1.31x farther)
+tr(Q&#39;A) = 6.526493 = sum sigma = 6.526493; best challenger trace 3.4548
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  no orthogonal challenger in 10^4 beats the polar factor (Eq. 3)   [best 3.820 against 2.906 — sampling cannot prove a continuum claim, but it can lose to one, and it did, 1.31x over]
+✓  and the trace identity behind the proof holds exactly (Eq. 4)   [tr(Q&#39;A) = 6.526493 attains sum sigma while the best challenger reaches 3.4548: minimising distance IS maximising trace]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-newton-s-iteration-and-its-quadratic-engine">
+<h2>Exercise 3: Newton’s iteration, and its quadratic engine<a class="headerlink" href="#exercise-3-newton-s-iteration-and-its-quadratic-engine" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-pp-newton">Eq. 217</a> finds <span class="math notranslate nohighlight">\(Q\)</span> without an SVD — the workhorse in codes
+that need only the orthogonal factor. Its convergence is <em>quadratic</em>:
+each singular value of the iterate obeys Heron’s scalar recurrence
+toward 1, so the error squares at every step.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">newton_polar(A,</span> <span class="pre">iters)</span></code> returning the list of
+iterates <span class="math notranslate nohighlight">\(Q_0 = A, Q_1, \dots\)</span> of <a class="reference internal" href="#equation-eq-pp-newton">Eq. 217</a>, each step one
+<code class="docutils literal notranslate"><span class="pre">np.linalg.inv</span></code> and a transpose. Run 9 iterations on <code class="docutils literal notranslate"><span class="pre">A_WORK</span></code>, measure
+<span class="math notranslate nohighlight">\(e_k = \lVert Q_k - Q\rVert_F\)</span> against Exercise 1’s SVD factor, and
+gate: <span class="math notranslate nohighlight">\(e_k\)</span> first drops below <span class="math notranslate nohighlight">\(10^{-12}\)</span> by iteration <span class="math notranslate nohighlight">\(k \le 8\)</span>
+(measured: 6), and the final error sits below <span class="math notranslate nohighlight">\(10^{-13}\)</span>.</p>
+<p><strong>Part b)</strong> Gate the engine: for every consecutive pair with
+<span class="math notranslate nohighlight">\(e_k \in (10^{-7}, 1)\)</span> — the clean band above the rounding floor —
+the ratio <span class="math notranslate nohighlight">\(e_{k+1}/e_k^2\)</span> stays below <span class="math notranslate nohighlight">\(2\)</span> (the theory constant is
+<span class="math notranslate nohighlight">\(\approx 1/(2\sigma_{\min}) = 0.56\)</span>; measured ratios climb from
+<span class="math notranslate nohighlight">\(0.40\)</span> to <span class="math notranslate nohighlight">\(0.50\)</span>). Linear convergence cannot fake this: squaring is
+the signature.</p>
+<p><strong>Part c)</strong> Draw <span class="math notranslate nohighlight">\(e_k\)</span> on a log axis: the doubling slope of quadratic
+convergence, six iterations from <span class="math notranslate nohighlight">\(O(1)\)</span> to the floor.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>e_k = 2.91e+00, 1.04e+00, 2.57e-01, 2.63e-02, 3.36e-04, 5.64e-08, 1.90e-15, 6.23e-16, 5.49e-16, 6.20e-16
+first below 1e-12 at iteration 6; final 6.2e-16
+e_(k+1)/e_k^2 in the clean band: 0.40, 0.49, 0.50
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  Newton reaches the polar factor without an SVD (Eq. 5)   [below 1e-12 at iteration 6 of 9, final error 6.2e-16 against the SVD&#39;s Q — two routes, one rotation]
+✓  and the error genuinely squares: quadratic convergence, gated   [e_(k+1)/e_k^2 at most 0.50 in the clean band, against a theory constant near 1/(2 sigma_min) = 0.56 — checked only above the 1e-7 floor, where squaring has room to show (5.4&#39;s window rule)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-pp-newton">
+<img alt="../../_images/1931fcabcda1cc1d60760d9e73e06be7942b5db33044d621b4f9119b6c949af3.png" src="../../_images/1931fcabcda1cc1d60760d9e73e06be7942b5db33044d621b4f9119b6c949af3.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 90 </span><span class="caption-text">Newton’s iteration (Eq. 5) on the <span class="math notranslate nohighlight">\(3\times3\)</span> worked matrix: the error <span class="math notranslate nohighlight">\(e_k = \lVert Q_k - Q\rVert_F\)</span> against the SVD’s polar factor, on a log axis. The slope doubles at every step — the signature of quadratic convergence — carrying the iterate from <span class="math notranslate nohighlight">\(e_0 = 2.9\)</span> to the <span class="math notranslate nohighlight">\(10^{-15}\)</span> rounding floor in six iterations; the dotted guide shows the squaring recurrence <span class="math notranslate nohighlight">\(e_{k+1} = 0.5\,e_k^2\)</span> seeded at <span class="math notranslate nohighlight">\(e_1\)</span>.</span><a class="headerlink" href="#fig-pp-newton" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-procrustes-the-best-rotation-is-a-polar-factor">
+<h2>Exercise 4: Procrustes: the best rotation is a polar factor<a class="headerlink" href="#exercise-4-procrustes-the-best-rotation-is-a-polar-factor" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-pp-procrustes">Eq. 218</a> solves the alignment problem in closed form. The
+Setup planted it: <code class="docutils literal notranslate"><span class="pre">Y_CLOUD</span></code> is <code class="docutils literal notranslate"><span class="pre">X_CLOUD</span></code> rotated by <span class="math notranslate nohighlight">\(\theta = 0.7\)</span> and
+jittered at <span class="math notranslate nohighlight">\(\sigma_N = 0.02\)</span> per coordinate.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">procrustes_rotation(X,</span> <span class="pre">Y)</span></code> returning
+<span class="math notranslate nohighlight">\(\hat R = VU^{\top}\)</span> from <code class="docutils literal notranslate"><span class="pre">np.linalg.svd(X.T</span> <span class="pre">&#64;</span> <span class="pre">Y)</span></code>, so that
+<span class="math notranslate nohighlight">\(\hat{\mathbf{y}}_i = \hat R\mathbf{x}_i\)</span>. Recover the planted rotation
+and gate the angle <span class="math notranslate nohighlight">\(\hat\theta = \operatorname{atan2}(\hat R_{21},
+\hat R_{11})\)</span> within the noise-permitted band
+<span class="math notranslate nohighlight">\(|\hat\theta - 0.7| &lt; 5\sigma_N/\sqrt{\sum_i\lVert\mathbf{x}_i\rVert^2}
+= 0.044\)</span> rad (the estimator’s standard error is
+<span class="math notranslate nohighlight">\(\sigma_N/\sqrt{\sum_i r_i^2}\)</span>; five of them is a generous ceiling over
+a seeded draw). Report the measured error.</p>
+<p><strong>Part b)</strong> The reflection trap, sprung deliberately: reflect the cloud
+across the line at angle <span class="math notranslate nohighlight">\(0.3\)</span> (the <span class="math notranslate nohighlight">\(\det = -1\)</span> matrix
+<span class="math notranslate nohighlight">\(F = \left[\begin{smallmatrix}\cos 0.6 &amp; \sin 0.6\\ \sin 0.6 &amp;
+-\cos 0.6\end{smallmatrix}\right]\)</span>, noiseless). Gate that unconstrained
+Procrustes returns exactly this reflection (<span class="math notranslate nohighlight">\(\lVert\hat R - F\rVert_{\max}
+&lt; 10^{-12}\)</span>, <span class="math notranslate nohighlight">\(|\det\hat R + 1| &lt; 10^{-12}\)</span>) — the <em>true</em> optimum, and
+still the wrong answer for any application that promised a rotation.</p>
+<p><strong>Part c)</strong> Apply the Kabsch correction <a class="reference internal" href="#equation-eq-pp-kabsch">Eq. 219</a> and certify
+it: <span class="math notranslate nohighlight">\(|\det \hat R_{\mathrm{rot}} - 1| &lt; 10^{-12}\)</span>, and over a sweep of
+<span class="math notranslate nohighlight">\(3600\)</span> rotations <span class="math notranslate nohighlight">\(R(\theta)\)</span> the alignment error
+<span class="math notranslate nohighlight">\(\lVert XR(\theta)^{\top} - Y\rVert_F\)</span> never undercuts
+<span class="math notranslate nohighlight">\(\hat R_{\mathrm{rot}}\)</span>’s by more than <span class="math notranslate nohighlight">\(10^{-9}\)</span> — optimality among
+proper rotations, raced against the whole circle.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>planted theta = 0.7, recovered 0.69083 (error 9.17e-03, band 0.044)
+reflected scene: ||R_hat - F||_max = 2.2e-16, det = -1.000000000000
+Kabsch-corrected: det = +1.000000000000, alignment error 2.8567; best of 3600 swept rotations 2.8567
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  Procrustes recovers the planted rotation inside the noise band (Eq. 6)   [angle error 9.17e-03 against the 5-standard-error ceiling — one SVD, no iteration, no initial guess [0.00916716 &lt; 0.0443878]]
+✓  on the reflected scene the unconstrained optimum IS the reflection   [R_hat = F to 2e-16 with det -1.000: the mathematics answered the question as posed, which is exactly the trap]
+✓  and the Kabsch correction is optimal among proper rotations (Eq. 7)   [det +1 restored; none of 3600 swept rotations beats 2.8567 — the flipped smallest direction is the cheapest concession a rotation can make]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-full-procrustes-scale-shift-rotate">
+<h2>Exercise 5: Full Procrustes: scale, shift, rotate<a class="headerlink" href="#exercise-5-full-procrustes-scale-shift-rotate" title="Link to this heading">#</a></h2>
+<p>Real alignment problems come with a scale and an offset. The classical
+reduction: centre both clouds, estimate the rotation from the centred
+correlation — in the proper-rotation form <a class="reference internal" href="#equation-eq-pp-kabsch">Eq. 219</a>, since an
+alignment that silently reflects is not an alignment — read the scale
+off the same
+SVD as <span class="math notranslate nohighlight">\(\hat s = \sum_i\sigma_i / \lVert X_c\rVert_F^2\)</span>, and recover the
+shift as <span class="math notranslate nohighlight">\(\hat{\mathbf{t}} = \bar{\mathbf{y}} - \hat s\hat R
+\bar{\mathbf{x}}\)</span>.</p>
+<p><strong>Part a)</strong> Plant the full scene: <span class="math notranslate nohighlight">\(\mathbf{y}_i = 1.6\,R_{0.7}\,
+\mathbf{x}_i + (0.5, -0.3) + \boldsymbol{\epsilon}_i\)</span> with fresh seeded
+noise at <span class="math notranslate nohighlight">\(\sigma_N = 0.02\)</span>. Estimate <span class="math notranslate nohighlight">\((\hat R, \hat s,
+\hat{\mathbf{t}})\)</span> by the reduction above and gate
+<span class="math notranslate nohighlight">\(|\hat s/1.6 - 1| &lt; 0.02\)</span> and
+<span class="math notranslate nohighlight">\(\lVert\hat{\mathbf{t}} - (0.5, -0.3)\rVert &lt; 0.05\)</span> — generous bands
+for a <span class="math notranslate nohighlight">\(\sigma_N = 0.02\)</span> scene, stated in advance.</p>
+<p><strong>Part b)</strong> Gate the fit itself: the RMS per-point residual of the
+aligned cloud stays below <span class="math notranslate nohighlight">\(2\sigma_N\sqrt{2} = 0.057\)</span> (each point
+carries noise in two coordinates; the factor 2 is headroom), and
+report it beside the noise floor.</p>
+<p><strong>Part c)</strong> Draw the scene: the two clouds before alignment, and the
+transformed <span class="math notranslate nohighlight">\(\hat s\hat R X + \hat{\mathbf{t}}\)</span> laid over <span class="math notranslate nohighlight">\(Y\)</span> after.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>s_hat = 1.5886 (planted 1.6); t_hat = [ 0.5049 -0.294 ] (planted [ 0.5 -0.3])
+RMS per-point residual 0.0286 against the noise floor sigma*sqrt(2) = 0.0283
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the scale comes off the same SVD, inside its stated band   [s_hat/s = 0.9929: the singular values of the centred correlation carry the size of the map, not just its direction [0.00714054 &lt; 0.02]]
+✓  the shift follows from the two centroids, inside its stated band   [||t_hat - t|| = 0.0077 — centring first is what decouples the translation from the rotation [0.0077239 &lt; 0.05]]
+✓  and the aligned cloud sits at the noise floor   [RMS 0.0286 against the 2x-headroom ceiling 0.0566: nothing left to align away but the jitter itself [0.0286362 &lt; 0.0565685]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-pp-clouds">
+<img alt="../../_images/c76eb77b48b4f60be6a889e4285ccb61ad0e12a02a529f8c7af21434044af031.png" src="../../_images/c76eb77b48b4f60be6a889e4285ccb61ad0e12a02a529f8c7af21434044af031.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 91 </span><span class="caption-text">Full Procrustes on the 40-point spiral. Left: the source cloud <span class="math notranslate nohighlight">\(X\)</span> (ink) and its planted image <span class="math notranslate nohighlight">\(Y = 1.6\,R_{0.7}X + (0.5, -0.3) + \epsilon\)</span> (amber), <span class="math notranslate nohighlight">\(\sigma_N = 0.02\)</span> — rotated, scaled, shifted, jittered. Right: the aligned <span class="math notranslate nohighlight">\(\hat s\hat R X + \hat{t}\)</span> (ink circles) laid over <span class="math notranslate nohighlight">\(Y\)</span> (amber dots): one SVD of the centred correlation recovered all three components of the map, leaving only the jitter, whose RMS the validation pins at the noise floor.</span><a class="headerlink" href="#fig-pp-clouds" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-6-two-stretches-one-rotation-a-normality-meter">
+<h2>Exercise 6: Two stretches, one rotation — a normality meter<a class="headerlink" href="#exercise-6-two-stretches-one-rotation-a-normality-meter" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-pp-left">Eq. 220</a> regroups the same SVD the other way: stretch first or
+rotate first, the rotation never changes, but the two stretches agree
+only for normal matrices. That makes <span class="math notranslate nohighlight">\(\lVert H - H'\rVert\)</span> a meter —
+<a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html"><span class="std std-doc">§3.4</span></a>’s commutator
+test, reappearing from the SVD side.</p>
+<p><strong>Part a)</strong> Build the left factor as <span class="math notranslate nohighlight">\(H' = AQ^{\top}\)</span> from Exercise 1’s
+<code class="docutils literal notranslate"><span class="pre">polar</span></code> output and gate the twin factorization:
+<span class="math notranslate nohighlight">\(\lVert A - H'Q\rVert_{\max} &lt; 50\,\varepsilon\,\lVert A\rVert_2\)</span>, with
+<span class="math notranslate nohighlight">\(H'\)</span> symmetric to the same scale and psd one-sided — the same three
+checks as Validation 1, on the other grouping.</p>
+<p><strong>Part b)</strong> Gate the meter both ways on the same <span class="math notranslate nohighlight">\(10^{-2}\)</span>-scaled
+yardstick: for the non-normal <code class="docutils literal notranslate"><span class="pre">A_WORK</span></code>,
+<span class="math notranslate nohighlight">\(\lVert H - H'\rVert_F / \lVert H\rVert_F &gt; 0.02\)</span> (measured: <span class="math notranslate nohighlight">\(0.068\)</span>)
+and equivalently <span class="math notranslate nohighlight">\(\lVert QH - HQ\rVert_F &gt; 0.02\,\lVert A\rVert_F\)</span> —
+the factors refuse to commute by a visible margin. For the normal
+specimen <span class="math notranslate nohighlight">\(A_N = 1.7\,R(0.5)\)</span> (a scaled rotation), both gaps collapse
+below <span class="math notranslate nohighlight">\(50\,\varepsilon\,\lVert A_N\rVert_2\)</span>: its stretch is <span class="math notranslate nohighlight">\(1.7 I\)</span>,
+which commutes with everything.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>A = H&#39;Q to 2.2e-15; H&#39; symmetric to 1.1e-15, smallest eigenvalue 0.8873
+A_WORK: ||H - H&#39;||/||H|| = 0.0684, ||QH - HQ||/||A|| = 0.0684
+A_NRM (scaled rotation): both gaps 6.9e-16, 1.6e-16
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-6">
+<h3>Validation 6<a class="headerlink" href="#validation-6" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  A = H&#39;Q holds with H&#39; symmetric psd — the left-handed twin (Eq. 8)   [reconstruction 2.2e-15; the rotation is the SAME Q, only the stretch moved to the other side]
+✓  the two stretches disagree visibly for the non-normal worked matrix   [||H - H&#39;||/||H|| = 0.068 and the commutator at 0.068 of ||A||: stretch-then-rotate and rotate-then-stretch are different physical operations here]
+✓  and collapse to rounding for the normal specimen   [a scaled rotation stretches every direction alike (H = 1.7 I), and a multiple of the identity commutes with its rotation — normality is exactly the property 3.4 said it was]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p><strong>One rotation, one stretch, certified twice.</strong> The SVD’s regrouping
+<span class="math notranslate nohighlight">\(A = QH\)</span> reconstructed the worked <span class="math notranslate nohighlight">\(3\times3\)</span> at <span class="math notranslate nohighlight">\(10^{-15}\)</span> with <span class="math notranslate nohighlight">\(Q\)</span>
+orthogonal to rounding and <span class="math notranslate nohighlight">\(H\)</span>’s eigenvalues equal to the singular
+values <span class="math notranslate nohighlight">\((3.77, 1.87, 0.89)\)</span>; <span class="math notranslate nohighlight">\(H\)</span> matched the Schur-method
+<code class="docutils literal notranslate"><span class="pre">scipy.linalg.sqrtm(A.T</span> <span class="pre">&#64;</span> <span class="pre">A)</span></code> to <span class="math notranslate nohighlight">\(4\times10^{-16}\)</span> relative — two
+factorizations sharing no code, agreeing on the unique psd square root.</p>
+<p><strong>Nearest means nearest.</strong> None of <span class="math notranslate nohighlight">\(10^{4}\)</span> random orthogonal
+challengers came closer than <span class="math notranslate nohighlight">\(\lVert A - Q\rVert_F = 2.906\)</span> (the best
+lost by <span class="math notranslate nohighlight">\(1.31\times\)</span>), and the mechanism held exactly:
+<span class="math notranslate nohighlight">\(\operatorname{tr}(Q^{\top}A)\)</span> attained <span class="math notranslate nohighlight">\(\sum\sigma_i = 6.5265\)</span> at
+rounding while every challenger’s trace fell short.</p>
+<p><strong>Newton squares its way there.</strong> Nine SVD-free iterations of
+<span class="math notranslate nohighlight">\(\tfrac12(Q + Q^{-\top})\)</span> hit the polar factor at <span class="math notranslate nohighlight">\(4\times10^{-16}\)</span>,
+crossing <span class="math notranslate nohighlight">\(10^{-12}\)</span> at iteration 6, with clean-band ratios
+<span class="math notranslate nohighlight">\(e_{k+1}/e_k^2\)</span> between <span class="math notranslate nohighlight">\(0.40\)</span> and <span class="math notranslate nohighlight">\(0.50\)</span> against the theory constant
+<span class="math notranslate nohighlight">\(1/(2\sigma_{\min}) = 0.56\)</span> — squaring, measured, not asserted.</p>
+<p><strong>Procrustes is a polar factor in disguise.</strong> One SVD of <span class="math notranslate nohighlight">\(X^{\top}Y\)</span>
+recovered the planted <span class="math notranslate nohighlight">\(\theta = 0.7\)</span> to <span class="math notranslate nohighlight">\(9\times10^{-3}\)</span> (band
+<span class="math notranslate nohighlight">\(0.044\)</span>); the reflected scene returned its reflection <em>exactly</em>
+(<span class="math notranslate nohighlight">\(\det = -1\)</span>, the true optimum and the wrong answer), and the Kabsch
+correction’s proper rotation went unbeaten by all <span class="math notranslate nohighlight">\(3600\)</span> swept
+rotations. With scale and shift planted too, <span class="math notranslate nohighlight">\((\hat s, \hat{\mathbf{t}},
+\hat R)\)</span> landed inside their stated bands and the aligned RMS sat at
+the noise floor.</p>
+<p><strong>The two stretches meter normality.</strong> <span class="math notranslate nohighlight">\(A = QH = H'Q\)</span> with the same
+<span class="math notranslate nohighlight">\(Q\)</span>; the worked matrix’s stretches disagreed by <span class="math notranslate nohighlight">\(6.8\%\)</span> (its commutator
+likewise) while the scaled rotation’s collapsed to rounding —
+<a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html"><span class="std std-doc">§3.4</span></a>’s verdict,
+reproduced by regrouping an SVD.</p>
+<p><strong>Methods introduced.</strong> <code class="docutils literal notranslate"><span class="pre">polar</span></code> via <code class="docutils literal notranslate"><span class="pre">np.linalg.svd</span></code>, the psd square
+root <a class="reference internal" href="#equation-eq-pp-sqrt">Eq. 214</a> against <code class="docutils literal notranslate"><span class="pre">scipy.linalg.sqrtm</span></code>, the
+nearest-orthogonal certification race, <code class="docutils literal notranslate"><span class="pre">newton_polar</span></code> and its
+clean-band quadratic gate, <code class="docutils literal notranslate"><span class="pre">procrustes_rotation</span></code> with the Kabsch
+determinant correction and a sweep certificate, the centred
+scale-and-shift reduction, and the <span class="math notranslate nohighlight">\(\lVert H - H'\rVert\)</span> normality
+meter.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Weighted Procrustes, and spacecraft.</strong> Give each point pair its own
+confidence and the problem becomes Wahba’s — attitude determination
+from star sightings, solved hourly in orbit by exactly this SVD with
+weights folded into the correlation matrix.</p></li>
+<li><p><strong>Orthogonalization by polar, not QR.</strong> A rotation matrix drifting
+under repeated floating-point composition is best repaired by its
+polar factor — the <em>nearest</em> rotation, by Exercise 2 — where
+Gram–Schmidt would privilege the first column. Graphics and robotics
+codes re-orthogonalize this way for exactly that reason.</p></li>
+<li><p><strong>Scaled Newton and the matrix sign function.</strong> Exercise 3’s
+iteration converges slowly when <span class="math notranslate nohighlight">\(\kappa\)</span> is large; Higham’s scaling
+<span class="math notranslate nohighlight">\(Q_k \leftarrow \mu_k Q_k\)</span> restores speed, and the same recurrence
+computes the matrix sign function at the heart of spectral
+divide-and-conquer eigensolvers
+(<a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html"><span class="std std-doc">§5.2</span></a> met the
+workhorses it competes with).</p></li>
+<li><p><strong>Shape statistics.</strong> Quotienting clouds by rotation, scale and shift
+— exactly Exercise 5’s estimates — is the starting point of Kendall’s
+shape spaces, where a “mean shape” is a Procrustes average and
+<a class="reference internal" href="pca-covariance-whitening.html"><span class="std std-doc">§4.3</span></a>’s PCA runs on the aligned
+residuals.</p></li>
+</ul>
+<div class="docutils container" id="id8">
+<div role="list" class="citation-list">
+<div class="citation" id="id17" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">GVL13</a><span class="fn-bracket">]</span></span>
+<p>Gene H. Golub and Charles F. Van Loan. <em>Matrix Computations</em>. Johns Hopkins University Press, Baltimore, 4 edition, 2013.</p>
+</div>
+<div class="citation" id="id20" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Hig08<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id5">2</a>)</span>
+<p>Nicholas J. Higham. <em>Functions of Matrices: Theory and Computation</em>. SIAM, Philadelphia, 2008. <a class="reference external" href="https://doi.org/10.1137/1.9780898717778">doi:10.1137/1.9780898717778</a>.</p>
+</div>
+<div class="citation" id="id65" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Kab76<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id4">1</a>,<a role="doc-backlink" href="#id7">2</a>)</span>
+<p>Wolfgang Kabsch. A solution for the best rotation to relate two sets of vectors. <em>Acta Crystallographica Section A</em>, 32(5):922–923, 1976. <a class="reference external" href="https://doi.org/10.1107/S0567739476001873">doi:10.1107/S0567739476001873</a>.</p>
+</div>
+<div class="citation" id="id64" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Schonemann66<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id3">1</a>,<a role="doc-backlink" href="#id6">2</a>)</span>
+<p>Peter H. Schönemann. A generalized solution of the orthogonal Procrustes problem. <em>Psychometrika</em>, 31(1):1–10, 1966. <a class="reference external" href="https://doi.org/10.1007/BF02289451">doi:10.1007/BF02289451</a>.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/04-svd"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="randomized-svd-sketching.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">4.4 Randomized SVD and Sketching</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../05-numerical/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Chapter V — Numerical Linear Algebra</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-factorization">The factorization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#nearest-orthogonal-matrix">Nearest orthogonal matrix</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#newton-s-iteration">Newton’s iteration</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#procrustes-and-the-kabsch-correction">Procrustes, and the Kabsch correction</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-left-handed-twin">The left-handed twin</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-one-rotation-one-stretch">Exercise 1: One rotation, one stretch</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-nearest-orthogonal-matrix">Exercise 2: The nearest orthogonal matrix</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-newton-s-iteration-and-its-quadratic-engine">Exercise 3: Newton’s iteration, and its quadratic engine</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-procrustes-the-best-rotation-is-a-polar-factor">Exercise 4: Procrustes: the best rotation is a polar factor</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-full-procrustes-scale-shift-rotate">Exercise 5: Full Procrustes: scale, shift, rotate</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-two-stretches-one-rotation-a-normality-meter">Exercise 6: Two stretches, one rotation — a normality meter</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

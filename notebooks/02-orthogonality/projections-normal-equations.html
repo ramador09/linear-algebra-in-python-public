@@ -1,0 +1,1481 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="2.1 Projections and the Normal Equations" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/02-orthogonality/projections-normal-equations.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: Chapter I asked what a matrix can reach. This chapter asks what to do when the thing you want is out of reach, which is the normal situati..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: Chapter I asked what a matrix can reach. This chapter asks what to do when the thing you want is out of reach, which is the normal situati..." />
+
+    <title>2.1 Projections and the Normal Equations &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/02-orthogonality/projections-normal-equations';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/02-orthogonality/projections-normal-equations.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="2.2 Gram–Schmidt, QR, Householder, and Givens" href="gram-schmidt-qr.html" />
+    <link rel="prev" title="Chapter II — Orthogonality and Least Squares" href="index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter II — Orthogonality and Least Squares</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/02-orthogonality/projections-normal-equations.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/02-orthogonality/projections-normal-equations.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/02-orthogonality/projections-normal-equations.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/02-orthogonality/projections-normal-equations.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>2.1 Projections and the Normal Equations</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#onto-a-line-then-onto-a-subspace">Onto a line, then onto a subspace</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-makes-p-a-projector">What makes <span class="math notranslate nohighlight">\(P\)</span> a projector</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#least-squares-and-why-least-squares">Least squares, and why “least squares”</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-the-projector-onto-a-line-is-a-matrix">Exercise 1: The projector onto a line is a matrix</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-onto-a-subspace-and-the-four-facts-that-follow">Exercise 2: Onto a subspace, and the four facts that follow</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-normal-equations-and-a-line-through-four-points">Exercise 3: The normal equations, and a line through four points</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-more-columns-fitting-a-plane">Exercise 4: More columns: fitting a plane</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-the-complementary-projector-and-the-two-halves-of-the-data">Exercise 5: The complementary projector, and the two halves of the data</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="projections-and-the-normal-equations">
+<h1>2.1 Projections and the Normal Equations<a class="headerlink" href="#projections-and-the-normal-equations" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter II — Orthogonality and Least Squares
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;2.1
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">When Ax = b has no solution — which is almost always — the useful question is which x comes closest. The answer is a perpendicular dropped onto a subspace, and it is the most-used computation in applied mathematics.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;intermediate&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;75–105 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p>Chapter I asked what a matrix can reach. This chapter asks what to do when the
+thing you want is out of reach, which is the normal situation.</p>
+<p><a class="reference internal" href="../01-matrices/four-subspaces.html"><span class="std std-doc">§1.4</span></a> established that
+<span class="math notranslate nohighlight">\(A\mathbf{x} = \mathbf{b}\)</span> has a solution exactly when <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> lies in the
+column space. Real data essentially never does: measure four points that should
+lie on a line and they will not, because measurements carry noise and models
+are approximations. The system is inconsistent, and asking for an exact
+solution is asking the wrong question.</p>
+<p>The right question is: which <span class="math notranslate nohighlight">\(\mathbf{x}\)</span> makes <span class="math notranslate nohighlight">\(A\mathbf{x}\)</span> <em>closest</em> to
+<span class="math notranslate nohighlight">\(\mathbf{b}\)</span>? And the answer is entirely geometric. The reachable vectors form
+the column space, a subspace; the closest point of a subspace to a given point
+is the foot of the perpendicular from it; so the answer is
+<span class="math notranslate nohighlight">\(\mathbf{p} = P\mathbf{b}\)</span>, where <span class="math notranslate nohighlight">\(P\)</span> is the orthogonal projector onto <span class="math notranslate nohighlight">\(C(A)\)</span>.
+Everything else in this notebook — the normal equations, the formula
+<span class="math notranslate nohighlight">\(P = A(A^{\top}A)^{-1}A^{\top}\)</span>, the fact that the residual is orthogonal to
+every column — is that one sentence written out.</p>
+<p>The picture is the one <a class="reference internal" href="../01-matrices/four-subspaces.html"><span class="std std-doc">§1.4</span></a> drew in
+<span class="math notranslate nohighlight">\(\mathbb{R}^3\)</span>: an amber plane, a perpendicular line, and <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> split
+between them. Here we compute with it. And the residual is not an
+embarrassment: it is exactly the component of the data in
+<span class="math notranslate nohighlight">\(N(A^{\top})\)</span>, the part no choice of parameters could ever explain, and its
+size is the honest measure of how well the model fits.</p>
+<p>One warning to carry forward. The formula <span class="math notranslate nohighlight">\(P = A(A^{\top}A)^{-1}A^{\top}\)</span> and
+the normal equations <span class="math notranslate nohighlight">\(A^{\top}A\hat{\mathbf{x}} = A^{\top}\mathbf{b}\)</span> are
+correct, and they are <em>not</em> how a numerical library solves least squares.
+Forming <span class="math notranslate nohighlight">\(A^{\top}A\)</span> squares the condition number, which
+<a class="reference internal" href="least-squares-four-ways.html"><span class="std std-doc">§2.3</span></a> measures and
+<a class="reference internal" href="gram-schmidt-qr.html"><span class="std std-doc">§2.2</span></a> repairs. This notebook establishes the geometry;
+those two fix the arithmetic.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> Strang <span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id4" title="Gilbert Strang. Introduction to Linear Algebra. Wellesley-Cambridge Press, Wellesley, MA, 6 edition, 2023. ISBN 978-1-7331466-7-8.">Str23</a>]</span> Chapter 4 is the source of this
+notebook’s framing; Boyd and Vandenberghe <span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id7" title="Stephen Boyd and Lieven Vandenberghe. Introduction to Applied Linear Algebra: Vectors, Matrices, and Least Squares. Cambridge University Press, 2018. doi:10.1017/9781108583664.">BV18</a>]</span> Chapters 12–13
+give the applied version, with far more examples than fit here.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="onto-a-line-then-onto-a-subspace">
+<h3>Onto a line, then onto a subspace<a class="headerlink" href="#onto-a-line-then-onto-a-subspace" title="Link to this heading">#</a></h3>
+<p><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html"><span class="std std-doc">§0.3</span></a> projected
+<span class="math notranslate nohighlight">\(\mathbf{b}\)</span> onto a single direction <span class="math notranslate nohighlight">\(\mathbf{a}\)</span>:</p>
+<div class="math notranslate nohighlight" id="equation-eq-proj-line">
+<span class="eqno">(100)<a class="headerlink" href="#equation-eq-proj-line" title="Link to this equation">#</a></span>\[\mathbf{p} = \frac{\mathbf{a}^{\top}\mathbf{b}}{\mathbf{a}^{\top}\mathbf{a}}\,\mathbf{a}
+= \underbrace{\frac{\mathbf{a}\mathbf{a}^{\top}}{\mathbf{a}^{\top}\mathbf{a}}}_{P}\,\mathbf{b} .\]</div>
+<p>Written that second way it is a <strong>matrix</strong> times <span class="math notranslate nohighlight">\(\mathbf{b}\)</span>, and that matrix
+is the projector onto the line. Replacing the single column <span class="math notranslate nohighlight">\(\mathbf{a}\)</span> by a
+full matrix <span class="math notranslate nohighlight">\(A\)</span> and repeating the derivation gives the general case.</p>
+<p>We want <span class="math notranslate nohighlight">\(\mathbf{p} = A\hat{\mathbf{x}}\)</span> in the column space with
+<span class="math notranslate nohighlight">\(\mathbf{e} = \mathbf{b} - A\hat{\mathbf{x}}\)</span> perpendicular to that space —
+that is, perpendicular to every column of <span class="math notranslate nohighlight">\(A\)</span>. Perpendicular to every column
+means <span class="math notranslate nohighlight">\(A^{\top}\mathbf{e} = \mathbf{0}\)</span>, so</p>
+<div class="math notranslate nohighlight" id="equation-eq-proj-normal">
+<span class="eqno">(101)<a class="headerlink" href="#equation-eq-proj-normal" title="Link to this equation">#</a></span>\[A^{\top}\big(\mathbf{b} - A\hat{\mathbf{x}}\big) = \mathbf{0}
+\qquad\Longleftrightarrow\qquad
+A^{\top}\!A\,\hat{\mathbf{x}} = A^{\top}\mathbf{b} ,\]</div>
+<p>the <strong>normal equations</strong>. When <span class="math notranslate nohighlight">\(A\)</span> has independent columns, <span class="math notranslate nohighlight">\(A^{\top}A\)</span> is
+invertible and</p>
+<div class="math notranslate nohighlight" id="equation-eq-proj-projector">
+<span class="eqno">(102)<a class="headerlink" href="#equation-eq-proj-projector" title="Link to this equation">#</a></span>\[\hat{\mathbf{x}} = (A^{\top}\!A)^{-1}A^{\top}\mathbf{b},
+\qquad
+\mathbf{p} = A\hat{\mathbf{x}} = \underbrace{A(A^{\top}\!A)^{-1}A^{\top}}_{P}\,\mathbf{b}.\]</div>
+<p>The name “normal” is about the perpendicular, not about normalisation or the
+normal distribution.</p>
+</section>
+<section id="what-makes-p-a-projector">
+<h3>What makes <span class="math notranslate nohighlight">\(P\)</span> a projector<a class="headerlink" href="#what-makes-p-a-projector" title="Link to this heading">#</a></h3>
+<p>Two properties characterise an orthogonal projector completely:</p>
+<div class="math notranslate nohighlight" id="equation-eq-proj-properties">
+<span class="eqno">(103)<a class="headerlink" href="#equation-eq-proj-properties" title="Link to this equation">#</a></span>\[P^2 = P \quad\text{(idempotent)}, \qquad P^{\top} = P \quad\text{(symmetric)} .\]</div>
+<p>Idempotence says projecting an already-projected vector changes nothing —
+obvious geometrically, and a real constraint algebraically. Symmetry is what
+makes the projection <em>orthogonal</em> rather than oblique. Two consequences used
+throughout:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\operatorname{trace} P = \operatorname{rank} A\)</span>, since a projector’s
+eigenvalues are all 0 or 1 and the number of 1s is the dimension of the space
+projected onto;</p></li>
+<li><p><span class="math notranslate nohighlight">\(I - P\)</span> is also a projector, onto the orthogonal complement — which by
+<a class="reference internal" href="../01-matrices/four-subspaces.html"><span class="std std-doc">§1.4</span></a> is <span class="math notranslate nohighlight">\(N(A^{\top})\)</span>.</p></li>
+</ul>
+</section>
+<section id="least-squares-and-why-least-squares">
+<h3>Least squares, and why “least squares”<a class="headerlink" href="#least-squares-and-why-least-squares" title="Link to this heading">#</a></h3>
+<p>Minimising <span class="math notranslate nohighlight">\(\|\mathbf{b} - A\mathbf{x}\|_2^2\)</span> over <span class="math notranslate nohighlight">\(\mathbf{x}\)</span> and setting the
+gradient to zero returns <a class="reference internal" href="#equation-eq-proj-normal">Eq. 101</a> exactly. So the geometric answer
+and the calculus answer agree, and the quantity being minimised is a sum of
+squared residuals — which is where the name comes from. Because
+<span class="math notranslate nohighlight">\(\mathbf{p} \perp \mathbf{e}\)</span>, Pythagoras applies:</p>
+<div class="math notranslate nohighlight" id="equation-eq-proj-pythagoras">
+<span class="eqno">(104)<a class="headerlink" href="#equation-eq-proj-pythagoras" title="Link to this equation">#</a></span>\[\|\mathbf{b}\|^2 = \|\mathbf{p}\|^2 + \|\mathbf{e}\|^2 ,\]</div>
+<p>so <span class="math notranslate nohighlight">\(\|\mathbf{e}\|\)</span> measures exactly how much of the data the model failed to
+capture.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data only: the worked vectors and matrices. The projector formula — this
+notebook’s central object — is built in Exercise 2, where it is the lesson.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sympy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">la</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random vector below comes from this seed</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">110</span><span class="p">)</span>
+
+<span class="c1"># The worked data of Exercises 2, 3 and 5: four measurements at integer</span>
+<span class="c1"># times, chosen</span>
+<span class="c1"># so the least-squares line comes out with exactly integer coefficients and an</span>
+<span class="c1"># exactly integer residual, so every check can be made without a tolerance.</span>
+<span class="n">T_DATA</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">])</span>
+<span class="n">B_DATA</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-the-projector-onto-a-line-is-a-matrix">
+<h2>Exercise 1: The projector onto a line is a matrix<a class="headerlink" href="#exercise-1-the-projector-onto-a-line-is-a-matrix" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-proj-line">Eq. 100</a> was written in <a class="reference internal" href="../00-machine/vectors-norms-inner-products.html"><span class="std std-doc">§0.3</span></a>
+as a formula producing a vector. Regrouping it as
+<span class="math notranslate nohighlight">\(\big(\mathbf{a}\mathbf{a}^{\top}/\mathbf{a}^{\top}\mathbf{a}\big)\mathbf{b}\)</span>
+turns it into a <strong>matrix</strong> acting on <span class="math notranslate nohighlight">\(\mathbf{b}\)</span>, and that shift is what makes
+the generalisation to subspaces possible: a projector is an object in its own
+right, not a recipe applied to one vector at a time.</p>
+<p>The matrix <span class="math notranslate nohighlight">\(\mathbf{a}\mathbf{a}^{\top}\)</span> is an outer product, so by
+<a class="reference internal" href="../01-matrices/four-ways-to-multiply.html"><span class="std std-doc">§1.1</span></a> it has rank exactly 1 —
+and dividing by the scalar <span class="math notranslate nohighlight">\(\mathbf{a}^{\top}\mathbf{a}\)</span> does not change that.
+So the projector onto a line has rank 1, and its trace must therefore be 1.</p>
+<p>Use the specific direction <span class="math notranslate nohighlight">\(\mathbf{a} = (2, 1)^{\top}\)</span>, for which
+<span class="math notranslate nohighlight">\(\mathbf{a}^{\top}\mathbf{a} = 5\)</span> and</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+P = \frac{1}{5}\begin{bmatrix} 4 &amp; 2\\ 2 &amp; 1\end{bmatrix}.
+\end{split}\]</div>
+<p><strong>Part a)</strong> Build <span class="math notranslate nohighlight">\(P\)</span> two ways for <span class="math notranslate nohighlight">\(\mathbf{a} = (2,1)^{\top}\)</span>: as
+<code class="docutils literal notranslate"><span class="pre">np.outer(a,</span> <span class="pre">a)</span> <span class="pre">/</span> <span class="pre">(a</span> <span class="pre">&#64;</span> <span class="pre">a)</span></code>, and by spelling out the general formula
+<a class="reference internal" href="#equation-eq-proj-projector">Eq. 102</a> on the column matrix <code class="docutils literal notranslate"><span class="pre">A1</span> <span class="pre">=</span> <span class="pre">a_dir.reshape(-1,</span> <span class="pre">1)</span></code> —
+<code class="docutils literal notranslate"><span class="pre">A1</span> <span class="pre">&#64;</span> <span class="pre">np.linalg.solve(A1.T</span> <span class="pre">&#64;</span> <span class="pre">A1,</span> <span class="pre">A1.T)</span></code>. Confirm the two agree to
+<span class="math notranslate nohighlight">\(10^{-14}\)</span> and both equal the stated <span class="math notranslate nohighlight">\(\tfrac15\begin{psmallmatrix}4&amp;2\\2&amp;1\end{psmallmatrix}\)</span>.</p>
+<p><strong>Part b)</strong> Confirm the defining properties <a class="reference internal" href="#equation-eq-proj-properties">Eq. 103</a>:
+<span class="math notranslate nohighlight">\(P^2 = P\)</span> and <span class="math notranslate nohighlight">\(P^{\top} = P\)</span>, each to <span class="math notranslate nohighlight">\(10^{-14}\)</span>. Then confirm
+<span class="math notranslate nohighlight">\(\operatorname{trace} P = 1\)</span> and <span class="math notranslate nohighlight">\(\operatorname{rank} P = 1\)</span> using
+<code class="docutils literal notranslate"><span class="pre">np.trace</span></code> and <code class="docutils literal notranslate"><span class="pre">np.linalg.matrix_rank</span></code>.</p>
+<p><strong>Part c)</strong> Confirm the projector reproduces
+<a class="reference internal" href="../00-machine/vectors-norms-inner-products.html"><span class="std std-doc">§0.3</span></a>’s answer: for
+<span class="math notranslate nohighlight">\(\mathbf{b} = (3,4)^{\top}\)</span>, check that <span class="math notranslate nohighlight">\(P\mathbf{b}\)</span> equals
+<span class="math notranslate nohighlight">\(\big((\mathbf{a}^{\top}\mathbf{b})/(\mathbf{a}^{\top}\mathbf{a})\big)\mathbf{a}\)</span>
+exactly, and that the residual <span class="math notranslate nohighlight">\(\mathbf{b} - P\mathbf{b}\)</span> satisfies
+<span class="math notranslate nohighlight">\(\mathbf{a}^{\top}(\mathbf{b} - P\mathbf{b}) = 0\)</span> to <span class="math notranslate nohighlight">\(10^{-15}\)</span>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>P from the outer product:
+ [[0.8 0.4]
+ [0.4 0.2]]
+
+agrees with the general formula: 0.000e+00
+agrees with the stated form: 0.000e+00
+
+P^2 - P        : 1.110e-16
+P^T - P        : 0.000e+00
+trace P        : 1.0000000000   (= rank of the line)
+rank P         : 1
+
+P b            : [4. 2.]
+formula of Eq.1: [4. 2.]
+residual       : [-1.  2.]   a . residual = 0.000e+00
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<p>The two constructions of <span class="math notranslate nohighlight">\(P\)</span> share no code — one is an outer product, one goes
+through <span class="math notranslate nohighlight">\((A^{\top}A)^{-1}\)</span> — so their agreement is real evidence rather than a
+restatement. The rank and trace checks confirm the object is what its geometry
+requires.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the outer-product and (A^T A)^-1 constructions of P agree   [max|Δ| = 0 (rtol=0, atol=1e-14)]
+✓  and both equal (1/5)[[4, 2], [2, 1]]   [max|Δ| = 0 (rtol=0, atol=1e-14)]
+✓  P is idempotent: P^2 = P (Eq. 4)   [max|Δ| = 1.11022e-16 (rtol=0, atol=1e-14)]
+✓  and symmetric, which is what makes the projection orthogonal   [max|Δ| = 0 (rtol=0, atol=1e-14)]
+✓  trace P = 1 = the dimension of the line it projects onto   [got 1 vs expected 1 (rtol=0, atol=1e-14)]
+✓  P b reproduces the projection formula of section 0.3   [max|Δ| = 0 (rtol=0, atol=1e-14)]
+✓  and the residual is orthogonal to the direction   [got 0 vs expected 0 (rtol=0, atol=1e-15)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-onto-a-subspace-and-the-four-facts-that-follow">
+<h2>Exercise 2: Onto a subspace, and the four facts that follow<a class="headerlink" href="#exercise-2-onto-a-subspace-and-the-four-facts-that-follow" title="Link to this heading">#</a></h2>
+<p>Replacing the single column of Exercise 1 by a matrix gives
+<a class="reference internal" href="#equation-eq-proj-projector">Eq. 102</a>, and the properties generalise exactly.</p>
+<p>One subtlety is worth stating because it is the whole reason projectors are the
+right object. <span class="math notranslate nohighlight">\(P\)</span> depends only on the <strong>column space</strong> of <span class="math notranslate nohighlight">\(A\)</span>, not on <span class="math notranslate nohighlight">\(A\)</span>
+itself. Replace the columns by any other basis of the same space — scale them,
+reorder them, take combinations — and <span class="math notranslate nohighlight">\(P\)</span> is unchanged. That is why
+<a class="reference internal" href="../01-matrices/four-subspaces.html"><span class="std std-doc">§1.4</span></a> compared subspaces through their
+projectors, and it is what makes <span class="math notranslate nohighlight">\(P\)</span> a property of the geometry rather than of
+the parametrisation.</p>
+<p>Use the explicit <span class="math notranslate nohighlight">\(4\times2\)</span> matrix</p>
+<div class="math notranslate nohighlight" id="equation-eq-proj-design">
+<span class="eqno">(105)<a class="headerlink" href="#equation-eq-proj-design" title="Link to this equation">#</a></span>\[\begin{split}A = \begin{bmatrix} 1 &amp; 0\\ 1 &amp; 1\\ 1 &amp; 2\\ 1 &amp; 3 \end{bmatrix},\end{split}\]</div>
+<p>whose columns span a two-dimensional subspace of <span class="math notranslate nohighlight">\(\mathbb{R}^4\)</span>. It is the
+<strong>design matrix</strong> of the line fit in Exercise 3: its first column is the
+constant term, its second the times <span class="math notranslate nohighlight">\(t = 0,1,2,3\)</span>.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">projector_onto(A)</span></code> — <a class="reference internal" href="#equation-eq-proj-projector">Eq. 102</a>, computed by
+SOLVING with <span class="math notranslate nohighlight">\(A^{\top}A\)</span> rather than inverting it. Build <span class="math notranslate nohighlight">\(P\)</span> for
+<a class="reference internal" href="#equation-eq-proj-design">Eq. 105</a> with it, and</p>
+<p><strong>Write this one yourself</strong> — the implementation is the lesson.</p>
+<p>confirm <span class="math notranslate nohighlight">\(P^2 = P\)</span> and <span class="math notranslate nohighlight">\(P^{\top} = P\)</span> to <span class="math notranslate nohighlight">\(10^{-13}\)</span>, and that
+<span class="math notranslate nohighlight">\(\operatorname{trace} P = 2 = \operatorname{rank} A\)</span> to <span class="math notranslate nohighlight">\(10^{-12}\)</span>.</p>
+<p><strong>Part b)</strong> Confirm <span class="math notranslate nohighlight">\(P\)</span> acts as the identity on the column space and
+annihilates its complement: check <span class="math notranslate nohighlight">\(PA = A\)</span> to <span class="math notranslate nohighlight">\(10^{-13}\)</span> (every column of <span class="math notranslate nohighlight">\(A\)</span>
+is already in <span class="math notranslate nohighlight">\(C(A)\)</span>, so projecting changes nothing), and that for the left
+null space basis <span class="math notranslate nohighlight">\(Y\)</span> obtained as the last <strong>two</strong> columns of
+<code class="docutils literal notranslate"><span class="pre">np.linalg.svd(A)[0]</span></code> (the <span class="math notranslate nohighlight">\(4\times2\)</span> design has a two-dimensional
+<span class="math notranslate nohighlight">\(N(A^{\top})\)</span>), <span class="math notranslate nohighlight">\(PY = 0\)</span> to <span class="math notranslate nohighlight">\(10^{-13}\)</span>.</p>
+<p><strong>Part c)</strong> Confirm <span class="math notranslate nohighlight">\(P\)</span> depends only on the subspace, not on the basis. Form
+<span class="math notranslate nohighlight">\(A' = A M\)</span> for 50 random invertible <span class="math notranslate nohighlight">\(2\times2\)</span> matrices <span class="math notranslate nohighlight">\(M\)</span> drawn from
+<code class="docutils literal notranslate"><span class="pre">rng.standard_normal((2,</span> <span class="pre">2))</span></code> (rejecting any with <span class="math notranslate nohighlight">\(|\det| &lt; 0.1\)</span>), build the
+projector of each, and confirm every one equals <span class="math notranslate nohighlight">\(P\)</span> to <span class="math notranslate nohighlight">\(10^{-11}\)</span>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>A (design matrix of Eq. 6):
+ [[1. 0.]
+ [1. 1.]
+ [1. 2.]
+ [1. 3.]]
+
+P = A (A^T A)^-1 A^T:
+ [[ 0.7  0.4  0.1 -0.2]
+ [ 0.4  0.3  0.2  0.1]
+ [ 0.1  0.2  0.3  0.4]
+ [-0.2  0.1  0.4  0.7]]
+
+P^2 - P                 : 2.220e-16
+P^T - P                 : 5.551e-17
+trace P                 : 2.0000000000   rank A = 2
+|P A - A|               : 5.551e-16
+|P y| for y in N(A^T)   : 1.290e-16
+
+P is unchanged under 50 changes of basis: max gap 3.905e-13
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<p>The basis-independence check is the important one: it establishes that <span class="math notranslate nohighlight">\(P\)</span> is
+an invariant of the subspace, which is what licenses using projectors to
+compare subspaces at all. The annihilation check uses the left null space from
+<a class="reference internal" href="../01-matrices/four-subspaces.html"><span class="std std-doc">§1.4</span></a>, a route the projector’s
+construction never touched.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  P^2 = P for the subspace projector   [max|Δ| = 2.22045e-16 (rtol=0, atol=1e-13)]
+✓  and P^T = P   [max|Δ| = 5.55112e-17 (rtol=0, atol=1e-13)]
+✓  trace P = 2 = rank A (Eq. 4&#39;s consequence)   [got 2 vs expected 2 (rtol=0, atol=1e-12)]
+✓  P acts as the identity on the column space: P A = A   [max|Δ| = 5.55112e-16 (rtol=0, atol=1e-13)]
+✓  and annihilates the left null space, its orthogonal complement   [max|Δ| = 1.28991e-16 (rtol=0, atol=1e-13)]
+✓  P depends only on the SUBSPACE, not on the basis (50 changes of basis)   [largest gap 3.90e-13: the projector is an invariant of the geometry]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-the-normal-equations-and-a-line-through-four-points">
+<h2>Exercise 3: The normal equations, and a line through four points<a class="headerlink" href="#exercise-3-the-normal-equations-and-a-line-through-four-points" title="Link to this heading">#</a></h2>
+<p>Now the computation the whole chapter exists for.</p>
+<p>Four measurements are taken at times <span class="math notranslate nohighlight">\(t = 0, 1, 2, 3\)</span>, giving values
+<span class="math notranslate nohighlight">\(\mathbf{b} = (2, 1, 6, 7)^{\top}\)</span>. We want the straight line
+<span class="math notranslate nohighlight">\(y = C + Dt\)</span> that fits them best. Writing the four equations
+<span class="math notranslate nohighlight">\(C + Dt_i = b_i\)</span> in matrix form gives <span class="math notranslate nohighlight">\(A\mathbf{x} = \mathbf{b}\)</span> with <span class="math notranslate nohighlight">\(A\)</span> the
+design matrix <a class="reference internal" href="#equation-eq-proj-design">Eq. 105</a> and <span class="math notranslate nohighlight">\(\mathbf{x} = (C, D)^{\top}\)</span> — four
+equations, two unknowns, and no exact solution, since the four points are not
+collinear.</p>
+<p>The normal equations <a class="reference internal" href="#equation-eq-proj-normal">Eq. 101</a> reduce it to a <span class="math notranslate nohighlight">\(2\times2\)</span> system.
+Here</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A^{\top}\!A = \begin{bmatrix} 4 &amp; 6\\ 6 &amp; 14\end{bmatrix},
+\qquad
+A^{\top}\mathbf{b} = \begin{pmatrix} 16\\ 34 \end{pmatrix},
+\end{split}\]</div>
+<p>with <span class="math notranslate nohighlight">\(\det(A^{\top}A) = 20\)</span>, and the data was chosen so the solution comes out
+exactly <span class="math notranslate nohighlight">\(\hat{\mathbf{x}} = (1, 2)^{\top}\)</span>: the best-fit line is <span class="math notranslate nohighlight">\(y = 1 + 2t\)</span>,
+passing through <span class="math notranslate nohighlight">\((1, 3, 5, 7)\)</span>, with residual
+<span class="math notranslate nohighlight">\(\mathbf{e} = (1, -2, 1, 0)^{\top}\)</span> and <span class="math notranslate nohighlight">\(\|\mathbf{e}\|^2 = 6\)</span>. Every quantity
+is an integer, so every check in this exercise is exact.</p>
+<p>Note the two entries of <span class="math notranslate nohighlight">\(A^{\top}A\)</span>: the top-left is <span class="math notranslate nohighlight">\(m = 4\)</span>, the count, and
+the rest are sums of <span class="math notranslate nohighlight">\(t_i\)</span> and <span class="math notranslate nohighlight">\(t_i^2\)</span>. The normal equations for a line fit are
+the familiar formulas from a statistics course, and this is where they come
+from.</p>
+<p><strong>Part a)</strong> Build <span class="math notranslate nohighlight">\(A\)</span> from <code class="docutils literal notranslate"><span class="pre">np.column_stack([np.ones(4),</span> <span class="pre">T_DATA])</span></code> and form
+<span class="math notranslate nohighlight">\(A^{\top}A\)</span> and <span class="math notranslate nohighlight">\(A^{\top}\mathbf{b}\)</span> explicitly. Confirm they equal the
+matrices stated above exactly, and that <span class="math notranslate nohighlight">\(\det(A^{\top}A) = 20\)</span> via
+<code class="docutils literal notranslate"><span class="pre">np.linalg.det</span></code>.</p>
+<p><strong>Part b)</strong> Solve the normal equations with <code class="docutils literal notranslate"><span class="pre">np.linalg.solve(A.T</span> <span class="pre">&#64;</span> <span class="pre">A,</span> <span class="pre">A.T</span> <span class="pre">&#64;</span> <span class="pre">b)</span></code>
+and confirm <span class="math notranslate nohighlight">\(\hat{\mathbf{x}} = (1, 2)\)</span> to <span class="math notranslate nohighlight">\(10^{-13}\)</span>. Cross-check against
+<code class="docutils literal notranslate"><span class="pre">np.linalg.lstsq(A,</span> <span class="pre">b,</span> <span class="pre">rcond=None)[0]</span></code> and against
+<code class="docutils literal notranslate"><span class="pre">np.polyfit(T_DATA,</span> <span class="pre">B_DATA,</span> <span class="pre">1)</span></code> (which returns coefficients in decreasing
+order, so reverse it), requiring agreement to <span class="math notranslate nohighlight">\(10^{-12}\)</span>.</p>
+<p><strong>Part c)</strong> Confirm the geometry. Form <span class="math notranslate nohighlight">\(\mathbf{p} = A\hat{\mathbf{x}}\)</span> and
+<span class="math notranslate nohighlight">\(\mathbf{e} = \mathbf{b} - \mathbf{p}\)</span>, and check: <span class="math notranslate nohighlight">\(\mathbf{p} = (1,3,5,7)\)</span> and
+<span class="math notranslate nohighlight">\(\mathbf{e} = (1,-2,1,0)\)</span> to <span class="math notranslate nohighlight">\(10^{-13}\)</span>; <span class="math notranslate nohighlight">\(A^{\top}\mathbf{e} = \mathbf{0}\)</span> to
+<span class="math notranslate nohighlight">\(10^{-13}\)</span>, so the residual is orthogonal to <strong>both</strong> columns; and Pythagoras
+<a class="reference internal" href="#equation-eq-proj-pythagoras">Eq. 104</a>, <span class="math notranslate nohighlight">\(\|\mathbf{b}\|^2 = 90 = 84 + 6\)</span>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>A^T A =
+ [[ 4.  6.]
+ [ 6. 14.]] 
+   det = 20.0000000000
+A^T b = [16. 34.]
+
+normal equations : [1. 2.]
+np.linalg.lstsq  : [1. 2.]
+np.polyfit       : [1. 2.]
+best-fit line    : y = 1 + 2 t
+
+p = A x_hat      : [1. 3. 5. 7.]
+e = b - p        : [ 1. -2.  1.  0.]
+A^T e            : [0. 0.]   (orthogonal to both columns)
+
+||b||^2 = 90.0   ||p||^2 = 84.0   ||e||^2 = 6.0
+Pythagoras: 84.0 + 6.0 = 90.0
+
+exact solution over the rationals: [1, 2]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-proj-line-fit">
+<img alt="../../_images/7cd1c71bd740e41a8ce73a543bbcecf02cd37dd57e39a0f251f4eb27f6fe9d2e.png" src="../../_images/7cd1c71bd740e41a8ce73a543bbcecf02cd37dd57e39a0f251f4eb27f6fe9d2e.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 39 </span><span class="caption-text">The four measurements <span class="math notranslate nohighlight">\(\mathbf{b} = (2,1,6,7)\)</span> at times <span class="math notranslate nohighlight">\(t = 0,1,2,3\)</span> (ink points) and the least-squares line <span class="math notranslate nohighlight">\(y = 1 + 2t\)</span> (amber), whose values <span class="math notranslate nohighlight">\((1,3,5,7)\)</span> are the projection <span class="math notranslate nohighlight">\(\mathbf{p} = P\mathbf{b}\)</span> of the data onto the column space of the design matrix. The vertical segments are the residuals <span class="math notranslate nohighlight">\(\mathbf{e} = (1,-2,1,0)\)</span>, whose squared lengths sum to <span class="math notranslate nohighlight">\(\|\mathbf{e}\|^2 = 6\)</span> — the quantity least squares minimises, and the part of the data no straight line can explain.</span><a class="headerlink" href="#fig-proj-line-fit" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<p>Every quantity here is an integer by construction, so the checks carry no
+tolerance beyond what the solve introduces. The exact rational solution is
+computed independently with SymPy, and the three floating-point routes —
+normal equations, <code class="docutils literal notranslate"><span class="pre">lstsq</span></code>, and <code class="docutils literal notranslate"><span class="pre">polyfit</span></code> — must all agree with it.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  A^T A is exactly [[4, 6], [6, 14]]   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  and A^T b is exactly (16, 34)   [max|Δ| = 0 (rtol=0, atol=0)]
+✓  the normal equations give x_hat = (1, 2)   [max|Δ| = 0 (rtol=0, atol=1e-13)]
+✓  and the exact rational solution is (1, 2) with no rounding at all   [SymPy over the rationals, an independent route]
+✓  np.linalg.lstsq agrees   [max|Δ| = 0 (rtol=0, atol=1e-12)]
+✓  and so does np.polyfit   [max|Δ| = 1.55431e-15 (rtol=0, atol=1e-12)]
+✓  the fitted values are exactly (1, 3, 5, 7)   [max|Δ| = 0 (rtol=0, atol=1e-13)]
+✓  and the residual is exactly (1, -2, 1, 0)   [max|Δ| = 0 (rtol=0, atol=1e-13)]
+✓  A^T e = 0: the residual is orthogonal to both columns (Eq. 2)   [max|Δ| = 0 (rtol=0, atol=1e-13)]
+✓  Pythagoras: 90 = 84 + 6 (Eq. 5)   [got 90 vs expected 90 (rtol=0, atol=1e-12)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-more-columns-fitting-a-plane">
+<h2>Exercise 4: More columns: fitting a plane<a class="headerlink" href="#exercise-4-more-columns-fitting-a-plane" title="Link to this heading">#</a></h2>
+<p>Nothing in <a class="reference internal" href="#equation-eq-proj-normal">Eq. 101</a> cared that <span class="math notranslate nohighlight">\(A\)</span> had two columns. Adding a third
+fits a plane <span class="math notranslate nohighlight">\(z = c + a x + b y\)</span> instead of a line, and the machinery is
+unchanged — which is the point. “Least squares” is not a family of formulas
+per model; it is one projection, with the model living entirely in the columns
+of <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<p>Take six sample points <span class="math notranslate nohighlight">\((x_i, y_i)\)</span> and measured heights <span class="math notranslate nohighlight">\(z_i\)</span>:</p>
+<div class="math notranslate nohighlight" id="equation-eq-proj-plane-data">
+<span class="eqno">(106)<a class="headerlink" href="#equation-eq-proj-plane-data" title="Link to this equation">#</a></span>\[\begin{split}\begin{array}{c|cccccc}
+(x, y) &amp; (0,0) &amp; (1,0) &amp; (0,1) &amp; (1,1) &amp; (2,1) &amp; (1,2)\\ \hline
+z &amp; 1.0 &amp; 2.5 &amp; 2.5 &amp; 4.3 &amp; 4.8 &amp; 5.9
+\end{array}
+\qquad
+A = \begin{bmatrix} 1 &amp; x_1 &amp; y_1\\ \vdots &amp; \vdots &amp; \vdots\\ 1 &amp; x_6 &amp; y_6\end{bmatrix} .\end{split}\]</div>
+<p>Six equations, three unknowns. The design matrix has a column of ones for the
+constant and one column per coordinate, and everything else proceeds exactly as
+in Exercise 3.</p>
+<p>The residual now has a clean interpretation worth naming. By
+<a class="reference internal" href="../01-matrices/four-subspaces.html"><span class="std std-doc">§1.4</span></a>, <span class="math notranslate nohighlight">\(\mathbf{e}\)</span> lies in
+<span class="math notranslate nohighlight">\(N(A^{\top})\)</span>, which for this <span class="math notranslate nohighlight">\(A\)</span> has dimension <span class="math notranslate nohighlight">\(6 - 3 = 3\)</span>. So the six
+measurements decompose into three numbers a plane can represent and three it
+cannot, and <span class="math notranslate nohighlight">\(\|\mathbf{e}\|\)</span> measures the second group. A model with more
+columns would leave a smaller residual — and fitting six columns to six points
+would leave none at all, which is exactly the overfitting that
+<a class="reference internal" href="../08-learning/learning-as-least-squares.html"><span class="std std-doc">§8.1</span></a> confronts.</p>
+<p><strong>Part a)</strong> Build <span class="math notranslate nohighlight">\(A\)</span> from <a class="reference internal" href="#equation-eq-proj-plane-data">Eq. 106</a> with
+<code class="docutils literal notranslate"><span class="pre">np.column_stack([np.ones(6),</span> <span class="pre">pts[:,</span> <span class="pre">0],</span> <span class="pre">pts[:,</span> <span class="pre">1]])</span></code>, solve the normal
+equations with <code class="docutils literal notranslate"><span class="pre">np.linalg.solve(A.T</span> <span class="pre">&#64;</span> <span class="pre">A,</span> <span class="pre">A.T</span> <span class="pre">&#64;</span> <span class="pre">z)</span></code>, and report the fitted
+plane. Cross-check against <code class="docutils literal notranslate"><span class="pre">np.linalg.lstsq(A,</span> <span class="pre">z,</span> <span class="pre">rcond=None)[0]</span></code> to
+<span class="math notranslate nohighlight">\(10^{-11}\)</span>.</p>
+<p><strong>Part b)</strong> Confirm the geometry survives the extra column: check
+<span class="math notranslate nohighlight">\(\operatorname{trace} P = 3 = \operatorname{rank} A\)</span> to <span class="math notranslate nohighlight">\(10^{-11}\)</span>,
+<span class="math notranslate nohighlight">\(A^{\top}\mathbf{e} = \mathbf{0}\)</span> to <span class="math notranslate nohighlight">\(10^{-12}\)</span> (now three orthogonality
+conditions, one per column), and Pythagoras to <span class="math notranslate nohighlight">\(10^{-11}\)</span>.</p>
+<p><strong>Part c)</strong> Confirm the residual lies in the left null space: compute
+<span class="math notranslate nohighlight">\(P_{N(A^{\top})} = I - P\)</span> and check <span class="math notranslate nohighlight">\(\big(I - P\big)\mathbf{e} = \mathbf{e}\)</span> to
+<span class="math notranslate nohighlight">\(10^{-12}\)</span> — the residual is already entirely in the unreachable subspace, so
+projecting it there changes nothing. Report <span class="math notranslate nohighlight">\(\dim N(A^{\top}) = 3\)</span> from
+<span class="math notranslate nohighlight">\(\operatorname{trace}(I - P)\)</span>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>A (6x3 design matrix):
+ [[1. 0. 0.]
+ [1. 1. 0.]
+ [1. 0. 1.]
+ [1. 1. 1.]
+ [1. 2. 1.]
+ [1. 1. 2.]]
+
+fitted plane: z = 1.068182 + 1.184091 x + 1.734091 y
+np.linalg.lstsq agrees to 3.775e-15
+
+trace P              : 3.0000000000   rank A = 3
+A^T e                : [0. 0. 0.]
+||z||^2 = 89.840000  =  ||p||^2 + ||e||^2 = 89.414773 + 0.425227
+
+residual norm        : 0.652095
+(I - P) e - e        : 2.054e-15
+trace(I - P)         : 3.0000000000   = m - r = 3
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<p>The check worth noticing is the last: <span class="math notranslate nohighlight">\((I-P)\mathbf{e} = \mathbf{e}\)</span> says the
+residual is <em>already</em> entirely in the unreachable subspace, so projecting it
+there is a no-op. That is a statement about where the residual lives, and it
+ties this exercise directly back to
+<a class="reference internal" href="../01-matrices/four-subspaces.html"><span class="std std-doc">§1.4</span></a>.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the normal equations and np.linalg.lstsq agree on the plane fit   [max|Δ| = 3.77476e-15 (rtol=0, atol=1e-11)]
+✓  trace P = 3 = rank A: the projector&#39;s trace counts the columns   [got 3 vs expected 3 (rtol=0, atol=1e-11)]
+✓  A^T e = 0: three orthogonality conditions, one per column   [max|Δ| = 6.21725e-15 (rtol=0, atol=1e-12)]
+✓  Pythagoras holds for the plane fit too   [got 89.84 vs expected 89.84 (rtol=0, atol=1e-11)]
+✓  (I - P) e = e: the residual already lies entirely in N(A^T)   [max|Δ| = 2.05391e-15 (rtol=0, atol=1e-12)]
+✓  and dim N(A^T) = m - r = 3, from trace(I - P)   [got 3 vs expected 3 (rtol=0, atol=1e-11)]
+✓  the residual is genuinely nonzero: the data does not lie on a plane   [||e|| = 0.6521, which is what the model cannot explain]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-the-complementary-projector-and-the-two-halves-of-the-data">
+<h2>Exercise 5: The complementary projector, and the two halves of the data<a class="headerlink" href="#exercise-5-the-complementary-projector-and-the-two-halves-of-the-data" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-proj-properties">Eq. 103</a> noted that <span class="math notranslate nohighlight">\(I - P\)</span> is also a projector. It is worth
+making that explicit, because the pair <span class="math notranslate nohighlight">\((P,\ I-P)\)</span> <em>is</em> the decomposition
+<a class="reference internal" href="../01-matrices/four-subspaces.html"><span class="std std-doc">§1.4</span></a> drew, now available as two
+matrices you can apply.</p>
+<p>For any <span class="math notranslate nohighlight">\(\mathbf{b}\)</span>,</p>
+<div class="math notranslate nohighlight" id="equation-eq-proj-splitting">
+<span class="eqno">(107)<a class="headerlink" href="#equation-eq-proj-splitting" title="Link to this equation">#</a></span>\[\mathbf{b} = \underbrace{P\mathbf{b}}_{\in\, C(A)}
+           + \underbrace{(I - P)\mathbf{b}}_{\in\, N(A^{\top})} ,
+\qquad P + (I - P) = I ,\]</div>
+<p>and the two pieces are orthogonal. The first is the part of the data the model
+can produce; the second is the part it cannot. Least squares keeps the first
+and reports the size of the second.</p>
+<p>There is one degenerate case worth checking, because it is the sanity boundary
+of the whole construction: if <span class="math notranslate nohighlight">\(A\)</span> is square and invertible, its column space is
+all of <span class="math notranslate nohighlight">\(\mathbb{R}^m\)</span>, nothing is unreachable, and <span class="math notranslate nohighlight">\(P\)</span> must be the identity
+with <span class="math notranslate nohighlight">\(I - P = 0\)</span>. Least squares then reduces to solving the system exactly,
+which is what it should do.</p>
+<p><strong>Part a)</strong> For the <span class="math notranslate nohighlight">\(4\times2\)</span> design matrix <a class="reference internal" href="#equation-eq-proj-design">Eq. 105</a>, build both
+<span class="math notranslate nohighlight">\(P\)</span> and <span class="math notranslate nohighlight">\(I - P\)</span>, and confirm: both are idempotent and symmetric to <span class="math notranslate nohighlight">\(10^{-13}\)</span>;
+<span class="math notranslate nohighlight">\(P + (I-P) = I\)</span> exactly; and <span class="math notranslate nohighlight">\(P(I-P) = 0\)</span> to <span class="math notranslate nohighlight">\(10^{-13}\)</span>, so the two ranges are
+orthogonal.</p>
+<p><strong>Part b)</strong> Confirm the trace split: <span class="math notranslate nohighlight">\(\operatorname{trace} P = 2\)</span> and
+<span class="math notranslate nohighlight">\(\operatorname{trace}(I-P) = 2\)</span>, summing to <span class="math notranslate nohighlight">\(m = 4\)</span>, matching the dimensions
+<span class="math notranslate nohighlight">\(r\)</span> and <span class="math notranslate nohighlight">\(m - r\)</span> of <a class="reference internal" href="../01-matrices/four-subspaces.html"><span class="std std-doc">§1.4</span></a>.</p>
+<p><strong>Part c)</strong> Confirm the degenerate case: for the invertible
+<span class="math notranslate nohighlight">\(A_{\text{sq}} = \begin{psmallmatrix}2&amp;1\\1&amp;3\end{psmallmatrix}\)</span>, build <span class="math notranslate nohighlight">\(P\)</span> and
+check it equals <span class="math notranslate nohighlight">\(I_2\)</span> to <span class="math notranslate nohighlight">\(10^{-13}\)</span>, that <span class="math notranslate nohighlight">\(I - P = 0\)</span>, and that the
+least-squares solution from <code class="docutils literal notranslate"><span class="pre">np.linalg.lstsq</span></code> equals <code class="docutils literal notranslate"><span class="pre">np.linalg.solve</span></code> to
+<span class="math notranslate nohighlight">\(10^{-13}\)</span> for the right-hand side <span class="math notranslate nohighlight">\(\mathbf{b} = (5, 10)^{\top}\)</span>.</p>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p>Ask for a function <code class="docutils literal notranslate"><span class="pre">oblique_projector(A,</span> <span class="pre">W)</span></code> producing the <em>oblique</em> projector
+<span class="math notranslate nohighlight">\(P_W = A(A^{\top}WA)^{-1}A^{\top}W\)</span> for a symmetric positive definite weight
+<span class="math notranslate nohighlight">\(W\)</span> — the projector behind <strong>weighted</strong> least squares, which
+<a class="reference internal" href="least-squares-four-ways.html"><span class="std std-doc">§2.3</span></a> uses when measurements have unequal
+uncertainties. Then check it yourself: it must satisfy <span class="math notranslate nohighlight">\(P_W^2 = P_W\)</span> to
+<span class="math notranslate nohighlight">\(10^{-12}\)</span> for 20 random <span class="math notranslate nohighlight">\(W\)</span>, it must <strong>fail</strong> <span class="math notranslate nohighlight">\(P_W^{\top} = P_W\)</span> whenever
+<span class="math notranslate nohighlight">\(W \neq I\)</span> (that is what “oblique” means), and it must reduce exactly to the
+<span class="math notranslate nohighlight">\(P\)</span> of this notebook when <span class="math notranslate nohighlight">\(W = I\)</span>. The check is yours.</p>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>P^2 - P          : 2.220e-16
+(I-P)^2 - (I-P)  : 1.665e-16
+(I-P)^T - (I-P)  : 5.551e-17
+P + (I-P) - I    : 0.000e+00
+P (I-P)          : 1.743e-16   (the ranges are orthogonal)
+
+trace P          : 2.0000000000   (= r)
+trace (I-P)      : 2.0000000000   (= m - r)
+sum              : 4.0000000000   (= m = 4)
+
+square invertible A (det = 5.0):
+  P - I                 : 2.220e-16
+  I - P                 : 2.220e-16
+  lstsq vs solve        : 1.332e-15
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<p>The degenerate case is the one that matters most as a check: if the
+construction did <em>not</em> reduce to an ordinary solve when nothing is unreachable,
+something would be wrong with the derivation rather than with the arithmetic.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  I - P is idempotent, so it is also a projector   [max|Δ| = 1.66533e-16 (rtol=0, atol=1e-13)]
+✓  and symmetric, so it is an ORTHOGONAL projector   [max|Δ| = 5.55112e-17 (rtol=0, atol=1e-13)]
+✓  trace P = 2 = r, the dimension of the plane it projects onto   [got 2 vs expected 2 (rtol=0, atol=1e-12)]
+✓  P (I - P) = 0: their ranges are orthogonal subspaces   [max|Δ| = 1.74305e-16 (rtol=0, atol=1e-13)]
+✓  and trace (I - P) = 2 = m - r, matching the split of section 1.4   [got 2 vs expected 2 (rtol=0, atol=1e-12)]
+✓  for a square invertible A the projector is the identity   [max|Δ| = 2.22045e-16 (rtol=0, atol=1e-13)]
+✓  so least squares reduces to an ordinary solve, as it must   [max|Δ| = 1.33227e-15 (rtol=0, atol=1e-13)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p>When <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> is out of reach, the answer is a perpendicular.</p>
+<p>The concrete results:</p>
+<ul class="simple">
+<li><p>the projector onto the line through <span class="math notranslate nohighlight">\((2,1)^{\top}\)</span> came out
+<span class="math notranslate nohighlight">\(\tfrac15\begin{psmallmatrix}4&amp;2\\2&amp;1\end{psmallmatrix}\)</span> by two independent
+constructions, with <span class="math notranslate nohighlight">\(P^2 = P\)</span>, <span class="math notranslate nohighlight">\(P^{\top} = P\)</span>, and
+<span class="math notranslate nohighlight">\(\operatorname{trace} P = \operatorname{rank} P = 1\)</span>;</p></li>
+<li><p>for the <span class="math notranslate nohighlight">\(4\times2\)</span> design matrix, <span class="math notranslate nohighlight">\(P\)</span> satisfied <span class="math notranslate nohighlight">\(PA = A\)</span> and annihilated the
+left null space, and was <strong>unchanged under 50 random changes of basis</strong> to
+<span class="math notranslate nohighlight">\(10^{-11}\)</span> — it is an invariant of the subspace, not of the parametrisation;</p></li>
+<li><p>the four measurements <span class="math notranslate nohighlight">\(\mathbf{b} = (2,1,6,7)\)</span> at <span class="math notranslate nohighlight">\(t = 0,1,2,3\)</span> gave
+<span class="math notranslate nohighlight">\(A^{\top}A = \begin{psmallmatrix}4&amp;6\\6&amp;14\end{psmallmatrix}\)</span> and
+<span class="math notranslate nohighlight">\(A^{\top}\mathbf{b} = (16,34)\)</span> exactly, best-fit line <span class="math notranslate nohighlight">\(y = 1 + 2t\)</span> with
+<span class="math notranslate nohighlight">\(\hat{\mathbf{x}} = (1,2)\)</span> confirmed by the normal equations, <code class="docutils literal notranslate"><span class="pre">lstsq</span></code>,
+<code class="docutils literal notranslate"><span class="pre">polyfit</span></code> <strong>and</strong> exact rational arithmetic; the projection was <span class="math notranslate nohighlight">\((1,3,5,7)\)</span>,
+the residual exactly <span class="math notranslate nohighlight">\((1,-2,1,0)\)</span> orthogonal to both columns, and
+<span class="math notranslate nohighlight">\(\|\mathbf{b}\|^2 = 90 = 84 + 6\)</span>;</p></li>
+<li><p>the same machinery fitted a plane to six points with no change beyond an
+extra column, giving three orthogonality conditions instead of two, and the
+residual satisfied <span class="math notranslate nohighlight">\((I-P)\mathbf{e} = \mathbf{e}\)</span> — it lies entirely in the
+three-dimensional <span class="math notranslate nohighlight">\(N(A^{\top})\)</span>, the part of the data no plane can produce;</p></li>
+<li><p>and <span class="math notranslate nohighlight">\(I - P\)</span> was confirmed to be the complementary orthogonal projector with
+<span class="math notranslate nohighlight">\(P(I-P) = 0\)</span> and traces summing to <span class="math notranslate nohighlight">\(m\)</span>, degenerating correctly to
+<span class="math notranslate nohighlight">\(P = I\)</span>, <span class="math notranslate nohighlight">\(I - P = 0\)</span> when <span class="math notranslate nohighlight">\(A\)</span> is square and invertible, where least squares
+becomes an ordinary solve.</p></li>
+</ul>
+<p>Methods met: <code class="docutils literal notranslate"><span class="pre">np.outer</span></code> for a rank-one projector, <span class="math notranslate nohighlight">\(P = A(A^{\top}A)^{-1}A^{\top}\)</span>
+built by <strong>solving</strong> rather than inverting, the normal equations
+<a class="reference internal" href="#equation-eq-proj-normal">Eq. 101</a>, <code class="docutils literal notranslate"><span class="pre">np.linalg.lstsq</span></code>, <code class="docutils literal notranslate"><span class="pre">np.polyfit</span></code>, and the trace of a
+projector as the dimension of its range.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>The arithmetic, which is not yet right.</strong> Everything here formed
+<span class="math notranslate nohighlight">\(A^{\top}A\)</span>. That squares the condition number, so a fit that is mildly
+awkward becomes numerically hopeless.
+<a class="reference internal" href="least-squares-four-ways.html"><span class="std std-doc">§2.3</span></a> measures the damage on Vandermonde
+matrices and finds four orders of magnitude by degree 14.</p></li>
+<li><p><strong>The repair.</strong> If the columns of <span class="math notranslate nohighlight">\(A\)</span> were <strong>orthonormal</strong>, then
+<span class="math notranslate nohighlight">\(A^{\top}A = I\)</span> and the projector would be just <span class="math notranslate nohighlight">\(QQ^{\top}\)</span>, with no inverse
+to form and no conditioning penalty. Manufacturing such a basis is the <span class="math notranslate nohighlight">\(QR\)</span>
+factorization of <a class="reference internal" href="gram-schmidt-qr.html"><span class="std std-doc">§2.2</span></a>, and it is the correct way to
+solve least squares.</p></li>
+<li><p><strong>When the columns are not independent.</strong> <span class="math notranslate nohighlight">\(A^{\top}A\)</span> is then singular and
+<a class="reference internal" href="#equation-eq-proj-projector">Eq. 102</a> fails, though the <em>projection</em> still exists — the
+geometry never needed independence, only the formula did.
+<a class="reference internal" href="pseudoinverse-regularization.html"><span class="std std-doc">§2.4</span></a> handles that case with the
+pseudoinverse.</p></li>
+<li><p><strong>Weighting the measurements.</strong> All four residuals counted equally here. If
+some measurements are more trustworthy, the right object is a weighted
+projector, which is oblique rather than orthogonal — the assistant callout
+above builds one, and <a class="reference internal" href="least-squares-four-ways.html"><span class="std std-doc">§2.3</span></a> uses it.</p></li>
+</ul>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h3>
+<div class="docutils container" id="id3">
+<div role="list" class="citation-list">
+<div class="citation" id="id7" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">BV18</a><span class="fn-bracket">]</span></span>
+<p>Stephen Boyd and Lieven Vandenberghe. <em>Introduction to Applied Linear Algebra: Vectors, Matrices, and Least Squares</em>. Cambridge University Press, 2018. <a class="reference external" href="https://doi.org/10.1017/9781108583664">doi:10.1017/9781108583664</a>.</p>
+</div>
+<div class="citation" id="id4" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">Str23</a><span class="fn-bracket">]</span></span>
+<p>Gilbert Strang. <em>Introduction to Linear Algebra</em>. Wellesley-Cambridge Press, Wellesley, MA, 6 edition, 2023. ISBN 978-1-7331466-7-8.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/02-orthogonality"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Chapter II — Orthogonality and Least Squares</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="gram-schmidt-qr.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">2.2 Gram–Schmidt, QR, Householder, and Givens</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#onto-a-line-then-onto-a-subspace">Onto a line, then onto a subspace</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-makes-p-a-projector">What makes <span class="math notranslate nohighlight">\(P\)</span> a projector</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#least-squares-and-why-least-squares">Least squares, and why “least squares”</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-the-projector-onto-a-line-is-a-matrix">Exercise 1: The projector onto a line is a matrix</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-onto-a-subspace-and-the-four-facts-that-follow">Exercise 2: Onto a subspace, and the four facts that follow</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-normal-equations-and-a-line-through-four-points">Exercise 3: The normal equations, and a line through four points</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-more-columns-fitting-a-plane">Exercise 4: More columns: fitting a plane</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-the-complementary-projector-and-the-two-halves-of-the-data">Exercise 5: The complementary projector, and the two halves of the data</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

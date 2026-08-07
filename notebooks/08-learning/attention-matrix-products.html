@@ -1,0 +1,1311 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="8.5 Attention Is a Product of Matrices" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/08-learning/attention-matrix-products.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: Everything in this notebook is a corollary of earlier chapters. The attention head[ VSP+17] is three linear maps of §8.4 ’s embeddings (qu..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: Everything in this notebook is a corollary of earlier chapters. The attention head[ VSP+17] is three linear maps of §8.4 ’s embeddings (qu..." />
+
+    <title>8.5 Attention Is a Product of Matrices &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/08-learning/attention-matrix-products';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/08-learning/attention-matrix-products.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization" href="low-rank-lora-quantization.html" />
+    <link rel="prev" title="8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings" href="text-to-vectors-embeddings.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter VIII — The Linear Algebra of Learning</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/08-learning/attention-matrix-products.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/08-learning/attention-matrix-products.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/08-learning/attention-matrix-products.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/08-learning/attention-matrix-products.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>8.5 Attention Is a Product of Matrices</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#one-head">One head</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#many-heads-one-matmul">Many heads, one matmul</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cache-order-and-cost">Cache, order, and cost</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-one-head-assembled-and-read">Exercise 1: One head, assembled and read</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-mask-is-exact-the-scaling-is-calibrated">Exercise 2: The mask is exact; the scaling is calibrated</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-many-heads-are-one-matmul">Exercise 3: Many heads are one matmul</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-the-kv-cache-is-an-identity-and-the-cost-is-quadratic">Exercise 4: The KV cache is an identity, and the cost is quadratic</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-order-absent-by-default-relative-by-rotation">Exercise 5: Order: absent by default, relative by rotation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="attention-is-a-product-of-matrices">
+<h1>8.5 Attention Is a Product of Matrices<a class="headerlink" href="#attention-is-a-product-of-matrices" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter VIII — The Linear Algebra of Learning
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;8.5
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">The mechanism behind every large language model is four matrix products and one row-wise softmax: queries ask, keys answer, the score matrix routes, values ride along. This notebook builds the whole head by hand, gates each celebrated property — exact mask zeros, KV-cache equivalence, RoPE&#x27;s relative-position identity — and counts the quadratic cost that shapes the industry.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;advanced&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;150–180 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p>Everything in this notebook is a corollary of earlier chapters. The
+<strong>attention head</strong> <span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id46" title="Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Łukasz Kaiser, and Illia Polosukhin. Attention is all you need. In Advances in Neural Information Processing Systems 30, 5998–6008. 2017.">VSP+17</a>]</span> is three linear maps of
+<a class="reference internal" href="text-to-vectors-embeddings.html"><span class="std std-doc">§8.4</span></a>’s embeddings (queries, keys,
+values), one Gram-like score matrix (<a class="reference internal" href="../06-structure/kernels-gram-matrix.html"><span class="std std-doc">§6.5</span></a>’s
+similarity, asymmetric), one row-wise softmax
+(<a class="reference internal" href="linear-layer-backpropagation.html"><span class="std std-doc">§8.3</span></a>’s, batched), and one
+weighted average — assembled by hand on an interpretable
+repeated-token sequence whose attention heatmap shows same tokens
+finding each other. The gates are the course’s kind: rows sum to one
+at rounding; the <strong>causal mask</strong>’s zeros are <em>exact</em>
+(<span class="math notranslate nohighlight">\(e^{-\infty} = 0\)</span>, not small); the einsum spelling
+(<a class="reference internal" href="../07-tensors/einsum-contraction.html"><span class="std std-doc">§7.1</span></a>’s promised
+<code class="docutils literal notranslate"><span class="pre">bhqd,bhkd-&gt;bhqk</span></code>) equals the loop; <strong>multi-head</strong> concatenation
+equals its single-block matmul; and the <span class="math notranslate nohighlight">\(1/\sqrt{d}\)</span> scaling holds
+the score variance at <span class="math notranslate nohighlight">\(0.997\)</span> on a dedicated stream — the reason the
+softmax neither saturates nor flattens as heads widen.</p>
+<p>Then the properties that run the industry. The <strong>KV cache</strong> —
+decoding one token at a time against a key/value matrix that grows
+one row per step — is gated <em>equal to full recomputation</em> at
+<span class="math notranslate nohighlight">\(10^{-12}\)</span> scaled (measured near rounding): incremental decoding is a
+mathematical identity, not an
+approximation, which is why inference engines are allowed to do it.
+Bare attention is <strong>permutation-equivariant</strong> (gated at <span class="math notranslate nohighlight">\(10^{-13}\)</span>,
+measured near <span class="math notranslate nohighlight">\(10^{-16}\)</span>: shuffle the tokens, the outputs shuffle
+identically — “attention has
+no idea where anything is”), and <strong>RoPE</strong> <span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id47" title="Jianlin Su, Murtadha Ahmed, Yu Lu, Shengfeng Pan, Wen Bo, and Yunfeng Liu. RoFormer: enhanced transformer with rotary position embedding. Neurocomputing, 568:127063, 2024. doi:10.1016/j.neucom.2023.127063.">SAL+24</a>]</span>
+breaks it by design: 2×2 rotation blocks whose inner products depend
+<em>only on position differences</em> — the identity
+<span class="math notranslate nohighlight">\(\langle R_mq, R_nk\rangle = \langle R_{m-n}q, k\rangle\)</span> gated at
+<span class="math notranslate nohighlight">\(2\times10^{-14}\)</span> across 100 random position pairs. The cost ledger
+closes the story: attention’s <span class="math notranslate nohighlight">\(4n^2d\)</span> against the MLP block’s
+<span class="math notranslate nohighlight">\(16nd^2\)</span> crosses at exactly <span class="math notranslate nohighlight">\(n = 4d\)</span> (counted, drawn, gated as
+arithmetic) — the quadratic wall every long-context paper is trying
+to climb.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> Vaswani et al. <span class="bibtex-citation" id="id3">[<a class="reference internal" href="#id46" title="Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Łukasz Kaiser, and Illia Polosukhin. Attention is all you need. In Advances in Neural Information Processing Systems 30, 5998–6008. 2017.">VSP+17</a>]</span>; Su et al.
+<span class="bibtex-citation" id="id4">[<a class="reference internal" href="#id47" title="Jianlin Su, Murtadha Ahmed, Yu Lu, Shengfeng Pan, Wen Bo, and Yunfeng Liu. RoFormer: enhanced transformer with rotary position embedding. Neurocomputing, 568:127063, 2024. doi:10.1016/j.neucom.2023.127063.">SAL+24</a>]</span> for RoPE. Everything runs on a 10-token toy
+sequence at <span class="math notranslate nohighlight">\(d = 32\)</span> — the mathematics is identical at 128k tokens,
+which is precisely the point of doing it small and gated.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="one-head">
+<h3>One head<a class="headerlink" href="#one-head" title="Link to this heading">#</a></h3>
+<p>For token embeddings <span class="math notranslate nohighlight">\(X \in \mathbb{R}^{n\times d}\)</span>:</p>
+<div class="math notranslate nohighlight" id="equation-eq-at-head">
+<span class="eqno">(289)<a class="headerlink" href="#equation-eq-at-head" title="Link to this equation">#</a></span>\[Q = XW_Q,\;\; K = XW_K,\;\; V = XW_V, \qquad
+\mathrm{Attn}(X) \;=\;
+\underbrace{\mathrm{softmax}_{\text{rows}}\!
+\Bigl(\frac{QK^{\top}}{\sqrt{d}}\Bigr)}_{A}\,V ,\]</div>
+<p><span class="math notranslate nohighlight">\(A\)</span> row-stochastic (<a class="reference internal" href="../06-structure/markov-perron-pagerank.html"><span class="std std-doc">§6.2</span></a>’s
+matrices, learned): each output is a convex combination of value
+rows, weights set by query–key dot products. The <span class="math notranslate nohighlight">\(\sqrt{d}\)</span> keeps
+the scores’ variance at 1 for unit-variance inputs — without it the
+softmax saturates as <span class="math notranslate nohighlight">\(d\)</span> grows. Causal masking sets future scores to
+<span class="math notranslate nohighlight">\(-\infty\)</span> <em>before</em> the softmax, making the forbidden weights exactly
+<span class="math notranslate nohighlight">\(e^{-\infty} = 0\)</span>.</p>
+</section>
+<section id="many-heads-one-matmul">
+<h3>Many heads, one matmul<a class="headerlink" href="#many-heads-one-matmul" title="Link to this heading">#</a></h3>
+<p><span class="math notranslate nohighlight">\(h\)</span> heads of width <span class="math notranslate nohighlight">\(d/h\)</span> run <a class="reference internal" href="#equation-eq-at-head">Eq. 289</a> in parallel and
+concatenate; because concatenation-then-linear-map is a block matrix
+product, the whole layer is still one matmul in disguise —
+<a class="reference internal" href="../07-tensors/einsum-contraction.html"><span class="std std-doc">§7.1</span></a>’s <code class="docutils literal notranslate"><span class="pre">bhqd,bhkd-&gt;bhqk</span></code>
+executes all heads in one string.</p>
+</section>
+<section id="cache-order-and-cost">
+<h3>Cache, order, and cost<a class="headerlink" href="#cache-order-and-cost" title="Link to this heading">#</a></h3>
+<p>Decoding token <span class="math notranslate nohighlight">\(t\)</span> needs row <span class="math notranslate nohighlight">\(t\)</span> of <span class="math notranslate nohighlight">\(A\)</span> only, against keys/values
+<span class="math notranslate nohighlight">\(1..t\)</span> — so caching <span class="math notranslate nohighlight">\(K, V\)</span> and appending one row per token computes
+<em>exactly</em> the causal attention output, one row at a time. Bare
+attention is permutation-equivariant
+(<span class="math notranslate nohighlight">\(\mathrm{Attn}(PX) = P\,\mathrm{Attn}(X)\)</span> — no notion of position);
+<strong>RoPE</strong> rotates each 2-plane of <span class="math notranslate nohighlight">\(q\)</span> and <span class="math notranslate nohighlight">\(k\)</span> by angles proportional
+to absolute position, and pure rotation makes the <em>scores</em> relative:</p>
+<div class="math notranslate nohighlight" id="equation-eq-at-rope">
+<span class="eqno">(290)<a class="headerlink" href="#equation-eq-at-rope" title="Link to this equation">#</a></span>\[\langle R_m q,\; R_n k\rangle \;=\; \langle R_{m-n}q,\; k\rangle .\]</div>
+<p>The price of it all: scores and weighted sums cost <span class="math notranslate nohighlight">\(4n^2d\)</span> FLOPs
+against the MLP block’s <span class="math notranslate nohighlight">\(16nd^2\)</span>, crossing at <span class="math notranslate nohighlight">\(n = 4d\)</span> — past that,
+context length, not width, owns the budget.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data and instruments only: the ten-token sequence, the tied display
+projections, and softmax restated from
+<a class="reference internal" href="linear-layer-backpropagation.html"><span class="std std-doc">§8.3</span></a>. The head itself is assembled
+in Exercise 1.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">draw</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random array below comes from this seed</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+
+<span class="n">D_MODEL</span> <span class="o">=</span> <span class="mi">32</span>
+<span class="n">TOKENS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;the&quot;</span><span class="p">,</span> <span class="s2">&quot;cat&quot;</span><span class="p">,</span> <span class="s2">&quot;sat&quot;</span><span class="p">,</span> <span class="s2">&quot;on&quot;</span><span class="p">,</span> <span class="s2">&quot;the&quot;</span><span class="p">,</span> <span class="s2">&quot;mat&quot;</span><span class="p">,</span> <span class="s2">&quot;the&quot;</span><span class="p">,</span> <span class="s2">&quot;cat&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;sat&quot;</span><span class="p">,</span> <span class="s2">&quot;on&quot;</span><span class="p">]</span>
+<span class="n">N_SEQ</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">TOKENS</span><span class="p">)</span>
+<span class="n">vocab_types</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">TOKENS</span><span class="p">))</span>
+<span class="n">type_emb</span> <span class="o">=</span> <span class="p">{</span><span class="n">w</span><span class="p">:</span> <span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">(</span><span class="n">D_MODEL</span><span class="p">)</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">vocab_types</span><span class="p">}</span>
+<span class="n">X_seq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">type_emb</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">TOKENS</span><span class="p">])</span>
+
+<span class="n">W_Q</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">((</span><span class="n">D_MODEL</span><span class="p">,</span> <span class="n">D_MODEL</span><span class="p">))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">D_MODEL</span><span class="p">)</span>
+<span class="c1"># The display head TIES the key projection to the query projection: the</span>
+<span class="c1"># score matrix is then the Gram matrix of W_Q-projected embeddings, so</span>
+<span class="c1"># same tokens provably attend to each other and the heatmap is readable.</span>
+<span class="c1"># Untrained UNTIED projections give an arbitrary quadratic form — who</span>
+<span class="c1"># attends to whom would be noise (Exercise 3&#39;s heads are untied, as in</span>
+<span class="c1"># real models, where training does the aligning).</span>
+<span class="n">W_K</span> <span class="o">=</span> <span class="n">W_Q</span>
+<span class="n">W_V</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">((</span><span class="n">D_MODEL</span><span class="p">,</span> <span class="n">D_MODEL</span><span class="p">))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">D_MODEL</span><span class="p">)</span>
+
+
+<span class="c1"># built from scratch in §8.3; restated here as an instrument.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">softmax_rows</span><span class="p">(</span><span class="n">S</span><span class="p">):</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="n">S</span> <span class="o">-</span> <span class="n">S</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">E</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">E</span> <span class="o">/</span> <span class="n">E</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-one-head-assembled-and-read">
+<h2>Exercise 1: One head, assembled and read<a class="headerlink" href="#exercise-1-one-head-assembled-and-read" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">attention(X,</span> <span class="pre">Wq,</span> <span class="pre">Wk,</span> <span class="pre">Wv,</span> <span class="pre">mask=None)</span></code> — project,
+score, scale by the width of the <em>projected</em> queries, softmax,
+average — and run <a class="reference internal" href="#equation-eq-at-head">Eq. 289</a> step by step on the ten-token
+sequence — repeated words share embeddings, and the display head ties
+<span class="math notranslate nohighlight">\(W_K = W_Q\)</span> so the scores form a Gram matrix and same tokens
+<em>provably</em> find each other (untrained untied projections would give
+an arbitrary quadratic form; training is what aligns them in real
+models). Gate the stochastic structure: every attention row
+nonnegative with sum <span class="math notranslate nohighlight">\(1\)</span> within <span class="math notranslate nohighlight">\(10^{-14}\)</span> — the matrix is
+row-stochastic by construction, <a class="reference internal" href="../06-structure/markov-perron-pagerank.html"><span class="std std-doc">§6.2</span></a>’s
+object with learned entries. Gate the readability too: the mean
+attention weight between same-token pairs exceeds ten times the mean
+between different-token pairs.</p>
+<p><strong>Write this one yourself</strong> — the head is this notebook, and every
+exercise below calls the one you build here.</p>
+<p><strong>Part b)</strong> Gate the einsum spelling against the loop: the
+<a class="reference internal" href="../07-tensors/einsum-contraction.html"><span class="std std-doc">§7.1</span></a> string <code class="docutils literal notranslate"><span class="pre">&quot;qd,kd-&gt;qk&quot;</span></code>
+for scores and <code class="docutils literal notranslate"><span class="pre">&quot;qk,kd-&gt;qd&quot;</span></code> for the output equal the explicit
+per-token loops at <span class="math notranslate nohighlight">\(10^{-13}\)</span> — the forward pointer that notebook
+planted, picked up.</p>
+<p><strong>Part c)</strong> Draw the attention heatmap with token labels on both
+axes: the three <code class="docutils literal notranslate"><span class="pre">the</span></code>s attend to each other, <code class="docutils literal notranslate"><span class="pre">cat</span></code> finds <code class="docutils literal notranslate"><span class="pre">cat</span></code> — a
+similarity structure no one programmed, emerging from shared
+embeddings through <a class="reference internal" href="#equation-eq-at-head">Eq. 289</a>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>attention rows: nonnegative True, sums within 2.2e-16
+mean weight: same-token pairs 0.391, different-token 0.008 (46x)
+einsum vs explicit loops: 2.7e-15
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-at-heatmap">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f1637388f80&gt;
+</pre></div>
+</div>
+<figcaption>
+<p><span class="caption-number">Fig. 152 </span><span class="caption-text">Left: the attention matrix for the ten-token sequence, labels on both axes – rows are queries, columns are keys, each row a probability distribution (gated to sum to 1). Repeated words share embeddings and the display head ties <span class="math notranslate nohighlight">\(W_K = W_Q\)</span>, so the scores form a Gram matrix and the three ‘the’s provably find each other, ‘cat’ attends to ‘cat’ – gated at a ten-fold weight separation (measured near 50-fold). (Untrained untied projections would route arbitrarily; training is what aligns real heads.) Right: the same head under the causal mask – the upper triangle is EXACTLY zero (e to the minus infinity, not a small number), every row still sums to 1 over its allowed past, and the first row has nowhere to look but itself.</span><a class="headerlink" href="#fig-at-heatmap" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<figure class="align-default" id="id5">
+<img alt="../../_images/c71e99dbc8e960e90e9c5feddd98d7925f9f843ff8062a22a48d027b382fda72.png" src="../../_images/c71e99dbc8e960e90e9c5feddd98d7925f9f843ff8062a22a48d027b382fda72.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 153 </span><span class="caption-text">Left: the attention matrix for the ten-token sequence, labels on both axes – rows are queries, columns are keys, each row a probability distribution (gated to sum to 1). Repeated words share embeddings and the display head ties <span class="math notranslate nohighlight">\(W_K = W_Q\)</span>, so the scores form a Gram matrix and the three ‘the’s provably find each other, ‘cat’ attends to ‘cat’ – gated at a ten-fold weight separation (measured near 50-fold). (Untrained untied projections would route arbitrarily; training is what aligns real heads.) Right: the same head under the causal mask – the upper triangle is EXACTLY zero (e to the minus infinity, not a small number), every row still sums to 1 over its allowed past, and the first row has nowhere to look but itself.</span><a class="headerlink" href="#id5" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  attention is row-stochastic by construction (Eq. 1)   [rows nonnegative, sums within 2e-16 — 6.2&#39;s matrices with learned entries, one distribution per query]
+✓  and same tokens find each other, provably, in the tied-projection head   [0.39 vs 0.008 mean weight (46x): tied W_K = W_Q makes the scores a Gram matrix, so the heatmap&#39;s story is a theorem of the construction, not a lucky draw]
+✓  and the einsum spelling equals the explicit loops   [7.1&#39;s forward-pointer string, picked up: qd,kd-&gt;qk then qk,kd-&gt;qd [2.66454e-15 &lt; 1e-13]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-the-mask-is-exact-the-scaling-is-calibrated">
+<h2>Exercise 2: The mask is exact; the scaling is calibrated<a class="headerlink" href="#exercise-2-the-mask-is-exact-the-scaling-is-calibrated" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> Gate the causal mask’s central fact <strong>exactly</strong>: after
+setting future scores to <span class="math notranslate nohighlight">\(-\infty\)</span> and applying softmax, every
+masked entry equals <span class="math notranslate nohighlight">\(0.0\)</span> — <code class="docutils literal notranslate"><span class="pre">np.exp(-inf)</span></code> is an exact IEEE zero,
+not a small number, so “the model cannot see the future” is an
+identity, not an approximation. Rows still sum to 1 over the
+permitted past.</p>
+<p><strong>Part b)</strong> Gate the <span class="math notranslate nohighlight">\(\sqrt{d}\)</span> calibration on a dedicated stream:
+for i.i.d. unit-variance queries and keys at <span class="math notranslate nohighlight">\(d = 64\)</span>, the scaled
+scores’ variance is <span class="math notranslate nohighlight">\(1\)</span> within 5% (measured 0.997 over <span class="math notranslate nohighlight">\(10^4\)</span>
+pairs). Sweep the temperature and draw mean attention <strong>entropy</strong>
+against the scaling exponent: unscaled scores at large <span class="math notranslate nohighlight">\(d\)</span> saturate
+the softmax to near-one-hot (entropy toward 0), overscaled flatten
+it toward uniform (<span class="math notranslate nohighlight">\(\ln n\)</span>) — <span class="math notranslate nohighlight">\(1/\sqrt{d}\)</span> sits on the usable slope,
+which is the design reason it is in <a class="reference internal" href="#equation-eq-at-head">Eq. 289</a> at all.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>masked entries exactly zero: True; causal row sums within 1.1e-16
+scaled score variance at d = 64: 0.9971
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-at-entropy">
+<img alt="../../_images/55932681691f014effb4b1b5d0f07ef0b80de3b0228472e507077bc0ae825353.png" src="../../_images/55932681691f014effb4b1b5d0f07ef0b80de3b0228472e507077bc0ae825353.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 154 </span><span class="caption-text">Mean attention entropy against the scaling exponent <span class="math notranslate nohighlight">\(\tau\)</span> in <span class="math notranslate nohighlight">\(\mathrm{softmax}(S/d^{\tau})\)</span>, for 64 unit-variance tokens at <span class="math notranslate nohighlight">\(d = 64\)</span>. Unscaled (<span class="math notranslate nohighlight">\(\tau = 0\)</span>) the scores have variance <span class="math notranslate nohighlight">\(d\)</span> and the softmax saturates toward one-hot rows (entropy near 0 – gradients die); fully scaled (<span class="math notranslate nohighlight">\(\tau = 1\)</span>) the scores shrink and rows flatten toward uniform (entropy near <span class="math notranslate nohighlight">\(\ln 64\)</span>, dotted – nothing is selected). The transformer’s <span class="math notranslate nohighlight">\(\tau = 1/2\)</span> (amber) sits on the usable slope, which is Eq. 1’s <span class="math notranslate nohighlight">\(\sqrt{d}\)</span> earning its place: variance 1 whatever the width.</span><a class="headerlink" href="#fig-at-entropy" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the causal mask produces exact zeros, rows renormalized over the past   [exp(-inf) is an IEEE zero — &#39;cannot see the future&#39; is an identity, and the gate is equality]
+✓  and 1/sqrt(d) holds the score variance at one   [0.997 over ten thousand dedicated-stream pairs — the calibration that keeps softmax on its usable slope at any width]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-many-heads-are-one-matmul">
+<h2>Exercise 3: Many heads are one matmul<a class="headerlink" href="#exercise-3-many-heads-are-one-matmul" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> Write the loop view <code class="docutils literal notranslate"><span class="pre">multi_head_loop(X)</span></code>: four heads of
+width 8 (weights in the Setup-seeded lists <code class="docutils literal notranslate"><span class="pre">W_q_h</span></code>, <code class="docutils literal notranslate"><span class="pre">W_k_h</span></code>, <code class="docutils literal notranslate"><span class="pre">W_v_h</span></code>),
+each running <a class="reference internal" href="#equation-eq-at-head">Eq. 289</a>, outputs concatenated and mixed by
+<span class="math notranslate nohighlight">\(W_O\)</span>.</p>
+<p><strong>Write this one yourself</strong> — then check it against the einsum block
+view <code class="docutils literal notranslate"><span class="pre">multi_head_einsum(X)</span></code> of Part b.</p>
+<p><strong>Part b)</strong> Gate the block identity at <span class="math notranslate nohighlight">\(10^{-13}\)</span>: running the four
+heads separately and concatenating equals the single batched einsum
+<code class="docutils literal notranslate"><span class="pre">&quot;hqd,hkd-&gt;hqk&quot;</span></code> / <code class="docutils literal notranslate"><span class="pre">&quot;hqk,hkd-&gt;hqd&quot;</span></code> over a head axis followed by one
+reshape and one matmul — multi-head attention is not four mechanisms
+but one block-structured matrix product, which is why GPUs love it.</p>
+<p><strong>Part c)</strong> Draw the layer as a tensor diagram: <span class="math notranslate nohighlight">\(X\)</span> fanning into
+per-head <span class="math notranslate nohighlight">\(Q, K, V\)</span> blocks, the head axis carried through the score
+and value contractions, one output projection collecting the
+concatenation.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>per-head loop + concat vs batched einsum + one matmul: 7.8e-16
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-at-diagram">
+<img alt="../../_images/9276be38eda9d4ff35e9a05ff7e0aac6b399a374fc61904675c3996a6948ee9a.png" src="../../_images/9276be38eda9d4ff35e9a05ff7e0aac6b399a374fc61904675c3996a6948ee9a.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 155 </span><span class="caption-text">Multi-head attention as a tensor network, 7.1’s notation doing systems design: the token axis <span class="math notranslate nohighlight">\(n\)</span> enters at the left, fans through per-head projections (the head axis <span class="math notranslate nohighlight">\(h\)</span> is a free index carried by every intermediate node), the score node contracts queries against keys and the softmax re-normalizes it, values ride the resulting distribution, and the output projection collects the concatenated heads back to width <span class="math notranslate nohighlight">\(d\)</span>. Reading the diagram left to right IS the einsum program of Exercise 3 – and seeing the head axis as just another tensor index is why ‘four heads’ compiles to one block matmul.</span><a class="headerlink" href="#fig-at-diagram" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  four heads concatenated equal one block-structured product   [the loop view and the head-axis einsum agree at rounding — multi-head is one matmul wearing a reshape [7.77156e-16 &lt; 1e-13]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-the-kv-cache-is-an-identity-and-the-cost-is-quadratic">
+<h2>Exercise 4: The KV cache is an identity, and the cost is quadratic<a class="headerlink" href="#exercise-4-the-kv-cache-is-an-identity-and-the-cost-is-quadratic" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> Gate incremental decoding: process the sequence one token
+at a time, appending each new key and value row to a growing cache
+and computing only the newest query’s attention row. The stacked
+outputs equal full causal attention at <span class="math notranslate nohighlight">\(10^{-12}\)</span> scaled (measured
+near rounding) — the cache is
+<em>exactly</em> the same mathematics reordered, which is the license every
+inference engine runs on.</p>
+<p><strong>Part b)</strong> The ledger, counted and drawn: per layer, attention costs
+<span class="math notranslate nohighlight">\(4n^2d\)</span> FLOPs (scores + weighted sum) against the MLP block’s
+<span class="math notranslate nohighlight">\(16nd^2\)</span>; gate the crossover at exactly <span class="math notranslate nohighlight">\(n = 4d\)</span> (arithmetic:
+<span class="math notranslate nohighlight">\(4n^2d = 16nd^2 \iff n = 4d\)</span>) and draw both curves at <span class="math notranslate nohighlight">\(d = 64\)</span> with
+the crossover marked — past <span class="math notranslate nohighlight">\(n = 256\)</span> the quadratic term owns the
+budget, and every long-context architecture paper is an attempt to
+move that line.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>incremental KV-cache decoding vs full recomputation: 8.9e-16
+crossover: 4 n^2 d = 16 n d^2 at n = 4d = 256 (difference there: 0 flops — an identity)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-at-flops">
+<img alt="../../_images/2955c231526b89c43a30e4542c584cd2783e1caf95da882436e21b85427c69b0.png" src="../../_images/2955c231526b89c43a30e4542c584cd2783e1caf95da882436e21b85427c69b0.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 156 </span><span class="caption-text">The per-layer FLOP ledger at <span class="math notranslate nohighlight">\(d = 64\)</span>: attention’s <span class="math notranslate nohighlight">\(4n^2d\)</span> (ink) against the MLP block’s <span class="math notranslate nohighlight">\(16nd^2\)</span> (amber), log-log, crossing at exactly <span class="math notranslate nohighlight">\(n = 4d = 256\)</span> (dotted) – an identity of the two count formulas, gated as arithmetic. Short sequences are MLP-dominated and width is the budget; long sequences are attention-dominated and the <span class="math notranslate nohighlight">\(n^2\)</span> term is why a 128k-token context costs what it costs. Every efficient-attention proposal – linear, sparse, sliding-window – is an attempt to bend the ink curve.</span><a class="headerlink" href="#fig-at-flops" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the KV cache reproduces full attention exactly-to-rounding   [9e-16: incremental decoding is the same mathematics reordered — an identity, and the inference industry&#39;s license [8.88178e-16 &lt; 1e-12]]
+✓  and the attention/MLP crossover sits at exactly n = 4d   [4 n^2 d = 16 n d^2 is n = 4d by arithmetic — counted, drawn, and the line every long-context paper is trying to move]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-order-absent-by-default-relative-by-rotation">
+<h2>Exercise 5: Order: absent by default, relative by rotation<a class="headerlink" href="#exercise-5-order-absent-by-default-relative-by-rotation" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> Gate permutation equivariance of the bare
+(unmasked) head: for a random permutation <span class="math notranslate nohighlight">\(P\)</span>,
+<span class="math notranslate nohighlight">\(\mathrm{Attn}(PX) = P\,\mathrm{Attn}(X)\)</span> at <span class="math notranslate nohighlight">\(10^{-13}\)</span> — attention
+treats the sequence as a <em>set</em>. (The causal mask breaks this
+trivially by fixing an order; the deep fix is positional encoding.)</p>
+<p><strong>Part b)</strong> Implement RoPE: rotate each consecutive 2-plane of <span class="math notranslate nohighlight">\(q\)</span>
+and <span class="math notranslate nohighlight">\(k\)</span> by <span class="math notranslate nohighlight">\(\theta_j m\)</span> with per-plane frequencies
+<span class="math notranslate nohighlight">\(\theta_j = 10000^{-2j/d}\)</span>, position <span class="math notranslate nohighlight">\(m\)</span>. Gate <a class="reference internal" href="#equation-eq-at-rope">Eq. 290</a> over
+100 random position pairs at <span class="math notranslate nohighlight">\(10^{-12}\)</span> (measured
+<span class="math notranslate nohighlight">\(2\times10^{-14}\)</span>): the score depends only on <span class="math notranslate nohighlight">\(m - n\)</span> — <em>relative</em>
+position from <em>absolute</em> rotations, because rotations compose by
+adding angles.</p>
+<p><strong>Part c)</strong> Gate the breaking: with RoPE applied, the permutation
+test of Part a fails by <span class="math notranslate nohighlight">\(O(1)\)</span> (measured 1.27 — gated only as
+exceeding 0.01, its size being the model’s business). Order is now
+information, which is the entire job of a positional encoding.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>permutation equivariance (bare attention): 4.4e-16
+RoPE relative-position identity, 100 pairs: 2.5e-14
+with RoPE the same test fails by 0.116 — order is now information
+</pre></div>
+</div>
+</div>
+</div>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p>The head here is single-layer and frozen; real models stack and
+train. Ask your assistant for <code class="docutils literal notranslate"><span class="pre">tiny_copy_transformer(seq_len,</span> <span class="pre">d)</span></code> —
+one attention layer plus <a class="reference internal" href="linear-layer-backpropagation.html"><span class="std std-doc">§8.3</span></a>’s
+training loop, taught to copy the previous token on a synthetic
+stream — then check it against the mathematics rather than a demo:
+(i) after training, the attention matrix approximates the shifted
+identity (mean weight on the correct previous token above 0.9);
+(ii) with the causal mask removed the task becomes trivially
+solvable and the learned pattern changes accordingly — compare the
+two heatmaps; (iii) the trained model’s KV-cache decode equals its
+full forward pass at <span class="math notranslate nohighlight">\(10^{-12}\)</span>, because Exercise 4’s identity is
+architecture-independent. The check is yours.</p>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  bare attention is permutation-equivariant: sequences are sets   [4e-16 under a random shuffle — no positional signal exists in Eq. 1, which is a theorem about its symmetry [4.44089e-16 &lt; 1e-13]]
+✓  RoPE scores depend only on the position difference (Eq. 2)   [worst 2e-14 over 100 random pairs — absolute rotations, relative scores, because angles add]
+✓  and RoPE breaks the set symmetry, as a positional encoding must   [the equivariance test now fails by 0.12 (O(1), size reported not gated) — order has become information]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p><strong>One head is four products and a softmax, all gated.</strong> Rows
+stochastic at <span class="math notranslate nohighlight">\(10^{-16}\)</span>; the einsum spelling equal to the loops;
+the heatmap showing repeated tokens finding each other through
+nothing but shared embeddings and dot products. The causal mask’s
+zeros were <em>exact</em> (<span class="math notranslate nohighlight">\(e^{-\infty}\)</span>), and <span class="math notranslate nohighlight">\(1/\sqrt{d}\)</span> held the score
+variance at <span class="math notranslate nohighlight">\(0.997\)</span> — with the entropy sweep showing what saturates
+and what flattens on either side of the square root.</p>
+<p><strong>Multi-head is one matmul; the cache is an identity; the cost is
+arithmetic.</strong> Four heads concatenated equalled the head-axis einsum
+at <span class="math notranslate nohighlight">\(10^{-15}\)</span>; incremental KV-cache decoding equalled full causal
+attention at rounding (gated at <span class="math notranslate nohighlight">\(10^{-12}\)</span> scaled) — the inference
+industry’s license;
+and the attention/MLP FLOP crossover sat at exactly <span class="math notranslate nohighlight">\(n = 4d\)</span> by
+identity, drawn at <span class="math notranslate nohighlight">\(d = 64\)</span> where it lands on <span class="math notranslate nohighlight">\(n = 256\)</span>.</p>
+<p><strong>Order is a choice.</strong> Bare attention shuffled its outputs exactly
+with its inputs (<span class="math notranslate nohighlight">\(10^{-16}\)</span> — sequences are sets); RoPE’s rotations
+made scores depend only on position differences
+(<span class="math notranslate nohighlight">\(2\times10^{-14}\)</span> over 100 pairs) and broke the shuffle symmetry by
+a reported <span class="math notranslate nohighlight">\(1.27\)</span> — position injected exactly where the mechanism
+needed it and nowhere else.</p>
+<p><strong>Methods introduced.</strong> Head assembly from projections, row-wise
+softmax gating, exact-zero causal masking, entropy-vs-temperature
+sweeps, head-axis einsum for multi-head, KV-cache incremental
+decoding, FLOP crossover ledgers, permutation-equivariance tests,
+and RoPE with its relative-position identity.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Compression next.</strong> <a class="reference internal" href="low-rank-lora-quantization.html"><span class="std std-doc">§8.6</span></a>
+asks what happens to these weight matrices after training: LoRA is
+a rank decision (Chapter IV), quantization a rounding decision
+(Chapter V), and both are gated the course’s way.</p></li>
+<li><p><strong>The quadratic wall.</strong> Linear attention, sliding windows, and
+state-space models all bend Exercise 4’s ink curve — every one of
+them a different factorization or sparsification of <span class="math notranslate nohighlight">\(A\)</span>, i.e.
+Chapters IV–VI applied to one matrix.</p></li>
+<li><p><strong>Attention as a kernel.</strong> Rows of <span class="math notranslate nohighlight">\(A\)</span> are
+<a class="reference internal" href="../06-structure/kernels-gram-matrix.html"><span class="std std-doc">§6.5</span></a>’s similarity
+weights with a learned, asymmetric kernel — the connection that
+powers both theory (performers, random features) and intuition.</p></li>
+<li><p><strong>What remains is what breaks.</strong> <a class="reference internal" href="where-linear-algebra-stops.html"><span class="std std-doc">§8.7</span></a>
+closes the chapter with the boundary: the nonlinearities,
+normalizations and training dynamics where the linear story stops
+being the whole story — measured, as always.</p></li>
+</ul>
+<div class="docutils container" id="id6">
+<div role="list" class="citation-list">
+<div class="citation" id="id47" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>SAL+24<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id2">1</a>,<a role="doc-backlink" href="#id4">2</a>)</span>
+<p>Jianlin Su, Murtadha Ahmed, Yu Lu, Shengfeng Pan, Wen Bo, and Yunfeng Liu. RoFormer: enhanced transformer with rotary position embedding. <em>Neurocomputing</em>, 568:127063, 2024. <a class="reference external" href="https://doi.org/10.1016/j.neucom.2023.127063">doi:10.1016/j.neucom.2023.127063</a>.</p>
+</div>
+<div class="citation" id="id46" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>VSP+17<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id3">2</a>)</span>
+<p>Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Łukasz Kaiser, and Illia Polosukhin. Attention is all you need. In <em>Advances in Neural Information Processing Systems 30</em>, 5998–6008. 2017.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/08-learning"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="text-to-vectors-embeddings.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="low-rank-lora-quantization.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#one-head">One head</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#many-heads-one-matmul">Many heads, one matmul</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cache-order-and-cost">Cache, order, and cost</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-one-head-assembled-and-read">Exercise 1: One head, assembled and read</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-mask-is-exact-the-scaling-is-calibrated">Exercise 2: The mask is exact; the scaling is calibrated</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-many-heads-are-one-matmul">Exercise 3: Many heads are one matmul</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-the-kv-cache-is-an-identity-and-the-cost-is-quadratic">Exercise 4: The KV cache is an identity, and the cost is quadratic</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-order-absent-by-default-relative-by-rotation">Exercise 5: Order: absent by default, relative by rotation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

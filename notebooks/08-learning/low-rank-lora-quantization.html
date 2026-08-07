@@ -1,0 +1,1258 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/08-learning/low-rank-lora-quantization.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: Chapter IV taught that low-rank structure is a property to measure, never to assume. This notebook applies that discipline to trained neur..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: Chapter IV taught that low-rank structure is a property to measure, never to assume. This notebook applies that discipline to trained neur..." />
+
+    <title>8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/08-learning/low-rank-lora-quantization';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/08-learning/low-rank-lora-quantization.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream" href="where-linear-algebra-stops.html" />
+    <link rel="prev" title="8.5 Attention Is a Product of Matrices" href="attention-matrix-products.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter VIII — The Linear Algebra of Learning</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/08-learning/low-rank-lora-quantization.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/08-learning/low-rank-lora-quantization.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/08-learning/low-rank-lora-quantization.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/08-learning/low-rank-lora-quantization.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#two-objects-two-structures">Two objects, two structures</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compression-as-perturbation">Compression as perturbation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-what-fine-tuning-actually-moves">Exercise 1: What fine-tuning actually moves</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-lora-training-the-update-s-structure">Exercise 2: LoRA: training the update’s structure</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-compression-duel-the-manifest-called-wrong">Exercise 3: The compression duel the manifest called wrong</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-quantization-rounding-priced-by-chapter-v">Exercise 4: Quantization: rounding, priced by Chapter V</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="low-rank-structure-in-trained-models-lora-pruning-and-quantization">
+<h1>8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization<a class="headerlink" href="#low-rank-structure-in-trained-models-lora-pruning-and-quantization" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter VIII — The Linear Algebra of Learning
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;8.6
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">What structure does training leave in a weight matrix? This notebook measures instead of assuming: the fine-tuning update is dramatically low-rank (the LoRA premise, gated), the weights themselves are not (so magnitude pruning beats SVD compression — the opposite of the folklore this notebook was asked to confirm), and quantization error obeys exactly the perturbation bounds Chapter V priced.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;advanced&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;135–165 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p>Chapter IV taught that low-rank structure is a <em>property to measure</em>,
+never to assume. This notebook applies that discipline to trained
+neural weights, and the measurements split cleanly down the middle of
+the folklore. A <a class="reference internal" href="linear-layer-backpropagation.html"><span class="std std-doc">§8.3</span></a>-style MLP
+is pretrained on half the digit classes, then fine-tuned on all ten;
+the <strong>update</strong> <span class="math notranslate nohighlight">\(\Delta W = W_{\text{ft}} - W_{\text{pre}}\)</span> needs only
+<strong>6 of 48</strong> singular directions for 90% of its Frobenius norm — the
+<strong>LoRA premise</strong> <span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id46" title="Edward J. Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu Wang, and Weizhu Chen. LoRA: low-rank adaptation of large language models. In International Conference on Learning Representations. 2022.">HSW+22</a>]</span>, measured rather than asserted —
+and rank-2 LoRA adapters recover full fine-tuning accuracy within 1%
+while training 7% of the adapted matrix’s parameters (rank-1: 3.6%,
+within 2% — with the scaling law <span class="math notranslate nohighlight">\(r(m+n)/mn\)</span> stated, since “under 5%
+at <span class="math notranslate nohighlight">\(r = 8\)</span>” is a large-model geometry no <span class="math notranslate nohighlight">\(64\times48\)</span> matrix can
+offer).</p>
+<p>The <em>weights themselves</em> refuse the same story. Their spectrum is
+nearly flat, and at equal compression <strong>magnitude pruning beats SVD
+truncation at every ratio tested</strong> — 0.93 vs 0.75 accuracy at
+4× compression — the reverse of the manifest’s expected verdict,
+gated in the direction the measurement actually went: the update is
+low-rank because fine-tuning is a small coherent correction; the
+weights are full-rank because training filled them with information;
+and choosing a compression scheme is choosing <em>which object’s</em>
+structure to exploit. <strong>Quantization</strong> closes the chapter-long
+perturbation story: 8-bit stays inside a 0.1 logit tolerance and
+4-bit exceeds it (both deterministic arithmetic, both gated), the
+measured output error sits under the operator-norm bound on every
+batch, and per-channel scaling — a diagonal preconditioner,
+<a class="reference internal" href="gradient-descent-conditioning.html"><span class="std std-doc">§8.2</span></a>’s idea at inference time
+— cuts the error by a measured 1.35× (the folklore says “halves”;
+the folklore assumed worse-scaled channels than tanh training
+produces, and the gate follows the measurement).</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> Hu et al. <span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id46" title="Edward J. Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu Wang, and Weizhu Chen. LoRA: low-rank adaptation of large language models. In International Conference on Learning Representations. 2022.">HSW+22</a>]</span> for LoRA; the SVD and
+perturbation machinery are Chapters IV and V. Everything trains in
+seconds of pure NumPy on the scikit-learn digits
+<span class="bibtex-citation" id="id3">[<a class="reference internal" href="#id53" title="Fabian Pedregosa, Gaël Varoquaux, Alexandre Gramfort, and others. Scikit-learn: machine learning in Python. Journal of Machine Learning Research, 12:2825–2830, 2011.">PVG+11</a>]</span>.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="two-objects-two-structures">
+<h3>Two objects, two structures<a class="headerlink" href="#two-objects-two-structures" title="Link to this heading">#</a></h3>
+<p>Fine-tuning moves weights by <span class="math notranslate nohighlight">\(\Delta W = W_{\text{ft}} -
+W_{\text{pre}}\)</span>. LoRA’s bet is that <span class="math notranslate nohighlight">\(\Delta W\)</span> is approximately
+rank-<span class="math notranslate nohighlight">\(r\)</span> for small <span class="math notranslate nohighlight">\(r\)</span>, so the update can be <em>parameterized</em> as</p>
+<div class="math notranslate nohighlight" id="equation-eq-lq-lora">
+<span class="eqno">(291)<a class="headerlink" href="#equation-eq-lq-lora" title="Link to this equation">#</a></span>\[W \;=\; W_{\text{pre}} + AB, \qquad
+A \in \mathbb{R}^{m\times r},\; B \in \mathbb{R}^{r\times n},
+\qquad \frac{\text{trainable}}{\text{full}} = \frac{r(m+n)}{mn},\]</div>
+<p>with <span class="math notranslate nohighlight">\(W_{\text{pre}}\)</span> frozen. Whether the bet is <em>good</em> is an
+empirical question about <span class="math notranslate nohighlight">\(\Delta W\)</span>’s singular spectrum — Exercise 1
+measures it — and is logically independent of whether <span class="math notranslate nohighlight">\(W\)</span> itself is
+low-rank, which Exercise 3 measures separately (it is not, and the
+compression verdict follows).</p>
+</section>
+<section id="compression-as-perturbation">
+<h3>Compression as perturbation<a class="headerlink" href="#compression-as-perturbation" title="Link to this heading">#</a></h3>
+<p>Every compression replaces <span class="math notranslate nohighlight">\(W\)</span> by <span class="math notranslate nohighlight">\(W + E\)</span> and every consequence is
+priced by Chapter V:</p>
+<div class="math notranslate nohighlight" id="equation-eq-lq-perturb">
+<span class="eqno">(292)<a class="headerlink" href="#equation-eq-lq-perturb" title="Link to this equation">#</a></span>\[\lVert (W+E)x - Wx \rVert \;\le\; \lVert E\rVert_2\,\lVert x\rVert ,\]</div>
+<p>through 1-Lipschitz activations and the next layer’s norm. SVD
+truncation makes <span class="math notranslate nohighlight">\(\lVert E\rVert_2 = \sigma_{r+1}\)</span> (Eckart–Young,
+optimal <em>in norm</em>); magnitude pruning makes <span class="math notranslate nohighlight">\(E\)</span> the small entries
+(optimal in <em>count</em>); uniform <span class="math notranslate nohighlight">\(b\)</span>-bit quantization makes <span class="math notranslate nohighlight">\(E\)</span>
+rounding noise of scale <span class="math notranslate nohighlight">\(\max|W|/(2^{b-1}-1)\)</span>, and <strong>per-channel</strong>
+scales — a diagonal matrix on the columns — shrink it exactly the
+way <a class="reference internal" href="gradient-descent-conditioning.html"><span class="std std-doc">§8.2</span></a>’s preconditioner
+shrank <span class="math notranslate nohighlight">\(\kappa\)</span>: by matching the scale to each column’s own range.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data and instruments only: the digits split, two restatements from
+<a class="reference internal" href="linear-layer-backpropagation.html"><span class="std std-doc">§8.3</span></a> — softmax and the plain
+training loop — and the adapter-aware accuracy readout. The LoRA loop is
+Exercise 2’s build.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_digits</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random array below comes from this seed</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+
+<span class="n">X_all</span><span class="p">,</span> <span class="n">y_all</span> <span class="o">=</span> <span class="n">load_digits</span><span class="p">(</span><span class="n">return_X_y</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">X_all</span> <span class="o">=</span> <span class="n">X_all</span> <span class="o">/</span> <span class="mf">16.0</span>
+<span class="n">perm</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y_all</span><span class="p">))</span>
+<span class="n">X_tr</span><span class="p">,</span> <span class="n">y_tr</span> <span class="o">=</span> <span class="n">X_all</span><span class="p">[</span><span class="n">perm</span><span class="p">[:</span><span class="mi">1200</span><span class="p">]],</span> <span class="n">y_all</span><span class="p">[</span><span class="n">perm</span><span class="p">[:</span><span class="mi">1200</span><span class="p">]]</span>
+<span class="n">X_te</span><span class="p">,</span> <span class="n">y_te</span> <span class="o">=</span> <span class="n">X_all</span><span class="p">[</span><span class="n">perm</span><span class="p">[</span><span class="mi">1200</span><span class="p">:]],</span> <span class="n">y_all</span><span class="p">[</span><span class="n">perm</span><span class="p">[</span><span class="mi">1200</span><span class="p">:]]</span>
+<span class="n">D_IN</span><span class="p">,</span> <span class="n">H_MID</span><span class="p">,</span> <span class="n">C_OUT</span> <span class="o">=</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">48</span><span class="p">,</span> <span class="mi">10</span>
+
+
+<span class="c1"># built from scratch in §8.3; restated here as an instrument.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">softmax</span><span class="p">(</span><span class="n">z</span><span class="p">):</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">z</span> <span class="o">-</span> <span class="n">z</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">e</span> <span class="o">/</span> <span class="n">e</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="c1"># built from scratch in §8.3; restated here as an instrument — the plain</span>
+<span class="c1"># full-batch loop. The LoRA variant is Exercise 2&#39;s build.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_mlp</span><span class="p">(</span><span class="n">Xd</span><span class="p">,</span> <span class="n">yd</span><span class="p">,</span> <span class="n">W1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">W2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">epochs</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;8.3&#39;s training loop: forward, backward, step, full batch.&quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">yd</span><span class="p">)</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">C_OUT</span><span class="p">))</span>
+    <span class="n">Y</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">yd</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span>
+        <span class="n">A1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">Xd</span> <span class="o">@</span> <span class="n">W1</span> <span class="o">+</span> <span class="n">b1</span><span class="p">)</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="n">softmax</span><span class="p">(</span><span class="n">A1</span> <span class="o">@</span> <span class="n">W2</span> <span class="o">+</span> <span class="n">b2</span><span class="p">)</span>
+        <span class="n">G2</span> <span class="o">=</span> <span class="p">(</span><span class="n">P</span> <span class="o">-</span> <span class="n">Y</span><span class="p">)</span> <span class="o">/</span> <span class="n">n</span>
+        <span class="n">gW2</span><span class="p">,</span> <span class="n">gb2</span> <span class="o">=</span> <span class="n">A1</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">G2</span><span class="p">,</span> <span class="n">G2</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">G1</span> <span class="o">=</span> <span class="p">(</span><span class="n">G2</span> <span class="o">@</span> <span class="n">W2</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">A1</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">W1</span> <span class="o">-=</span> <span class="n">lr</span> <span class="o">*</span> <span class="p">(</span><span class="n">Xd</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">G1</span><span class="p">)</span>
+        <span class="n">b1</span> <span class="o">-=</span> <span class="n">lr</span> <span class="o">*</span> <span class="n">G1</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">W2</span> <span class="o">-=</span> <span class="n">lr</span> <span class="o">*</span> <span class="n">gW2</span>
+        <span class="n">b2</span> <span class="o">-=</span> <span class="n">lr</span> <span class="o">*</span> <span class="n">gb2</span>
+    <span class="k">return</span> <span class="n">W1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">W2</span><span class="p">,</span> <span class="n">b2</span>
+
+
+<span class="c1"># instrument: the test-set readout, adapter-aware — it evaluates, never</span>
+<span class="c1"># trains.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">accuracy</span><span class="p">(</span><span class="n">Xd</span><span class="p">,</span> <span class="n">yd</span><span class="p">,</span> <span class="n">W1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">W2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">lora</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">W1_eff</span> <span class="o">=</span> <span class="n">W1</span> <span class="o">+</span> <span class="p">(</span><span class="n">lora</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">@</span> <span class="n">lora</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">lora</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">softmax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">Xd</span> <span class="o">@</span> <span class="n">W1_eff</span> <span class="o">+</span> <span class="n">b1</span><span class="p">)</span> <span class="o">@</span> <span class="n">W2</span> <span class="o">+</span> <span class="n">b2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">((</span><span class="n">P</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="n">yd</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-what-fine-tuning-actually-moves">
+<h2>Exercise 1: What fine-tuning actually moves<a class="headerlink" href="#exercise-1-what-fine-tuning-actually-moves" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> Pretrain the MLP on digit classes 0–4 only (300 full-batch
+epochs), then fine-tune <em>everything</em> on all ten classes (300 more).
+Report the accuracy arc: 52% (half the classes were never seen) to
+98.3%.</p>
+<p><strong>Part b)</strong> The three spectra, on one log axis: the random init
+<span class="math notranslate nohighlight">\(W_{\text{init}}\)</span>, the pretrained <span class="math notranslate nohighlight">\(W_{\text{pre}}\)</span>, and the update
+<span class="math notranslate nohighlight">\(\Delta W = W_{\text{ft}} - W_{\text{pre}}\)</span>. Gate the split verdict:
+the <strong>update</strong> reaches 90% of its Frobenius norm within its top
+<span class="math notranslate nohighlight">\(r_{90} \le 8\)</span> of 48 directions (measured: <strong>6</strong> — the LoRA premise,
+quantified), while the <strong>pretrained weights</strong> need <span class="math notranslate nohighlight">\(r_{90} &gt; 15\)</span>
+(measured: far more — training fills the spectrum, and the contrast
+is the whole design space of Exercises 2 and 3).</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>pretrained on 0-4: 0.516 on the full test set; after full fine-tuning: 0.983
+r for 90% Frobenius: update 6 of 48; pretrained weights 22 of 48 — two objects, two structures
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-lq-spectra">
+<img alt="../../_images/754963993145041ee0fd9d7c4e6d4fce7ea497af7e14c71647e080c5607f6d20.png" src="../../_images/754963993145041ee0fd9d7c4e6d4fce7ea497af7e14c71647e080c5607f6d20.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 157 </span><span class="caption-text">Singular values of the random initialization (grey), the pretrained weights (ink) and the fine-tuning update <span class="math notranslate nohighlight">\(\Delta W\)</span> (amber), one log axis. Init and trained weights share a broad, slowly decaying spectrum – training does not make a layer low-rank, it fills it. The update is different in kind: six of 48 directions carry 90% of its Frobenius norm (gated), because fine-tuning from a competent starting point is a small, coherent correction. This split – update compressible, weights not – is the entire design space: LoRA lives on the amber curve, and Exercise 3’s compression verdict lives on the ink one.</span><a class="headerlink" href="#fig-lq-spectra" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the pretrain/fine-tune arc behaves: half-blind, then competent   [0.52 to 0.983 test accuracy — the update below is what carried the difference]
+✓  the LoRA premise, measured: the update is low-rank, the weights are not   [90% Frobenius at r = 6 of 48 for dW against r = 22 for the weights — assumption converted to measurement, and the contrast drives everything below]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-lora-training-the-update-s-structure">
+<h2>Exercise 2: LoRA: training the update’s structure<a class="headerlink" href="#exercise-2-lora-training-the-update-s-structure" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> Write the adapter loop <code class="docutils literal notranslate"><span class="pre">train_mlp_lora</span></code>: freeze
+<span class="math notranslate nohighlight">\(W_{\text{pre}}\)</span>, train
+<span class="math notranslate nohighlight">\(A \in \mathbb{R}^{64\times r}\)</span> (small init) and
+<span class="math notranslate nohighlight">\(B \in \mathbb{R}^{r\times48}\)</span> (zero init — so fine-tuning starts
+<em>exactly</em> at the pretrained model) via <a class="reference internal" href="#equation-eq-lq-lora">Eq. 291</a>, gradients
+through the product.</p>
+<p><strong>Write this one yourself</strong> — two extra lines in the backward pass.</p>
+<p><strong>Part b)</strong> Sweep <span class="math notranslate nohighlight">\(r \in \{1, 2, 4, 8\}\)</span> and gate the measured pair,
+with the parameter ledger stated by the formula <span class="math notranslate nohighlight">\(r(m+n)/mn\)</span>:
+rank-1 trains <strong>3.6%</strong> of <span class="math notranslate nohighlight">\(W_1\)</span>’s parameters and lands within 2% of
+full fine-tuning; rank-2 trains 7.3% and lands within <strong>one
+percent</strong> (the
+manifest’s “<span class="math notranslate nohighlight">\(r = 8\)</span> under 5%” is a geometry no <span class="math notranslate nohighlight">\(64\times48\)</span> matrix
+can produce — at this shape <span class="math notranslate nohighlight">\(r = 1\)</span> <em>is</em> the sub-5% regime, and the
+formula, not the folklore number, is what transfers to
+<span class="math notranslate nohighlight">\(4096\times4096\)</span> where <span class="math notranslate nohighlight">\(r = 8\)</span> costs 0.4%).</p>
+<p><strong>Part c)</strong> Draw accuracy against <span class="math notranslate nohighlight">\(r\)</span> with the full-fine-tune line:
+the curve saturates immediately — matching Exercise 1’s <span class="math notranslate nohighlight">\(r_{90} = 6\)</span>,
+since adapters cannot need more rank than the update they imitate
+carries.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>LoRA r = 1: accuracy 0.970 (full 0.983), adapter = 3.6% of W1&#39;s parameters
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>LoRA r = 2: accuracy 0.975 (full 0.983), adapter = 7.3% of W1&#39;s parameters
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>LoRA r = 4: accuracy 0.973 (full 0.983), adapter = 14.6% of W1&#39;s parameters
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>LoRA r = 8: accuracy 0.973 (full 0.983), adapter = 29.2% of W1&#39;s parameters
+the formula at transformer shape: r = 8 on 4096x4096 trains 0.39%
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-lq-lora">
+<img alt="../../_images/d504addaa41d8717545e46be2dd83e26fde0f701d5d8a8e8431a1b83485436c3.png" src="../../_images/d504addaa41d8717545e46be2dd83e26fde0f701d5d8a8e8431a1b83485436c3.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 158 </span><span class="caption-text">Test accuracy against LoRA rank (amber), with full fine-tuning (ink line) and the frozen pretrained model (grey line). The curve saturates essentially at <span class="math notranslate nohighlight">\(r = 1\)</span>: rank-1 adapters – 3.6% of the matrix’s parameters – recover all but 1.3% of the full fine-tune, and rank 2 closes to within one percent. Nothing improves past that, and Exercise 1 said why before the sweep ran: the true update carries 90% of itself in six directions, so an adapter has nothing more to imitate. The parameter fractions follow <span class="math notranslate nohighlight">\(r(m+n)/mn\)</span> – at transformer shapes the same <span class="math notranslate nohighlight">\(r = 8\)</span> costs 0.4%, which is the regime the folklore numbers describe.</span><a class="headerlink" href="#fig-lq-lora" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  rank-1 LoRA: under 5% of the parameters, within 2% of full fine-tuning (Eq. 1)   [accuracy gap 0.013 at 3.6% trainable — the sub-5% regime at THIS shape is r = 1; the formula r(m+n)/mn is what transfers, not the folklore&#39;s r = 8]
+✓  and rank-2 closes to within 2%   [gap 0.008 at 7.3% of parameters — saturation at tiny rank, exactly as Exercise 1&#39;s r90 = 6 predicted it must]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-the-compression-duel-the-manifest-called-wrong">
+<h2>Exercise 3: The compression duel the manifest called wrong<a class="headerlink" href="#exercise-3-the-compression-duel-the-manifest-called-wrong" title="Link to this heading">#</a></h2>
+<p>The manifest asked to gate “SVD truncation beats magnitude pruning at
+equal compression.” The measurement says the opposite, three times,
+with margins — so the <em>measured</em> direction is what gets gated, and
+the explanation is Exercise 1’s split verdict.</p>
+<p><strong>Part a)</strong> Compress the fine-tuned <span class="math notranslate nohighlight">\(W_1\)</span> to 50%, 25% and 12.5% of
+its parameters two ways: rank truncation (keep
+<span class="math notranslate nohighlight">\(r = \lceil\text{keep}\cdot mn/(m+n)\rceil\)</span> singular triples) and
+magnitude pruning (zero the smallest entries). Evaluate test accuracy
+with everything else frozen.</p>
+<p><strong>Part b)</strong> Gate the duel as measured: pruning wins at <em>every</em> ratio
+— 0.968 vs 0.941, 0.928 vs 0.750, 0.765 vs 0.561 — because
+Eckart–Young optimality is optimality in <em>norm</em>, and Exercise 1
+showed this matrix’s spectrum is flat: cutting it at rank <span class="math notranslate nohighlight">\(r\)</span> throws
+away directions nearly as important as those kept, while pruning’s
+error is spread across many unimportant entries. Low-rank was the
+right structure for the <em>update</em>; it is the wrong structure for
+<em>these weights</em> — one experiment, both lessons.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>keep 50.0%: SVD (r = 14) 0.941 | pruning 0.968
+keep 25.0%: SVD (r = 7) 0.750 | pruning 0.928
+keep 12.5%: SVD (r = 3) 0.561 | pruning 0.765
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  magnitude pruning beats SVD truncation at every tested compression — the duel gated as measured, not as expected   [worst margin 0.027; the manifest predicted the reverse, and the flat weight spectrum of Exercise 1 explains the verdict: Eckart-Young optimizes norm, and a flat spectrum makes norm-optimal rank cuts expensive while entry-wise error stays cheap — right structure for the update, wrong one for the weights]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-quantization-rounding-priced-by-chapter-v">
+<h2>Exercise 4: Quantization: rounding, priced by Chapter V<a class="headerlink" href="#exercise-4-quantization-rounding-priced-by-chapter-v" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> Uniform symmetric quantization of <span class="math notranslate nohighlight">\(W_1\)</span> at 8 and 4 bits
+(tensor-wide scale <span class="math notranslate nohighlight">\(\max|W|/(2^{b-1}-1)\)</span>). Both are deterministic
+arithmetic on fixed weights, so both sides of the manifest’s claim
+are gateable: the 8-bit model’s worst logit deviation stays inside
+the stated tolerance <strong>0.1</strong>, and the 4-bit model’s exceeds it
+(measured: 0.082 against 1.48).</p>
+<p><strong>Part b)</strong> Gate the perturbation bound <a class="reference internal" href="#equation-eq-lq-perturb">Eq. 292</a> on every
+test batch: the measured logit deviation never exceeds
+<span class="math notranslate nohighlight">\(\lVert W_2\rVert_2\,\lVert E\rVert_2\,\lVert x\rVert_2\)</span> (tanh is
+1-Lipschitz) — Chapter V’s machinery pricing a deployment decision,
+one-sided as always.</p>
+<p><strong>Part c)</strong> Per-channel scales — one scale per column, a diagonal
+preconditioner at inference — cut the quantization error by a
+measured <strong>1.35×</strong> (Frobenius) at both bit widths. The folklore says
+“halves”; that figure belongs to layers with badly mismatched
+channel ranges, and tanh-trained columns are comparatively
+homogeneous — the gate asks for <span class="math notranslate nohighlight">\(\ge 1.25\times\)</span> and the prose
+reports why it is not 2. Draw the error histogram and the weight
+matrix before/after 4-bit.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>8-bit, per-channel=False: ||E||_F 0.141, worst logit deviation 0.082, accuracy 0.983
+8-bit, per-channel=True: ||E||_F 0.104, worst logit deviation 0.065, accuracy 0.985
+4-bit, per-channel=False: ||E||_F 2.508, worst logit deviation 1.478, accuracy 0.972
+4-bit, per-channel=True: ||E||_F 1.835, worst logit deviation 1.143, accuracy 0.975
+
+perturbation bound: holds on every batch, worst slack 5.9x
+per-channel error reduction: 1.35x at 8-bit, 1.37x at 4-bit (folklore says 2x; tanh-trained columns are homogeneous)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-lq-quant">
+<img alt="../../_images/8acb8d378f287a31eaec5275b69a319b7347c4de16569aac085772255e1feb3b.png" src="../../_images/8acb8d378f287a31eaec5275b69a319b7347c4de16569aac085772255e1feb3b.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 159 </span><span class="caption-text">Quantization, seen and counted. Left: the 4-bit error histogram – uniform rounding noise bounded by half a quantization step, exactly the model Eq. 2 prices. Centre and right: the fine-tuned weight matrix before and after 4-bit quantization on a shared colour scale – the banding is 15 levels doing the work of a continuum, visibly coarser where columns are small relative to the tensor-wide scale, which is precisely the mismatch per-channel scaling repairs (a measured 1.35x error cut here; the folklore’s 2x belongs to worse-scaled layers than tanh training produces).</span><a class="headerlink" href="#fig-lq-quant" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p>The compression duel used one matrix and one metric. Ask your
+assistant for <code class="docutils literal notranslate"><span class="pre">compression_frontier(model,</span> <span class="pre">ratios)</span></code> sweeping SVD,
+pruning, quantization and LoRA-on-the-update across compression
+ratios into one accuracy-vs-bits plot, then check it against the
+mathematics rather than a demo: (i) every curve is monotone
+non-increasing as compression tightens; (ii) the quantization points
+obey Eq. 2’s bound at every ratio; (iii) compressing the <em>update</em>
+by rank (keep <span class="math notranslate nohighlight">\(W_{\text{pre}}\)</span> exact, truncate <span class="math notranslate nohighlight">\(\Delta W\)</span> at
+Exercise 1’s <span class="math notranslate nohighlight">\(r_{90}\)</span>) beats compressing the <em>weights</em> by rank at
+equal stored parameters — the split verdict, turned into a frontier.
+The check is yours.</p>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  8-bit sits inside the 0.1 logit tolerance and 4-bit exceeds it   [0.082 against 1.48: both deterministic arithmetic on fixed weights, so for once both sides of a pass/fail claim are honestly gateable]
+✓  and the measured deviation respects the operator-norm bound on every batch (Eq. 2)   [worst slack 5.9x — Chapter V&#39;s perturbation calculus pricing a deployment decision, one-sided as the theorem is]
+✓  while per-channel scaling cuts the error by the measured 1.35x   [1.35x and 1.37x — the folklore&#39;s &#39;halves&#39; assumes badly mismatched channel ranges; the gate follows the measurement and the prose explains the gap]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p><strong>Two objects, two verdicts — measured.</strong> The fine-tuning update
+carried 90% of itself in 6 of 48 directions (the LoRA premise,
+gated); the trained weights needed far more — training fills a
+spectrum, fine-tuning writes a correction. Every later result was a
+corollary of that split.</p>
+<p><strong>LoRA delivered at the rank the update dictated.</strong> Rank-1 adapters
+(3.6% of the matrix) came within 1.3% of full fine-tuning; rank-2
+within one percent; nothing improved past saturation because
+nothing could.
+The parameter story was told by the formula <span class="math notranslate nohighlight">\(r(m+n)/mn\)</span> — the
+manifest’s “<span class="math notranslate nohighlight">\(r = 8\)</span> under 5%” is transformer geometry, honestly
+unreachable at <span class="math notranslate nohighlight">\(64\times48\)</span> and stated as such.</p>
+<p><strong>The compression duel went to pruning, three for three.</strong> 0.968 vs
+0.941, 0.928 vs 0.750, 0.765 vs 0.561 — the manifest predicted the
+opposite; the flat weight spectrum explains the measured verdict,
+and the gate follows the measurement. Eckart–Young optimality is
+norm-optimality, and a flat spectrum makes rank cuts expensive.</p>
+<p><strong>Quantization obeyed Chapter V to the letter.</strong> 8-bit inside the 0.1
+logit tolerance, 4-bit outside (both gated — deterministic
+arithmetic allows it); the operator-norm bound held on every batch
+with 5.9× worst slack; per-channel scaling cut error by a measured
+1.35× with the folklore’s 2× explained rather than claimed.</p>
+<p><strong>Methods introduced.</strong> Update-spectrum analysis, LoRA adapters with
+through-product gradients, parameter-fraction ledgers, equal-budget
+compression duels, uniform and per-channel quantization, and
+perturbation-bound certification of deployed weights.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>The boundary next.</strong> <a class="reference internal" href="where-linear-algebra-stops.html"><span class="std std-doc">§8.7</span></a>
+closes the chapter by measuring where the linear story stops:
+nonlinearity, normalization, and the training dynamics no fixed
+matrix captures.</p></li>
+<li><p><strong>Structured sparsity.</strong> Hardware wants 2:4 patterns, not
+arbitrary masks; the duel of Exercise 3 rerun under structural
+constraints is where pruning research actually lives.</p></li>
+<li><p><strong>Outliers rule real quantization.</strong> Transformer activations carry
+rare huge channels; per-channel scaling becomes essential rather
+than a 1.35× nicety, and mixed-precision schemes (keep outliers in
+16-bit) are the industrial answer — the diagonal preconditioner
+idea, taken seriously at scale.</p></li>
+<li><p><strong>QLoRA closes the loop.</strong> Quantize the frozen base, train LoRA
+adapters in full precision on top: Exercises 2 and 4 composed —
+and every gate in this notebook applies verbatim.</p></li>
+</ul>
+<div class="docutils container" id="id4">
+<div role="list" class="citation-list">
+<div class="citation" id="id46" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>HSW+22<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id2">2</a>)</span>
+<p>Edward J. Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu Wang, and Weizhu Chen. LoRA: low-rank adaptation of large language models. In <em>International Conference on Learning Representations</em>. 2022.</p>
+</div>
+<div class="citation" id="id53" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">PVG+11</a><span class="fn-bracket">]</span></span>
+<p>Fabian Pedregosa, Gaël Varoquaux, Alexandre Gramfort, and others. Scikit-learn: machine learning in Python. <em>Journal of Machine Learning Research</em>, 12:2825–2830, 2011.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/08-learning"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="attention-matrix-products.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">8.5 Attention Is a Product of Matrices</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="where-linear-algebra-stops.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#two-objects-two-structures">Two objects, two structures</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compression-as-perturbation">Compression as perturbation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-what-fine-tuning-actually-moves">Exercise 1: What fine-tuning actually moves</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-lora-training-the-update-s-structure">Exercise 2: LoRA: training the update’s structure</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-compression-duel-the-manifest-called-wrong">Exercise 3: The compression duel the manifest called wrong</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-quantization-rounding-priced-by-chapter-v">Exercise 4: Quantization: rounding, priced by Chapter V</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

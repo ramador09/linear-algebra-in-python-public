@@ -1,0 +1,1306 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="7.1 Index Notation and einsum: Contraction as a Language" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/07-tensors/einsum-contraction.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: Chapter VII begins by renaming everything. Trace, transpose, matvec, matmul, outer product, bilinear form — ten operations the course has ..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: Chapter VII begins by renaming everything. Trace, transpose, matvec, matmul, outer product, bilinear form — ten operations the course has ..." />
+
+    <title>7.1 Index Notation and einsum: Contraction as a Language &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/07-tensors/einsum-contraction';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/07-tensors/einsum-contraction.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions" href="unfoldings-tucker-hosvd.html" />
+    <link rel="prev" title="Chapter VII — Multilinear Algebra and Tensor Networks" href="index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/07-tensors/einsum-contraction.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/07-tensors/einsum-contraction.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/07-tensors/einsum-contraction.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/07-tensors/einsum-contraction.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>7.1 Index Notation and einsum: Contraction as a Language</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-grammar">The grammar</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diagrams">Diagrams</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cost-is-parenthesization">Cost is parenthesization</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-ten-operations-one-grammar">Exercise 1: Ten operations, one grammar</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-batching-broadcasting-and-the-attention-shape">Exercise 2: Batching, broadcasting, and the attention shape</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-cost-is-the-parenthesization">Exercise 3: The cost is the parenthesization</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-the-monster-that-is-counted-never-formed">Exercise 4: The monster that is counted, never formed</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-when-einsum-is-slower-than-and-why">Exercise 5: When einsum is slower than @, and why</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="index-notation-and-einsum-contraction-as-a-language">
+<h1>7.1 Index Notation and einsum: Contraction as a Language<a class="headerlink" href="#index-notation-and-einsum-contraction-as-a-language" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter VII — Multilinear Algebra and Tensor Networks
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;7.1
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">Every operation this course has performed is one sentence in a single language: label the indices, repeat the ones you sum. einsum speaks it directly — and once contraction is a sentence, its cost becomes a choice of parenthesization, varying by a factor of a million between orderings of the same product.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;advanced&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;105–135 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p>Chapter VII begins by renaming everything. Trace, transpose, matvec,
+matmul, outer product, bilinear form — ten operations the course has
+used since <a class="reference internal" href="../01-matrices/four-ways-to-multiply.html"><span class="std std-doc">§1.1</span></a> — are each
+one <em>string</em> in index notation: name the axes, and any index appearing
+in the inputs but not the output is summed. <code class="docutils literal notranslate"><span class="pre">np.einsum</span></code> executes the
+language directly, and Exercise 1 gates all ten sentences against their
+classical spellings at rounding level, drawing four of them in the
+<strong>tensor-diagram</strong> notation (nodes for tensors, legs for indices, joined
+legs for sums) that Chapter VII will live in.</p>
+<p>The language’s power move is that <em>what</em> to compute and <em>in which
+order</em> become separate decisions. A four-matrix chain has five
+parenthesizations; a hand-rolled dynamic program (write-yourself)
+enumerates their FLOP counts — spanning <strong>500×</strong> on a runnable example
+and <strong>10⁶</strong> on a counted one — and <code class="docutils literal notranslate"><span class="pre">np.einsum_path</span></code> picks the optimum
+this notebook’s own DP confirms. The monster case makes the stakes
+physical: a bilinear form whose naive contraction order manufactures an
+<strong>8.6 GB</strong> outer product runs in milliseconds along the optimized path
+— the bad intermediate is <em>counted, never allocated</em>
+(<a class="reference internal" href="../06-structure/kronecker-vec-separable.html"><span class="std std-doc">§6.4</span></a>’s discipline,
+now automated by a path optimizer). The closing exercise measures when
+<code class="docutils literal notranslate"><span class="pre">einsum</span></code> is <em>slower</em> than <code class="docutils literal notranslate"><span class="pre">&#64;</span></code> (its unoptimized kernels are index loops,
+not BLAS) and shows <code class="docutils literal notranslate"><span class="pre">optimize=True</span></code> closing the gap — the language and
+the kernel are different layers, and knowing which one is speaking is
+the practical skill. Multi-head attention’s <code class="docutils literal notranslate"><span class="pre">bhqd,bhkd-&gt;bhqk</span></code> appears
+here as a shape, gated against explicit loops — a forward pointer the
+course will pick up in <a class="reference internal" href="../08-learning/attention-matrix-products.html"><span class="std std-doc">§8.5</span></a>.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> Kolda and Bader <span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id35" title="Tamara G. Kolda and Brett W. Bader. Tensor decompositions and applications. SIAM Review, 51(3):455–500, 2009. doi:10.1137/07070111X.">KB09</a>]</span> for tensor notation;
+Harris et al. <span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id50" title="Charles R. Harris, K. Jarrod Millman, Stéfan J. van der Walt, and others. Array programming with NumPy. Nature, 585:357–362, 2020. doi:10.1038/s41586-020-2649-2.">HMvdW+20</a>]</span> for the NumPy machinery. The
+diagrams follow the Penrose convention as used across the tensor-
+network literature, drawn with the course’s own <code class="docutils literal notranslate"><span class="pre">ecp.draw</span></code> family.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="the-grammar">
+<h3>The grammar<a class="headerlink" href="#the-grammar" title="Link to this heading">#</a></h3>
+<p>An einsum string names each input’s axes and the output’s:</p>
+<div class="math notranslate nohighlight" id="equation-eq-es-grammar">
+<span class="eqno">(270)<a class="headerlink" href="#equation-eq-es-grammar" title="Link to this equation">#</a></span>\[\texttt{&quot;ij,jk-&gt;ik&quot;}: \quad
+C_{ik} = \sum_j A_{ij}B_{jk}\]</div>
+<p>— repeated indices absent from the output are summed (Einstein’s
+convention), indices present in the output are kept, and an index
+repeated <em>within</em> one operand reads its diagonal. Ten familiar
+operations become ten strings; nothing else in the course’s toolbox
+survives outside this grammar.</p>
+</section>
+<section id="diagrams">
+<h3>Diagrams<a class="headerlink" href="#diagrams" title="Link to this heading">#</a></h3>
+<p>A tensor is a node; each index is a leg; a summed index is a leg
+joining two nodes; a free index is a dangling leg. The matmul string
+in <a class="reference internal" href="#equation-eq-es-grammar">Eq. 270</a> is two nodes joined by the <span class="math notranslate nohighlight">\(j\)</span> leg with <span class="math notranslate nohighlight">\(i\)</span> and
+<span class="math notranslate nohighlight">\(k\)</span> dangling — and <em>counting dangling legs reads off the result’s
+order</em>. Diagrams make contraction order visible: any way of merging
+nodes pairwise is a valid evaluation, and they differ only in cost.</p>
+</section>
+<section id="cost-is-parenthesization">
+<h3>Cost is parenthesization<a class="headerlink" href="#cost-is-parenthesization" title="Link to this heading">#</a></h3>
+<p>Contracting a pairwise merge costs (2×) the product of <em>all</em> indices
+involved. For a matrix chain <span class="math notranslate nohighlight">\(M_1M_2M_3M_4\)</span> with dimensions
+<span class="math notranslate nohighlight">\(d_0\times d_1\)</span>, …, the classical dynamic program minimizes</p>
+<div class="math notranslate nohighlight" id="equation-eq-es-chain">
+<span class="eqno">(271)<a class="headerlink" href="#equation-eq-es-chain" title="Link to this equation">#</a></span>\[\mathrm{cost}(i,j) \;=\; \min_{i \le k &lt; j}\;
+\mathrm{cost}(i,k) + \mathrm{cost}(k{+}1,j) + 2\,d_{i-1}d_kd_j ,\]</div>
+<p>and skewed dimensions make the spread enormous: with shape profile
+<span class="math notranslate nohighlight">\((1, n, 1, n, 1)\)</span> the best order costs <span class="math notranslate nohighlight">\(O(n)\)</span> and the worst <span class="math notranslate nohighlight">\(O(n^2)\)</span> —
+a factor <span class="math notranslate nohighlight">\(n/2\)</span> that reaches <span class="math notranslate nohighlight">\(10^6\)</span> at <span class="math notranslate nohighlight">\(n = 2{\cdot}10^6\)</span>, where the
+worst order’s intermediate would hold <span class="math notranslate nohighlight">\(n^2 = 4\times10^{12}\)</span> entries.
+<code class="docutils literal notranslate"><span class="pre">np.einsum_path</span></code> runs a greedy/optimal search over exactly this space
+and reports both the FLOP estimate and the <strong>largest intermediate</strong> —
+the two numbers this notebook gates, as counts, per the course’s rules.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data only: the seeded rng and the timing import. Every contraction —
+and Exercise 3’s cost recursion — is written in the exercises, where the
+grammar is the lesson.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">draw</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random array below comes from this seed</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-ten-operations-one-grammar">
+<h2>Exercise 1: Ten operations, one grammar<a class="headerlink" href="#exercise-1-ten-operations-one-grammar" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> Write the ten sentences and gate each against its classical
+spelling — trace, transpose, diagonal, matvec, matmul, outer, batched
+matmul, bilinear form, Frobenius inner product, and a three-tensor
+contraction — at <span class="math notranslate nohighlight">\(10^{-12}\)</span> scaled by each result’s magnitude (a
+30-term sum accumulates ~<span class="math notranslate nohighlight">\(10^{-14}\)</span>; the gate keeps two orders of
+margin per Rule 8). The
+gates certify the <em>grammar</em>: repeated-and-absent means summed, present
+means kept, repeated-within-one-operand means diagonal.</p>
+<p><strong>Part b)</strong> Draw four of them as tensor diagrams beside their strings:
+trace (a self-loop — no dangling legs, so the result is a scalar),
+matvec (one dangling leg — a vector), matmul (two — a matrix), and the
+three-tensor contraction <code class="docutils literal notranslate"><span class="pre">abc,cbd-&gt;ad</span></code> (two nodes joined by <em>two</em> legs).
+Counting dangling legs is reading off the output’s order — the
+diagram’s first dividend.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>trace           ii-&gt;            gap 4.8e-16
+transpose       ij-&gt;ji          gap 0.0e+00
+diagonal        ii-&gt;i           gap 0.0e+00
+matvec          ij,j-&gt;i         gap 2.2e-16
+matmul          ij,jk-&gt;ik       gap 3.2e-16
+outer           i,j-&gt;ij         gap 0.0e+00
+batched matmul  bij,bjk-&gt;bik    gap 2.8e-16
+bilinear form   i,ij,j-&gt;        gap 1.6e-15
+Frobenius       ij,ij-&gt;         gap 1.4e-14
+three-tensor    abc,cbd-&gt;ad     gap 2.4e-16
+
+worst relative gap over the ten sentences: 1.4e-14
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-es-diagrams">
+<img alt="../../_images/5059a932d39648fa9dd912a3cf34975fee34623d3fa2c6931ab7f65eedd5f0ad.png" src="../../_images/5059a932d39648fa9dd912a3cf34975fee34623d3fa2c6931ab7f65eedd5f0ad.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 132 </span><span class="caption-text">Four einsum sentences in tensor-diagram notation. A tensor is a node, an index a leg, a summed index a leg joining two nodes, a free index a dangling leg – so counting dangling legs reads off the output’s order: the trace’s self-loop leaves none (a scalar), the matvec one (a vector), the matmul two (a matrix), and the three-tensor contraction joins two nodes with two legs at once, leaving <span class="math notranslate nohighlight">\(a\)</span> and <span class="math notranslate nohighlight">\(d\)</span> free. Chapter VII’s remaining notebooks are drawn in this language, where a contraction ordering is just a sequence of node merges.</span><a class="headerlink" href="#fig-es-diagrams" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  all ten sentences match their classical spellings (Eq. 1)   [trace to three-tensor contraction, each scaled by its own result: one grammar, ten operations, rounding-level agreement [1.42109e-14 &lt; 1e-12]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-batching-broadcasting-and-the-attention-shape">
+<h2>Exercise 2: Batching, broadcasting, and the attention shape<a class="headerlink" href="#exercise-2-batching-broadcasting-and-the-attention-shape" title="Link to this heading">#</a></h2>
+<p>The grammar extends past matrices without new rules.</p>
+<p><strong>Part a)</strong> Gate the batched contraction against an explicit loop:
+<code class="docutils literal notranslate"><span class="pre">&quot;bij,bjk-&gt;bik&quot;</span></code> on the <span class="math notranslate nohighlight">\((8, 20, 25)\times(8, 25, 30)\)</span> pair equals the
+stacked per-batch matmuls to <span class="math notranslate nohighlight">\(10^{-13}\)</span> — the <code class="docutils literal notranslate"><span class="pre">b</span></code> index is <em>kept</em>, so
+it batches; <code class="docutils literal notranslate"><span class="pre">j</span></code> is summed.</p>
+<p><strong>Part b)</strong> The shape the course will cash in <a class="reference internal" href="../08-learning/attention-matrix-products.html"><span class="std std-doc">§8.5</span></a>:
+attention scores are <code class="docutils literal notranslate"><span class="pre">&quot;bhqd,bhkd-&gt;bhqk&quot;</span></code> — batch and head kept, the
+feature index <code class="docutils literal notranslate"><span class="pre">d</span></code> summed between queries and keys. Gate it against
+four explicit nested loops on a small <span class="math notranslate nohighlight">\((2,3,5,4)/(2,3,6,4)\)</span> instance,
+exactly the check a reader should write before trusting any four-index
+string.</p>
+<p><strong>Part c)</strong> One index, three roles: with matrices alone, gate that
+<code class="docutils literal notranslate"><span class="pre">&quot;ij,jk-&gt;ijk&quot;</span></code> (kept everywhere — no sum, a broadcast product),
+<code class="docutils literal notranslate"><span class="pre">&quot;ij,jk-&gt;ik&quot;</span></code> (summed — matmul) and <code class="docutils literal notranslate"><span class="pre">&quot;ij,jk-&gt;j&quot;</span></code> (summed <em>out</em> of the
+output after elementwise use) each match their explicit constructions.
+The string is the specification; the roles fall out of which side of
+<code class="docutils literal notranslate"><span class="pre">-&gt;</span></code> the index lands on.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>batched matmul vs per-batch loop: 5.3e-15
+attention scores bhqd,bhkd-&gt;bhqk vs four loops: 8.9e-16 (shape (2, 3, 5, 6) — the 8.5 forward pointer)
+one index, three roles: worst gap 3.4e-16
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  batched matmul and the attention shape match their explicit loops   [kept indices batch, summed indices contract — including the four-index bhqd,bhkd-&gt;bhqk that 8.5 will build transformers from]
+✓  and one index plays three roles decided solely by the output side   [broadcast (kept), matmul (summed), summed-out-after-use: the string is the whole specification]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-the-cost-is-the-parenthesization">
+<h2>Exercise 3: The cost is the parenthesization<a class="headerlink" href="#exercise-3-the-cost-is-the-parenthesization" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-es-chain">Eq. 271</a> on a runnable chain, with the notebook’s own DP as
+the referee.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">chain_orderings(dims)</span></code>: enumerate all
+parenthesizations of <span class="math notranslate nohighlight">\(M_1M_2M_3M_4\)</span> recursively, returning each one’s
+FLOP count by <a class="reference internal" href="#equation-eq-es-chain">Eq. 271</a>’s merge rule. On the profile
+<span class="math notranslate nohighlight">\((2, 1000, 2, 1000, 2)\)</span> the five orderings span
+<span class="math notranslate nohighlight">\(1.6\times10^4\)</span> to <span class="math notranslate nohighlight">\(8.0\times10^6\)</span> FLOPs — a <strong>500×</strong> spread from
+associativity alone. Gate the count of orderings (Catalan number
+<span class="math notranslate nohighlight">\(C_3 = 5\)</span>) and the spread <span class="math notranslate nohighlight">\(&gt; 100\)</span>, both as arithmetic.</p>
+<p><strong>Write this one yourself</strong> — the recursion is <a class="reference internal" href="#equation-eq-es-chain">Eq. 271</a>
+verbatim.</p>
+<p><strong>Part b)</strong> Gate the referee against the optimizer: the FLOP estimate
+<code class="docutils literal notranslate"><span class="pre">np.einsum_path</span></code> reports for its chosen path (parsed from its return)
+agrees with the cheapest DP cost to within its scalar-ops convention —
+gated at a relative gap of 0.6, with the naive/optimized ratio the
+optimizer reports printed beside it.</p>
+<p><strong>Part c)</strong> Run best and worst orderings as explicit einsum paths and
+gate agreement at <span class="math notranslate nohighlight">\(10^{-12}\)</span> scaled; report both wall times (the model
+ratio is 500×; the clocks say what they say, per Rule 2). Draw the five
+orderings’ FLOPs as bars.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>((M1M2)(M3M4))  1.60e+04 flops
+(((M1M2)M3)M4)  2.40e+04 flops
+(M1(M2(M3M4)))  2.40e+04 flops
+((M1(M2M3))M4)  8.01e+06 flops
+(M1((M2M3)M4))  8.01e+06 flops
+orderings: 5 (Catalan C_3 = 5); spread 500x
+  Complete contraction:  ab,bc,cd,de-&gt;ae
+         Naive scaling:  5
+     Optimized scaling:  3
+      Naive FLOP count:  3.200e+07
+  Optimized FLOP count:  1.602e+04
+   Theoretical speedup:  1997.877
+  Largest intermediate:  4.000e+00 elements
+--------------------------------------------------------------------------
+scaling                  current                                remaining
+--------------------------------------------------------------------------
+   3                   bc,ab-&gt;ac                             cd,de,ac-&gt;ae
+   3                   de,cd-&gt;ce                                ac,ce-&gt;ae
+   3                   ce,ac-&gt;ae                                   ae-&gt;ae
+einsum_path naive/optimized FLOP ratio: 1998
+best vs worst ordering results: 7.3e-16; clocks 0.27 ms vs 3.20 ms (reported)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-es-orderings">
+<img alt="../../_images/3394acac87fd87ae8869c26e163db0df6eed347e4d1cf7147bd26f87aebf1634.png" src="../../_images/3394acac87fd87ae8869c26e163db0df6eed347e4d1cf7147bd26f87aebf1634.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 133 </span><span class="caption-text">FLOP counts for all five parenthesizations of the four-matrix chain with dimension profile <span class="math notranslate nohighlight">\((2, 1000, 2, 1000, 2)\)</span>, from the notebook’s own dynamic program. Grouping the two cheap bottlenecks first – <span class="math notranslate nohighlight">\((M_1M_2)(M_3M_4)\)</span> – costs <span class="math notranslate nohighlight">\(1.6\times10^4\)</span> operations; grouping across a fat middle – <span class="math notranslate nohighlight">\(M_1(M_2M_3)M_4\)</span> variants – manufactures a <span class="math notranslate nohighlight">\(1000\times1000\)</span> intermediate and costs <span class="math notranslate nohighlight">\(8\times10^6\)</span>: a factor of 500 from associativity alone, before any change in what is computed. np.einsum_path searches exactly this space, and Exercise 4’s counted monster shows the same spread reaching <span class="math notranslate nohighlight">\(10^6\)</span>.</span><a class="headerlink" href="#fig-es-orderings" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  five parenthesizations, spanning 500x in counted FLOPs (Eq. 2)   [Catalan C_3 = 5 orderings; spread 500x on the runnable profile — associativity is a performance decision]
+✓  and einsum_path&#39;s chosen cost matches the notebook&#39;s own DP   [optimizer 1.6e+04 vs DP best 1.6e+04 — same search space, independent implementations, agreeing within the scalar-ops convention]
+✓  while every ordering computes the same numbers   [best vs worst at 7e-16 relative: the order changes the cost, never the mathematics — clocks reported, models gated]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-the-monster-that-is-counted-never-formed">
+<h2>Exercise 4: The monster that is counted, never formed<a class="headerlink" href="#exercise-4-the-monster-that-is-counted-never-formed" title="Link to this heading">#</a></h2>
+<p>The manifest asks for a contraction whose naive intermediate exceeds
+8 GB. Here is one that <em>runs in milliseconds</em>.</p>
+<p><strong>Part a)</strong> The bilinear form <span class="math notranslate nohighlight">\(x^{\top}Ay\)</span> at <span class="math notranslate nohighlight">\(n = 32768\)</span>… except <span class="math notranslate nohighlight">\(A\)</span>
+itself would be 8.6 GB. Keep everything runnable but the mistake: take
+<span class="math notranslate nohighlight">\(x, y \in \mathbb{R}^{32768}\)</span> and a <em>diagonal</em> interaction — the string
+<code class="docutils literal notranslate"><span class="pre">&quot;i,i,i-&gt;&quot;</span></code> with three vectors runs instantly — then commit the real
+crime deliberately on paper: contract <code class="docutils literal notranslate"><span class="pre">&quot;i,j-&gt;ij&quot;</span></code> <em>first</em> (the outer
+product, <span class="math notranslate nohighlight">\(n^2 = 1.07\times10^9\)</span> entries, <strong>8.6 GB</strong>) before summing
+against a diagonal. Gate the ledger by counting: naive largest
+intermediate <span class="math notranslate nohighlight">\(8.6\)</span> GB against the optimized path’s <span class="math notranslate nohighlight">\(n\)</span> entries
+(<span class="math notranslate nohighlight">\(0.26\)</span> MB) — a factor of <span class="math notranslate nohighlight">\(32768\)</span>, never allocated.</p>
+<p><strong>Part b)</strong> Let the optimizer testify: <code class="docutils literal notranslate"><span class="pre">np.einsum_path</span></code> on
+<code class="docutils literal notranslate"><span class="pre">&quot;i,ij,j-&gt;&quot;</span></code> with a <em>materializable</em> stand-in (<span class="math notranslate nohighlight">\(n_s = 4096\)</span>, <span class="math notranslate nohighlight">\(A_s\)</span>
+134 MB) reports its naive and optimized largest intermediates; gate
+that its optimized route’s largest intermediate is <span class="math notranslate nohighlight">\(n_s\)</span> elements (a
+vector — it does <span class="math notranslate nohighlight">\(x^{\top}A\)</span> first) while the naive route’s is
+<span class="math notranslate nohighlight">\(n_s^2\)</span>. Then run it and gate the value against <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">&#64;</span> <span class="pre">A</span> <span class="pre">&#64;</span> <span class="pre">y</span></code> at
+<span class="math notranslate nohighlight">\(10^{-11}\)</span> scaled.</p>
+<p><strong>Part c)</strong> Scale the counted claim to the manifest’s <span class="math notranslate nohighlight">\(10^6\)</span>: on the
+chain profile <span class="math notranslate nohighlight">\((1, 2{\cdot}10^6, 1, 2{\cdot}10^6, 1)\)</span> the DP of
+Exercise 3 — pure integer arithmetic, no arrays — reports best
+<span class="math notranslate nohighlight">\(8.0\times10^6\)</span> (the balanced ordering) and worst <span class="math notranslate nohighlight">\(1.6\times10^{13}\)</span>
+FLOPs: a spread of <span class="math notranslate nohighlight">\(2.0\times10^6\)</span>, whose worst intermediate would hold <span class="math notranslate nohighlight">\(4\times10^{12}\)</span>
+entries (32 TB). Gate the spread as counting; nothing of that size
+ever exists.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>the deliberate crime, counted: outer-first intermediate 1,073,741,824 entries (8.6 GB) vs optimized path&#39;s 32,768 (0.26 MB) — ratio 32,768x, never allocated
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Complete contraction:  i,ij,j-&gt;
+         Naive scaling:  2
+     Optimized scaling:  2
+      Naive FLOP count:  5.033e+07
+  Optimized FLOP count:  3.356e+07
+   Theoretical speedup:  1.500
+  Largest intermediate:  4.096e+03 elements
+--------------------------------------------------------------------------
+scaling                  current                                remaining
+--------------------------------------------------------------------------
+   2                     ij,i-&gt;j                                    j,j-&gt;
+   1                       j,j-&gt;                                       -&gt;
+optimized bilinear at n = 4096: 5.1 ms, matches x@A@y to 0.0e+00
+counted monster chain: best 8.0e+06, worst 1.6e+13 flops — spread 2.0e+06x; worst intermediate 4e+12 entries (32 TB), counted only
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the naive order&#39;s intermediate exceeds 8 GB — counted, not allocated   [8.6 GB at n = 32768 against the optimizer&#39;s largest intermediate of 4096 elements (one vector) at the materializable n = 4096: 6.4&#39;s never-form-it discipline, found automatically by a path search]
+✓  and the optimized route computes the right number in milliseconds   [0e+00 against x@A@y at n = 4096 — the optimizer&#39;s chosen order is (x&#39;A)y, largest intermediate one vector]
+✓  while the counted chain reaches the manifest&#39;s million-fold spread   [2.0e+06x between orderings at n = 2e6, by integer arithmetic on Eq. 2 — the worst order&#39;s 32 TB intermediate is why this claim can only ever be counted]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-when-einsum-is-slower-than-and-why">
+<h2>Exercise 5: When einsum is slower than &#64;, and why<a class="headerlink" href="#exercise-5-when-einsum-is-slower-than-and-why" title="Link to this heading">#</a></h2>
+<p>The language and the kernel are different layers.</p>
+<p><strong>Part a)</strong> Gate the agreements first: on a <span class="math notranslate nohighlight">\(500\times500\)</span> matmul,
+<code class="docutils literal notranslate"><span class="pre">einsum</span></code> with <code class="docutils literal notranslate"><span class="pre">optimize=False</span></code>, with <code class="docutils literal notranslate"><span class="pre">optimize=True</span></code>, <code class="docutils literal notranslate"><span class="pre">np.tensordot</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">&#64;</span></code> all produce the same matrix to <span class="math notranslate nohighlight">\(10^{-11}\)</span> scaled (four spellings,
+one BLAS-grade answer — though not bitwise: the course’s first CI
+lesson applies between summation orders).</p>
+<p><strong>Part b)</strong> Report the clocks: unoptimized <code class="docutils literal notranslate"><span class="pre">einsum</span></code> runs its own
+C index loops — typically several times slower than <code class="docutils literal notranslate"><span class="pre">&#64;</span></code>’s <code class="docutils literal notranslate"><span class="pre">dgemm</span></code> —
+while <code class="docutils literal notranslate"><span class="pre">optimize=True</span></code> plans, then <em>dispatches to BLAS via tensordot</em>,
+landing near <code class="docutils literal notranslate"><span class="pre">&#64;</span></code>. Nothing here is gated (Rule 2; constant factors are
+the machine’s), but the mechanism is stated and the numbers printed:
+the string chooses <em>what</em>; <code class="docutils literal notranslate"><span class="pre">optimize</span></code> chooses <em>how</em>; BLAS does the
+arithmetic.</p>
+<p><strong>Part c)</strong> The honest boundary: for the <em>two-operand, BLAS-shaped</em>
+case, <code class="docutils literal notranslate"><span class="pre">&#64;</span></code> is the kernel and <code class="docutils literal notranslate"><span class="pre">einsum</span></code> at best matches it. The language
+earns its keep exactly where <code class="docutils literal notranslate"><span class="pre">&#64;</span></code> has no spelling — the ten sentences of
+Exercise 1, the four-index attention shape, the path-planned chains —
+which is why Chapter VII speaks it everywhere while Chapter V never
+needed it.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>four spellings agree to 2.0e-15 relative
+  @                             6.04 ms
+  einsum, optimize=False       34.74 ms
+  einsum, optimize=True         6.21 ms
+  tensordot                     6.12 ms
+(clocks reported, not gated — the string chooses what, optimize chooses how, BLAS does the arithmetic)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p><code class="docutils literal notranslate"><span class="pre">np.einsum_path</span></code> optimizes one contraction; real tensor programs chain
+many. Ask your assistant for <code class="docutils literal notranslate"><span class="pre">contract_tree(strings,</span> <span class="pre">tensors)</span></code> that
+plans a whole sequence with shared intermediates, then check it against
+the mathematics rather than a demo: (i) on Exercise 3’s chain it
+reproduces the DP-optimal cost; (ii) on a tree where one intermediate
+is used twice, its plan beats replanning each contraction separately
+by exactly the cost of the shared piece (count both); (iii) every plan
+it emits computes the same numbers as unplanned einsum to <span class="math notranslate nohighlight">\(10^{-12}\)</span>.
+The check is yours.</p>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  four spellings of the same matmul agree at rounding level   [@, einsum both ways, tensordot — different summation orders, so agreement is gated scaled, never bitwise (the course&#39;s first CI lesson)]
+clocks on record, reported only — einsum&#39;s index loops vs dgemm: 34.7 ms against 6.0 ms today; sizes are the machine&#39;s business, the mechanism (language above, kernel below) is the lesson
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p><strong>Ten operations, one grammar, rounding-level agreement.</strong> Trace to
+three-tensor contraction, every sentence matched its classical spelling
+below <span class="math notranslate nohighlight">\(10^{-13}\)</span> scaled; four of them became tensor diagrams whose
+dangling legs read off the output’s order. Batching and broadcasting
+needed no new rules — the attention shape <code class="docutils literal notranslate"><span class="pre">bhqd,bhkd-&gt;bhqk</span></code> passed
+against four explicit loops, a forward pointer <a class="reference internal" href="../08-learning/attention-matrix-products.html"><span class="std std-doc">§8.5</span></a>
+will pick up.</p>
+<p><strong>Cost is parenthesization, refereed twice.</strong> The write-yourself DP
+enumerated all five orderings of the four-matrix chain (Catalan
+<span class="math notranslate nohighlight">\(C_3 = 5\)</span>): <span class="math notranslate nohighlight">\(1.6\times10^4\)</span> to <span class="math notranslate nohighlight">\(8\times10^6\)</span> FLOPs — 500× from
+associativity alone — with <code class="docutils literal notranslate"><span class="pre">einsum_path</span></code>’s chosen cost matching the
+DP’s and both orderings computing identical numbers at <span class="math notranslate nohighlight">\(10^{-15}\)</span>.
+Clocks were reported; counts were gated.</p>
+<p><strong>The monster was counted, never formed.</strong> The naive order of a
+bilinear contraction wants an 8.6 GB outer product; the optimized path
+keeps one vector (<span class="math notranslate nohighlight">\(0.26\)</span> MB, a <span class="math notranslate nohighlight">\(32768\times\)</span> ledger) and the
+materializable stand-in ran in milliseconds while matching <code class="docutils literal notranslate"><span class="pre">x&#64;A&#64;y</span></code> to
+<span class="math notranslate nohighlight">\(10^{-13}\)</span>. The counted chain at <span class="math notranslate nohighlight">\(n = 2{\cdot}10^6\)</span> delivered the
+manifest’s <span class="math notranslate nohighlight">\(10^6\)</span> spread — its worst intermediate is 32 TB, which is
+precisely why that claim exists only as integer arithmetic.</p>
+<p><strong>And the language knows its place.</strong> Four spellings of one matmul
+agreed to <span class="math notranslate nohighlight">\(10^{-13}\)</span> relative; unoptimized <code class="docutils literal notranslate"><span class="pre">einsum</span></code> ran its index loops
+slower than <code class="docutils literal notranslate"><span class="pre">&#64;</span></code>’s <code class="docutils literal notranslate"><span class="pre">dgemm</span></code> while <code class="docutils literal notranslate"><span class="pre">optimize=True</span></code> closed the gap by
+dispatching to BLAS — numbers printed, nothing gated, mechanism stated:
+the string chooses <em>what</em>, the optimizer chooses <em>how</em>, the kernel does
+the arithmetic.</p>
+<p><strong>Methods introduced.</strong> The einsum grammar and its three index roles,
+tensor-diagram notation via <code class="docutils literal notranslate"><span class="pre">ecp.draw.tensor_network</span></code>, the
+matrix-chain DP, explicit einsum paths, <code class="docutils literal notranslate"><span class="pre">np.einsum_path</span></code> cost and
+intermediate reports, counted-not-allocated ledgers, and the
+language-vs-kernel layering.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Unfoldings next.</strong> <a class="reference internal" href="unfoldings-tucker-hosvd.html"><span class="std std-doc">§7.2</span></a> reshapes
+tensors into matrices to borrow Chapter IV’s SVD — einsum strings
+describe the reshapes, and the diagrams show which legs were grouped.</p></li>
+<li><p><strong>Tensor networks are diagrams taken literally.</strong>
+<a class="reference internal" href="tensor-trains-mps.html"><span class="std std-doc">§7.3</span></a> writes a <span class="math notranslate nohighlight">\(2^{50}\)</span>-entry tensor as a
+train of small ones — the never-form-it discipline as a <em>data
+structure</em>, with contraction order as the entire algorithmic content.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">opt_einsum</span></code> and beyond.</strong> Production contraction planners (shared
+intermediates, GPU backends, slicing against memory ceilings) grow
+straight out of <code class="docutils literal notranslate"><span class="pre">einsum_path</span></code>; the assistant exercise above is their
+seed.</p></li>
+<li><p><strong>Back to learning.</strong> Every layer of <a class="reference internal" href="../08-learning/linear-layer-backpropagation.html"><span class="std std-doc">§8.3</span></a>’s
+backpropagation is an einsum whose <em>adjoint</em> is another einsum with
+permuted strings — the grammar’s cleanest dividend, saved for the
+chapter that needs it.</p></li>
+</ul>
+<div class="docutils container" id="id3">
+<div role="list" class="citation-list">
+<div class="citation" id="id50" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">HMvdW+20</a><span class="fn-bracket">]</span></span>
+<p>Charles R. Harris, K. Jarrod Millman, Stéfan J. van der Walt, and others. Array programming with NumPy. <em>Nature</em>, 585:357–362, 2020. <a class="reference external" href="https://doi.org/10.1038/s41586-020-2649-2">doi:10.1038/s41586-020-2649-2</a>.</p>
+</div>
+<div class="citation" id="id35" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">KB09</a><span class="fn-bracket">]</span></span>
+<p>Tamara G. Kolda and Brett W. Bader. Tensor decompositions and applications. <em>SIAM Review</em>, 51(3):455–500, 2009. <a class="reference external" href="https://doi.org/10.1137/07070111X">doi:10.1137/07070111X</a>.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/07-tensors"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Chapter VII — Multilinear Algebra and Tensor Networks</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="unfoldings-tucker-hosvd.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-grammar">The grammar</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diagrams">Diagrams</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cost-is-parenthesization">Cost is parenthesization</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-ten-operations-one-grammar">Exercise 1: Ten operations, one grammar</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-batching-broadcasting-and-the-attention-shape">Exercise 2: Batching, broadcasting, and the attention shape</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-cost-is-the-parenthesization">Exercise 3: The cost is the parenthesization</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-the-monster-that-is-counted-never-formed">Exercise 4: The monster that is counted, never formed</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-when-einsum-is-slower-than-and-why">Exercise 5: When einsum is slower than @, and why</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

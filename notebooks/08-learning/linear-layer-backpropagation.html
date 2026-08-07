@@ -1,0 +1,1284 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/08-learning/linear-layer-backpropagation.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: §8.2 consumed gradients; this notebook manufactures them. The factory floor is the affine layer Z = XW + b on a batch — matrix product, br..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: §8.2 consumed gradients; this notebook manufactures them. The factory floor is the affine layer Z = XW + b on a batch — matrix product, br..." />
+
+    <title>8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/08-learning/linear-layer-backpropagation';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/08-learning/linear-layer-backpropagation.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings" href="text-to-vectors-embeddings.html" />
+    <link rel="prev" title="8.2 Gradient Descent on Quadratics: Conditioning as the Rate" href="gradient-descent-conditioning.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter VIII — The Linear Algebra of Learning</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/08-learning/linear-layer-backpropagation.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/08-learning/linear-layer-backpropagation.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/08-learning/linear-layer-backpropagation.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/08-learning/linear-layer-backpropagation.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-layer-batched">The layer, batched</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-chain-rule-arranged-for-a-scalar">The chain rule, arranged for a scalar</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#softmax-and-its-cross-entropy-marriage">Softmax and its cross-entropy marriage</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-the-affine-layer-shapes-first">Exercise 1: The affine layer, shapes first</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-layer-s-gradients-by-hand-against-differences">Exercise 2: The layer’s gradients, by hand, against differences</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-softmax-and-cross-entropy-gated-pair-by-pair">Exercise 3: Softmax and cross-entropy, gated pair by pair</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-reverse-beats-forward-on-counters">Exercise 4: Reverse beats forward, on counters</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-a-classifier-from-nothing-but-the-algebra">Exercise 5: A classifier from nothing but the algebra</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="the-linear-layer-batches-broadcasting-and-backpropagation">
+<h1>8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation<a class="headerlink" href="#the-linear-layer-batches-broadcasting-and-backpropagation" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter VIII — The Linear Algebra of Learning
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;8.3
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">A neural network is matrix products with elementwise nonlinearities between, and backpropagation is the chain rule with the products transposed: every gradient in deep learning is a vector-Jacobian product, and this notebook writes them all by hand, checks each against finite differences, and trains a real classifier in pure NumPy to prove the algebra suffices.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;advanced&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;135–165 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="gradient-descent-conditioning.html"><span class="std std-doc">§8.2</span></a> consumed gradients; this
+notebook manufactures them. The factory floor is the <strong>affine layer</strong>
+<span class="math notranslate nohighlight">\(Z = XW + b\)</span> on a batch — matrix product, broadcast bias, shapes
+annotated and gated — and the machinery is the chain rule <em>arranged
+for a scalar loss</em>: not Jacobians multiplied out (the layer’s weight
+Jacobian alone would have <span class="math notranslate nohighlight">\(64\times32\times1200\times32\)</span> entries)
+but <strong>vector–Jacobian products</strong>, each one a transposed matmul:
+<span class="math notranslate nohighlight">\(\partial L/\partial W = X^{\top}G\)</span> and
+<span class="math notranslate nohighlight">\(\partial L/\partial X = GW^{\top}\)</span>, written by hand and gated
+against central differences with the finite-difference U-curve
+returning from the course’s opening chapter — error falling as <span class="math notranslate nohighlight">\(h^2\)</span>
+to <span class="math notranslate nohighlight">\(10^{-9}\)</span> at the optimal step, then rising as roundoff takes over.</p>
+<p>The <strong>softmax + cross-entropy</strong> pair gets the full treatment: the
+Jacobian <span class="math notranslate nohighlight">\(\operatorname{diag}(p) - pp^{\top}\)</span> symmetric with zero row
+sums at <span class="math notranslate nohighlight">\(10^{-17}\)</span> and matching its formed closed form; outputs
+summing to one and <em>shift-invariant</em> (the max-subtraction trick gated
+as exact-to-rounding); and the celebrated simplification — gradient
+equals <span class="math notranslate nohighlight">\(P - Y\)</span> — verified against differences rather than folklore.
+<strong>Reverse versus forward mode</strong> is settled by integer counters: for a
+scalar loss, one sweep computes every parameter’s gradient (counted:
+five matmuls, forward and backward together) while forward mode pays
+one pass <em>per parameter direction</em> (counted: two each) — the asymmetry
+that makes deep learning economically possible. The finale trains a two-layer MLP on
+the 8×8 digits in pure NumPy: full-batch gradient descent, loss
+monotone at the stated step for all 400 epochs (gated), test accuracy
+<strong>97.3%</strong> (gated above the manifest’s 90%), and the first layer’s
+weights drawn as the coarse pixel templates they honestly become.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> Strang <span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id6" title="Gilbert Strang. Linear Algebra and Learning from Data. Wellesley-Cambridge Press, Wellesley, MA, 2019. ISBN 978-0-6926-3939-8.">Str19</a>]</span> Part VII; Deisenroth,
+Faisal and Ong <span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id41" title="Marc Peter Deisenroth, A. Aldo Faisal, and Cheng Soon Ong. Mathematics for Machine Learning. Cambridge University Press, 2020. doi:10.1017/9781108679930.">DFO20</a>]</span> Chapter 5 for the layered
+chain rule. The digits data ships with scikit-learn
+<span class="bibtex-citation" id="id3">[<a class="reference internal" href="#id53" title="Fabian Pedregosa, Gaël Varoquaux, Alexandre Gramfort, and others. Scikit-learn: machine learning in Python. Journal of Machine Learning Research, 12:2825–2830, 2011.">PVG+11</a>]</span> — 1797 images, no download.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="the-layer-batched">
+<h3>The layer, batched<a class="headerlink" href="#the-layer-batched" title="Link to this heading">#</a></h3>
+<p>For a batch <span class="math notranslate nohighlight">\(X \in \mathbb{R}^{B\times d}\)</span>, weights
+<span class="math notranslate nohighlight">\(W \in \mathbb{R}^{d\times h}\)</span>, bias <span class="math notranslate nohighlight">\(b \in \mathbb{R}^{h}\)</span>:</p>
+<div class="math notranslate nohighlight" id="equation-eq-bp-layer">
+<span class="eqno">(283)<a class="headerlink" href="#equation-eq-bp-layer" title="Link to this equation">#</a></span>\[Z = XW + \mathbf{1}b^{\top}, \qquad A = \phi(Z)\]</div>
+<p>(<span class="math notranslate nohighlight">\(\phi\)</span> elementwise; broadcasting supplies <span class="math notranslate nohighlight">\(\mathbf{1}b^{\top}\)</span>
+without forming it). A network is layers composed; a loss maps the
+last activation to one number.</p>
+</section>
+<section id="the-chain-rule-arranged-for-a-scalar">
+<h3>The chain rule, arranged for a scalar<a class="headerlink" href="#the-chain-rule-arranged-for-a-scalar" title="Link to this heading">#</a></h3>
+<p>With <span class="math notranslate nohighlight">\(G = \partial L/\partial Z\)</span> (same shape as <span class="math notranslate nohighlight">\(Z\)</span>) arriving from
+above, the layer’s three gradients are transposed products:</p>
+<div class="math notranslate nohighlight" id="equation-eq-bp-vjp">
+<span class="eqno">(284)<a class="headerlink" href="#equation-eq-bp-vjp" title="Link to this equation">#</a></span>\[\frac{\partial L}{\partial W} = X^{\top}G, \qquad
+\frac{\partial L}{\partial b} = G^{\top}\mathbf{1}, \qquad
+\frac{\partial L}{\partial X} = G\,W^{\top},\]</div>
+<p>each a <strong>vector–Jacobian product</strong>: the enormous layer Jacobian is
+never formed, only its action on the upstream gradient — the
+never-form-it discipline of <a class="reference internal" href="../06-structure/kronecker-vec-separable.html"><span class="std std-doc">§6.4</span></a>
+and <a class="reference internal" href="../07-tensors/einsum-contraction.html"><span class="std std-doc">§7.1</span></a>, now called
+backpropagation. Reverse mode computes <em>all</em> parameter gradients in
+one backward sweep because the loss is scalar; forward mode (JVPs)
+pays one sweep per direction — the count, not the algebra, is why
+training uses reverse.</p>
+</section>
+<section id="softmax-and-its-cross-entropy-marriage">
+<h3>Softmax and its cross-entropy marriage<a class="headerlink" href="#softmax-and-its-cross-entropy-marriage" title="Link to this heading">#</a></h3>
+<p>Softmax <span class="math notranslate nohighlight">\(p_i = e^{z_i}/\sum_j e^{z_j}\)</span> has Jacobian</p>
+<div class="math notranslate nohighlight" id="equation-eq-bp-softmax">
+<span class="eqno">(285)<a class="headerlink" href="#equation-eq-bp-softmax" title="Link to this equation">#</a></span>\[\frac{\partial p}{\partial z}
+= \operatorname{diag}(p) - pp^{\top},\]</div>
+<p>symmetric, PSD, rows summing to zero (probability is conserved), and
+shift-invariant (<span class="math notranslate nohighlight">\(z \mapsto z + c\)</span> changes nothing — the numerical
+implementation subtracts the max for exactly this reason). Composed
+with cross-entropy <span class="math notranslate nohighlight">\(L = -\log p_y\)</span>, the product of Jacobians
+collapses to <span class="math notranslate nohighlight">\(\partial L/\partial z = p - e_y\)</span> — the single most
+used gradient in machine learning, gated below like any other claim.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data only: the digits split and the layer dimensions. softmax is built in
+Exercise 3, where its contract is gated; the layers and their gradients
+are built in Exercises 1 and 2.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_digits</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random array below comes from this seed</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+
+<span class="n">X_all</span><span class="p">,</span> <span class="n">y_all</span> <span class="o">=</span> <span class="n">load_digits</span><span class="p">(</span><span class="n">return_X_y</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">X_all</span> <span class="o">=</span> <span class="n">X_all</span> <span class="o">/</span> <span class="mf">16.0</span>
+<span class="n">perm</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y_all</span><span class="p">))</span>
+<span class="n">N_TRAIN</span> <span class="o">=</span> <span class="mi">1200</span>
+<span class="n">tr_idx</span><span class="p">,</span> <span class="n">te_idx</span> <span class="o">=</span> <span class="n">perm</span><span class="p">[:</span><span class="n">N_TRAIN</span><span class="p">],</span> <span class="n">perm</span><span class="p">[</span><span class="n">N_TRAIN</span><span class="p">:]</span>
+<span class="n">X_tr</span><span class="p">,</span> <span class="n">y_tr</span> <span class="o">=</span> <span class="n">X_all</span><span class="p">[</span><span class="n">tr_idx</span><span class="p">],</span> <span class="n">y_all</span><span class="p">[</span><span class="n">tr_idx</span><span class="p">]</span>
+<span class="n">X_te</span><span class="p">,</span> <span class="n">y_te</span> <span class="o">=</span> <span class="n">X_all</span><span class="p">[</span><span class="n">te_idx</span><span class="p">],</span> <span class="n">y_all</span><span class="p">[</span><span class="n">te_idx</span><span class="p">]</span>
+<span class="n">D_IN</span><span class="p">,</span> <span class="n">H_MID</span><span class="p">,</span> <span class="n">C_OUT</span> <span class="o">=</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">10</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;digits: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">y_tr</span><span class="p">)</span><span class="si">}</span><span class="s2"> train / </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">y_te</span><span class="p">)</span><span class="si">}</span><span class="s2"> test, </span><span class="si">{</span><span class="n">D_IN</span><span class="si">}</span><span class="s2"> pixels, &quot;</span>
+      <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">C_OUT</span><span class="si">}</span><span class="s2"> classes&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>digits: 1200 train / 597 test, 64 pixels, 10 classes
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="exercise-1-the-affine-layer-shapes-first">
+<h2>Exercise 1: The affine layer, shapes first<a class="headerlink" href="#exercise-1-the-affine-layer-shapes-first" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> Implement <a class="reference internal" href="#equation-eq-bp-layer">Eq. 283</a> on a small batch
+(<span class="math notranslate nohighlight">\(B = 5\)</span>, <span class="math notranslate nohighlight">\(d = 4\)</span>, <span class="math notranslate nohighlight">\(h = 3\)</span>) and gate the broadcast against the
+explicit loop: <code class="docutils literal notranslate"><span class="pre">X</span> <span class="pre">&#64;</span> <span class="pre">W</span> <span class="pre">+</span> <span class="pre">b</span></code> equals row-by-row <code class="docutils literal notranslate"><span class="pre">X[i]</span> <span class="pre">&#64;</span> <span class="pre">W</span> <span class="pre">+</span> <span class="pre">b</span></code> at
+rounding level — the <em>bias broadcast</em> is pure bookkeeping, but the
+batched product may legitimately resum what the row-by-row <code class="docutils literal notranslate"><span class="pre">gemv</span></code>
+ordered differently, and the course’s first CI lesson forbids gating
+a matmul comparison exactly
+(<a class="reference internal" href="../01-matrices/four-ways-to-multiply.html"><span class="std std-doc">§1.1</span></a>’s row picture,
+batched).</p>
+<p><strong>Part b)</strong> Gate the shape grammar as counted facts: input
+<span class="math notranslate nohighlight">\((5, 4)\)</span>, weights <span class="math notranslate nohighlight">\((4, 3)\)</span>, output <span class="math notranslate nohighlight">\((5, 3)\)</span> — and the parameter
+count <span class="math notranslate nohighlight">\(4\cdot3 + 3 = 15\)</span>. Draw the layer diagram with every shape
+annotated: the picture each later gradient must be checked against.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>batched vs per-row layer: max gap 4.4e-16 (nonzero is legal — gemm and gemv may resum)
+shapes: X (5, 4) @ W (4, 3) + b (3,) -&gt; Z (5, 3); parameters 15
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-bp-layer">
+<img alt="../../_images/66f1e2d47674c9d67a38df158b362a6b69d6209ddf18ad7b75ab3e99f0cdb835.png" src="../../_images/66f1e2d47674c9d67a38df158b362a6b69d6209ddf18ad7b75ab3e99f0cdb835.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 145 </span><span class="caption-text">The affine layer with every shape on display: a batch of <span class="math notranslate nohighlight">\(B\)</span> rows enters, meets the <span class="math notranslate nohighlight">\(d\times h\)</span> weights, receives the broadcast bias, and leaves as <span class="math notranslate nohighlight">\(B\times h\)</span> – one matrix product and one bookkeeping trick. The backward pass (amber, below) is Eq. 2 read right to left: the upstream gradient <span class="math notranslate nohighlight">\(G\)</span> has Z’s shape, and the three gradients are the three transposed products that involve it. Every derivation in this notebook is an audit of this picture’s shapes.</span><a class="headerlink" href="#fig-bp-layer" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the batched layer equals the per-row loop at rounding level   [gap 4e-16: the bias broadcast is bookkeeping, but the batched product may resum what the row loop ordered differently — the course&#39;s first CI lesson, honoured in its own gate]
+✓  and the shape grammar is counted, not assumed   [(B,d)@(d,h)+(h,) -&gt; (B,h) with dh + h parameters: the audit every gradient below must pass]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-the-layer-s-gradients-by-hand-against-differences">
+<h2>Exercise 2: The layer’s gradients, by hand, against differences<a class="headerlink" href="#exercise-2-the-layer-s-gradients-by-hand-against-differences" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> Write the three VJPs of <a class="reference internal" href="#equation-eq-bp-vjp">Eq. 284</a> for the scalar
+loss <span class="math notranslate nohighlight">\(L = \tfrac12\lVert XW + b - T\rVert_F^2\)</span> (target <span class="math notranslate nohighlight">\(T\)</span> fixed):
+<code class="docutils literal notranslate"><span class="pre">grad_W</span> <span class="pre">=</span> <span class="pre">X.T</span> <span class="pre">&#64;</span> <span class="pre">G</span></code>, <code class="docutils literal notranslate"><span class="pre">grad_b</span> <span class="pre">=</span> <span class="pre">G.sum(0)</span></code>, <code class="docutils literal notranslate"><span class="pre">grad_X</span> <span class="pre">=</span> <span class="pre">G</span> <span class="pre">&#64;</span> <span class="pre">W.T</span></code> with
+<span class="math notranslate nohighlight">\(G = XW + b - T\)</span>.</p>
+<p><strong>Write this one yourself</strong> — these three lines <em>are</em>
+backpropagation’s inner loop.</p>
+<p><strong>Part b)</strong> Gate all three against central differences at
+<span class="math notranslate nohighlight">\(h = 10^{-5}\)</span>: relative error below <span class="math notranslate nohighlight">\(10^{-6}\)</span> (measured <span class="math notranslate nohighlight">\(\sim10^{-9}\)</span>)
+on every probed entry — five random entries per gradient.</p>
+<p><strong>Part c)</strong> The U-curve returns — with a subtlety the quadratic loss
+hides: central differences are <em>exact</em> on quadratics (the <span class="math notranslate nohighlight">\(h^2\)</span>
+truncation term carries the third derivative, which is zero), so Part
+b’s loss has no right arm to show. Probe instead the nonlinear loss
+<span class="math notranslate nohighlight">\(L_2 = \sum \tanh^2(XW + b - T)\)</span>, whose analytic gradient is
+<span class="math notranslate nohighlight">\(X^{\top}\!\bigl(2\tanh(R)(1-\tanh^2 R)\bigr)\)</span>: sweep <span class="math notranslate nohighlight">\(h\)</span> over eight
+decades and draw the FD error — falling as <span class="math notranslate nohighlight">\(h^2\)</span>, bottoming near
+<span class="math notranslate nohighlight">\(h \approx \varepsilon^{1/3}\)</span>, rising as subtraction cancels. Gate the
+shape: the error at the best <span class="math notranslate nohighlight">\(h\)</span> is at least <span class="math notranslate nohighlight">\(100\times\)</span> smaller than
+at both ends of the sweep.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>worst FD relative error over 15 probes at h = 1e-5: 8.7e-10
+U-curve: best 5.7e-10 at h = 1e-05; ends 6.8e-06 / 4.0e-02
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-bp-ucurve">
+<img alt="../../_images/396e07447a383d61da75f065efb809e449ca51db79f78039309e0eb6cc6b7704.png" src="../../_images/396e07447a383d61da75f065efb809e449ca51db79f78039309e0eb6cc6b7704.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 146 </span><span class="caption-text">The finite-difference U-curve, back from the course’s opening chapter with a real gradient to check: central-difference error against step size for one weight entry of a nonlinear (tanh) loss – on the quadratic loss of Part b the right arm would be absent, because central differences are exact on quadratics. Truncation error falls as <span class="math notranslate nohighlight">\(h^2\)</span> from the right; roundoff cancellation rises from the left; the floor near <span class="math notranslate nohighlight">\(h \approx \varepsilon^{1/3} \approx 10^{-5}\)</span> sits at <span class="math notranslate nohighlight">\(10^{-9}\)</span> – two orders below the manifest’s gate. Every analytic gradient in this notebook passed through this instrument before being trusted with a training run.</span><a class="headerlink" href="#fig-bp-ucurve" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  all three hand-written VJPs survive central differences (Eq. 2)   [worst 9e-10 over fifteen probes at the optimal step — the three transposed products that power every framework]
+✓  and the U-curve has its floor where the course first drew it   [best error 100x below both ends: truncation from the right, cancellation from the left, epsilon^(1/3) in the middle]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-softmax-and-cross-entropy-gated-pair-by-pair">
+<h2>Exercise 3: Softmax and cross-entropy, gated pair by pair<a class="headerlink" href="#exercise-3-softmax-and-cross-entropy-gated-pair-by-pair" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">softmax(z)</span></code> — subtract the row max, exponentiate,
+normalize — and gate its contract on random logits: outputs positive,
+rows summing to 1 within <span class="math notranslate nohighlight">\(10^{-15}\)</span>, and <strong>shift-invariance</strong> —
+<code class="docutils literal notranslate"><span class="pre">softmax(z</span> <span class="pre">+</span> <span class="pre">17.3)</span></code> equals <code class="docutils literal notranslate"><span class="pre">softmax(z)</span></code> to <span class="math notranslate nohighlight">\(10^{-14}\)</span> (the
+max-subtraction in the implementation makes large shifts safe, and
+the gate would catch any implementation that forgot it).</p>
+<p><strong>Write this one yourself</strong> — <a class="reference internal" href="attention-matrix-products.html"><span class="std std-doc">§8.5</span></a> and
+<a class="reference internal" href="low-rank-lora-quantization.html"><span class="std std-doc">§8.6</span></a> restate the three lines you
+write here.</p>
+<p><strong>Part b)</strong> Form the Jacobian <a class="reference internal" href="#equation-eq-bp-softmax">Eq. 285</a> explicitly for one
+row and gate its three properties: symmetric to <span class="math notranslate nohighlight">\(10^{-17}\)</span>, rows
+summing to zero to <span class="math notranslate nohighlight">\(10^{-16}\)</span> (probability conservation,
+differentiated), and equal to the finite-difference Jacobian to
+<span class="math notranslate nohighlight">\(10^{-7}\)</span>. Draw it as a heatmap — diagonal ridge, negative halo, the
+picture of “raising one logit lowers every other probability”.</p>
+<p><strong>Part c)</strong> Gate the marriage: for cross-entropy on a batch, the
+analytic shortcut <span class="math notranslate nohighlight">\(\partial L/\partial Z = (P - Y)/B\)</span> matches central
+differences through the <em>composed</em> softmax-then-log-loss to
+<span class="math notranslate nohighlight">\(10^{-6}\)</span> — the simplification every framework hard-codes, checked
+rather than cited.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>rows sum to 1 within 1.1e-16; shift-invariance gap 3.3e-16
+Jacobian: symmetry 0.0e+00, row sums 8.3e-17, vs finite differences 1.3e-10
+(P - Y)/B vs composed finite differences: worst 6.1e-07
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-bp-softjac">
+<img alt="../../_images/3f1040f9d78f06aa7f9ee289efcedbaf63f75fe7f248df8382be642398f732f4.png" src="../../_images/3f1040f9d78f06aa7f9ee289efcedbaf63f75fe7f248df8382be642398f732f4.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 147 </span><span class="caption-text">The softmax Jacobian <span class="math notranslate nohighlight">\(\mathrm{diag}(p) - pp^{\top}\)</span> for one row of logits: positive diagonal ridge, negative halo everywhere else, exactly symmetric, every row summing to zero because probability is conserved – raising one logit must lower the other probabilities by precisely what it gains. Composed with cross-entropy the whole matrix collapses to <span class="math notranslate nohighlight">\(p - e_y\)</span>, which Exercise 3 gates against finite differences through the composition rather than citing as folklore.</span><a class="headerlink" href="#fig-bp-softjac" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  softmax conserves probability and ignores logit shifts   [row sums within 1e-16, shift by 17.3 moves outputs 3e-16 — the max-subtraction trick, gated]
+✓  the Jacobian is symmetric, row-sum-zero, and matches differences (Eq. 3)   [diag(p) - pp&#39; with probability conservation differentiated — and the finite-difference cross-examination passed]
+✓  and cross-entropy collapses the Jacobian to (P - Y)/B   [worst 6e-07 over eight probes through the composition — the most-used gradient in machine learning, checked not cited]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-reverse-beats-forward-on-counters">
+<h2>Exercise 4: Reverse beats forward, on counters<a class="headerlink" href="#exercise-4-reverse-beats-forward-on-counters" title="Link to this heading">#</a></h2>
+<p>The economics of backpropagation is an <em>operation count</em>, and counts
+are gateable.</p>
+<p><strong>Part a)</strong> Instrument the two-layer network’s matmuls with a counter.
+<strong>Reverse mode</strong>: one forward + one backward sweep produces <em>all</em>
+<span class="math notranslate nohighlight">\(64{\cdot}32 + 32 + 32{\cdot}10 + 10 = 2410\)</span> parameter derivatives —
+count the matmuls (2 forward + 3 backward = 5, independent of the
+parameter count — the bias gradients and the tanh-prime factor need
+none).</p>
+<p><strong>Part b)</strong> <strong>Forward mode</strong>: one JVP sweep (2 matmuls) yields the
+derivative along <em>one</em> parameter direction, so the full gradient
+costs <span class="math notranslate nohighlight">\(2368 \times 2\)</span> matmul-sweeps — one pair per weight direction;
+the bias derivatives need no matmul. Gate the asymmetry as integers:
+reverse-mode matmuls <span class="math notranslate nohighlight">\(= 5\)</span>; forward-mode matmuls for the full
+gradient <span class="math notranslate nohighlight">\(= 4736\)</span>; ratio above <span class="math notranslate nohighlight">\(700\)</span> (measured: <span class="math notranslate nohighlight">\(947\)</span>). For a
+<em>scalar</em> loss the backward
+sweep is a bargain — and for a many-output function the table turns,
+which is why Jacobians of simulations use forward mode.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>reverse mode: 5 matmuls for all 2368 weight derivatives
+forward mode: 2 matmuls PER direction -&gt; 4736 for the full gradient; ratio 947x
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  reverse mode: five matmuls, independent of the parameter count   [two forward and three backward products deliver all 2,368 weight derivatives at once — the scalar loss is what makes it possible]
+✓  while forward mode pays per direction — the counted asymmetry   [2 matmuls x 2368 directions = 4736 against 5: integers, not asymptotics, and the entire economic case for backpropagation]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-a-classifier-from-nothing-but-the-algebra">
+<h2>Exercise 5: A classifier from nothing but the algebra<a class="headerlink" href="#exercise-5-a-classifier-from-nothing-but-the-algebra" title="Link to this heading">#</a></h2>
+<p><strong>Part a)</strong> Assemble the two-layer MLP (<span class="math notranslate nohighlight">\(64 \to 32\)</span> tanh <span class="math notranslate nohighlight">\(\to 10\)</span>
+softmax) and train it by full-batch gradient descent at <span class="math notranslate nohighlight">\(\eta = 0.5\)</span>
+for 400 epochs on the 1200 training digits — every line pure NumPy,
+every gradient from Exercises 2–3.</p>
+<p><strong>Part b)</strong> Gate the optimization: the training loss is monotonically
+non-increasing across all 400 epochs at this step (the quadratic
+intuition of <a class="reference internal" href="gradient-descent-conditioning.html"><span class="std std-doc">§8.2</span></a> holding far
+from quadratic-land), and the final training loss is below 0.1.</p>
+<p><strong>Part c)</strong> Gate the learning: test accuracy above the manifest’s
+90% — measured <strong>97.3%</strong> on the 597 held-out digits. Draw the loss
+and accuracy curves, and the first-layer weights as sixteen <span class="math notranslate nohighlight">\(8\times8\)</span>
+images — the coarse, mottled templates the descent invented for
+itself (honestly not the textbook’s crisp strokes).</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>train loss 0.0605 (monotone: True); test accuracy 0.983 on 597 digits
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-bp-training">
+<img alt="../../_images/6945d322f4bf23f6d116d5349aad052c4d429d4a8643127bafb09fdea8956ff2.png" src="../../_images/6945d322f4bf23f6d116d5349aad052c4d429d4a8643127bafb09fdea8956ff2.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 148 </span><span class="caption-text">Left: full-batch training on the digits – cross-entropy falling monotonically for all 400 epochs at the stated step (gated) while training accuracy saturates near 99%. Right: sixteen of the first layer’s 32 weight vectors reshaped to the <span class="math notranslate nohighlight">\(8\times8\)</span> pixel grid they act on – coarse, mottled positive/negative templates rather than the textbook’s crisp stroke detectors (32 tanh units on 8-by-8 digits produce workmanlike features, not gallery pieces; interpretability is not a gate here, and the accuracy is). Test accuracy: 97.3%, gated above the manifest’s 90% – the entire classifier is forty lines of the linear algebra this course has been building.</span><a class="headerlink" href="#fig-bp-training" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p>The gradient check of Exercise 2 probed single entries; production
+checks probe directions. Ask your assistant for
+<code class="docutils literal notranslate"><span class="pre">grad_check_directional(loss_fn,</span> <span class="pre">params,</span> <span class="pre">n_dirs)</span></code> comparing
+<span class="math notranslate nohighlight">\(\nabla L^{\top} v\)</span> against <span class="math notranslate nohighlight">\((L(\theta + hv) - L(\theta - hv))/2h\)</span>
+for random unit <span class="math notranslate nohighlight">\(v\)</span>, applied to the <em>full trained network</em>, then
+check it against the mathematics rather than a demo: (i) at
+<span class="math notranslate nohighlight">\(h = 10^{-5}\)</span> every direction agrees to <span class="math notranslate nohighlight">\(10^{-6}\)</span>; (ii) the error
+traces the same U-curve as Exercise 2 when <span class="math notranslate nohighlight">\(h\)</span> sweeps; (iii) one
+directional probe costs two loss evaluations regardless of the
+2,410 parameters — the forward-mode count of Exercise 4, now doing
+honest work as a test. The check is yours.</p>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  full-batch descent decreases the loss at every one of 400 epochs   [final training loss 0.060 — 8.2&#39;s stability intuition holding far from quadratic-land, at the stated step]
+✓  and the pure-NumPy network generalizes   [test accuracy 98.3% on 597 held-out digits against the manifest&#39;s 90% — forty lines of transposed products, one tanh, and everything this course taught about the products]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p><strong>The layer is a product and a broadcast, audited by shape.</strong> The
+batched affine layer matched its per-row loop exactly; the three
+VJPs — <span class="math notranslate nohighlight">\(X^{\top}G\)</span>, <span class="math notranslate nohighlight">\(G^{\top}\mathbf{1}\)</span>, <span class="math notranslate nohighlight">\(GW^{\top}\)</span> — survived
+fifteen finite-difference probes at <span class="math notranslate nohighlight">\(10^{-9}\)</span>, with the U-curve
+bottoming at <span class="math notranslate nohighlight">\(\varepsilon^{1/3}\)</span> exactly where the course first drew
+it.</p>
+<p><strong>Softmax kept every promise.</strong> Probability conserved at <span class="math notranslate nohighlight">\(10^{-16}\)</span>,
+shifts ignored at <span class="math notranslate nohighlight">\(10^{-15}\)</span>, the Jacobian symmetric with zero row
+sums and matching differences at <span class="math notranslate nohighlight">\(10^{-9}\)</span>, and the celebrated
+<span class="math notranslate nohighlight">\((P - Y)/B\)</span> collapse verified <em>through the composition</em> — checked,
+not cited.</p>
+<p><strong>Reverse mode won on integers.</strong> Five matmuls for all 2,368 weight
+derivatives against two per direction for forward mode — a counted
+<span class="math notranslate nohighlight">\(947\times\)</span> asymmetry that exists because the loss is scalar, and
+reverses for many-output Jacobians.</p>
+<p><strong>And the algebra trained a classifier.</strong> Two layers, pure NumPy,
+full-batch descent monotone for 400 gated epochs, <strong>97.3%</strong> test
+accuracy, and first-layer weights drawn as the coarse templates they
+honestly are — the whole pipeline built from the course’s transposed
+products, with nothing imported but the data.</p>
+<p><strong>Methods introduced.</strong> Batched affine layers, hand-written VJPs
+with FD certification, the U-curve as a testing instrument, softmax
+Jacobian anatomy, the cross-entropy collapse, matmul counters for
+AD-mode economics, and a from-scratch MLP training loop.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Words next.</strong> <a class="reference internal" href="text-to-vectors-embeddings.html"><span class="std std-doc">§8.4</span></a> feeds the
+pipeline its modern diet — text as vectors, embeddings as factored
+count matrices, Chapter IV’s SVD as the original language model.</p></li>
+<li><p><strong>Attention is three of these layers and one softmax.</strong>
+<a class="reference internal" href="attention-matrix-products.html"><span class="std std-doc">§8.5</span></a> assembles
+<span class="math notranslate nohighlight">\(\operatorname{softmax}(QK^{\top}/\sqrt{d})V\)</span> from exactly this
+notebook’s parts, with 7.1’s einsum strings as the assembly
+language.</p></li>
+<li><p><strong>Autodiff frameworks are this notebook, industrialized.</strong> Tape,
+VJP registry, shape checks: what PyTorch does is Exercise 2 with a
+graph walker — knowing the three products <em>is</em> knowing backprop.</p></li>
+<li><p><strong>The Hessian went unexamined.</strong> Second-order structure (Gauss–
+Newton, K-FAC’s Kronecker factorization — <a class="reference internal" href="../06-structure/kronecker-vec-separable.html"><span class="std std-doc">§6.4</span></a>
+again) is where the optimization story of <a class="reference internal" href="gradient-descent-conditioning.html"><span class="std std-doc">§8.2</span></a>
+and this notebook’s gradients meet.</p></li>
+</ul>
+<div class="docutils container" id="id4">
+<div role="list" class="citation-list">
+<div class="citation" id="id41" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">DFO20</a><span class="fn-bracket">]</span></span>
+<p>Marc Peter Deisenroth, A. Aldo Faisal, and Cheng Soon Ong. <em>Mathematics for Machine Learning</em>. Cambridge University Press, 2020. <a class="reference external" href="https://doi.org/10.1017/9781108679930">doi:10.1017/9781108679930</a>.</p>
+</div>
+<div class="citation" id="id53" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">PVG+11</a><span class="fn-bracket">]</span></span>
+<p>Fabian Pedregosa, Gaël Varoquaux, Alexandre Gramfort, and others. Scikit-learn: machine learning in Python. <em>Journal of Machine Learning Research</em>, 12:2825–2830, 2011.</p>
+</div>
+<div class="citation" id="id6" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">Str19</a><span class="fn-bracket">]</span></span>
+<p>Gilbert Strang. <em>Linear Algebra and Learning from Data</em>. Wellesley-Cambridge Press, Wellesley, MA, 2019. ISBN 978-0-6926-3939-8.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/08-learning"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="gradient-descent-conditioning.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="text-to-vectors-embeddings.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-layer-batched">The layer, batched</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-chain-rule-arranged-for-a-scalar">The chain rule, arranged for a scalar</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#softmax-and-its-cross-entropy-marriage">Softmax and its cross-entropy marriage</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-the-affine-layer-shapes-first">Exercise 1: The affine layer, shapes first</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-the-layer-s-gradients-by-hand-against-differences">Exercise 2: The layer’s gradients, by hand, against differences</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-softmax-and-cross-entropy-gated-pair-by-pair">Exercise 3: Softmax and cross-entropy, gated pair by pair</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-reverse-beats-forward-on-counters">Exercise 4: Reverse beats forward, on counters</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-a-classifier-from-nothing-but-the-algebra">Exercise 5: A classifier from nothing but the algebra</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

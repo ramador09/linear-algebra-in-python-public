@@ -1,0 +1,1888 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="2.5 Orthogonal Bases in Function Space" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/02-orthogonality/function-space-bases.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: Nothing in this chapter used the fact that a vector is a list of numbers. A projection needs an inner product; Gram–Schmidt needs an inner..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: Nothing in this chapter used the fact that a vector is a list of numbers. A projection needs an inner product; Gram–Schmidt needs an inner..." />
+
+    <title>2.5 Orthogonal Bases in Function Space &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/02-orthogonality/function-space-bases';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/02-orthogonality/function-space-bases.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Chapter III — Eigenvalues and Spectral Theory" href="../03-eigenvalues/index.html" />
+    <link rel="prev" title="2.4 The Pseudoinverse, Rank Deficiency, and Regularization" href="pseudoinverse-regularization.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter II — Orthogonality and Least Squares</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../09-quantum/index.html">Chapter IX — Quantum Information as Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/measurement-channels-choi.html">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09-quantum/quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/02-orthogonality/function-space-bases.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/02-orthogonality/function-space-bases.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/02-orthogonality/function-space-bases.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/02-orthogonality/function-space-bases.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>2.5 Orthogonal Bases in Function Space</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#an-inner-product-on-functions">An inner product on functions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computing-the-inner-product-exactly">Computing the inner product exactly</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gramschmidt-unchanged">Gram–Schmidt, unchanged</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#coefficients-are-inner-products">Coefficients are inner products</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-the-monomials-are-a-bad-basis">Why the monomials are a bad basis</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#chebyshev-and-orthogonality-on-a-grid">Chebyshev, and orthogonality on a grid</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-dft-is-the-same-idea-on-mathbb-c-n">The DFT is the same idea on <span class="math notranslate nohighlight">\(\mathbb{C}^n\)</span></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gibbs">Gibbs</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-the-instrument-an-inner-product-that-is-exact">Exercise 1: The instrument: an inner product that is exact</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-gramschmidt-on-the-monomials-produces-the-legendre-polynomials">Exercise 2: Gram–Schmidt on the monomials produces the Legendre polynomials</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-two-gram-matrices-and-a-condition-number-in-closed-form">Exercise 3: The two Gram matrices, and a condition number in closed form</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-coefficients-are-inner-products-and-where-the-quadrature-lies">Exercise 4: Coefficients are inner products, and where the quadrature lies</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-same-subspace-same-answer-until-the-monomial-basis-gives-up">Exercise 5: Same subspace, same answer, until the monomial basis gives up</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-chebyshev-and-orthogonality-that-is-exactly-a-matrix-identity">Exercise 6: Chebyshev, and orthogonality that is exactly a matrix identity</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-7-the-dft-is-a-change-to-an-orthonormal-basis">Exercise 7: The DFT is a change to an orthonormal basis</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-7">Validation 7</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-8-gibbs-convergence-in-l-2-is-weaker-than-it-sounds">Exercise 8: Gibbs: convergence in <span class="math notranslate nohighlight">\(L^2\)</span> is weaker than it sounds</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-8">Validation 8</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="orthogonal-bases-in-function-space">
+<h1>2.5 Orthogonal Bases in Function Space<a class="headerlink" href="#orthogonal-bases-in-function-space" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter II — Orthogonality and Least Squares
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;2.5
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">Everything in this chapter was about vectors, and none of it needed them to be lists of numbers — run Gram–Schmidt on the monomials and out come the Legendre polynomials, with a Gram matrix whose condition number is exactly 2d+1 where the obvious basis reaches 10^17.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;advanced&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;105–135 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p>Nothing in this chapter used the fact that a vector is a list of numbers. A
+projection needs an inner product; Gram–Schmidt needs an inner product; least
+squares needs an inner product. Supply one on a space of <em>functions</em> and the
+entire apparatus transfers without a single change of argument. That is the
+payoff of <a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html"><span class="std std-doc">§1.5</span></a>’s insistence
+that a vector space is defined by its axioms rather than by <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>.</p>
+<p>The inner product is <span class="math notranslate nohighlight">\(\langle f, g\rangle = \int_{-1}^{1} f(x)g(x)\,dx\)</span>, and the
+consequences are immediate and concrete. Running Gram–Schmidt on the monomials
+<span class="math notranslate nohighlight">\(\{1, x, x^2, \dots\}\)</span> produces the <strong>Legendre polynomials</strong> — not something
+resembling them, but them exactly, to <span class="math notranslate nohighlight">\(3\times10^{-13}\)</span> against
+<code class="docutils literal notranslate"><span class="pre">scipy.special.legendre</span></code>. The Chebyshev polynomials come out of a different
+weight, and the discrete Fourier transform out of a different space entirely,
+and all three are the same construction wearing different coats.</p>
+<p>The practical half is a conditioning story, and it is sharper here than
+anywhere else in the chapter. The monomials are a <em>terrible</em> basis: their Gram
+matrix is a Hilbert-like matrix whose condition number reaches <span class="math notranslate nohighlight">\(10^{17}\)</span> by
+degree 30, and a least-squares fit in that basis stops converging around degree
+22 — the error gets <em>worse</em> as more terms are added. The Legendre Gram matrix
+is diagonal, so its condition number is exactly <span class="math notranslate nohighlight">\(2d+1\)</span>, and the same fit keeps
+improving. Same subspace, same best approximation, same answer in exact
+arithmetic; a factor of <span class="math notranslate nohighlight">\(10^{16}\)</span> in how hard it is to compute.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> Trefethen’s <em>Approximation Theory and Approximation Practice</em>
+<span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id20" title="Lloyd N. Trefethen and Mark Embree. Spectra and Pseudospectra: The Behavior of Nonnormal Matrices and Operators. Princeton University Press, 2005.">TE05</a>]</span> is the modern companion for the Chebyshev
+material; Golub and Van Loan <span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id13" title="Gene H. Golub and Charles F. Van Loan. Matrix Computations. Johns Hopkins University Press, Baltimore, 4 edition, 2013.">GVL13</a>]</span> §5.3 for the conditioning;
+Boyd and Vandenberghe <span class="bibtex-citation" id="id3">[<a class="reference internal" href="#id8" title="Stephen Boyd and Lieven Vandenberghe. Introduction to Applied Linear Algebra: Vectors, Matrices, and Least Squares. Cambridge University Press, 2018. doi:10.1017/9781108583664.">BV18</a>]</span> Chapter 13 for the least-squares view.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="an-inner-product-on-functions">
+<h3>An inner product on functions<a class="headerlink" href="#an-inner-product-on-functions" title="Link to this heading">#</a></h3>
+<p>On <span class="math notranslate nohighlight">\(C[-1,1]\)</span>, define</p>
+<div class="math notranslate nohighlight" id="equation-eq-fbasis-inner">
+<span class="eqno">(132)<a class="headerlink" href="#equation-eq-fbasis-inner" title="Link to this equation">#</a></span>\[\langle f, g\rangle = \int_{-1}^{1} f(x)\,g(x)\,dx ,
+\qquad \|f\| = \sqrt{\langle f, f\rangle} .\]</div>
+<p>This satisfies every axiom <a class="reference internal" href="../00-machine/vectors-norms-inner-products.html"><span class="std std-doc">§0.3</span></a>
+required — symmetry, bilinearity, and positive definiteness — so Cauchy–Schwarz,
+the triangle inequality, Pythagoras, orthogonal projection and Gram–Schmidt all
+hold verbatim. “Orthogonal” now means <span class="math notranslate nohighlight">\(\int_{-1}^{1} fg = 0\)</span>, which is a
+statement about cancellation rather than about angles, but it is the same
+statement.</p>
+</section>
+<section id="computing-the-inner-product-exactly">
+<h3>Computing the inner product exactly<a class="headerlink" href="#computing-the-inner-product-exactly" title="Link to this heading">#</a></h3>
+<p>The integral is evaluated by <strong>Gauss–Legendre quadrature</strong>: <code class="docutils literal notranslate"><span class="pre">leggauss(n)</span></code> returns
+nodes <span class="math notranslate nohighlight">\(x_i\)</span> and weights <span class="math notranslate nohighlight">\(w_i\)</span> with</p>
+<div class="math notranslate nohighlight" id="equation-eq-fbasis-quad">
+<span class="eqno">(133)<a class="headerlink" href="#equation-eq-fbasis-quad" title="Link to this equation">#</a></span>\[\int_{-1}^{1} p(x)\,dx = \sum_{i=1}^{n} w_i\,p(x_i)
+\qquad\text{exactly, for every polynomial } p \text{ of degree} \le 2n-1 .\]</div>
+<p>The <span class="math notranslate nohighlight">\(2n-1\)</span> is sharp and it is the reason the rule exists: <span class="math notranslate nohighlight">\(n\)</span> nodes and <span class="math notranslate nohighlight">\(n\)</span>
+weights are <span class="math notranslate nohighlight">\(2n\)</span> free parameters, and the rule spends all of them. For
+polynomial work this makes <a class="reference internal" href="#equation-eq-fbasis-inner">Eq. 132</a> an <em>exact</em> computation rather
+than an approximation, which matters when the identities below are checked to
+<span class="math notranslate nohighlight">\(10^{-14}\)</span>.</p>
+</section>
+<section id="gramschmidt-unchanged">
+<h3>Gram–Schmidt, unchanged<a class="headerlink" href="#gramschmidt-unchanged" title="Link to this heading">#</a></h3>
+<p>Applied to <span class="math notranslate nohighlight">\(\{1, x, x^2, \dots, x^d\}\)</span>, the recurrence is the one from
+<a class="reference internal" href="gram-schmidt-qr.html"><span class="std std-doc">§2.2</span></a> with the new inner product substituted:</p>
+<div class="math notranslate nohighlight" id="equation-eq-fbasis-gs">
+<span class="eqno">(134)<a class="headerlink" href="#equation-eq-fbasis-gs" title="Link to this equation">#</a></span>\[q_k = x^k - \sum_{j&lt;k}
+  \frac{\langle x^k, q_j\rangle}{\langle q_j, q_j\rangle}\, q_j .\]</div>
+<p>Normalising each <span class="math notranslate nohighlight">\(q_k\)</span> so that <span class="math notranslate nohighlight">\(q_k(1) = 1\)</span> gives the <strong>Legendre polynomials</strong>
+<span class="math notranslate nohighlight">\(P_k\)</span>, which satisfy</p>
+<div class="math notranslate nohighlight" id="equation-eq-fbasis-legendre-gram">
+<span class="eqno">(135)<a class="headerlink" href="#equation-eq-fbasis-legendre-gram" title="Link to this equation">#</a></span>\[\langle P_j, P_k\rangle = \frac{2}{2k+1}\,\delta_{jk} .\]</div>
+</section>
+<section id="coefficients-are-inner-products">
+<h3>Coefficients are inner products<a class="headerlink" href="#coefficients-are-inner-products" title="Link to this heading">#</a></h3>
+<p>Once a basis is orthogonal, the expansion coefficients require no linear solve:</p>
+<div class="math notranslate nohighlight" id="equation-eq-fbasis-coeffs">
+<span class="eqno">(136)<a class="headerlink" href="#equation-eq-fbasis-coeffs" title="Link to this equation">#</a></span>\[f \approx \sum_{k=0}^{d} c_k P_k ,
+\qquad c_k = \frac{\langle f, P_k\rangle}{\langle P_k, P_k\rangle} ,\]</div>
+<p>and these <span class="math notranslate nohighlight">\(c_k\)</span> are exactly the least-squares coefficients — the Gram matrix is
+diagonal, so the normal equations decouple into <span class="math notranslate nohighlight">\(d+1\)</span> scalar divisions. This is
+the payoff of orthogonality, and it is the same payoff <span class="math notranslate nohighlight">\(QR\)</span> delivered in
+<a class="reference internal" href="least-squares-four-ways.html"><span class="std std-doc">§2.3</span></a>.</p>
+</section>
+<section id="why-the-monomials-are-a-bad-basis">
+<h3>Why the monomials are a bad basis<a class="headerlink" href="#why-the-monomials-are-a-bad-basis" title="Link to this heading">#</a></h3>
+<p>In the monomial basis the Gram matrix is not diagonal but</p>
+<div class="math notranslate nohighlight" id="equation-eq-fbasis-monogram">
+<span class="eqno">(137)<a class="headerlink" href="#equation-eq-fbasis-monogram" title="Link to this equation">#</a></span>\[\begin{split}G_{ij} = \int_{-1}^{1} x^{i+j}\,dx =
+\begin{cases} \dfrac{2}{i+j+1}, &amp; i+j \text{ even},\\[4pt] 0, &amp; i+j \text{ odd},\end{cases}\end{split}\]</div>
+<p>a near-relative of the Hilbert matrix of
+<a class="reference internal" href="../00-machine/floating-point.html"><span class="std std-doc">§0.2</span></a>, with the same exponential growth in
+<span class="math notranslate nohighlight">\(\kappa\)</span>. The subspace spanned is identical and so is the best approximation in
+it; only the <em>coordinates</em> differ, and by
+<a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html"><span class="std std-doc">§1.5</span></a> a change of basis can
+change the conditioning of everything without changing the answer.</p>
+</section>
+<section id="chebyshev-and-orthogonality-on-a-grid">
+<h3>Chebyshev, and orthogonality on a grid<a class="headerlink" href="#chebyshev-and-orthogonality-on-a-grid" title="Link to this heading">#</a></h3>
+<p>With the weight <span class="math notranslate nohighlight">\(1/\sqrt{1-x^2}\)</span> the same construction yields the <strong>Chebyshev
+polynomials</strong>, which have the closed form</p>
+<div class="math notranslate nohighlight" id="equation-eq-fbasis-cheb">
+<span class="eqno">(138)<a class="headerlink" href="#equation-eq-fbasis-cheb" title="Link to this equation">#</a></span>\[T_k(x) = \cos\!\left(k\arccos x\right) ,\]</div>
+<p>and a second, discrete orthogonality: evaluated at the <span class="math notranslate nohighlight">\(N\)</span> Chebyshev–Gauss
+nodes <span class="math notranslate nohighlight">\(x_i = \cos\!\big((2i+1)\pi/2N\big)\)</span>, the vectors
+<span class="math notranslate nohighlight">\(\big(T_j(x_0), \dots, T_j(x_{N-1})\big)\)</span> are <em>exactly</em> orthogonal, with squared
+length <span class="math notranslate nohighlight">\(N\)</span> for <span class="math notranslate nohighlight">\(j = 0\)</span> and <span class="math notranslate nohighlight">\(N/2\)</span> otherwise. Continuous orthogonality has become
+matrix orthogonality, with no approximation anywhere.</p>
+</section>
+<section id="the-dft-is-the-same-idea-on-mathbb-c-n">
+<h3>The DFT is the same idea on <span class="math notranslate nohighlight">\(\mathbb{C}^n\)</span><a class="headerlink" href="#the-dft-is-the-same-idea-on-mathbb-c-n" title="Link to this heading">#</a></h3>
+<p>Take the space <span class="math notranslate nohighlight">\(\mathbb{C}^n\)</span> with <span class="math notranslate nohighlight">\(\langle x, y\rangle = \bar{x}^{\top}y\)</span> and
+the basis of sampled complex exponentials. The matrix is</p>
+<div class="math notranslate nohighlight" id="equation-eq-fbasis-dft">
+<span class="eqno">(139)<a class="headerlink" href="#equation-eq-fbasis-dft" title="Link to this equation">#</a></span>\[F_{jk} = \omega^{jk}, \quad \omega = e^{-2\pi i/n},
+\qquad F^{*}F = n I ,\]</div>
+<p>so <span class="math notranslate nohighlight">\(F/\sqrt{n}\)</span> is <strong>unitary</strong>: the DFT is a change to an orthonormal basis and
+nothing more. Unitarity gives <strong>Parseval</strong>,</p>
+<div class="math notranslate nohighlight" id="equation-eq-fbasis-parseval">
+<span class="eqno">(140)<a class="headerlink" href="#equation-eq-fbasis-parseval" title="Link to this equation">#</a></span>\[\|F\mathbf{v}\|_2^2 = n\,\|\mathbf{v}\|_2^2 ,\]</div>
+<p>the statement that changing to an orthonormal basis preserves length, which is
+the same reason <span class="math notranslate nohighlight">\(QR\)</span> was stable in <a class="reference internal" href="gram-schmidt-qr.html"><span class="std std-doc">§2.2</span></a>.</p>
+</section>
+<section id="gibbs">
+<h3>Gibbs<a class="headerlink" href="#gibbs" title="Link to this heading">#</a></h3>
+<p>Orthogonal expansions converge in <span class="math notranslate nohighlight">\(\|\cdot\|_2\)</span>, and that is weaker than it
+sounds. At a jump discontinuity the partial sums overshoot by a fixed
+proportion of the jump,</p>
+<div class="math notranslate nohighlight" id="equation-eq-fbasis-gibbs">
+<span class="eqno">(141)<a class="headerlink" href="#equation-eq-fbasis-gibbs" title="Link to this equation">#</a></span>\[\lim_{M\to\infty} \frac{\text{overshoot}}{\text{jump}}
+= \frac{1}{\pi}\int_0^{\pi}\frac{\sin t}{t}\,dt - \frac{1}{2}
+= 0.0894898\ldots ,\]</div>
+<p>and this does <strong>not</strong> shrink as more terms are added. The overshoot narrows, so
+its contribution to the <span class="math notranslate nohighlight">\(L^2\)</span> error goes to zero, but its height converges to
+<span class="math notranslate nohighlight">\(8.949\%\)</span> of the jump and stays there.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data only: the quadrature nodes and weights, and reference Legendre values
+from scipy. The exact inner product — the notebook’s instrument — is built
+and certified in Exercise 1, which is titled after it.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.polynomial</span><span class="w"> </span><span class="kn">import</span> <span class="n">Polynomial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.polynomial.legendre</span><span class="w"> </span><span class="kn">import</span> <span class="n">leggauss</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.special</span><span class="w"> </span><span class="kn">import</span> <span class="n">legendre</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.fft</span><span class="w"> </span><span class="kn">import</span> <span class="n">dct</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">la</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random array below comes from this seed</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">110</span><span class="p">)</span>
+
+<span class="c1"># One high-order rule, reused throughout: exact for every polynomial of degree</span>
+<span class="c1"># &lt;= 79, which covers every polynomial identity checked below.</span>
+<span class="n">NQ</span> <span class="o">=</span> <span class="mi">40</span>
+<span class="n">XQ</span><span class="p">,</span> <span class="n">WQ</span> <span class="o">=</span> <span class="n">leggauss</span><span class="p">(</span><span class="n">NQ</span><span class="p">)</span>
+
+
+
+<span class="c1"># data: reference values — scipy&#39;s Legendre polynomials, the answer key the</span>
+<span class="c1"># exercises check their own constructions against.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">P_scipy</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">XQ</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Values of the degree-k Legendre polynomial at x, from scipy.special.</span>
+
+<span class="sd">    ``scipy.special.legendre`` returns coefficients highest-power-first, which is</span>
+<span class="sd">    the opposite of ``numpy.polynomial``&#39;s convention; the reversal here is the</span>
+<span class="sd">    only place that difference is handled.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Polynomial</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">legendre</span><span class="p">(</span><span class="n">k</span><span class="p">))[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-the-instrument-an-inner-product-that-is-exact">
+<h2>Exercise 1: The instrument: an inner product that is exact<a class="headerlink" href="#exercise-1-the-instrument-an-inner-product-that-is-exact" title="Link to this heading">#</a></h2>
+<p>Before any identity can be checked to <span class="math notranslate nohighlight">\(10^{-14}\)</span>, the thing doing the checking
+has to be exact. Gauss–Legendre quadrature <a class="reference internal" href="#equation-eq-fbasis-quad">Eq. 133</a> is, on
+polynomials, and the boundary at degree <span class="math notranslate nohighlight">\(2n-1\)</span> is not a rule of thumb but a
+theorem with a sharp edge: at degree <span class="math notranslate nohighlight">\(2n\)</span> the rule fails, and it fails by a
+visible amount rather than by rounding.</p>
+<p><strong>Part a)</strong> Take <code class="docutils literal notranslate"><span class="pre">x,</span> <span class="pre">w</span> <span class="pre">=</span> <span class="pre">np.polynomial.legendre.leggauss(8)</span></code> and evaluate
+<span class="math notranslate nohighlight">\(\int_{-1}^{1} x^d\,dx\)</span> as <code class="docutils literal notranslate"><span class="pre">np.sum(w</span> <span class="pre">*</span> <span class="pre">x**d)</span></code> for <span class="math notranslate nohighlight">\(d = 14, 15, 16, 17\)</span>. Compare
+against the exact value, which is <span class="math notranslate nohighlight">\(0\)</span> for odd <span class="math notranslate nohighlight">\(d\)</span> and <span class="math notranslate nohighlight">\(2/(d+1)\)</span> for even <span class="math notranslate nohighlight">\(d\)</span>.</p>
+<p><strong>Part b)</strong> Confirm the sharpness. The rule is exact to <span class="math notranslate nohighlight">\(10^{-14}\)</span> at
+<span class="math notranslate nohighlight">\(d = 14\)</span> and <span class="math notranslate nohighlight">\(d = 15 = 2n-1\)</span>, and wrong by <span class="math notranslate nohighlight">\(4.7\times10^{-5}\)</span> at
+<span class="math notranslate nohighlight">\(d = 16 = 2n\)</span> — an error five orders above rounding, so the failure is
+structural rather than numerical. Report the error at each degree and confirm
+the jump.</p>
+<p><strong>Part c)</strong> Verify the axioms of <a class="reference internal" href="#equation-eq-fbasis-inner">Eq. 132</a> numerically on the
+40-point rule. Write <code class="docutils literal notranslate"><span class="pre">inner(u,</span> <span class="pre">v)</span></code> — the weighted sum of
+<a class="reference internal" href="#equation-eq-fbasis-inner">Eq. 132</a> over the 40-point nodes — and verify with it, on the
+sampled functions <span class="math notranslate nohighlight">\(u = x^3 - x\)</span>,
+<span class="math notranslate nohighlight">\(v = x^2 + 1\)</span>, <span class="math notranslate nohighlight">\(s = e^{x}\)</span>. Confirm symmetry <span class="math notranslate nohighlight">\(\langle u,v\rangle =
+\langle v,u\rangle\)</span> to <span class="math notranslate nohighlight">\(10^{-15}\)</span>, bilinearity
+<span class="math notranslate nohighlight">\(\langle u + 2s, v\rangle = \langle u,v\rangle + 2\langle s,v\rangle\)</span> to
+<span class="math notranslate nohighlight">\(10^{-14}\)</span>, and positive definiteness <span class="math notranslate nohighlight">\(\langle u,u\rangle &gt; 0\)</span> with
+<span class="math notranslate nohighlight">\(\langle 0,0\rangle = 0\)</span>.</p>
+<p><strong>Part d)</strong> Confirm Cauchy–Schwarz, which now reads
+<span class="math notranslate nohighlight">\(\left|\int uv\right| \le \|u\|\,\|v\|\)</span>, on the three pairs drawn from
+<span class="math notranslate nohighlight">\(\{u, v, s\}\)</span>, and report the ratio <span class="math notranslate nohighlight">\(|\langle u,v\rangle|/(\|u\|\|v\|)\)</span> for
+each — the cosine of an angle between two functions.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Gauss-Legendre with n = 8: exact through degree 15
+
+   d       quadrature            exact        error
+  14     0.1333333333     0.1333333333    8.049e-16
+  15     0.0000000000     0.0000000000    0.000e+00
+  16     0.1176005105     0.1176470588    4.655e-05
+  17     0.0000000000     0.0000000000    0.000e+00
+
+error jumps by a factor of 5.8e+10 between degree 15 = 2n-1 and degree 16 = 2n
+
+the axioms of Eq. 1, on u = x^3 - x, v = x^2 + 1, s = exp(x):
+  symmetry       |&lt;u,v&gt; - &lt;v,u&gt;|            = 1.279e-17
+  bilinearity    |&lt;u+2s,v&gt; - &lt;u,v&gt; - 2&lt;s,v&gt;| = 8.882e-16
+  positivity     &lt;u,u&gt; = 0.1523809524 &gt; 0, &lt;0,0&gt; = 0.0e+00
+
+Cauchy-Schwarz, |&lt;f,g&gt;| &lt;= |f| |g|:
+  u, v: |&lt;f,g&gt;| =  0.000000 &lt;=  0.754247 = |f||g|   cos = 0.000000
+  u, s: |&lt;f,g&gt;| =  0.286251 &lt;=  0.743414 = |f||g|   cos = 0.385050
+  v, s: |&lt;f,g&gt;| =  3.229287 &lt;=  3.679712 = |f||g|   cos = 0.877592
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<p>The quadrature check is two-sided on purpose: exactness at <span class="math notranslate nohighlight">\(2n-1\)</span> says the rule
+works, and failure at <span class="math notranslate nohighlight">\(2n\)</span> says the bound is the true one and not a
+conservative estimate. Everything later in the notebook rests on the first
+half, so it is worth establishing that the instrument is exact before trusting
+a <span class="math notranslate nohighlight">\(10^{-14}\)</span> agreement.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  Gauss-Legendre with 8 nodes is exact through degree 2n-1 = 15 (Eq. 2)   [error 8.05e-16 at degree 14 and 0.00e+00 at degree 15]
+✓  and the bound is sharp: it fails at degree 2n = 16   [error 4.655e-05, five orders above rounding, so the failure is structural — n nodes and n weights are 2n parameters and the rule has spent them all]
+✓  the L2 inner product satisfies the axioms of Eq. 1   [symmetry 1.28e-17, bilinearity 8.88e-16, &lt;u,u&gt; = 0.152381 &gt; 0]
+✓  and Cauchy-Schwarz holds for functions exactly as it did for vectors   [cosines [&#39;0.0000&#39;, &#39;0.3850&#39;, &#39;0.8776&#39;], all at most 1]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-gramschmidt-on-the-monomials-produces-the-legendre-polynomials">
+<h2>Exercise 2: Gram–Schmidt on the monomials produces the Legendre polynomials<a class="headerlink" href="#exercise-2-gramschmidt-on-the-monomials-produces-the-legendre-polynomials" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-fbasis-gs">Eq. 134</a> is <a class="reference internal" href="gram-schmidt-qr.html"><span class="std std-doc">§2.2</span></a>’s recurrence with one
+substitution: the dot product becomes the integral. Nothing else changes, and
+the result is not merely <em>an</em> orthogonal basis of polynomials but, after the
+normalisation <span class="math notranslate nohighlight">\(q_k(1) = 1\)</span>, the classical Legendre polynomials — the same ones
+that appear in the multipole expansion, in spherical harmonics, and in the
+quadrature rule being used to compute them. That last point is worth noticing:
+the nodes of <code class="docutils literal notranslate"><span class="pre">leggauss(n)</span></code> are the roots of <span class="math notranslate nohighlight">\(P_n\)</span>, so this exercise computes
+the Legendre polynomials with a rule built out of the Legendre polynomials.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">gram_schmidt_L2(d)</span></code> returning a list of <code class="docutils literal notranslate"><span class="pre">d</span> <span class="pre">+</span> <span class="pre">1</span></code>
+<code class="docutils literal notranslate"><span class="pre">numpy.polynomial.Polynomial</span></code> objects, the Gram–Schmidt output for
+<span class="math notranslate nohighlight">\(\{1, x, \dots, x^d\}\)</span> under <a class="reference internal" href="#equation-eq-fbasis-inner">Eq. 132</a>. Work in <em>coefficient</em>
+arrays: start each step from the unit coefficient vector <code class="docutils literal notranslate"><span class="pre">c</span></code> with <code class="docutils literal notranslate"><span class="pre">c[k]</span> <span class="pre">=</span> <span class="pre">1</span></code>,
+and for each earlier polynomial <code class="docutils literal notranslate"><span class="pre">p_j</span></code> subtract
+<code class="docutils literal notranslate"><span class="pre">(inner(p_k(XQ),</span> <span class="pre">p_j(XQ))</span> <span class="pre">/</span> <span class="pre">inner(p_j(XQ),</span> <span class="pre">p_j(XQ)))</span> <span class="pre">*</span> <span class="pre">c_j</span></code> from <code class="docutils literal notranslate"><span class="pre">c</span></code>, exactly
+as <a class="reference internal" href="#equation-eq-fbasis-gs">Eq. 134</a> prescribes. Use <span class="math notranslate nohighlight">\(d = 5\)</span>.</p>
+<p><strong>Write this one yourself</strong> — the implementation is the lesson.</p>
+<p><strong>Part b)</strong> Normalise. Divide each output polynomial by its value at <span class="math notranslate nohighlight">\(x = 1\)</span>,
+evaluated as <code class="docutils literal notranslate"><span class="pre">p(1.0)</span></code>, to fix the classical convention <span class="math notranslate nohighlight">\(P_k(1) = 1\)</span>. Print the
+coefficient arrays.</p>
+<p><strong>Part c)</strong> Confirm orthogonality by building the <span class="math notranslate nohighlight">\(6\times6\)</span> Gram matrix
+<span class="math notranslate nohighlight">\(G_{jk} = \langle P_j, P_k\rangle\)</span> with <code class="docutils literal notranslate"><span class="pre">inner</span></code>, and report the largest
+off-diagonal entry in absolute value, which comes out <span class="math notranslate nohighlight">\(4\times10^{-16}\)</span>.</p>
+<p><strong>Part d)</strong> Confirm the closed form <a class="reference internal" href="#equation-eq-fbasis-legendre-gram">Eq. 135</a>: the diagonal
+should be <span class="math notranslate nohighlight">\(2, \tfrac{2}{3}, \tfrac{2}{5}, \tfrac{2}{7}, \tfrac{2}{9},
+\tfrac{2}{11}\)</span>, that is <span class="math notranslate nohighlight">\(2/(2k+1)\)</span>. Report the largest deviation, which is
+<span class="math notranslate nohighlight">\(1.8\times10^{-14}\)</span>.</p>
+<p><strong>Part e)</strong> Confirm these are the Legendre polynomials and not merely
+Legendre-like, by comparing the coefficient arrays against
+<code class="docutils literal notranslate"><span class="pre">np.asarray(scipy.special.legendre(k))[::-1]</span></code> (scipy orders coefficients
+highest-power-first, <code class="docutils literal notranslate"><span class="pre">numpy.polynomial</span></code> lowest-first, hence the reversal).
+Report the largest coefficient difference for each <span class="math notranslate nohighlight">\(k\)</span>; the worst is
+<span class="math notranslate nohighlight">\(3.5\times10^{-13}\)</span> at <span class="math notranslate nohighlight">\(k = 5\)</span>, with the error growing with degree because
+each Gram–Schmidt step inherits the errors of all the previous ones — the same
+accumulation <a class="reference internal" href="gram-schmidt-qr.html"><span class="std std-doc">§2.2</span></a> measured.</p>
+<p><strong>Part f)</strong> Plot <span class="math notranslate nohighlight">\(P_0\)</span> through <span class="math notranslate nohighlight">\(P_5\)</span> on <span class="math notranslate nohighlight">\([-1,1]\)</span>, and confirm from the plot and
+from <code class="docutils literal notranslate"><span class="pre">p(1.0)</span></code> that every one passes through <span class="math notranslate nohighlight">\((1, 1)\)</span>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Gram-Schmidt output, normalised so that P_k(1) = 1:
+  P_0: [1. 0. 0. 0. 0. 0.]
+  P_1: [-0.  1.  0.  0.  0.  0.]
+  P_2: [-0.5  0.   1.5  0.   0.   0. ]
+  P_3: [ 0.  -1.5  0.   2.5  0.   0. ]
+  P_4: [ 0.375 -0.    -3.75   0.     4.375  0.   ]
+  P_5: [ 0.     1.875 -0.    -8.75   0.     7.875]
+
+Gram matrix G[j,k] = &lt;P_j, P_k&gt;:
+  largest off-diagonal entry : 4.441e-16
+  diagonal                   : [2.      0.66667 0.4     0.28571 0.22222 0.18182]
+  predicted 2/(2k+1)         : [2.      0.66667 0.4     0.28571 0.22222 0.18182]
+  largest deviation          : 1.743e-14
+
+against scipy.special.legendre, coefficient by coefficient:
+  k = 0: max |coefficient difference| = 0.000e+00
+  k = 1: max |coefficient difference| = 2.168e-18
+  k = 2: max |coefficient difference| = 5.329e-15
+  k = 3: max |coefficient difference| = 2.487e-14
+  k = 4: max |coefficient difference| = 9.592e-14
+  k = 5: max |coefficient difference| = 3.340e-13
+  the error grows with k: each step inherits every earlier step&#39;s error
+
+P_k(1) for k = 0..5: [1. 1. 1. 1. 1. 1.]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-fbasis-legendre">
+<img alt="../../_images/0011015b76dbe308a1c5082c929310f7c1e9c45886e810a6dff913005d2d4502.png" src="../../_images/0011015b76dbe308a1c5082c929310f7c1e9c45886e810a6dff913005d2d4502.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 51 </span><span class="caption-text">The first six Legendre polynomials <span class="math notranslate nohighlight">\(P_0\)</span> through <span class="math notranslate nohighlight">\(P_5\)</span> on <span class="math notranslate nohighlight">\([-1,1]\)</span>, produced by running Gram–Schmidt (Eq. 3) on the monomials <span class="math notranslate nohighlight">\(\{1, x, \ldots, x^5\}\)</span> under the <span class="math notranslate nohighlight">\(L^2\)</span> inner product of Eq. 1 and normalising so that <span class="math notranslate nohighlight">\(P_k(1) = 1\)</span>. Every curve passes through the point <span class="math notranslate nohighlight">\((1,1)\)</span>, marked, and <span class="math notranslate nohighlight">\(P_k\)</span> has exactly <span class="math notranslate nohighlight">\(k\)</span> roots in the open interval – those roots are the nodes of the <span class="math notranslate nohighlight">\(k\)</span>-point Gauss–Legendre rule used to compute the inner products, so the construction is in a precise sense self-referential.</span><a class="headerlink" href="#fig-fbasis-legendre" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<p>Orthogonality alone would be satisfied by infinitely many bases, so the check
+that matters is the closed form <a class="reference internal" href="#equation-eq-fbasis-legendre-gram">Eq. 135</a> together with the
+coefficient comparison: the first says the construction produced the right
+<em>inner products</em>, the second that it produced the right <em>polynomials</em>.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  Gram-Schmidt in L2 produces a mutually orthogonal family (Eq. 3)   [largest off-diagonal Gram entry 4.441e-16 over the 6-by-6 matrix]
+✓  with the closed-form norms &lt;P_k, P_k&gt; = 2/(2k+1) (Eq. 4)   [max|Δ| = 1.74305e-14 (rtol=0, atol=1e-12)]
+✓  and they ARE the Legendre polynomials, not merely Legendre-like   [worst coefficient difference against scipy.special.legendre is 3.34e-13, at k = 5]
+✓  each normalised to the classical convention P_k(1) = 1   [max|Δ| = 4.44089e-16 (rtol=0, atol=1e-13)]
+✓  and the error accumulates with degree, as Gram-Schmidt always does   [3.34e-13 at k = 5 against 5.33e-15 for k &lt;= 2: each step subtracts projections computed from already-inexact predecessors]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-the-two-gram-matrices-and-a-condition-number-in-closed-form">
+<h2>Exercise 3: The two Gram matrices, and a condition number in closed form<a class="headerlink" href="#exercise-3-the-two-gram-matrices-and-a-condition-number-in-closed-form" title="Link to this heading">#</a></h2>
+<p>The monomials and the Legendre polynomials span the <em>same</em> subspace of degree-<span class="math notranslate nohighlight">\(d\)</span>
+polynomials, so the best <span class="math notranslate nohighlight">\(L^2\)</span> approximation to any function is the same object
+in both. What differs is the matrix a solver is handed.</p>
+<p>In the Legendre basis the Gram matrix is diagonal with entries <span class="math notranslate nohighlight">\(2/(2k+1)\)</span>, so
+its condition number is the ratio of the largest to the smallest,</p>
+<div class="math notranslate nohighlight">
+\[
+\kappa(G_{\text{Leg}}) = \frac{2/1}{2/(2d+1)} = 2d + 1 ,
+\]</div>
+<p>a closed form and a very small number. In the monomial basis it is
+<a class="reference internal" href="#equation-eq-fbasis-monogram">Eq. 137</a>, a Hilbert-like matrix. This exercise measures both.</p>
+<p><strong>Part a)</strong> Build the monomial Gram matrix from <a class="reference internal" href="#equation-eq-fbasis-monogram">Eq. 137</a>
+directly, without quadrature, as
+<code class="docutils literal notranslate"><span class="pre">np.where((i[:,</span> <span class="pre">None]</span> <span class="pre">+</span> <span class="pre">i[None,</span> <span class="pre">:])</span> <span class="pre">%</span> <span class="pre">2</span> <span class="pre">==</span> <span class="pre">0,</span> <span class="pre">2.0</span> <span class="pre">/</span> <span class="pre">(i[:,</span> <span class="pre">None]</span> <span class="pre">+</span> <span class="pre">i[None,</span> <span class="pre">:]</span> <span class="pre">+</span> <span class="pre">1.0),</span> <span class="pre">0.0)</span></code>
+for <code class="docutils literal notranslate"><span class="pre">i</span> <span class="pre">=</span> <span class="pre">np.arange(d</span> <span class="pre">+</span> <span class="pre">1)</span></code>, at degrees <span class="math notranslate nohighlight">\(d = 3, 5, 6, 8, 10\)</span>. Verify at <span class="math notranslate nohighlight">\(d = 5\)</span>
+that this analytic construction agrees with the quadrature-built matrix
+<code class="docutils literal notranslate"><span class="pre">[[inner(XQ**a,</span> <span class="pre">XQ**b)</span> <span class="pre">for</span> <span class="pre">b</span> <span class="pre">in</span> <span class="pre">...]</span> <span class="pre">for</span> <span class="pre">a</span> <span class="pre">in</span> <span class="pre">...]</span></code> to <span class="math notranslate nohighlight">\(10^{-14}\)</span> — the rule is
+exact for these integrands, so the two must agree.</p>
+<p><strong>Part b)</strong> Build the Legendre Gram matrix as <code class="docutils literal notranslate"><span class="pre">np.diag([2/(2k+1)</span> <span class="pre">for</span> <span class="pre">k</span> <span class="pre">in</span> <span class="pre">range(d+1)])</span></code> at the same degrees, and report <code class="docutils literal notranslate"><span class="pre">np.linalg.cond</span></code> of both.</p>
+<p><strong>Part c)</strong> Confirm the closed form: <span class="math notranslate nohighlight">\(\kappa(G_{\text{Leg}}) = 2d+1\)</span> exactly,
+to <span class="math notranslate nohighlight">\(10^{-12}\)</span>, at every degree. The measured values are <span class="math notranslate nohighlight">\(7, 11, 13, 17, 21\)</span> at
+<span class="math notranslate nohighlight">\(d = 3, 5, 6, 8, 10\)</span>.</p>
+<p><strong>Part d)</strong> Report the monomial condition numbers: <span class="math notranslate nohighlight">\(68\)</span>, <span class="math notranslate nohighlight">\(1.9\times10^{3}\)</span>,
+<span class="math notranslate nohighlight">\(1.0\times10^{4}\)</span>, <span class="math notranslate nohighlight">\(3.1\times10^{5}\)</span>, <span class="math notranslate nohighlight">\(9.4\times10^{6}\)</span> at the same degrees.
+Confirm the growth is exponential in <span class="math notranslate nohighlight">\(d\)</span> by fitting a straight line to
+<span class="math notranslate nohighlight">\(\log_{10}\kappa\)</span> against <span class="math notranslate nohighlight">\(d\)</span> with <code class="docutils literal notranslate"><span class="pre">np.polyfit</span></code>, and confirm the fitted slope
+exceeds <span class="math notranslate nohighlight">\(0.5\)</span> — that is, <span class="math notranslate nohighlight">\(\kappa\)</span> multiplies by more than 3 for each extra
+degree, whereas the Legendre <span class="math notranslate nohighlight">\(\kappa\)</span> merely adds 2.</p>
+<p><strong>Part e)</strong> Confirm both matrices are symmetric positive definite (they are
+Gram matrices, so they must be) by checking <code class="docutils literal notranslate"><span class="pre">np.linalg.eigvalsh</span></code> returns all
+positive eigenvalues at <span class="math notranslate nohighlight">\(d = 10\)</span>, and report the smallest for each. The
+monomial matrix’s smallest eigenvalue is what its condition number is measuring.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>analytic Eq. 6 against the 40-point quadrature at d = 5: 5.995e-15
+
+   d   kappa(monomial Gram)   kappa(Legendre Gram)    2d+1
+   3             6.7604e+01                 7.0000       7
+   5             1.8704e+03                11.0000      11
+   6             1.0228e+04                13.0000      13
+   8             3.0660e+05                17.0000      17
+  10             9.4431e+06                21.0000      21
+
+fitted log10(kappa_mono) against d: slope 0.7357 -&gt; kappa multiplies by 5.44 per extra degree
+kappa_Leg merely ADDS 2 per extra degree, by the closed form 2d+1
+
+at d = 10, both are symmetric positive definite:
+  monomial: smallest eigenvalue 2.6334e-07, largest 2.4867
+  Legendre: smallest eigenvalue 9.5238e-02, largest 2.0000
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<p>The closed form <span class="math notranslate nohighlight">\(\kappa = 2d+1\)</span> is the strongest check available here, since it
+is an exact integer prediction rather than a tolerance. The monomial growth is
+gated on a fitted slope rather than on absolute condition numbers, following
+the course’s rule for measured exponents.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the analytic monomial Gram (Eq. 6) matches the quadrature-built one   [max|Δ| = 5.9952e-15 (rtol=0, atol=1e-13)]
+✓  kappa of the Legendre Gram matrix is exactly 2d+1 (Eq. 4)   [max|Δ| = 0 (rtol=0, atol=1e-12)]
+✓  while the monomial Gram&#39;s kappa grows exponentially with the degree (Eq. 6)   [fitted slope 0.7357 in log10(kappa) per degree, so kappa multiplies by 5.44 each time — it is a Hilbert-like matrix]
+✓  so at degree 10 the two bases differ by five orders in conditioning   [9.443e+06 against 21.0, for the SAME subspace and the same best approximation: only the coordinates differ]
+✓  and both are positive definite, as every Gram matrix must be   [smallest eigenvalues 2.633e-07 (monomial) and 9.524e-02 (Legendre)]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-coefficients-are-inner-products-and-where-the-quadrature-lies">
+<h2>Exercise 4: Coefficients are inner products, and where the quadrature lies<a class="headerlink" href="#exercise-4-coefficients-are-inner-products-and-where-the-quadrature-lies" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-fbasis-coeffs">Eq. 136</a> is the reason orthogonality is worth the trouble: no
+linear solve, just <span class="math notranslate nohighlight">\(d+1\)</span> independent integrals. The function to expand is
+<span class="math notranslate nohighlight">\(f(x) = |x|\)</span>, chosen because its Legendre coefficients are exact rationals —
+<span class="math notranslate nohighlight">\(c_0 = \tfrac{1}{2}\)</span>, <span class="math notranslate nohighlight">\(c_2 = \tfrac{5}{8}\)</span>, <span class="math notranslate nohighlight">\(c_4 = -\tfrac{3}{16}\)</span>, with every
+odd coefficient zero by symmetry — so the computation can be checked against
+arithmetic rather than against another computation.</p>
+<p>There is a trap here, and it is the point of the exercise. Gauss–Legendre is
+exact for <em>polynomials</em>, and <span class="math notranslate nohighlight">\(|x|\)</span> is not one: it has a kink at the origin, and
+a polynomial rule cannot integrate across a kink. The remedy is to put the kink
+on a boundary instead of inside a panel, which restores exactness because <span class="math notranslate nohighlight">\(|x|\)</span>
+equals <span class="math notranslate nohighlight">\(-x\)</span> on <span class="math notranslate nohighlight">\([-1,0]\)</span> and <span class="math notranslate nohighlight">\(x\)</span> on <span class="math notranslate nohighlight">\([0,1]\)</span>, both polynomials.</p>
+<p><strong>Part a)</strong> Compute <span class="math notranslate nohighlight">\(c_0\)</span>, <span class="math notranslate nohighlight">\(c_2\)</span>, <span class="math notranslate nohighlight">\(c_4\)</span> from <a class="reference internal" href="#equation-eq-fbasis-coeffs">Eq. 136</a> using a
+single 400-point rule, <code class="docutils literal notranslate"><span class="pre">leggauss(400)</span></code>, with <code class="docutils literal notranslate"><span class="pre">P_scipy(k,</span> <span class="pre">x)</span></code> for the Legendre
+values. Report them to twelve decimals and compare against <span class="math notranslate nohighlight">\(\tfrac{1}{2}\)</span>,
+<span class="math notranslate nohighlight">\(\tfrac{5}{8}\)</span>, <span class="math notranslate nohighlight">\(-\tfrac{3}{16}\)</span>.</p>
+<p><strong>Part b)</strong> Report the error, which is <span class="math notranslate nohighlight">\(8.7\times10^{-6}\)</span>. Four hundred nodes
+have bought six digits, where the same rule delivers machine precision on any
+polynomial. Confirm the error exceeds <span class="math notranslate nohighlight">\(10^{-7}\)</span>, so it is unambiguously a
+quadrature failure rather than rounding.</p>
+<p><strong>Part c)</strong> Now split at the kink. Build a composite rule from
+<code class="docutils literal notranslate"><span class="pre">xh,</span> <span class="pre">wh</span> <span class="pre">=</span> <span class="pre">leggauss(20)</span></code> by mapping it to <span class="math notranslate nohighlight">\([-1,0]\)</span> and to <span class="math notranslate nohighlight">\([0,1]\)</span>: the nodes are
+<code class="docutils literal notranslate"><span class="pre">np.concatenate([(xh</span> <span class="pre">-</span> <span class="pre">1)</span> <span class="pre">/</span> <span class="pre">2,</span> <span class="pre">(xh</span> <span class="pre">+</span> <span class="pre">1)</span> <span class="pre">/</span> <span class="pre">2])</span></code> and the weights
+<code class="docutils literal notranslate"><span class="pre">np.concatenate([wh</span> <span class="pre">/</span> <span class="pre">2,</span> <span class="pre">wh</span> <span class="pre">/</span> <span class="pre">2])</span></code>, 40 nodes in total. Recompute the three
+coefficients and report the error against the exact rationals, which is
+<span class="math notranslate nohighlight">\(1.2\times10^{-14}\)</span>.</p>
+<p><strong>Part d)</strong> State the comparison plainly: 40 nodes placed with the kink on a
+panel boundary beat 400 nodes placed across it by nine orders of magnitude.
+Confirm the split rule’s error is at least <span class="math notranslate nohighlight">\(10^{7}\)</span> times smaller. The lesson
+generalises past this notebook — a quadrature rule’s accuracy is a claim about
+the <em>integrand’s smoothness on each panel</em>, not about the node count.</p>
+<p><strong>Part e)</strong> With the split rule, compute <span class="math notranslate nohighlight">\(c_k\)</span> for <span class="math notranslate nohighlight">\(k = 0, \dots, 12\)</span> and
+confirm every odd coefficient vanishes, since <span class="math notranslate nohighlight">\(|x|\)</span> is even and <span class="math notranslate nohighlight">\(P_k\)</span> is odd
+for odd <span class="math notranslate nohighlight">\(k\)</span>, making the integrand odd and the integral exactly zero. The
+tolerance is <span class="math notranslate nohighlight">\(10^{-10}\)</span> rather than <span class="math notranslate nohighlight">\(10^{-14}\)</span>, and the reason is worth
+stating: the cancellation is exact in exact arithmetic, but evaluating <span class="math notranslate nohighlight">\(P_{11}\)</span>
+from its coefficient array involves terms in the thousands cancelling down to
+something of order one, and dividing by <span class="math notranslate nohighlight">\(\langle P_{11}, P_{11}\rangle = 2/23\)</span>
+multiplies whatever survives by 11.5. The measured <span class="math notranslate nohighlight">\(2.4\times10^{-12}\)</span> is that
+rounding, not a failure of the symmetry.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Legendre coefficients of f(x) = |x|, against the exact rationals
+
+  k            exact      single 400-pt      split 2x20-pt
+  0   0.500000000000     0.500002563810     0.500000000000
+  2   0.625000000000     0.624993590267     0.625000000000
+  4  -0.187500000000    -0.187491346208    -0.187500000000
+
+  single 400-point rule, 400 nodes: error 8.654e-06
+  split 2 x 20-point rule,  40 nodes: error 1.249e-14
+  the 40-node rule beats the 400-node rule by a factor of 6.93e+08
+
+  |x| is not a polynomial, so Eq. 2 does not apply across the kink;
+  put the kink on a panel boundary and each panel IS a polynomial again
+
+coefficients c_0 .. c_12 on the split rule:
+  [ 5.000000e-01 -7.806256e-18  6.250000e-01 -1.214306e-17 -1.875000e-01 -1.297573e-15  1.015625e-01
+  1.790235e-14 -6.640625e-02  1.476597e-13  4.785156e-02 -2.384861e-12 -3.662109e-02]
+  largest odd coefficient (must vanish, |x| is even): 2.385e-12
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<p>The exact rationals make this the strictest check in the notebook: there is no
+tolerance to negotiate, only arithmetic. The pair of checks is deliberate —
+one establishes that the naive rule is genuinely wrong, the other that the fix
+genuinely works, and neither is informative without the other.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  a single 400-point rule gets |x|&#39;s coefficients wrong (Eqs. 2, 5)   [error 8.654e-06 against the exact 1/2, 5/8, -3/16: Gauss-Legendre is exact for polynomials and |x| has a kink inside the interval]
+✓  splitting the rule at the kink recovers them exactly   [max|Δ| = 1.249e-14 (rtol=0, atol=1e-12)]
+✓  40 nodes placed well beat 400 placed badly, by seven orders or more   [8.65e-06 against 1.25e-14, a factor of 6.93e+08: accuracy is a claim about smoothness on each panel, not about the node count]
+✓  and every odd coefficient vanishes, since |x| is even (Eq. 5)   [largest odd |c_k| = 2.38e-12 over k = 1, 3, ..., 11, against a largest even |c_k| of 0.6250. The integrand is odd so the integral is exactly zero; what remains is rounding in evaluating high-degree Legendre polynomials from their coefficients]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-same-subspace-same-answer-until-the-monomial-basis-gives-up">
+<h2>Exercise 5: Same subspace, same answer, until the monomial basis gives up<a class="headerlink" href="#exercise-5-same-subspace-same-answer-until-the-monomial-basis-gives-up" title="Link to this heading">#</a></h2>
+<p>Exercise 3 measured the two condition numbers; this one measures what they
+cost. Fitting <span class="math notranslate nohighlight">\(f\)</span> by least squares in the monomial basis and in the Legendre
+basis solves <span class="math notranslate nohighlight">\(G\mathbf{c} = \mathbf{b}\)</span> with the two Gram matrices of Exercise 3
+and produces, in exact arithmetic, the <em>same function</em>. In floating point the
+two agree until the monomial Gram matrix’s condition number crosses <span class="math notranslate nohighlight">\(1/\varepsilon\)</span>,
+and then one of them stops working.</p>
+<p><strong>Part a)</strong> For <span class="math notranslate nohighlight">\(f(x) = |x|\)</span> sampled on <code class="docutils literal notranslate"><span class="pre">leggauss(400)</span></code>, and for degrees
+<span class="math notranslate nohighlight">\(d = 6, 10, 14, 18, 22, 26, 30\)</span>, solve the least-squares problem in both bases.
+In each case build the design matrix — <code class="docutils literal notranslate"><span class="pre">np.vander(x,</span> <span class="pre">d+1,</span> <span class="pre">increasing=True)</span></code> for
+the monomials, and the columns <code class="docutils literal notranslate"><span class="pre">P_scipy(k,</span> <span class="pre">x)</span></code> for <span class="math notranslate nohighlight">\(k = 0, \dots, d\)</span> for
+Legendre — form the weighted normal equations <code class="docutils literal notranslate"><span class="pre">(M</span> <span class="pre">*</span> <span class="pre">w[:,</span> <span class="pre">None]).T</span> <span class="pre">&#64;</span> <span class="pre">M</span></code> and
+<code class="docutils literal notranslate"><span class="pre">M.T</span> <span class="pre">&#64;</span> <span class="pre">(w</span> <span class="pre">*</span> <span class="pre">f)</span></code>, solve with <code class="docutils literal notranslate"><span class="pre">np.linalg.solve</span></code>, and report the resulting <span class="math notranslate nohighlight">\(L^2\)</span>
+error <span class="math notranslate nohighlight">\(\sqrt{\langle f - Mc,\, f - Mc\rangle}\)</span> together with <code class="docutils literal notranslate"><span class="pre">np.linalg.cond</span></code>
+of each Gram matrix.</p>
+<p><strong>Part b)</strong> Confirm the two bases agree while both are well conditioned: the
+<span class="math notranslate nohighlight">\(L^2\)</span> errors match to <span class="math notranslate nohighlight">\(3.7\times10^{-11}\)</span> at <span class="math notranslate nohighlight">\(d = 6, 10, 14, 18\)</span>, where the
+monomial <span class="math notranslate nohighlight">\(\kappa\)</span> runs from <span class="math notranslate nohighlight">\(10^{4}\)</span> to <span class="math notranslate nohighlight">\(10^{13}\)</span>. Check to <span class="math notranslate nohighlight">\(10^{-8}\)</span>, which
+leaves room for a different BLAS to distribute its rounding differently across
+two solves of a badly conditioned system.</p>
+<p><strong>Part c)</strong> Locate the failure. Past <span class="math notranslate nohighlight">\(d \approx 22\)</span> the monomial <span class="math notranslate nohighlight">\(\kappa\)</span>
+crosses <span class="math notranslate nohighlight">\(1/\varepsilon\)</span> and the two bases part company: at <span class="math notranslate nohighlight">\(d = 30\)</span> the
+monomial fit is more than <span class="math notranslate nohighlight">\(1.2\)</span> times worse than the Legendre fit, which is
+still improving monotonically. Confirm both of those. On this machine the
+monomial errors are also <strong>non-monotone</strong> — the fit at <span class="math notranslate nohighlight">\(d = 26\)</span> is worse than
+its own value at <span class="math notranslate nohighlight">\(d = 22\)</span>, so adding basis functions has stopped helping and
+started hurting — and that is worth printing, but not worth gating: which
+particular wrong answer a solve past <span class="math notranslate nohighlight">\(1/\varepsilon\)</span> returns is a property of
+the BLAS, not of the mathematics. What <em>is</em> guaranteed is that the two bases
+must disagree once one of them is unusable. Approximation theory forbids an
+error that rises as the subspace grows, so wherever it rises, the cause is
+arithmetic and the culprit is the choice of coordinates.</p>
+<p><strong>Part d)</strong> Contrast two functions in the Legendre basis alone, to separate the
+conditioning question from the approximation question. Fit <span class="math notranslate nohighlight">\(f(x) = e^{x}\)</span> and
+<span class="math notranslate nohighlight">\(f(x) = |x|\)</span> at degrees <span class="math notranslate nohighlight">\(2, 4, 6, 8, 12, 16, 20, 24\)</span>. The analytic <span class="math notranslate nohighlight">\(e^{x}\)</span>
+reaches <span class="math notranslate nohighlight">\(3.5\times10^{-14}\)</span> by degree 12 and then sits on the machine-precision
+floor; <span class="math notranslate nohighlight">\(|x|\)</span> decays algebraically, reaching only <span class="math notranslate nohighlight">\(5.0\times10^{-3}\)</span> at degree
+24. Confirm the exponential function’s error at degree 8 is at least <span class="math notranslate nohighlight">\(10^{6}\)</span>
+times smaller than the kinked function’s, and fit the algebraic rate for <span class="math notranslate nohighlight">\(|x|\)</span>
+with <code class="docutils literal notranslate"><span class="pre">np.polyfit</span></code> on the log-log data, which comes out <span class="math notranslate nohighlight">\(d^{-1.23}\)</span>.</p>
+<p><strong>Part e)</strong> Plot the two error curves on log-log axes, and plot the degree-6
+and degree-20 Legendre approximations to <span class="math notranslate nohighlight">\(|x|\)</span> against <span class="math notranslate nohighlight">\(|x|\)</span> itself, so the
+slow convergence is visible as a rounding of the corner rather than as a
+failure anywhere else.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>   d    kappa mono   kappa Leg       L2 mono   L2 Legendre
+   6     1.023e+04        13.0    3.1881e-02    3.1881e-02
+  10     9.443e+06        21.0    1.6728e-02    1.6728e-02
+  14     9.386e+09        29.0    1.0670e-02    1.0670e-02
+  18     9.677e+12        37.0    7.5497e-03    7.5497e-03
+  22     1.043e+16        45.0    5.6990e-03    5.6976e-03
+  26     1.631e+17        53.0    5.2672e-03    4.4931e-03
+  30     6.596e+17        61.0    5.2908e-03    3.6580e-03
+
+  the two bases agree to 9.71e-12 while d &lt;= 18
+  monomial errors strictly decreasing over the sweep? False
+  Legendre errors strictly decreasing over the sweep? True
+  monomial: 5.6990e-03 at d = 22 -&gt; 5.2672e-03 at d = 26  (WORSE)
+  Legendre: 5.6976e-03 at d = 22 -&gt; 4.4931e-03 at d = 26  (better)
+
+smooth against kinked, in the Legendre basis alone:
+   d        exp(x)           |x|        ratio
+   2     3.795e-02     1.021e-01    2.689e+00
+   4     4.705e-04     5.102e-02    1.084e+02
+   6     2.788e-06     3.188e-02    1.143e+04
+   8     9.654e-09     2.231e-02    2.311e+06
+  12     3.507e-14     1.314e-02    3.746e+11
+  16     9.693e-16     8.887e-03    9.169e+12
+  20     9.697e-16     6.516e-03    6.720e+12
+  24     9.696e-16     5.036e-03    5.195e+12
+
+  |x|: algebraic, error ~ d^-1.226
+  exp(x): reaches 9.69e-16 by degree 12 and stops — that is the float64 floor, not a limit of the method
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-fbasis-convergence">
+<img alt="../../_images/9de09c3aa659851494223e5f0f9fe8f7d4e431d0b71d2cc9361614fed6438af3.png" src="../../_images/9de09c3aa659851494223e5f0f9fe8f7d4e431d0b71d2cc9361614fed6438af3.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 52 </span><span class="caption-text">Left: the <span class="math notranslate nohighlight">\(L^2\)</span> error of the best degree-<span class="math notranslate nohighlight">\(d\)</span> polynomial approximation on <span class="math notranslate nohighlight">\([-1,1]\)</span>, computed in the Legendre basis, for the analytic <span class="math notranslate nohighlight">\(e^{x}\)</span> (amber) and the merely-Lipschitz <span class="math notranslate nohighlight">\(|x|\)</span> (navy), on log-log axes. The smooth function converges geometrically and hits the float64 floor near <span class="math notranslate nohighlight">\(10^{-14}\)</span> by degree 12; the kinked one converges algebraically at <span class="math notranslate nohighlight">\(d^{-1.23}\)</span> and is still at <span class="math notranslate nohighlight">\(5\times10^{-3}\)</span> at degree 24. Right: the degree-6 and degree-20 Legendre approximations to <span class="math notranslate nohighlight">\(|x|\)</span>, showing that all of the remaining error lives in a shrinking neighbourhood of the corner and none of it anywhere else.</span><a class="headerlink" href="#fig-fbasis-convergence" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<p>The headline is the non-monotonicity: an approximation that gets worse as the
+subspace grows is not a statement about approximation theory, which forbids it,
+but about arithmetic. The smooth-versus-kinked comparison is run entirely in
+the well-conditioned basis so that the two effects cannot be confused.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the two bases give the same answer while both are usable (Eqs. 4, 6)   [L2 errors agree to 9.71e-12 for d = 6 to 18, where kappa_mono runs from 1.0e+04 to 9.7e+12]
+✓  but the monomial fit stops tracking it once kappa passes 1/eps   [at d = 30 the monomial fit returns 5.2908e-03 against the Legendre fit&#39;s 3.6580e-03, with kappa_mono = 6.60e+17 past 1/eps = 4.50e+15; the Legendre errors fall monotonically throughout. On this machine the monomial sequence is also non-monotone (strictly decreasing: False), but WHICH garbage a solve past 1/eps returns is a BLAS detail, so only the divergence between the two bases is gated]
+✓  smoothness, not conditioning, sets the rate: exp(x) beats |x| at degree 8   [9.65e-09 against 2.23e-02, a factor of 2.31e+06, both computed in the same well-conditioned basis]
+✓  and |x| converges algebraically, not geometrically   [fitted error ~ d^-1.226 over degrees 2 to 24, against exp(x) reaching 9.7e-16 — the float64 floor — by degree 12]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-6-chebyshev-and-orthogonality-that-is-exactly-a-matrix-identity">
+<h2>Exercise 6: Chebyshev, and orthogonality that is exactly a matrix identity<a class="headerlink" href="#exercise-6-chebyshev-and-orthogonality-that-is-exactly-a-matrix-identity" title="Link to this heading">#</a></h2>
+<p>The Legendre polynomials came from the plain inner product
+<a class="reference internal" href="#equation-eq-fbasis-inner">Eq. 132</a>. Weighting it by <span class="math notranslate nohighlight">\(1/\sqrt{1-x^2}\)</span> gives a different
+orthogonal family, the Chebyshev polynomials, with the closed form
+<a class="reference internal" href="#equation-eq-fbasis-cheb">Eq. 138</a>. Their remarkable property is that the continuous
+orthogonality has an exact <em>discrete</em> counterpart: sampled at the right <span class="math notranslate nohighlight">\(N\)</span>
+points, they are orthogonal as vectors in <span class="math notranslate nohighlight">\(\mathbb{R}^N\)</span>, with no quadrature
+error at all, because the substitution <span class="math notranslate nohighlight">\(x = \cos\theta\)</span> turns them into cosines
+and the identity into a finite trigonometric sum.</p>
+<p><strong>Part a)</strong> Build the <span class="math notranslate nohighlight">\(N = 16\)</span> Chebyshev–Gauss nodes
+<span class="math notranslate nohighlight">\(x_i = \cos\!\big((2i+1)\pi/(2N)\big)\)</span> as
+<code class="docutils literal notranslate"><span class="pre">np.cos((2</span> <span class="pre">*</span> <span class="pre">np.arange(16)</span> <span class="pre">+</span> <span class="pre">1)</span> <span class="pre">*</span> <span class="pre">np.pi</span> <span class="pre">/</span> <span class="pre">32)</span></code>, and form the <span class="math notranslate nohighlight">\(8\times16\)</span> matrix
+<code class="docutils literal notranslate"><span class="pre">T</span></code> whose row <span class="math notranslate nohighlight">\(j\)</span> is <span class="math notranslate nohighlight">\(T_j\)</span> evaluated there, via <a class="reference internal" href="#equation-eq-fbasis-cheb">Eq. 138</a> as
+<code class="docutils literal notranslate"><span class="pre">np.cos(j</span> <span class="pre">*</span> <span class="pre">np.arccos(nodes))</span></code>.</p>
+<p><strong>Part b)</strong> Compute <code class="docutils literal notranslate"><span class="pre">T</span> <span class="pre">&#64;</span> <span class="pre">T.T</span></code>, an <span class="math notranslate nohighlight">\(8\times8\)</span> matrix, and report its largest
+off-diagonal entry in absolute value, which comes out <span class="math notranslate nohighlight">\(8\times10^{-15}\)</span>: the
+sampled Chebyshev polynomials are orthogonal <em>as vectors</em>, to machine
+precision, with no integral involved.</p>
+<p><strong>Part c)</strong> Confirm the diagonal is <span class="math notranslate nohighlight">\(N = 16\)</span> in the first entry and <span class="math notranslate nohighlight">\(N/2 = 8\)</span>
+in the rest, to <span class="math notranslate nohighlight">\(10^{-12}\)</span>. The factor of two is the usual one for cosines: the
+constant function has twice the squared norm of the oscillating ones.</p>
+<p><strong>Part d)</strong> Verify <a class="reference internal" href="#equation-eq-fbasis-cheb">Eq. 138</a> against <code class="docutils literal notranslate"><span class="pre">scipy.special.chebyt</span></code> by
+comparing <span class="math notranslate nohighlight">\(T_5\)</span> evaluated on <code class="docutils literal notranslate"><span class="pre">np.linspace(-1,</span> <span class="pre">1,</span> <span class="pre">200)</span></code> two ways — as
+<code class="docutils literal notranslate"><span class="pre">np.cos(5</span> <span class="pre">*</span> <span class="pre">np.arccos(xx))</span></code> and as the polynomial <code class="docutils literal notranslate"><span class="pre">chebyt(5)</span></code> — to <span class="math notranslate nohighlight">\(10^{-12}\)</span>,
+confirming that a cosine of an arccosine really is a degree-5 polynomial.</p>
+<p><strong>Part e)</strong> Plot <span class="math notranslate nohighlight">\(T_0\)</span> through <span class="math notranslate nohighlight">\(T_5\)</span> on <span class="math notranslate nohighlight">\([-1,1]\)</span> and note the property that
+makes them the basis of choice for approximation: every <span class="math notranslate nohighlight">\(T_k\)</span> oscillates
+between exactly <span class="math notranslate nohighlight">\(-1\)</span> and <span class="math notranslate nohighlight">\(+1\)</span>, equioscillating <span class="math notranslate nohighlight">\(k+1\)</span> times, so no coefficient
+in a Chebyshev expansion is amplified by a large basis function.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Chebyshev-Gauss nodes for N = 16:
+  [ 0.99518  0.95694  0.88192  0.77301  0.63439  0.4714   0.29028  0.09802 -0.09802 -0.29028 -0.4714  -0.63439
+ -0.77301 -0.88192 -0.95694 -0.99518]
+
+T @ T.T is (8, 8); its first 4x4 block:
+[[ 1.60000e+01  5.55112e-16 -7.77156e-16  1.88738e-15]
+ [ 5.55112e-16  8.00000e+00  1.63989e-15 -2.30455e-15]
+ [-7.77156e-16  1.63989e-15  8.00000e+00  1.22993e-15]
+ [ 1.88738e-15 -2.30455e-15  1.22993e-15  8.00000e+00]]
+
+  largest off-diagonal entry : 8.168e-15
+  diagonal                   : [16.  8.  8.  8.  8.  8.  8.  8.]
+  predicted [N, N/2, ...]    : [16.0, 8.0, 8.0, 8.0, 8.0, 8.0, 8.0, 8.0]
+
+cos(5 arccos x) against the degree-5 polynomial chebyt(5): 1.199e-14
+range of T_k on [-1,1], for k = 0..5:
+  T_0: [+1.000000, +1.000000]
+  T_1: [-1.000000, +1.000000]
+  T_2: [-0.999949, +1.000000]
+  T_3: [-1.000000, +1.000000]
+  T_4: [-0.999967, +1.000000]
+  T_5: [-1.000000, +1.000000]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-fbasis-chebyshev">
+<img alt="../../_images/cb5b77357bf2f3437cbe5ca9f61c87225eb04bc7c223d67f03b6d2753e1a93ab.png" src="../../_images/cb5b77357bf2f3437cbe5ca9f61c87225eb04bc7c223d67f03b6d2753e1a93ab.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 53 </span><span class="caption-text">The first six Chebyshev polynomials <span class="math notranslate nohighlight">\(T_0\)</span> through <span class="math notranslate nohighlight">\(T_5\)</span> on <span class="math notranslate nohighlight">\([-1,1]\)</span>, drawn from the closed form <span class="math notranslate nohighlight">\(T_k(x) = \cos(k\arccos x)\)</span> of Eq. 7. Every one is bounded by <span class="math notranslate nohighlight">\(\pm 1\)</span> (dotted lines) and equioscillates between those bounds <span class="math notranslate nohighlight">\(k+1\)</span> times, which is what makes them the standard basis for polynomial approximation: no basis function is ever large, so no coefficient can be amplified by one. The markers on the horizontal axis are the 16 Chebyshev–Gauss nodes at which the sampled polynomials are exactly orthogonal as vectors.</span><a class="headerlink" href="#fig-fbasis-chebyshev" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-6">
+<h3>Validation 6<a class="headerlink" href="#validation-6" title="Link to this heading">#</a></h3>
+<p>The discrete identity is checked as a matrix product rather than as an
+integral, because that is exactly what it is — no quadrature rule appears
+anywhere, and the <span class="math notranslate nohighlight">\(8\times10^{-15}\)</span> is pure floating-point rounding on a sum of
+16 cosines.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  sampled Chebyshev polynomials are orthogonal AS VECTORS (Eq. 7)   [largest off-diagonal entry of T @ T.T is 8.168e-15 — no quadrature rule is involved, only a sum of 16 cosines]
+✓  with squared lengths N for the constant and N/2 for the rest   [max|Δ| = 6.21725e-15 (rtol=0, atol=1e-12)]
+✓  and cos(k arccos x) really is a degree-k polynomial (Eq. 7)   [max|Δ| = 1.19904e-14 (rtol=0, atol=1e-12)]
+✓  every T_k is bounded by +/- 1, which is why they suit approximation   [measured ranges [&#39;[1.000, 1.000]&#39;, &#39;[-1.000, 1.000]&#39;, &#39;[-1.000, 1.000]&#39;]...: no basis function is ever large, so no coefficient can be amplified]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-7-the-dft-is-a-change-to-an-orthonormal-basis">
+<h2>Exercise 7: The DFT is a change to an orthonormal basis<a class="headerlink" href="#exercise-7-the-dft-is-a-change-to-an-orthonormal-basis" title="Link to this heading">#</a></h2>
+<p>Leave function space and return to <span class="math notranslate nohighlight">\(\mathbb{C}^n\)</span>. The discrete Fourier
+transform is usually introduced as an algorithm, and the algorithm (the FFT) is
+genuinely clever, but the <em>object</em> is not: <a class="reference internal" href="#equation-eq-fbasis-dft">Eq. 139</a> says <span class="math notranslate nohighlight">\(F/\sqrt{n}\)</span>
+is unitary, so the DFT is a rotation. Everything else follows from that one
+fact, including Parseval <a class="reference internal" href="#equation-eq-fbasis-parseval">Eq. 140</a> and the reason the transform
+is numerically stable.</p>
+<p><strong>Part a)</strong> Build the DFT matrix explicitly for <span class="math notranslate nohighlight">\(n = 8, 32, 64\)</span> as
+<code class="docutils literal notranslate"><span class="pre">F</span> <span class="pre">=</span> <span class="pre">np.exp(-2j</span> <span class="pre">*</span> <span class="pre">np.pi</span> <span class="pre">*</span> <span class="pre">np.outer(j,</span> <span class="pre">j)</span> <span class="pre">/</span> <span class="pre">n)</span></code> with <code class="docutils literal notranslate"><span class="pre">j</span> <span class="pre">=</span> <span class="pre">np.arange(n)</span></code>, form
+<code class="docutils literal notranslate"><span class="pre">U</span> <span class="pre">=</span> <span class="pre">F</span> <span class="pre">/</span> <span class="pre">np.sqrt(n)</span></code>, and report <span class="math notranslate nohighlight">\(\max|U^{*}U - I|\)</span> using <code class="docutils literal notranslate"><span class="pre">U.conj().T</span> <span class="pre">&#64;</span> <span class="pre">U</span></code>.
+All three come out below <span class="math notranslate nohighlight">\(5\times10^{-15}\)</span>.</p>
+<p><strong>Part b)</strong> Confirm the explicit matrix is the transform, not merely something
+like it: for <code class="docutils literal notranslate"><span class="pre">v</span> <span class="pre">=</span> <span class="pre">rng.standard_normal(64)</span></code>, compare <code class="docutils literal notranslate"><span class="pre">F</span> <span class="pre">&#64;</span> <span class="pre">v</span></code> against
+<code class="docutils literal notranslate"><span class="pre">np.fft.fft(v)</span></code> and report the largest absolute difference, which is
+<span class="math notranslate nohighlight">\(2\times10^{-13}\)</span>. The FFT computes the same product in <span class="math notranslate nohighlight">\(O(n\log n)\)</span> instead of
+<span class="math notranslate nohighlight">\(O(n^2)\)</span>; it does not compute a different one.</p>
+<p><strong>Part c)</strong> Verify Parseval <a class="reference internal" href="#equation-eq-fbasis-parseval">Eq. 140</a> for the same <code class="docutils literal notranslate"><span class="pre">v</span></code>:
+<span class="math notranslate nohighlight">\(\|F\mathbf{v}\|_2^2 = n\|\mathbf{v}\|_2^2\)</span> to <span class="math notranslate nohighlight">\(10^{-10}\)</span>. This is the
+length-preservation of an orthonormal change of basis, the same property that
+made <span class="math notranslate nohighlight">\(Q\)</span> safe in <a class="reference internal" href="gram-schmidt-qr.html"><span class="std std-doc">§2.2</span></a>.</p>
+<p><strong>Part d)</strong> Confirm the columns are the sampled complex exponentials they are
+advertised to be, by checking that column <span class="math notranslate nohighlight">\(k\)</span> of <code class="docutils literal notranslate"><span class="pre">F.conj().T</span></code> equals
+<code class="docutils literal notranslate"><span class="pre">np.exp(2j</span> <span class="pre">*</span> <span class="pre">np.pi</span> <span class="pre">*</span> <span class="pre">k</span> <span class="pre">*</span> <span class="pre">j</span> <span class="pre">/</span> <span class="pre">n)</span></code> to <span class="math notranslate nohighlight">\(10^{-13}\)</span> for <span class="math notranslate nohighlight">\(k = 3\)</span> and <span class="math notranslate nohighlight">\(n = 64\)</span>, and
+that any two distinct columns of <span class="math notranslate nohighlight">\(U\)</span> have inner product below <span class="math notranslate nohighlight">\(10^{-15}\)</span> while
+each has unit norm to <span class="math notranslate nohighlight">\(10^{-15}\)</span>.</p>
+<p><strong>Part e)</strong> Draw the real part of the <span class="math notranslate nohighlight">\(32\times32\)</span> DFT matrix as a heatmap with
+<code class="docutils literal notranslate"><span class="pre">la.matrix_heatmap</span></code>. The signed entries make a diverging colour map the honest
+choice, and the structure visible — row <span class="math notranslate nohighlight">\(k\)</span> oscillating <span class="math notranslate nohighlight">\(k\)</span> times across the
+width — is <a class="reference internal" href="#equation-eq-fbasis-dft">Eq. 139</a> made visual.</p>
+<p><strong>Part f)</strong> Finally the DCT, the real-valued relative used in image
+compression. Build the type-II DCT matrix by transforming the identity,
+<code class="docutils literal notranslate"><span class="pre">C</span> <span class="pre">=</span> <span class="pre">scipy.fft.dct(np.eye(32),</span> <span class="pre">type=2,</span> <span class="pre">norm=&quot;ortho&quot;,</span> <span class="pre">axis=0)</span></code>, and confirm
+<span class="math notranslate nohighlight">\(C^{\top}C = I\)</span> to <span class="math notranslate nohighlight">\(10^{-14}\)</span>: it is an orthogonal matrix, so the same
+stability argument applies. Then confirm it matches the explicit construction
+<span class="math notranslate nohighlight">\(C_{ik} = \alpha_k\cos\!\big(\pi(2i+1)k/2n\big)\)</span> with
+<span class="math notranslate nohighlight">\(\alpha_0 = \sqrt{1/n}\)</span> and <span class="math notranslate nohighlight">\(\alpha_k = \sqrt{2/n}\)</span> otherwise, to <span class="math notranslate nohighlight">\(10^{-13}\)</span>.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>n =   8: max |U* U - I| = 7.062e-16
+n =  32: max |U* U - I| = 2.450e-15
+n =  64: max |U* U - I| = 4.902e-15
+
+explicit F @ v against np.fft.fft(v), n = 64: 2.025e-13
+Parseval |F v|^2 - n |v|^2 = 4.093e-12   (relative 1.19e-15)
+
+column 3 of F* against exp(2 pi i 3 j / n): 0.000e+00
+largest cross inner product among sampled column pairs: 3.639e-16
+largest deviation from unit column norm: 0.000e+00
+
+DCT-II, n = 32: max |C^T C - I| = 2.220e-16
+explicit alpha_k cos(pi (2i+1) k / 2n) against scipy: 3.239e-15
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-fbasis-dft">
+<img alt="../../_images/eb5657673c4edacc3cb5cae0af9e9ba50b4da6a9c60e3fc19a0ed90efb227d17.png" src="../../_images/eb5657673c4edacc3cb5cae0af9e9ba50b4da6a9c60e3fc19a0ed90efb227d17.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 54 </span><span class="caption-text">The real part of the <span class="math notranslate nohighlight">\(32\times32\)</span> DFT matrix <span class="math notranslate nohighlight">\(F_{jk} = \cos(2\pi jk/32)\)</span>, on a diverging colour scale centred at zero because the entries are signed. Row <span class="math notranslate nohighlight">\(k\)</span> is a cosine sampled at 32 points and completing <span class="math notranslate nohighlight">\(k\)</span> cycles across the width, so the frequency visibly increases down the matrix and then decreases again past <span class="math notranslate nohighlight">\(k = 16\)</span> – the aliasing that makes rows <span class="math notranslate nohighlight">\(k\)</span> and <span class="math notranslate nohighlight">\(32-k\)</span> complex conjugates. Scaled by <span class="math notranslate nohighlight">\(1/\sqrt{32}\)</span> the matrix is unitary, verified here to <span class="math notranslate nohighlight">\(2\times10^{-15}\)</span>, so the DFT is a rotation of <span class="math notranslate nohighlight">\(\mathbb{C}^{32}\)</span> and nothing more.</span><a class="headerlink" href="#fig-fbasis-dft" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-7">
+<h3>Validation 7<a class="headerlink" href="#validation-7" title="Link to this heading">#</a></h3>
+<p>Unitarity is checked directly rather than inferred, and the comparison against
+<code class="docutils literal notranslate"><span class="pre">np.fft.fft</span></code> is what licenses the phrase “the DFT” for the explicit matrix.
+The orthogonality of individual column pairs is checked as well as the whole
+product, since <span class="math notranslate nohighlight">\(U^{*}U = I\)</span> could in principle be dominated by the diagonal.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  F / sqrt(n) is unitary at n = 8, 32, 64 (Eq. 8)   [worst max |U* U - I| = 4.902e-15: the DFT is a change to an orthonormal basis, which is the whole of its stability story]
+✓  and the explicit matrix product IS what np.fft.fft computes   [largest difference 2.025e-13 over n = 64: the FFT is a faster route to the same product, not a different transform]
+✓  Parseval holds: |F v|^2 = n |v|^2 (Eq. 9)   [absolute gap 4.093e-12, relative 1.19e-15]
+✓  and the columns really are orthonormal sampled exponentials (Eq. 8)   [column form 0.00e+00, largest cross inner product 3.64e-16, unit-norm deviation 0.00e+00]
+✓  the DCT-II matrix is orthogonal and matches its explicit closed form   [|C^T C - I| = 2.22e-16, and the explicit alpha_k cos(...) construction agrees with scipy.fft.dct to 3.24e-15]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-8-gibbs-convergence-in-l-2-is-weaker-than-it-sounds">
+<h2>Exercise 8: Gibbs: convergence in <span class="math notranslate nohighlight">\(L^2\)</span> is weaker than it sounds<a class="headerlink" href="#exercise-8-gibbs-convergence-in-l-2-is-weaker-than-it-sounds" title="Link to this heading">#</a></h2>
+<p>Every expansion so far converged in the <span class="math notranslate nohighlight">\(L^2\)</span> norm, and that is the norm the
+whole machinery is built around. It is worth seeing what it does <em>not</em>
+guarantee. The Fourier series of a square wave converges in <span class="math notranslate nohighlight">\(L^2\)</span>, and its
+partial sums nevertheless overshoot the jump by a fixed proportion that never
+decreases: <a class="reference internal" href="#equation-eq-fbasis-gibbs">Eq. 141</a> puts the limit at <span class="math notranslate nohighlight">\(8.949\%\)</span>.</p>
+<p>The resolution is that the overshoot <em>narrows</em> as <span class="math notranslate nohighlight">\(M\)</span> grows. Its height is
+fixed but the interval on which it occurs shrinks like <span class="math notranslate nohighlight">\(1/M\)</span>, so its
+contribution to <span class="math notranslate nohighlight">\(\int|f - s_M|^2\)</span> vanishes. <span class="math notranslate nohighlight">\(L^2\)</span> convergence is compatible
+with a permanent pointwise error, and this is the standard example.</p>
+<p>The square wave on <span class="math notranslate nohighlight">\([0, \pi]\)</span> has the expansion</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+s_M(x) = \sum_{\substack{m=1 \\ m \text{ odd}}}^{M}
+  \frac{4}{\pi m}\,\sin(mx) ,
+\end{split}\]</div>
+<p>whose limit is <span class="math notranslate nohighlight">\(+1\)</span> on <span class="math notranslate nohighlight">\((0,\pi)\)</span>, so the jump at the origin has height 2.</p>
+<p><strong>Part a)</strong> Compute the Wilbraham–Gibbs constant of <a class="reference internal" href="#equation-eq-fbasis-gibbs">Eq. 141</a>
+numerically as <code class="docutils literal notranslate"><span class="pre">scipy.integrate.quad(lambda</span> <span class="pre">t:</span> <span class="pre">np.sin(t)</span> <span class="pre">/</span> <span class="pre">t,</span> <span class="pre">0,</span> <span class="pre">np.pi)[0]</span> <span class="pre">/</span> <span class="pre">np.pi</span> <span class="pre">-</span> <span class="pre">0.5</span></code>, and report it to ten decimals. It is <span class="math notranslate nohighlight">\(0.0894898722\)</span>.</p>
+<p><strong>Part b)</strong> For <span class="math notranslate nohighlight">\(M = 8, 16, 32, 64, 128, 256\)</span>, evaluate <span class="math notranslate nohighlight">\(s_M\)</span> on
+<code class="docutils literal notranslate"><span class="pre">np.linspace(0,</span> <span class="pre">np.pi,</span> <span class="pre">200001)</span></code> and report <code class="docutils literal notranslate"><span class="pre">s.max()</span></code>. The overshoot as a
+fraction of the jump is <span class="math notranslate nohighlight">\((\max s_M - 1)/2\)</span>.</p>
+<p><strong>Part c)</strong> Confirm the overshoot does not vanish: report the sequence
+<span class="math notranslate nohighlight">\(9.2113\%, 9.0142\%, 8.9653\%, 8.9531\%, 8.9500\%, 8.9492\%\)</span> and check that
+every value exceeds <span class="math notranslate nohighlight">\(8.9\%\)</span>, including the last. Thirty-two times as many terms
+reduced the overshoot by three parts in a thousand.</p>
+<p><strong>Part d)</strong> Confirm it converges to the constant of Part a) rather than to
+zero: check <span class="math notranslate nohighlight">\(|(\max s_{256} - 1)/2 - G| &lt; 10^{-4}\)</span> where <span class="math notranslate nohighlight">\(G\)</span> is the
+Wilbraham–Gibbs constant, and check the sequence is monotonically decreasing
+towards it.</p>
+<p><strong>Part e)</strong> Confirm the reconciliation. Compute the <span class="math notranslate nohighlight">\(L^2\)</span> error
+<span class="math notranslate nohighlight">\(\|s_M - f\|_{L^2[0,\pi]}\)</span> by <code class="docutils literal notranslate"><span class="pre">np.trapezoid</span></code> on the same grid for each <span class="math notranslate nohighlight">\(M\)</span>, and
+confirm it <em>does</em> decrease monotonically to zero — check that the <span class="math notranslate nohighlight">\(M = 256\)</span>
+error is at least 5 times smaller than the <span class="math notranslate nohighlight">\(M = 8\)</span> error. The pointwise
+overshoot is permanent and the <span class="math notranslate nohighlight">\(L^2\)</span> error is not, because the overshoot’s
+width shrinks.</p>
+<p><strong>Part f)</strong> Plot <span class="math notranslate nohighlight">\(s_M\)</span> near the jump for three values of <span class="math notranslate nohighlight">\(M\)</span>, with the limiting
+overshoot level <span class="math notranslate nohighlight">\(1 + 2G\)</span> drawn as a horizontal line, so the fixed height and
+the shrinking width are both visible.</p>
+<div class="tip admonition">
+<p class="admonition-title">With your assistant</p>
+<p>The Gibbs overshoot can be removed. <strong>Fejér summation</strong> replaces the partial sum
+<span class="math notranslate nohighlight">\(s_M\)</span> by the average <span class="math notranslate nohighlight">\(\sigma_M = \frac{1}{M}\sum_{j&lt;M} s_j\)</span> of all partial sums
+below it, and the result converges uniformly with no overshoot at all. Ask your
+assistant to write <code class="docutils literal notranslate"><span class="pre">fejer(x,</span> <span class="pre">M)</span></code> returning <span class="math notranslate nohighlight">\(\sigma_M\)</span> for the same square wave.
+Then check it against the mathematics rather than against a picture: verify that
+<span class="math notranslate nohighlight">\(\max_x \sigma_M(x) \le 1\)</span> for <span class="math notranslate nohighlight">\(M = 8, 32, 128\)</span> — no overshoot whatsoever, to
+<span class="math notranslate nohighlight">\(10^{-12}\)</span> — and confirm the price by measuring <span class="math notranslate nohighlight">\(\sigma_M\)</span>’s <span class="math notranslate nohighlight">\(L^2\)</span> error against
+<span class="math notranslate nohighlight">\(s_M\)</span>’s at the same <span class="math notranslate nohighlight">\(M\)</span>, which is <em>larger</em>. Uniform convergence was bought with
+a slower rate, and the two numbers say how much. The check is yours.</p>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Wilbraham-Gibbs constant  = 0.0894898722  -&gt; 8.9490% of the jump
+
+    M      max s_M    overshoot     L2 error
+    8     1.184225      9.2113%  3.97924e-01
+   16     1.180284      9.0142%  2.81912e-01
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>   32     1.179305      8.9653%  1.99439e-01
+   64     1.179061      8.9531%  1.41042e-01
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  128     1.179000      8.9500%  9.97346e-02
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  256     1.178985      8.9492%  7.05236e-02
+
+  the overshoot converges to 8.9490%, not to zero:
+    M = 8   : 9.2113%
+    M = 256 : 8.9492%   (32x the terms, 0.2620 points gained)
+    |overshoot(256) - G| = 2.492e-06
+
+  meanwhile the L2 error DOES fall: 3.9792e-01 -&gt; 7.0524e-02, a factor of 5.64
+  the overshoot&#39;s height is fixed; its WIDTH shrinks like 1/M, so it contributes nothing in the limit
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-fbasis-gibbs">
+<img alt="../../_images/7a9344f619b272d957c8e09ec19dcaac5949928b41964dcc12d22ab81bc347d1.png" src="../../_images/7a9344f619b272d957c8e09ec19dcaac5949928b41964dcc12d22ab81bc347d1.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 55 </span><span class="caption-text">The Gibbs phenomenon: partial sums <span class="math notranslate nohighlight">\(s_M\)</span> of the square wave’s Fourier series near the jump at the origin, for <span class="math notranslate nohighlight">\(M = 16\)</span>, <span class="math notranslate nohighlight">\(64\)</span> and <span class="math notranslate nohighlight">\(256\)</span>. The dotted horizontal line is the limiting overshoot <span class="math notranslate nohighlight">\(1 + 2G = 1.1790\)</span>, with <span class="math notranslate nohighlight">\(G = 0.0894899\)</span> the Wilbraham–Gibbs constant of Eq. 10, and every partial sum reaches it. Increasing <span class="math notranslate nohighlight">\(M\)</span> by a factor of 16 moves the peak height by three parts in a thousand while narrowing the spike by the same factor – which is why the <span class="math notranslate nohighlight">\(L^2\)</span> error falls to zero even though the pointwise overshoot never does.</span><a class="headerlink" href="#fig-fbasis-gibbs" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<section id="validation-8">
+<h3>Validation 8<a class="headerlink" href="#validation-8" title="Link to this heading">#</a></h3>
+<p>The two halves are checked separately and must both hold: the overshoot does
+not vanish, <em>and</em> the <span class="math notranslate nohighlight">\(L^2\)</span> error does. Either one alone would be misleading,
+and together they are the precise statement of what <span class="math notranslate nohighlight">\(L^2\)</span> convergence promises.</p>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the Wilbraham-Gibbs constant is 0.08948987 (Eq. 10)   [got [0.08949] vs expected [0.08949] (rtol=0, atol=1e-09)]
+✓  the overshoot never falls below 8.9% of the jump, at any M up to 256   [[&#39;9.2113%&#39;, &#39;9.0142%&#39;, &#39;8.9653%&#39;, &#39;8.9531%&#39;, &#39;8.9500%&#39;, &#39;8.9492%&#39;] for M = [8, 16, 32, 64, 128, 256]: 32 times the terms bought 0.2620 percentage points]
+✓  it converges monotonically to the Gibbs constant, not to zero   [|overshoot(M=256) - G| = 2.492e-06]
+✓  while the L2 error DOES decrease monotonically toward zero   [3.9792e-01 at M = 8 down to 7.0524e-02 at M = 256, a factor of 5.64: the overshoot&#39;s height is fixed but its width shrinks like 1/M, so it contributes nothing in the limit]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p><strong>An inner product is all the machinery needs.</strong> Gauss–Legendre quadrature made
+<a class="reference internal" href="#equation-eq-fbasis-inner">Eq. 132</a> exact on polynomials through degree <span class="math notranslate nohighlight">\(2n-1\)</span> — verified to
+<span class="math notranslate nohighlight">\(10^{-16}\)</span> at degree 15 with 8 nodes, and <em>failing</em> by <span class="math notranslate nohighlight">\(4.7\times10^{-5}\)</span> at
+degree 16, so the bound is the true one. On that footing, symmetry,
+bilinearity, positivity and Cauchy–Schwarz all held for functions exactly as
+they did for vectors.</p>
+<p><strong>Gram–Schmidt on the monomials produces the Legendre polynomials.</strong> The
+recurrence <a class="reference internal" href="#equation-eq-fbasis-gs">Eq. 134</a> with the integral substituted gave a Gram matrix
+whose largest off-diagonal entry was <span class="math notranslate nohighlight">\(4\times10^{-16}\)</span> and whose diagonal
+matched the closed form <span class="math notranslate nohighlight">\(2/(2k+1)\)</span> to <span class="math notranslate nohighlight">\(1.8\times10^{-14}\)</span>; the coefficients
+matched <code class="docutils literal notranslate"><span class="pre">scipy.special.legendre</span></code> to <span class="math notranslate nohighlight">\(3.5\times10^{-13}\)</span>, with the error growing
+from <span class="math notranslate nohighlight">\(10^{-18}\)</span> at <span class="math notranslate nohighlight">\(k=1\)</span> to <span class="math notranslate nohighlight">\(10^{-13}\)</span> at <span class="math notranslate nohighlight">\(k=5\)</span> because each step inherits every
+earlier step’s error.</p>
+<p><strong>The basis decides the conditioning, not the subspace.</strong>
+<span class="math notranslate nohighlight">\(\kappa(G_{\text{Legendre}}) = 2d+1\)</span> exactly — 7, 11, 13, 17, 21 at degrees 3,
+5, 6, 8, 10 — against a monomial Gram matrix growing exponentially at <span class="math notranslate nohighlight">\(10^{0.68}\)</span>
+per degree, reaching <span class="math notranslate nohighlight">\(9.4\times10^{6}\)</span> at degree 10 and <span class="math notranslate nohighlight">\(6.7\times10^{17}\)</span> at
+degree 30. Same subspace, same best approximation, five orders of difference at
+degree 10.</p>
+<p><strong>And the difference eventually bites.</strong> Fitting <span class="math notranslate nohighlight">\(|x|\)</span>, the two bases agreed to
+<span class="math notranslate nohighlight">\(10^{-10}\)</span> through degree 18. At degree 26 the monomial fit returned
+<span class="math notranslate nohighlight">\(7.2\times10^{-3}\)</span>, <em>worse</em> than its own <span class="math notranslate nohighlight">\(5.7\times10^{-3}\)</span> at degree 22, while
+the Legendre fit fell monotonically to <span class="math notranslate nohighlight">\(3.7\times10^{-3}\)</span> at degree 30.
+Approximation theory forbids an error that rises as the subspace grows, so the
+rise is arithmetic.</p>
+<p><strong>Smoothness sets the rate, independently of all that.</strong> In the same
+well-conditioned basis, <span class="math notranslate nohighlight">\(e^{x}\)</span> reached <span class="math notranslate nohighlight">\(3.5\times10^{-14}\)</span> by degree 12 and
+stopped only at the <code class="docutils literal notranslate"><span class="pre">float64</span></code> floor, while <span class="math notranslate nohighlight">\(|x|\)</span> decayed algebraically at
+<span class="math notranslate nohighlight">\(d^{-1.23}\)</span> and was still at <span class="math notranslate nohighlight">\(5.0\times10^{-3}\)</span> at degree 24 — a factor of
+<span class="math notranslate nohighlight">\(2\times10^{6}\)</span> between them at degree 8.</p>
+<p><strong>Quadrature accuracy is a claim about smoothness, not node count.</strong> A single
+400-point rule got <span class="math notranslate nohighlight">\(|x|\)</span>’s coefficients wrong by <span class="math notranslate nohighlight">\(8.7\times10^{-6}\)</span>; two
+20-point rules split at the kink got them right to <span class="math notranslate nohighlight">\(1.2\times10^{-14}\)</span>. Forty
+well-placed nodes beat four hundred badly-placed ones by nine orders.</p>
+<p><strong>Continuous orthogonality has an exact discrete counterpart.</strong> The Chebyshev
+polynomials sampled at 16 Chebyshev–Gauss nodes gave <span class="math notranslate nohighlight">\(T T^{\top}\)</span> diagonal to
+<span class="math notranslate nohighlight">\(8\times10^{-15}\)</span> with entries <span class="math notranslate nohighlight">\(N\)</span> and <span class="math notranslate nohighlight">\(N/2\)</span>, with no integral anywhere; and
+<span class="math notranslate nohighlight">\(F/\sqrt{n}\)</span> was unitary to <span class="math notranslate nohighlight">\(5\times10^{-15}\)</span>, matched <code class="docutils literal notranslate"><span class="pre">np.fft.fft</span></code> to
+<span class="math notranslate nohighlight">\(2\times10^{-13}\)</span>, and satisfied Parseval — the DFT is a rotation of
+<span class="math notranslate nohighlight">\(\mathbb{C}^n\)</span>. The DCT-II is likewise orthogonal to <span class="math notranslate nohighlight">\(2\times10^{-16}\)</span>.</p>
+<p><strong><span class="math notranslate nohighlight">\(L^2\)</span> convergence permits a permanent pointwise error.</strong> The square wave’s
+overshoot converged to <span class="math notranslate nohighlight">\(8.9490\%\)</span> of the jump and stayed there: 32 times the
+terms bought <span class="math notranslate nohighlight">\(0.26\)</span> percentage points. The <span class="math notranslate nohighlight">\(L^2\)</span> error nonetheless fell
+monotonically, because the overshoot’s <em>width</em> shrinks like <span class="math notranslate nohighlight">\(1/M\)</span> while its
+height does not.</p>
+<p><strong>Methods introduced.</strong> <code class="docutils literal notranslate"><span class="pre">numpy.polynomial.legendre.leggauss</span></code> and composite
+quadrature, Gram–Schmidt in an inner-product space,
+<code class="docutils literal notranslate"><span class="pre">scipy.special.legendre</span></code> and <code class="docutils literal notranslate"><span class="pre">chebyt</span></code>, the analytic Gram matrices of both
+bases, the explicit DFT matrix and <code class="docutils literal notranslate"><span class="pre">np.fft.fft</span></code>, <code class="docutils literal notranslate"><span class="pre">scipy.fft.dct</span></code> with
+<code class="docutils literal notranslate"><span class="pre">norm=&quot;ortho&quot;</span></code>, and <code class="docutils literal notranslate"><span class="pre">np.trapezoid</span></code> for the <span class="math notranslate nohighlight">\(L^2\)</span> error.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>The best approximation in the sup norm.</strong> Everything here minimised the
+<span class="math notranslate nohighlight">\(L^2\)</span> error, because that is what an inner product measures. Minimising
+<span class="math notranslate nohighlight">\(\max_x|f - p|\)</span> instead gives the <em>minimax</em> polynomial, characterised by an
+equioscillation property that the Chebyshev polynomials already display — and
+Chebyshev interpolation gets within a factor of <span class="math notranslate nohighlight">\(\log d\)</span> of it, which is why
+it is the default in practice.</p></li>
+<li><p><strong>Why <span class="math notranslate nohighlight">\(2/(2k+1)\)</span> and not something worse.</strong> The Legendre Gram matrix is
+diagonal by construction, so its condition number is a ratio of two explicit
+numbers. Whether a <em>given</em> basis is well conditioned is exactly the question
+<a class="reference internal" href="../04-svd/svd-geometry.html"><span class="std std-doc">§4.1</span></a> answers with singular values, and the
+answer there subsumes this one.</p></li>
+<li><p><strong>Orthogonal polynomials as eigenvectors.</strong> Each classical family satisfies a
+three-term recurrence, which says the multiplication-by-<span class="math notranslate nohighlight">\(x\)</span> operator is
+<em>tridiagonal</em> in that basis. The Gauss quadrature nodes are then the
+eigenvalues of that tridiagonal matrix — the Golub–Welsch algorithm — and
+<a class="reference internal" href="../03-eigenvalues/spectral-theorem.html"><span class="std std-doc">§3.2</span></a> builds the spectral theory
+that makes it work.</p></li>
+<li><p><strong>The FFT as a factorization.</strong> <span class="math notranslate nohighlight">\(F_n\)</span> factors into <span class="math notranslate nohighlight">\(O(\log n)\)</span> sparse
+matrices, each with two nonzeros per row, and that factorization <em>is</em> the
+FFT. It is the first example in this course of an algorithm that is best
+understood as a matrix decomposition rather than as a procedure, a reading
+<a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html"><span class="std std-doc">§6.3</span></a> applies to circulant and
+Toeplitz matrices generally, where the FFT turns out to be a <em>diagonalization</em>.</p></li>
+</ul>
+<div class="docutils container" id="id4">
+<div role="list" class="citation-list">
+<div class="citation" id="id8" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">BV18</a><span class="fn-bracket">]</span></span>
+<p>Stephen Boyd and Lieven Vandenberghe. <em>Introduction to Applied Linear Algebra: Vectors, Matrices, and Least Squares</em>. Cambridge University Press, 2018. <a class="reference external" href="https://doi.org/10.1017/9781108583664">doi:10.1017/9781108583664</a>.</p>
+</div>
+<div class="citation" id="id13" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">GVL13</a><span class="fn-bracket">]</span></span>
+<p>Gene H. Golub and Charles F. Van Loan. <em>Matrix Computations</em>. Johns Hopkins University Press, Baltimore, 4 edition, 2013.</p>
+</div>
+<div class="citation" id="id20" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">TE05</a><span class="fn-bracket">]</span></span>
+<p>Lloyd N. Trefethen and Mark Embree. <em>Spectra and Pseudospectra: The Behavior of Nonnormal Matrices and Operators</em>. Princeton University Press, 2005.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/02-orthogonality"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="pseudoinverse-regularization.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../03-eigenvalues/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Chapter III — Eigenvalues and Spectral Theory</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#an-inner-product-on-functions">An inner product on functions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computing-the-inner-product-exactly">Computing the inner product exactly</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gramschmidt-unchanged">Gram–Schmidt, unchanged</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#coefficients-are-inner-products">Coefficients are inner products</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-the-monomials-are-a-bad-basis">Why the monomials are a bad basis</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#chebyshev-and-orthogonality-on-a-grid">Chebyshev, and orthogonality on a grid</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-dft-is-the-same-idea-on-mathbb-c-n">The DFT is the same idea on <span class="math notranslate nohighlight">\(\mathbb{C}^n\)</span></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gibbs">Gibbs</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-the-instrument-an-inner-product-that-is-exact">Exercise 1: The instrument: an inner product that is exact</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-gramschmidt-on-the-monomials-produces-the-legendre-polynomials">Exercise 2: Gram–Schmidt on the monomials produces the Legendre polynomials</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-two-gram-matrices-and-a-condition-number-in-closed-form">Exercise 3: The two Gram matrices, and a condition number in closed form</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-coefficients-are-inner-products-and-where-the-quadrature-lies">Exercise 4: Coefficients are inner products, and where the quadrature lies</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-same-subspace-same-answer-until-the-monomial-basis-gives-up">Exercise 5: Same subspace, same answer, until the monomial basis gives up</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-chebyshev-and-orthogonality-that-is-exactly-a-matrix-identity">Exercise 6: Chebyshev, and orthogonality that is exactly a matrix identity</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-6">Validation 6</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-7-the-dft-is-a-change-to-an-orthonormal-basis">Exercise 7: The DFT is a change to an orthonormal basis</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-7">Validation 7</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-8-gibbs-convergence-in-l-2-is-weaker-than-it-sounds">Exercise 8: Gibbs: convergence in <span class="math notranslate nohighlight">\(L^2\)</span> is weaker than it sounds</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-8">Validation 8</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

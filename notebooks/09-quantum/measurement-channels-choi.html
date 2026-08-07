@@ -1,0 +1,1336 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="9.4 Measurement, Channels, and the Choi Matrix" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ramador.me/linear-algebra-in-python-public/notebooks/09-quantum/measurement-channels-choi.html" />
+<meta property="og:site_name" content="Linear Algebra in Python" />
+<meta property="og:description" content="Notebook overview: §9.2 ’s partial traces produced matrices that were not rank-one projectors: density matrices, the states of realistic, noisy systems. This..." />
+<meta property="og:image" content="https://ramador.me/linear-algebra-in-python-public/_static/og.png" />
+<meta property="og:image:alt" content="Linear Algebra in Python" />
+<meta name="description" content="Notebook overview: §9.2 ’s partial traces produced matrices that were not rank-one projectors: density matrices, the states of realistic, noisy systems. This..." />
+
+    <title>9.4 Measurement, Channels, and the Choi Matrix &#8212; Linear Algebra in Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ecp.css?v=db7e09ec" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"tex": {"macros": {"dd": "\\mathrm{d}", "vec": ["\\mathbf{#1}", 1], "mat": ["\\mathbf{#1}", 1], "R": "\\mathbb{R}", "C": "\\mathbb{C}", "rank": "\\operatorname{rank}", "tr": "\\operatorname{tr}", "diag": "\\operatorname{diag}", "vecop": "\\operatorname{vec}", "argmin": "\\operatorname*{arg\\,min}", "span": "\\operatorname{span}", "Null": "\\operatorname{null}", "Col": "\\operatorname{col}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/09-quantum/measurement-channels-choi';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../../_static/home-button.js?v=6d5ef4fc"></script>
+    <script src="../../_static/goatcounter.js?v=ce435452"></script>
+    <script src="../../_static/sidebar-toggle.js?v=3f5afc5c"></script>
+    <script src="../../_static/pdf-button.js?v=6408085c"></script>
+    <link rel="canonical" href="https://ramador.me/linear-algebra-in-python-public/notebooks/09-quantum/measurement-channels-choi.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="9.5 The Quantum Fourier Transform is the DFT Matrix" href="quantum-fourier-transform.html" />
+    <link rel="prev" title="9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue" href="chsh-tsirelson.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../00-front-matter/preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="Linear Algebra in Python - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="Linear Algebra in Python - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../00-front-matter/preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../prologue/one-matrix-five-factorizations.html">Prologue</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../00-machine/index.html">Chapter 0 — The Array and the Machine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/arrays-and-vectorization.html">0.1 Arrays, Shapes, and Vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/floating-point.html">0.2 Floating-Point Reality and the Tolerance Habit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../00-machine/vectors-norms-inner-products.html">0.3 Vectors: Geometry, Norms, and Inner Products</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../01-matrices/index.html">Chapter I — Matrices, Elimination, and Subspaces</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-ways-to-multiply.html">1.1 Matrices as Linear Maps: Four Ways to Multiply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/elimination-lu.html">1.2 Elimination, Pivoting, and A = LU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/inverses-rank-cr.html">1.3 Inverses, Rank, and A = CR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/four-subspaces.html">1.4 The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/vector-spaces-coordinates.html">1.5 Vector Spaces, Bases, and Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/linear-maps-change-of-basis.html">1.6 Linear Maps and Change of Basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../01-matrices/determinants.html">1.7 Determinants, Chapter, and Orientation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02-orthogonality/index.html">Chapter II — Orthogonality and Least Squares</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/projections-normal-equations.html">2.1 Projections and the Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/gram-schmidt-qr.html">2.2 Gram–Schmidt, QR, Householder, and Givens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/least-squares-four-ways.html">2.3 Least Squares Four Ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/pseudoinverse-regularization.html">2.4 The Pseudoinverse, Rank Deficiency, and Regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02-orthogonality/function-space-bases.html">2.5 Orthogonal Bases in Function Space</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03-eigenvalues/index.html">Chapter III — Eigenvalues and Spectral Theory</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalues-diagonalization.html">3.1 Eigenvalues, Eigenvectors, and Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/spectral-theorem.html">3.2 Symmetric Matrices and the Spectral Theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html">3.3 Positive Definiteness, Quadratic Forms, and Cholesky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/hermitian-unitary-normal.html">3.4 Complex Vectors, Hermitian, Unitary, and Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/schur-jordan-nonnormality.html">3.5 Similarity, Schur, Jordan, and Non-normality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html">3.6 Matrix Functions and the Matrix Exponential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03-eigenvalues/eigenvalue-perturbation.html">3.7 Eigenvalue Perturbation: Who Moves, and How Far</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04-svd/index.html">Chapter IV — The Singular Value Decomposition</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/svd-geometry.html">4.1 The SVD: Geometry, Existence, and the Four Subspaces Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/low-rank-eckart-young.html">4.2 Low-Rank Approximation and Eckart–Young</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/pca-covariance-whitening.html">4.3 PCA, Covariance, and Whitening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/randomized-svd-sketching.html">4.4 Randomized SVD and Sketching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04-svd/polar-procrustes.html">4.5 The Polar Decomposition and Procrustes</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../05-numerical/index.html">Chapter V — Numerical Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/norms-conditioning-stability.html">5.1 Norms, Conditioning, and Backward Stability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/eigenvalue-algorithms.html">5.2 How Eigenvalues Are Really Computed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/sparse-matrices.html">5.3 Sparse Matrices: Storage, Patterns, and Direct Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/stationary-and-cg.html">5.4 Stationary Iterations and Conjugate Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/krylov-gmres-preconditioning.html">5.5 Krylov Subspaces: Arnoldi, Lanczos, GMRES, and Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05-numerical/multigrid.html">5.6 Multigrid: The O(n) Solver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../06-structure/index.html">Chapter VI — Structure, Graphs, and Fast Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/graphs-laplacian.html">6.1 Graphs, Incidence Matrices, and the Laplacian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/markov-perron-pagerank.html">6.2 Markov Chains, Perron–Frobenius, and PageRank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html">6.3 Circulant, Toeplitz, and the FFT as Diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kronecker-vec-separable.html">6.4 Kronecker Products, vec, and Separable Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kernels-gram-matrix.html">6.5 Positive Definite Kernels and the Gram Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06-structure/kalman-recursive-least-squares.html">6.6 The Kalman Filter: Least Squares, Recursively</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../07-tensors/index.html">Chapter VII — Multilinear Algebra and Tensor Networks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/einsum-contraction.html">7.1 Index Notation and einsum: Contraction as a Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/unfoldings-tucker-hosvd.html">7.2 Tensors, Unfoldings, and the Tucker/HOSVD Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07-tensors/tensor-trains-mps.html">7.3 Tensor Trains and Matrix Product States</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../08-learning/index.html">Chapter VIII — The Linear Algebra of Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/learning-as-least-squares.html">8.1 Learning as Least Squares: Ridge, the SVD Spectrum, and Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/gradient-descent-conditioning.html">8.2 Gradient Descent on Quadratics: Conditioning as the Rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/linear-layer-backpropagation.html">8.3 The Linear Layer: Batches, Broadcasting, and Backpropagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/text-to-vectors-embeddings.html">8.4 From Text to Vectors: Tokens, One-Hot, and Embeddings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/attention-matrix-products.html">8.5 Attention Is a Product of Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/low-rank-lora-quantization.html">8.6 Low-Rank Structure in Trained Models: LoRA, Pruning, and Quantization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../08-learning/where-linear-algebra-stops.html">8.7 Where Linear Algebra Stops: Nonlinearity, Piecewise-Linear Maps, and the Residual Stream</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Chapter IX — Quantum Information as Linear Algebra</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="qubits-gates-bloch.html">9.1 Qubits, Gates, and the Bloch Sphere</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tensor-products-entanglement.html">9.2 Two Qubits: Tensor Products and Entanglement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chsh-tsirelson.html">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">9.4 Measurement, Channels, and the Choi Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quantum-fourier-transform.html">9.5 The Quantum Fourier Transform is the DFT Matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/five-factorizations-one-idea.html">Epilogue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epilogue/afterword.html">Afterword</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ramador09/linear-algebra-in-python-binder/main?urlpath=tree/notebooks/09-quantum/measurement-channels-choi.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ramador09/linear-algebra-in-python-binder/blob/main/notebooks/09-quantum/measurement-channels-choi.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/ramador09/linear-algebra-in-python-binder/issues/new?title=Issue%20on%20page%20%2Fnotebooks/09-quantum/measurement-channels-choi.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/09-quantum/measurement-channels-choi.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>9.4 Measurement, Channels, and the Choi Matrix</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#density-matrices-the-bloch-ball-filled-in">Density matrices: the Bloch ball filled in</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#channels-kraus-operators">Channels: Kraus operators</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-channel-as-one-matrix">The channel as one matrix</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#choi-complete-positivity-is-a-psd-test">Choi: complete positivity is a psd test</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-density-matrices-fill-the-ball">Exercise 1: Density matrices fill the ball</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-channels-the-kraus-engine">Exercise 2: Channels: the Kraus engine</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-channel-is-literally-a-matrix">Exercise 3: The channel is literally a matrix</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-choi-complete-positivity-is-one-psd-test">Exercise 4: Choi: complete positivity is one psd test</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-the-failure-weaponised-ppt-detects-entanglement">Exercise 5: The failure, weaponised: PPT detects entanglement</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="measurement-channels-and-the-choi-matrix">
+<h1>9.4 Measurement, Channels, and the Choi Matrix<a class="headerlink" href="#measurement-channels-and-the-choi-matrix" title="Link to this heading">#</a></h1>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="
+    font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    background:#faf7f0;
+    border:1px solid #dcd6c8;
+    border-left:6px solid #c0851a;
+    border-radius:6px;
+    padding:26px 30px 22px 30px;
+    margin:4px 0 26px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.03), 0 8px 24px -18px rgba(22,33,62,.5);">
+
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:4px;">
+    Linear Algebra in Python
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+    <span style="font-family:'Fraunces', 'Iowan Old Style', Georgia, serif;font-weight:900;font-size:22px;
+                 line-height:1.1;color:#16213e;
+                 font-variation-settings:'opsz' 144;">
+      Chapter IX — Quantum Information as Linear Algebra
+    </span>
+    <span style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:12px;letter-spacing:.06em;
+                 color:#46506b;">
+      Notebook&nbsp;9.4
+    </span>
+  </div>
+
+  <div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;font-size:15px;color:#46506b;
+                   margin-top:10px;max-width:62ch;">Noise turns state vectors into density matrices and gates into channels — linear maps on matrices, which Chapter VI taught the course to write as matrices themselves. One reshape of that superoperator, the Choi matrix, answers the subject&#x27;s deepest structural question with a psd test — and its most famous failure detects entanglement.</div>
+
+  <div style="margin-top:16px;"><div class='ecp-meta' style='font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#46506b;'>Level&nbsp;&middot;&nbsp;advanced&nbsp;&nbsp;&nbsp;&#8226;&nbsp;&nbsp;&nbsp;Est.&nbsp;&middot;&nbsp;120–150 min</div></div>
+
+  <div style="border-top:1px solid #dcd6c8;margin-top:16px;padding-top:12px;
+              display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+              font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;color:#46506b;
+              letter-spacing:.04em;">
+    <span>Raymond Amador</span>
+    <span>v1.2.0 &nbsp;·&nbsp; 2026-08-07 &nbsp;·&nbsp;
+          CC&nbsp;BY&nbsp;4.0 (text) / MIT (code)</span>
+  </div>
+</div></div></div>
+</div>
+<section id="notebook-overview">
+<h2>Notebook overview<a class="headerlink" href="#notebook-overview" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="tensor-products-entanglement.html"><span class="std std-doc">§9.2</span></a>’s partial traces produced
+matrices that were not rank-one projectors: <strong>density matrices</strong>, the
+states of realistic, noisy systems. This notebook builds their calculus.
+States become Hermitian psd trace-one matrices filling
+<a class="reference internal" href="qubits-gates-bloch.html"><span class="std std-doc">§9.1</span></a>’s Bloch <em>ball</em>; evolutions become
+<strong>channels</strong> <span class="math notranslate nohighlight">\(\rho \mapsto \sum_k K_k\rho K_k^{\dagger}\)</span>; and because a
+channel is a linear map on matrices, the course’s
+<a class="reference internal" href="../06-structure/kronecker-vec-separable.html"><span class="std std-doc">§6.4</span></a> machinery writes it
+as an ordinary matrix acting on <span class="math notranslate nohighlight">\(\operatorname{vec}(\rho)\)</span> — gated here
+against the Kraus route at rounding level, with the reason for the gap
+worth its own sentence: the two spellings sum over the Kraus index at
+different moments, so they are the course’s very first CI lesson
+(summation order) wearing quantum clothing.</p>
+<p>The centrepiece is the <strong>Choi matrix</strong>: feed half of a Bell pair through
+the channel and the output’s matrix decides, by a psd test, whether the
+map is <em>completely</em> positive — physical on entangled inputs, not merely
+on lone ones. The transpose map fails the test with an exact eigenvalue
+of <span class="math notranslate nohighlight">\(-\tfrac12\)</span>, and that failure is a tool: the same negative eigenvalue,
+read off a partially transposed state, is the <strong>PPT criterion</strong> that
+certifies the Bell pair’s entanglement. A no-go theorem and a detector,
+one psd computation apart.</p>
+<blockquote>
+<div><p><strong>How to read a check.</strong> A <code class="docutils literal notranslate"><span class="pre">validate</span></code> line prints ✓ or ✗ by comparing a
+result against something the computation did not assume. A ✗ flags a
+mismatch to investigate, never a verdict on its own.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Scope.</strong> Nielsen and Chuang <span class="bibtex-citation" id="id1">[<a class="reference internal" href="#id67" title="Michael A. Nielsen and Isaac L. Chuang. Quantum Computation and Quantum Information. Cambridge University Press, Cambridge, 10th anniversary edition, 2010. doi:10.1017/CBO9780511976667.">NC10</a>]</span> Chapters 2 and 8;
+the Choi correspondence is Choi’s <span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id70" title="Man-Duen Choi. Completely positive linear maps on complex matrices. Linear Algebra and its Applications, 10(3):285–290, 1975. doi:10.1016/0024-3795(75)90075-0.">Cho75</a>]</span>, the PPT criterion
+Peres’s <span class="bibtex-citation" id="id3">[<a class="reference internal" href="#id71" title="Asher Peres. Separability criterion for density matrices. Physical Review Letters, 77(8):1413–1415, 1996. doi:10.1103/PhysRevLett.77.1413.">Per96</a>]</span>. The psd machinery is
+<a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html"><span class="std std-doc">§3.3</span></a>’s, and the
+vec/Kronecker identities are
+<a class="reference internal" href="../06-structure/kronecker-vec-separable.html"><span class="std std-doc">§6.4</span></a>’s.</p>
+</div></blockquote>
+</section>
+<section id="theory-in-brief">
+<h2>Theory in brief<a class="headerlink" href="#theory-in-brief" title="Link to this heading">#</a></h2>
+<section id="density-matrices-the-bloch-ball-filled-in">
+<h3>Density matrices: the Bloch ball filled in<a class="headerlink" href="#density-matrices-the-bloch-ball-filled-in" title="Link to this heading">#</a></h3>
+<p>A noisy preparation is an ensemble <span class="math notranslate nohighlight">\(\{p_k, |\psi_k\rangle\}\)</span>, and every
+statistic it produces depends only on</p>
+<div class="math notranslate nohighlight" id="equation-eq-mc-density">
+<span class="eqno">(308)<a class="headerlink" href="#equation-eq-mc-density" title="Link to this equation">#</a></span>\[\rho \;=\; \sum_k p_k\,|\psi_k\rangle\langle\psi_k| ,
+\qquad \rho = \rho^{\dagger},\quad \rho \succeq 0,\quad
+\operatorname{tr}\rho = 1 ,\]</div>
+<p>with expectations <span class="math notranslate nohighlight">\(\langle A\rangle = \operatorname{tr}(\rho A)\)</span>. For
+one qubit, <span class="math notranslate nohighlight">\(\rho = \tfrac12(I + \mathbf{r}\cdot\boldsymbol{\sigma})\)</span>
+with <span class="math notranslate nohighlight">\(\lVert\mathbf{r}\rVert \le 1\)</span>: pure states on
+<a class="reference internal" href="qubits-gates-bloch.html"><span class="std std-doc">§9.1</span></a>’s sphere, mixtures strictly inside,
+and purity <span class="math notranslate nohighlight">\(\operatorname{tr}\rho^2 = \tfrac12(1 +
+\lVert\mathbf{r}\rVert^2)\)</span> measuring the distance in.</p>
+</section>
+<section id="channels-kraus-operators">
+<h3>Channels: Kraus operators<a class="headerlink" href="#channels-kraus-operators" title="Link to this heading">#</a></h3>
+<p>The general physical evolution is a <strong>channel</strong>,</p>
+<div class="math notranslate nohighlight" id="equation-eq-mc-kraus">
+<span class="eqno">(309)<a class="headerlink" href="#equation-eq-mc-kraus" title="Link to this equation">#</a></span>\[\Phi(\rho) \;=\; \sum_k K_k\,\rho\,K_k^{\dagger},
+\qquad \sum_k K_k^{\dagger}K_k = I ,\]</div>
+<p>the completeness condition making it trace-preserving. Unitaries are
+the one-term case; measurement-and-forget maps, decay and dephasing all
+take more terms, and each named channel acts on the Bloch ball by a
+specific contraction the exercises gate against closed forms.</p>
+</section>
+<section id="the-channel-as-one-matrix">
+<h3>The channel as one matrix<a class="headerlink" href="#the-channel-as-one-matrix" title="Link to this heading">#</a></h3>
+<p><span class="math notranslate nohighlight">\(\Phi\)</span> is linear in <span class="math notranslate nohighlight">\(\rho\)</span>, so it <em>is</em> a matrix once <span class="math notranslate nohighlight">\(\rho\)</span> is a
+vector. With row-major <code class="docutils literal notranslate"><span class="pre">reshape(-1)</span></code> as vec,
+<a class="reference internal" href="../06-structure/kronecker-vec-separable.html"><span class="std std-doc">§6.4</span></a>’s identity
+<span class="math notranslate nohighlight">\(\operatorname{vec}(AXB) = (A \otimes B^{\top})\operatorname{vec}(X)\)</span>
+gives the <strong>superoperator</strong></p>
+<div class="math notranslate nohighlight" id="equation-eq-mc-superop">
+<span class="eqno">(310)<a class="headerlink" href="#equation-eq-mc-superop" title="Link to this equation">#</a></span>\[S_{\Phi} \;=\; \sum_k K_k \otimes \overline{K_k},
+\qquad
+\operatorname{vec}(\Phi(\rho)) = S_{\Phi}\operatorname{vec}(\rho) ,\]</div>
+<p>and channel composition becomes matrix multiplication — the course’s
+oldest theme, absorbing quantum dynamics.</p>
+</section>
+<section id="choi-complete-positivity-is-a-psd-test">
+<h3>Choi: complete positivity is a psd test<a class="headerlink" href="#choi-complete-positivity-is-a-psd-test" title="Link to this heading">#</a></h3>
+<p>Positivity of <span class="math notranslate nohighlight">\(\Phi\)</span> on single systems is not enough: physics demands
+<span class="math notranslate nohighlight">\(\Phi \otimes \mathrm{id}\)</span> stay positive when the system is entangled
+with a bystander. Feeding half a Bell pair through decides it all at
+once. The <strong>Choi matrix</strong></p>
+<div class="math notranslate nohighlight" id="equation-eq-mc-choi">
+<span class="eqno">(311)<a class="headerlink" href="#equation-eq-mc-choi" title="Link to this equation">#</a></span>\[J(\Phi) \;=\; (\Phi \otimes \mathrm{id})\,
+|\Omega\rangle\langle\Omega| ,
+\qquad |\Omega\rangle = \tfrac{1}{\sqrt2}(|00\rangle + |11\rangle) ,\]</div>
+<p>is psd <strong>exactly when</strong> <span class="math notranslate nohighlight">\(\Phi\)</span> is completely positive <span class="bibtex-citation" id="id4">[<a class="reference internal" href="#id70" title="Man-Duen Choi. Completely positive linear maps on complex matrices. Linear Algebra and its Applications, 10(3):285–290, 1975. doi:10.1016/0024-3795(75)90075-0.">Cho75</a>]</span>.
+The transpose map is the canonical failure: positive on every single
+system, yet <span class="math notranslate nohighlight">\(J\)</span> picks up an eigenvalue <span class="math notranslate nohighlight">\(-\tfrac12\)</span> — and reading the
+same computation backwards, a state whose <em>partial transpose</em> has a
+negative eigenvalue must be entangled: the PPT criterion
+<span class="bibtex-citation" id="id5">[<a class="reference internal" href="#id71" title="Asher Peres. Separability criterion for density matrices. Physical Review Letters, 77(8):1413–1415, 1996. doi:10.1103/PhysRevLett.77.1413.">Per96</a>]</span>, with the Bell pair flagged at exactly <span class="math notranslate nohighlight">\(-\tfrac12\)</span>.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>Data and restated instruments only: the Pauli matrices, the maximally
+entangled reference state, the three named channels’ Kraus sets at
+stated noise levels, and the seeded state factory. The Kraus engine,
+the superoperator, the Choi construction and the PPT witness are all
+built in the exercises, where they are the lesson.</p>
+<p>The Setup below holds this notebook’s data and instruments — nothing you
+are asked to build. It is collapsed so the building stays yours; expand it
+whenever you want the details.</p>
+<!-- setup-policy: v2 --><div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ecp.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_style</span>
+
+<span class="n">use_style</span><span class="p">()</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># every random state below comes from this seed</span>
+
+<span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+
+<span class="c1"># data: the one-qubit cast, restated once more.</span>
+<span class="n">SIGMA_X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+<span class="n">SIGMA_Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="n">j</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.0</span><span class="n">j</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]])</span>
+<span class="n">SIGMA_Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+<span class="n">PAULIS</span> <span class="o">=</span> <span class="p">[</span><span class="n">SIGMA_X</span><span class="p">,</span> <span class="n">SIGMA_Y</span><span class="p">,</span> <span class="n">SIGMA_Z</span><span class="p">]</span>
+<span class="n">I2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+
+<span class="c1"># data: the maximally entangled reference state of Eq. 4.</span>
+<span class="n">OMEGA</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+<span class="n">OMEGA</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">OMEGA</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
+
+<span class="c1"># data: the three named channels at stated noise levels — Kraus sets as</span>
+<span class="c1"># the explicit constants every text tabulates.</span>
+<span class="n">P_DEPOL</span> <span class="o">=</span> <span class="mf">0.3</span>
+<span class="n">KRAUS_DEPOL</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">P_DEPOL</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)</span> <span class="o">*</span> <span class="n">I2</span><span class="p">,</span>
+               <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">P_DEPOL</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)</span> <span class="o">*</span> <span class="n">SIGMA_X</span><span class="p">,</span>
+               <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">P_DEPOL</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)</span> <span class="o">*</span> <span class="n">SIGMA_Y</span><span class="p">,</span>
+               <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">P_DEPOL</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)</span> <span class="o">*</span> <span class="n">SIGMA_Z</span><span class="p">]</span>
+<span class="n">P_DEPH</span> <span class="o">=</span> <span class="mf">0.3</span>
+<span class="n">KRAUS_DEPH</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">P_DEPH</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">I2</span><span class="p">,</span>
+              <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">P_DEPH</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">SIGMA_Z</span><span class="p">]</span>
+<span class="n">GAMMA_AMP</span> <span class="o">=</span> <span class="mf">0.4</span>
+<span class="n">KRAUS_AMP</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">GAMMA_AMP</span><span class="p">)]],</span>
+                      <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">),</span>
+             <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">GAMMA_AMP</span><span class="p">)],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]],</span>
+                      <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)]</span>
+<span class="n">CHANNELS</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;depolarizing&quot;</span><span class="p">:</span> <span class="n">KRAUS_DEPOL</span><span class="p">,</span> <span class="s2">&quot;dephasing&quot;</span><span class="p">:</span> <span class="n">KRAUS_DEPH</span><span class="p">,</span>
+            <span class="s2">&quot;amplitude damping&quot;</span><span class="p">:</span> <span class="n">KRAUS_AMP</span><span class="p">}</span>
+
+
+<span class="c1"># instrument: the seeded state factory — Gaussian draws and a norm.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">random_state</span><span class="p">(</span><span class="n">generator</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A random pure state on `dim` amplitudes: complex Gaussian, normalised.&quot;&quot;&quot;</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1.0</span><span class="n">j</span> <span class="o">*</span> <span class="n">generator</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">v</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+
+<span class="c1"># instrument: Bloch coordinates of a DENSITY matrix — the trace pairing,</span>
+<span class="c1"># extraction not construction (9.1&#39;s reader, one rung up).</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">bloch_of_rho</span><span class="p">(</span><span class="n">rho</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The Bloch vector tr(rho sigma_i) of a one-qubit density matrix.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">rho</span> <span class="o">@</span> <span class="n">s</span><span class="p">)))</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">PAULIS</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="exercise-1-density-matrices-fill-the-ball">
+<h2>Exercise 1: Density matrices fill the ball<a class="headerlink" href="#exercise-1-density-matrices-fill-the-ball" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-mc-density">Eq. 308</a> promotes states from vectors to matrices. The
+tests are <a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html"><span class="std std-doc">§3.3</span></a>’s,
+and the geometry is <a class="reference internal" href="qubits-gates-bloch.html"><span class="std std-doc">§9.1</span></a>’s sphere growing
+an interior.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">mix(states,</span> <span class="pre">probs)</span></code> returning
+<span class="math notranslate nohighlight">\(\sum_k p_k|\psi_k\rangle\langle\psi_k|\)</span> via <code class="docutils literal notranslate"><span class="pre">np.outer</span></code>. For 100
+seeded three-state mixtures (Dirichlet-free: seeded uniform weights,
+normalised), gate the three defining properties: Hermitian to
+<span class="math notranslate nohighlight">\(10^{-15}\)</span>, trace one to <span class="math notranslate nohighlight">\(10^{-14}\)</span>, smallest eigenvalue above
+<span class="math notranslate nohighlight">\(-10^{-14}\)</span> (one-sided psd).</p>
+<p><strong>Part b)</strong> Gate the geometry: every mixture’s Bloch vector has
+<span class="math notranslate nohighlight">\(\lVert\mathbf{r}\rVert \le 1 + 10^{-12}\)</span>, purity equals
+<span class="math notranslate nohighlight">\(\tfrac12(1 + \lVert\mathbf{r}\rVert^2)\)</span> to <span class="math notranslate nohighlight">\(10^{-13}\)</span>, and — the
+strict part — each seeded <em>three-state</em> mixture of non-parallel states
+lands <strong>strictly inside</strong> (<span class="math notranslate nohighlight">\(\lVert\mathbf{r}\rVert &lt; 1 - 10^{-6}\)</span>,
+one-sided over this seed’s draws, reported): mixing is a convex
+average in the ball, and averages of distinct points leave the sphere.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Hermitian 5.6e-17, trace-1 4.4e-16, min-eig floor 0.0e+00
+||r|| &lt;= 1 by 0.0e+00; purity identity 4.4e-16; longest mixture arrow 0.9940 (strictly inside)
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-1">
+<h3>Validation 1<a class="headerlink" href="#validation-1" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  seeded mixtures are Hermitian, unit-trace and psd (Eq. 1)   [100 three-state ensembles: 3.3&#39;s tests, passed at rounding — the state space of noisy preparations]
+✓  and they fill the interior of the Bloch ball   [||r|| &lt;= 1 with purity = (1 + ||r||^2)/2 at 4.4e-16; the longest arrow of this seed&#39;s mixtures is 0.9940 — convex averages of distinct pure points leave the sphere, one-sidedly reported for this seed]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-2-channels-the-kraus-engine">
+<h2>Exercise 2: Channels: the Kraus engine<a class="headerlink" href="#exercise-2-channels-the-kraus-engine" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-mc-kraus">Eq. 309</a> is the general physical map. This exercise builds
+the engine, gates the algebra, and reads each named channel’s
+signature off the Bloch ball against its closed form.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">kraus_apply(Ks,</span> <span class="pre">rho)</span></code> returning
+<span class="math notranslate nohighlight">\(\sum_k K_k\rho K_k^{\dagger}\)</span>. Gate the completeness sums
+<span class="math notranslate nohighlight">\(\sum_k K_k^{\dagger}K_k = I\)</span> for all three Setup channels to
+<span class="math notranslate nohighlight">\(10^{-15}\)</span>, and trace preservation on 100 seeded mixtures to
+<span class="math notranslate nohighlight">\(10^{-14}\)</span>.</p>
+<p><strong>Write this one yourself</strong> — one comprehension, and every noisy
+evolution in the subject runs through it.</p>
+<p><strong>Part b)</strong> Gate the Bloch signatures to <span class="math notranslate nohighlight">\(10^{-12}\)</span> on 50 seeded pure
+states: depolarizing at <span class="math notranslate nohighlight">\(p = 0.3\)</span> scales
+<span class="math notranslate nohighlight">\(\mathbf{r} \mapsto (1-p)\mathbf{r}\)</span> (isotropic shrink); dephasing at
+<span class="math notranslate nohighlight">\(p = 0.3\)</span> scales <span class="math notranslate nohighlight">\((r_x, r_y)\)</span> by <span class="math notranslate nohighlight">\(1-p\)</span> and <strong>keeps</strong> <span class="math notranslate nohighlight">\(r_z\)</span> (the
+equator contracts, the axis survives); amplitude damping at
+<span class="math notranslate nohighlight">\(\gamma = 0.4\)</span> scales <span class="math notranslate nohighlight">\((r_x, r_y)\)</span> by <span class="math notranslate nohighlight">\(\sqrt{1-\gamma}\)</span> and maps
+<span class="math notranslate nohighlight">\(r_z \mapsto (1-\gamma)r_z + \gamma\)</span> — an <em>affine</em> action, dragging
+everything toward the ground-state pole. Draw the three images of the
+sphere’s <span class="math notranslate nohighlight">\(xz\)</span> great circle.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>completeness worst 1.1e-16; trace preservation worst 4.4e-16
+Bloch signatures vs closed forms: worst 2.8e-16
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-2">
+<h3>Validation 2<a class="headerlink" href="#validation-2" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the Kraus sets are complete and the channels preserve trace (Eq. 2)   [completeness at 1.1e-16, trace held to 4.4e-16 over 300 channel applications — probability goes nowhere]
+✓  each channel&#39;s Bloch action matches its closed form   [isotropic shrink, equator-only contraction, and the affine drag toward the pole — three kinds of noise, three signatures, 50 seeded states each [2.77556e-16 &lt; 1e-12]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-mc-ball">
+<img alt="../../_images/715245bf8053e3b41033725ed6391d406a8b84caa12b2eca6542498ba0224c5d.png" src="../../_images/715245bf8053e3b41033725ed6391d406a8b84caa12b2eca6542498ba0224c5d.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 172 </span><span class="caption-text">The Bloch ball under the three named channels: the sphere’s <span class="math notranslate nohighlight">\(xz\)</span> great circle (grey) and its image (amber). Depolarizing at <span class="math notranslate nohighlight">\(p = 0.3\)</span> shrinks isotropically to radius <span class="math notranslate nohighlight">\(0.7\)</span>; dephasing at <span class="math notranslate nohighlight">\(p = 0.3\)</span> contracts only the equatorial direction, leaving the poles fixed — an ellipse standing on the full <span class="math notranslate nohighlight">\(z\)</span> axis; amplitude damping at <span class="math notranslate nohighlight">\(\gamma = 0.4\)</span> contracts anisotropically AND translates upward, dragging every state toward the ground-state pole at the top — the one affine map of the three, and the reason decay has a preferred destination.</span><a class="headerlink" href="#fig-mc-ball" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-3-the-channel-is-literally-a-matrix">
+<h2>Exercise 3: The channel is literally a matrix<a class="headerlink" href="#exercise-3-the-channel-is-literally-a-matrix" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-mc-superop">Eq. 310</a> says a channel has a matrix the moment <span class="math notranslate nohighlight">\(\rho\)</span>
+becomes a vector — <a class="reference internal" href="../06-structure/kronecker-vec-separable.html"><span class="std std-doc">§6.4</span></a>’s
+identity with a conjugate. The two routes compute the same <em>quantity</em>
+by different associations: <code class="docutils literal notranslate"><span class="pre">superop</span></code> adds the Kraus terms together
+<strong>before</strong> meeting <span class="math notranslate nohighlight">\(\rho\)</span>, while <code class="docutils literal notranslate"><span class="pre">kraus_apply</span></code> meets <span class="math notranslate nohighlight">\(\rho\)</span> first and
+adds afterwards. Same mathematics, different summation order — so the
+gate is at rounding, and the exercise says why rather than hoping.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">superop(Ks)</span></code> returning
+<span class="math notranslate nohighlight">\(\sum_k K_k \otimes \overline{K_k}\)</span>, acting on the row-major
+<code class="docutils literal notranslate"><span class="pre">rho.reshape(-1)</span></code>. Gate the two routes on 100 seeded mixtures and all
+three channels: <code class="docutils literal notranslate"><span class="pre">superop(Ks)</span> <span class="pre">&#64;</span> <span class="pre">vec(rho)</span></code> matches
+<code class="docutils literal notranslate"><span class="pre">vec(kraus_apply(Ks,</span> <span class="pre">rho))</span></code> to <span class="math notranslate nohighlight">\(10^{-15}\)</span>. Report whether the two
+happen to agree <em>bitwise</em> as well, and expect <strong>not</strong>: the identity
+<span class="math notranslate nohighlight">\(\operatorname{vec}(K\rho K^{\dagger}) = (K \otimes \overline{K})
+\operatorname{vec}(\rho)\)</span> is exact in <span class="math notranslate nohighlight">\(\mathbb{R}\)</span>, but summing the
+Kraus terms before contracting is a different order of additions from
+summing after, and float addition is not associative — the lesson
+<a class="reference internal" href="../00-machine/arrays-and-vectorization.html"><span class="std std-doc">§0.1</span></a> opened the course
+with, met again where it would be easiest to assume it away.</p>
+<p><strong>Write this one yourself</strong> — 6.4’s vec identity, conjugated into
+quantum service.</p>
+<p><strong>Part b)</strong> Gate composition-as-multiplication: dephasing <em>after</em>
+amplitude damping, computed as nested <code class="docutils literal notranslate"><span class="pre">kraus_apply</span></code>, equals the single
+matrix <code class="docutils literal notranslate"><span class="pre">superop(KRAUS_DEPH)</span> <span class="pre">&#64;</span> <span class="pre">superop(KRAUS_AMP)</span></code> acting on vec, to
+<span class="math notranslate nohighlight">\(5\times10^{-15}\)</span> on the same 100 mixtures — chained noise is a matrix
+product, which is how long circuits are actually analysed.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>superoperator vs Kraus: agree to 2.2e-16; bitwise identical = False (reported — the two routes sum the Kraus index at different moments, so they need not be)
+composition as matrix product: worst 1.1e-16
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-3">
+<h3>Validation 3<a class="headerlink" href="#validation-3" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the superoperator route matches the Kraus route at rounding (Eq. 3)   [agreement over 300 applications, and NOT bitwise (measured: identical = False) — kron-then-matvec adds the Kraus terms before contracting while sandwich-then-reshape adds after, and float addition is not associative. 6.4&#39;s identity is exact; its two spellings are not the same arithmetic [2.22045e-16 &lt; 1e-15]]
+✓  and chained noise is one matrix product   [dephasing-after-damping as nested sandwiches vs one 4x4 times vec: channel composition is matrix multiplication, the course&#39;s oldest sentence absorbing its newest subject [1.11022e-16 &lt; 5e-15]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4-choi-complete-positivity-is-one-psd-test">
+<h2>Exercise 4: Choi: complete positivity is one psd test<a class="headerlink" href="#exercise-4-choi-complete-positivity-is-one-psd-test" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#equation-eq-mc-choi">Eq. 311</a> folds a channel’s entire behaviour — on entangled
+inputs included — into one <span class="math notranslate nohighlight">\(4\times4\)</span> matrix. Positive semidefinite
+means physical; and the transpose map shows the test has teeth.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">choi(Ks)</span></code> as <span class="math notranslate nohighlight">\((\Phi \otimes \mathrm{id})\)</span> applied
+to <span class="math notranslate nohighlight">\(|\Omega\rangle\langle\Omega|\)</span>, i.e. <code class="docutils literal notranslate"><span class="pre">kraus_apply</span></code> with the lifted
+operators <span class="math notranslate nohighlight">\(K_k \otimes I\)</span>. Gate all three channels with one structural
+ceiling at <span class="math notranslate nohighlight">\(10^{-14}\)</span>, taken over the worst of three quantities
+(Hermitian asymmetry, <span class="math notranslate nohighlight">\(|\operatorname{tr}J - 1|\)</span>, and the depth of the
+most negative eigenvalue) — three psd verdicts, three physical
+channels.</p>
+<p><strong>Part b)</strong> The canonical failure: build the transpose map’s Choi
+matrix directly (<span class="math notranslate nohighlight">\((\mathrm{T} \otimes \mathrm{id})
+|\Omega\rangle\langle\Omega|\)</span>, a partial transpose of the reference
+projector) and gate its spectrum equal to
+<span class="math notranslate nohighlight">\((-\tfrac12, \tfrac12, \tfrac12, \tfrac12)\)</span> to <span class="math notranslate nohighlight">\(10^{-14}\)</span> — an exact
+fraction announcing that transposition is not completely positive.</p>
+<p><strong>Part c)</strong> Gate what makes the failure interesting: the transpose of
+every one of 100 seeded single-qubit mixtures is still psd (smallest
+eigenvalue above <span class="math notranslate nohighlight">\(-10^{-14}\)</span>) — the map is <em>positive</em>, and only the
+Bell-pair test of Part b exposes it. Draw the four Choi spectra.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  depolarizing      : eig(J) = [0.075 0.075 0.075 0.775]
+  dephasing         : eig(J) = [0.   0.   0.15 0.85]
+  amplitude damping : eig(J) = [0.  0.  0.2 0.8]
+structure + psd worst: 3.3e-16
+transpose map: eig(J) = [-0.5  0.5  0.5  0.5] (target (-1/2, 1/2, 1/2, 1/2): 1.1e-16)
+transpose of single-qubit states: min-eig floor 0.0e+00 — positive, just not completely
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-4">
+<h3>Validation 4<a class="headerlink" href="#validation-4" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the three physical channels&#39; Choi matrices are psd states (Eq. 4)   [Hermitian, unit trace, smallest eigenvalue floored at 3.3e-16 — complete positivity, certified by 3.3&#39;s test on one 4x4 matrix per channel]
+✓  the transpose map&#39;s Choi spectrum is (-1/2, 1/2, 1/2, 1/2) exactly   [an exact fraction: transposition fails complete positivity by the largest margin a trace-one matrix allows [1.11022e-16 &lt; 1e-14]]
+✓  yet the transpose is positive on every lone qubit   [100 seeded mixtures stay psd under transposition — the failure is invisible until entanglement enters, which is exactly what the Choi construction feeds it [0 &lt; 1e-14]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<figure class="align-default" id="fig-mc-choi">
+<img alt="../../_images/fbd9835a09bbd8327513ffbdff2de643c097898cb755395d5fde84c9827a75e8.png" src="../../_images/fbd9835a09bbd8327513ffbdff2de643c097898cb755395d5fde84c9827a75e8.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 173 </span><span class="caption-text">Choi spectra of four maps, as bars: the three physical channels — depolarizing, dephasing, amplitude damping — are entirely non-negative (psd: completely positive, by Choi’s theorem the same statement), while the transpose map (amber) carries an exact eigenvalue <span class="math notranslate nohighlight">\(-1/2\)</span> below the axis. That negative bar is a no-go theorem — no physical process transposes a density matrix — and Exercise 5 reads the same bar backwards as an entanglement detector.</span><a class="headerlink" href="#fig-mc-choi" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-5-the-failure-weaponised-ppt-detects-entanglement">
+<h2>Exercise 5: The failure, weaponised: PPT detects entanglement<a class="headerlink" href="#exercise-5-the-failure-weaponised-ppt-detects-entanglement" title="Link to this heading">#</a></h2>
+<p>Exercise 4’s negative eigenvalue becomes a detector when read against
+states instead of maps: if <span class="math notranslate nohighlight">\(\rho^{T_B}\)</span> (transpose on one subsystem)
+has a negative eigenvalue, <span class="math notranslate nohighlight">\(\rho\)</span> is entangled — because separable
+states are mixtures of products, and products transpose to products
+<span class="bibtex-citation" id="id6">[<a class="reference internal" href="#id71" title="Asher Peres. Separability criterion for density matrices. Physical Review Letters, 77(8):1413–1415, 1996. doi:10.1103/PhysRevLett.77.1413.">Per96</a>]</span>.</p>
+<p><strong>Part a)</strong> Write <code class="docutils literal notranslate"><span class="pre">partial_transpose(rho4)</span></code> transposing the second
+qubit’s indices (a <code class="docutils literal notranslate"><span class="pre">reshape(2,2,2,2)</span></code>, one <code class="docutils literal notranslate"><span class="pre">transpose</span></code>, reshape back).
+Gate the witness on the Bell state: the spectrum of
+<span class="math notranslate nohighlight">\(|\Omega\rangle\langle\Omega|^{T_B}\)</span> equals
+<span class="math notranslate nohighlight">\((-\tfrac12, \tfrac12, \tfrac12, \tfrac12)\)</span> to <span class="math notranslate nohighlight">\(10^{-14}\)</span> — maximal
+entanglement, flagged at the maximal margin.</p>
+<p><strong>Part b)</strong> Gate that the witness spares what it must: for 100 seeded
+<em>separable</em> mixtures <span class="math notranslate nohighlight">\(\sum_j p_j\,\rho_j^A \otimes \rho_j^B\)</span> (three
+products each), the partial transpose’s smallest eigenvalue stays
+above <span class="math notranslate nohighlight">\(-10^{-13}\)</span> — no false alarms, one-sidedly, across this seed’s
+draws.</p>
+<p><strong>Part c)</strong> Gate the dial’s threshold: for the Werner family
+<span class="math notranslate nohighlight">\(\rho_w = w\,|\Omega\rangle\langle\Omega| + (1-w)\,I/4\)</span>, the
+partial transpose’s smallest eigenvalue is <span class="math notranslate nohighlight">\((1 - 3w)/4\)</span> — gate the
+closed form to <span class="math notranslate nohighlight">\(10^{-13}\)</span> on a 100-point sweep, so the witness fires
+exactly for <span class="math notranslate nohighlight">\(w &gt; 1/3\)</span>: entanglement survives depolarizing mixing down
+to a sharp, exactly known threshold.</p>
+<div class="cell tag_solution tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Bell partial transpose: eig = [-0.5  0.5  0.5  0.5] (1.1e-16 from the exact fractions)
+separable mixtures: PT min-eig floor 1.3e-16 — no false alarms
+Werner family: min-eig vs (1 - 3w)/4 worst 1.7e-16 — the witness fires exactly above w = 1/3
+</pre></div>
+</div>
+</div>
+</div>
+<section id="validation-5">
+<h3>Validation 5<a class="headerlink" href="#validation-5" title="Link to this heading">#</a></h3>
+<div class="cell tag_validation tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓  the Bell pair&#39;s partial transpose carries the exact -1/2   [Exercise 4&#39;s no-go eigenvalue, read backwards as a detector: maximal entanglement flagged at the maximal margin [1.11022e-16 &lt; 1e-14]]
+✓  and separable states never trip the witness (one-sided)   [100 seeded product mixtures stay psd under partial transposition — products transpose to products, so the alarm is honest [1.2817e-16 &lt; 1e-13]]
+✓  the Werner dial&#39;s smallest PT eigenvalue is (1 - 3w)/4, exactly   [a closed-form threshold at w = 1/3: how much depolarizing mixing the Bell pair&#39;s detectable entanglement survives, known in fractions [1.66533e-16 &lt; 1e-13]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notebook-summary">
+<h2>Notebook summary<a class="headerlink" href="#notebook-summary" title="Link to this heading">#</a></h2>
+<p><strong>The ball filled in.</strong> 100 seeded three-state mixtures passed
+<a class="reference internal" href="../03-eigenvalues/positive-definite-cholesky.html"><span class="std std-doc">§3.3</span></a>’s tests at
+rounding, obeyed purity <span class="math notranslate nohighlight">\(= \tfrac12(1 + \lVert\mathbf{r}\rVert^2)\)</span> to
+<span class="math notranslate nohighlight">\(10^{-16}\)</span>-scale, and sat strictly inside the sphere (longest arrow
+<span class="math notranslate nohighlight">\(0.9940\)</span> for this seed) — density matrices as the convex hull
+<a class="reference internal" href="qubits-gates-bloch.html"><span class="std std-doc">§9.1</span></a>’s sphere never had.</p>
+<p><strong>Three noises, three signatures.</strong> The Kraus engine held completeness
+and trace preservation at rounding; depolarizing shrank isotropically
+by <span class="math notranslate nohighlight">\(0.7\)</span>, dephasing contracted only the equator, amplitude damping
+contracted <em>and translated</em> toward the pole — every Bloch action within
+<span class="math notranslate nohighlight">\(10^{-16}\)</span>-scale of its closed form.</p>
+<p><strong>A channel is literally a matrix.</strong> The superoperator
+<span class="math notranslate nohighlight">\(\sum K \otimes \overline{K}\)</span> agreed with the Kraus route to
+<span class="math notranslate nohighlight">\(2\times10^{-16}\)</span> over all 300 applications — and <em>not</em> bitwise, because
+the two spellings sum the Kraus index at different moments and float
+addition is not associative, which is the course’s opening lesson
+turning up in its last chapter. Chained noise collapsed to one matrix
+product at <span class="math notranslate nohighlight">\(10^{-16}\)</span>-scale:
+<a class="reference internal" href="../06-structure/kronecker-vec-separable.html"><span class="std std-doc">§6.4</span></a>’s vec identity in
+quantum service.</p>
+<p><strong>One psd test decides physicality, and its failure detects
+entanglement.</strong> The three channels’ Choi matrices were psd states; the
+transpose map’s spectrum came out <span class="math notranslate nohighlight">\((-\tfrac12, \tfrac12, \tfrac12,
+\tfrac12)\)</span> exactly while remaining positive on every lone qubit; and
+the same <span class="math notranslate nohighlight">\(-\tfrac12\)</span>, read off the Bell pair’s partial transpose,
+certified its entanglement — with 100 separable mixtures raising no
+false alarm and the Werner dial’s threshold landing on <span class="math notranslate nohighlight">\(w = 1/3\)</span> by the
+closed form <span class="math notranslate nohighlight">\((1 - 3w)/4\)</span>.</p>
+<p><strong>Methods introduced.</strong> <code class="docutils literal notranslate"><span class="pre">mix</span></code>, <code class="docutils literal notranslate"><span class="pre">kraus_apply</span></code>, the closed-form Bloch
+signatures, <code class="docutils literal notranslate"><span class="pre">superop</span></code> (6.4’s vec identity conjugated), <code class="docutils literal notranslate"><span class="pre">choi</span></code> via
+lifted Kraus operators, <code class="docutils literal notranslate"><span class="pre">partial_transpose</span></code>, and the Werner-family
+threshold as an exact-fraction gate.</p>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>The QFT closes the chapter.</strong>
+<a class="reference internal" href="quantum-fourier-transform.html"><span class="std std-doc">§9.5</span></a> returns to unitary — noiseless
+— evolution, where the chapter’s last handshake waits:
+<a class="reference internal" href="../06-structure/circulant-toeplitz-fft.html"><span class="std std-doc">§6.3</span></a>’s DFT matrix as
+the quantum computer’s workhorse transform.</p></li>
+<li><p><strong>PPT is necessary, not sufficient, beyond 2x3.</strong> For two qubits the
+witness is exact; at higher dimensions entangled states exist with
+positive partial transpose (“bound” entanglement), and detecting them
+needs the full apparatus of entanglement witnesses — Hermitian
+operators whose expectation separates the separable convex set from a
+target state, i.e. <a class="reference internal" href="../02-orthogonality/projections-normal-equations.html"><span class="std std-doc">§2.1</span></a>-style
+separating hyperplanes in matrix space.</p></li>
+<li><p><strong>Master equations.</strong> Continuous-time noise exponentiates a Lindblad
+generator: the channel semigroup <span class="math notranslate nohighlight">\(e^{t\mathcal{L}}\)</span>, with
+<a class="reference internal" href="../03-eigenvalues/matrix-functions-exponential.html"><span class="std std-doc">§3.6</span></a>’s matrix
+exponential acting on the superoperator of Exercise 3.</p></li>
+<li><p><strong>Error correction.</strong> The Kraus picture is where stabilizer codes
+live: a code is a subspace on which the noise’s Kraus operators act
+invertibly, and the Knill–Laflamme conditions are one more exercise
+in projectors and inner products.</p></li>
+</ul>
+<div class="docutils container" id="id7">
+<div role="list" class="citation-list">
+<div class="citation" id="id70" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Cho75<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id2">1</a>,<a role="doc-backlink" href="#id4">2</a>)</span>
+<p>Man-Duen Choi. Completely positive linear maps on complex matrices. <em>Linear Algebra and its Applications</em>, 10(3):285–290, 1975. <a class="reference external" href="https://doi.org/10.1016/0024-3795(75)90075-0">doi:10.1016/0024-3795(75)90075-0</a>.</p>
+</div>
+<div class="citation" id="id67" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">NC10</a><span class="fn-bracket">]</span></span>
+<p>Michael A. Nielsen and Isaac L. Chuang. <em>Quantum Computation and Quantum Information</em>. Cambridge University Press, Cambridge, 10th anniversary edition, 2010. <a class="reference external" href="https://doi.org/10.1017/CBO9780511976667">doi:10.1017/CBO9780511976667</a>.</p>
+</div>
+<div class="citation" id="id71" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Per96<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id3">1</a>,<a role="doc-backlink" href="#id5">2</a>,<a role="doc-backlink" href="#id6">3</a>)</span>
+<p>Asher Peres. Separability criterion for density matrices. <em>Physical Review Letters</em>, 77(8):1413–1415, 1996. <a class="reference external" href="https://doi.org/10.1103/PhysRevLett.77.1413">doi:10.1103/PhysRevLett.77.1413</a>.</p>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');</style>
+<div style="font-family:'Source Serif 4', 'Iowan Old Style', Georgia, serif;background:#faf7f0;border:1px solid #dcd6c8;
+            border-left:6px solid #c0851a;border-radius:6px;
+            padding:18px 22px;margin:30px 0 8px 0;">
+  <div style="font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;font-size:11px;letter-spacing:.12em;
+              text-transform:uppercase;color:#c0851a;font-weight:600;
+              margin-bottom:6px;">Take this notebook with you</div>
+  <div style="font-size:14.5px;color:#16213e;line-height:1.55;max-width:66ch;">
+    Use the download button (&#8595;) in the toolbar above to save this notebook
+    and run it yourself. The published notebooks ship <b>without worked
+    solutions</b>; if you would like the reference solutions &mdash; to teach
+    from or to check your own work &mdash; get in touch: <a href='mailto:hello@ramador.me' style='color:#c0851a;text-decoration:none;border-bottom:1px solid #c0851a;'>hello@ramador.me</a>.
+  </div>
+</div></div></div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/09-quantum"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="chsh-tsirelson.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">9.3 The CHSH Game: Tsirelson’s Bound is an Eigenvalue</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="quantum-fourier-transform.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">9.5 The Quantum Fourier Transform is the DFT Matrix</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-overview">Notebook overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#theory-in-brief">Theory in brief</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#density-matrices-the-bloch-ball-filled-in">Density matrices: the Bloch ball filled in</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#channels-kraus-operators">Channels: Kraus operators</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-channel-as-one-matrix">The channel as one matrix</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#choi-complete-positivity-is-a-psd-test">Choi: complete positivity is a psd test</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-density-matrices-fill-the-ball">Exercise 1: Density matrices fill the ball</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-1">Validation 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-channels-the-kraus-engine">Exercise 2: Channels: the Kraus engine</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-2">Validation 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-the-channel-is-literally-a-matrix">Exercise 3: The channel is literally a matrix</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-3">Validation 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-choi-complete-positivity-is-one-psd-test">Exercise 4: Choi: complete positivity is one psd test</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-4">Validation 4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-the-failure-weaponised-ppt-detects-entanglement">Exercise 5: The failure, weaponised: PPT detects entanglement</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validation-5">Validation 5</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-summary">Notebook summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Raymond Amador
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026 · CC BY-NC-SA 4.0 (text) / MIT (code).
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
