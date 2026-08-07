@@ -1,21 +1,21 @@
-# Volume 0 — The Array and the Machine
+# Chapter 0 — The Array and the Machine
 
 Before the first matrix, three notebooks about the thing that will hold it.
 
 A vector in a lecture is an element of a vector space. A vector in a Python
 session is a contiguous block of bytes with a shape attached, a rule for reading
 strides out of that block, and a floating-point format that cannot represent
-one tenth. Every result in the remaining eight volumes is produced by that
+one tenth. Every result in the remaining eight chapters is produced by that
 object, so it is worth knowing what it can and cannot do before asking it to
 diagonalise anything.
 
-The volume is short and it is not optional. [§0.1](arrays-and-vectorization.ipynb) is the array model —
+The chapter is short and it is not optional. [§0.1](arrays-and-vectorization.ipynb) is the array model —
 shapes, strides, views versus copies, broadcasting, and the reason a triple loop
 is four orders of magnitude slower than one `@`. [§0.2](floating-point.ipynb) is floating-point
 reality: machine epsilon, catastrophic cancellation, and the habit that replaces
 `==` with a tolerance, which is the habit every validation in this course rests
 on. [§0.3](vectors-norms-inner-products.ipynb) is the vector itself — dot products, angles, norms, projections — done
-concretely enough that Volume II's least squares is a short step rather than a
+concretely enough that Chapter II's least squares is a short step rather than a
 leap.
 
 There is one idea here that the rest of the course keeps cashing in. A

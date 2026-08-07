@@ -18,10 +18,10 @@ checked in code against something the calculation did not assume.
 
 ```{admonition} This course is being written in public
 :class: note
-6 of a planned 47 notebooks are live, and volumes are landing in
+6 of a planned 47 notebooks are live, and chapters are landing in
 order. Everything published here is finished work: each notebook executes
 end to end on every commit, and every one of its checks passes before it
-appears. What you will not find yet is the later volumes — the table of
+appears. What you will not find yet is the later chapters — the table of
 contents shows what exists rather than what is promised. Forward references in
 the prose point at notebooks that are still coming; they are tracked, and they
 resolve as each one lands.
@@ -29,7 +29,7 @@ resolve as each one lands.
 
 ## What this is
 
-Forty-seven Jupyter notebooks when complete, in nine volumes plus a Prologue
+Forty-seven Jupyter notebooks when complete, in nine chapters plus a Prologue
 and an Epilogue.
 Each notebook opens with a review of the mathematics it needs, then works
 through six to ten exercises. Every exercise has three parts: a statement that
@@ -49,7 +49,7 @@ derivative is. Everything else is built here.
 
 ## What runs through it
 
-Four threads hold the volumes together.
+Four threads hold the chapters together.
 
 **Exact against floating-point.** Most notebooks compute something twice: once
 exactly, in rational arithmetic with SymPy, and once in `float64`. The exact
@@ -57,7 +57,7 @@ answer is the ground truth the floating-point answer is measured against, and
 the *gap* between them is a recurring lesson rather than an embarrassment. Rank
 is the flagship case. In exact arithmetic rank is a theorem. In floating point
 it is a threshold, and you have to choose it. The Prologue plants that question
-in its last exercise; [§0.2](../00-machine/floating-point.ipynb) gives you the tolerance; Volume IV finally settles it.
+in its last exercise; [§0.2](../00-machine/floating-point.ipynb) gives you the tolerance; Chapter IV finally settles it.
 
 **Cost.** Every algorithm arrives with an operation count, and then a
 measurement that confirms the exponent. Why `solve` beats `inv`. Why the order
@@ -70,7 +70,7 @@ algorithm in the book.
 **Structure buys speed.** A general $n \times n$ system costs $O(n^3)$. A banded
 one costs $O(n)$. A circulant one costs $O(n \log n)$, because the Fourier
 matrix diagonalises it. A Kronecker product should never be formed at all.
-Volume VI is about recognising structure and cashing it in.
+Chapter VI is about recognising structure and cashing it in.
 
 **And the last thread is the one I did not expect to write.** The course ends
 with the linear algebra inside the systems that are currently rewriting how
@@ -81,10 +81,10 @@ $\langle R_m q, R_n k\rangle$ depends only on $m-n$, which is a fact you can
 verify to fourteen digits in about four lines. Low-rank adaptation works because
 the *update* to a trained weight matrix has a rapidly decaying singular
 spectrum, which is a claim we measure rather than repeat. None of this is
-mysterious. It is Volume II with better marketing, and Volume VIII is where the
+mysterious. It is Chapter II with better marketing, and Chapter VIII is where the
 course says so, carefully and with the checks attached.
 
-Volume VIII is not a machine-learning course. I am not qualified to teach one
+Chapter VIII is not a machine-learning course. I am not qualified to teach one
 and it would be a different book. What it is, is an honest account of the linear
 algebra that machine learning is made of — and [§8.7](../08-learning/where-linear-algebra-stops.ipynb) is a deliberate boundary
 marker, the notebook where the course says *here is where linear algebra stops*
@@ -92,12 +92,12 @@ and shows you exactly what a nonlinearity buys that a matrix cannot.
 
 ## How to read it
 
-In order, ideally. The volumes depend on each other: Volume V asks what the
-algorithms of Volumes I and II actually cost, Volume VIII is written in the
-index notation of Volume VII, and the Epilogue only makes sense once all five
-factorizations are in hand. That said, Volumes VI and VIII are more independent
+In order, ideally. The chapters depend on each other: Chapter V asks what the
+algorithms of Chapters I and II actually cost, Chapter VIII is written in the
+index notation of Chapter VII, and the Epilogue only makes sense once all five
+factorizations are in hand. That said, Chapters VI and VIII are more independent
 than the rest, and a reader who already knows the fundamentals can start at
-Volume IV without much pain.
+Chapter IV without much pain.
 
 Every notebook runs in the browser: the launch buttons at the top of each page
 open it on Binder or in Colab, with nothing to install. The reference solutions
@@ -120,8 +120,8 @@ This is the fourth of my open notebook courses, and it shares its machinery with
 the others: the same validation library, the same diagram engine with its
 collision-free label placement, the same insistence that a figure must depict
 exactly the object the text names. Readers of *Elementary Computational
-Physics* {cite}`ecp` will recognise §0.4 and §0.5 of its Volume 0 as the
-compressed ancestors of Volumes I through V here. That compression was the right
+Physics* {cite}`ecp` will recognise §0.4 and §0.5 of its Chapter 0 as the
+compressed ancestors of Chapters I through V here. That compression was the right
 call there, where linear algebra is a tool. Here it is the subject, so it gets
 the room.
 

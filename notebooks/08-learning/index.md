@@ -1,8 +1,8 @@
-# Volume VIII — The Linear Algebra of Learning
+# Chapter VIII — The Linear Algebra of Learning
 
-Here is the claim this volume defends: the mathematics inside a modern machine
+Here is the claim this chapter defends: the mathematics inside a modern machine
 learning system is, to a first approximation, the mathematics of the preceding
-seven volumes, and the parts that are not have a specific name and a specific
+seven chapters, and the parts that are not have a specific name and a specific
 job.
 
 That is not a debunking. It is an invitation. A great deal of writing about
@@ -25,7 +25,7 @@ of freedom, and the double-descent curve that embarrassed the textbooks in 2019.
 $(\kappa-1)/(\kappa+1)$: conditioning, again, now as a *training* cost. [§8.3](linear-layer-backpropagation.ipynb)
 builds a linear layer with batches and derives backpropagation as a product of
 Jacobians, gradient-checked against finite differences at the optimal step size
-— the U-curve of [§0.2](../00-machine/floating-point.ipynb), returning eight volumes later.
+— the U-curve of [§0.2](../00-machine/floating-point.ipynb), returning eight chapters later.
 
 [§8.4](text-to-vectors-embeddings.ipynb) gets from text to vectors: byte-pair encoding, one-hot vectors as a
 standard basis, the identity that an embedding lookup *is* a matrix product,
@@ -38,7 +38,7 @@ And [§8.7](where-linear-algebra-stops.ipynb) is the boundary. Five linear layer
 we verify it — so depth without nonlinearity buys nothing at all. A ReLU network
 is a piecewise-linear map, and we enumerate its regions and fit the exact affine
 map on each. LayerNorm is a projection followed by a scaling. The residual
-stream is a vector space and a probe is a least-squares fit. The volume ends by
+stream is a vector space and a probe is a least-squares fit. The chapter ends by
 saying precisely where linear algebra stops being the whole story, because a
 course that only showed you what its subject *can* do would be selling something.
 

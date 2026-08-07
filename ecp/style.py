@@ -60,7 +60,7 @@ _FONT_IMPORT = (
 class Notebook:
     """Lightweight metadata describing one notebook in the series."""
 
-    volume: str          # e.g. "Volume I — Elementary Mechanics"
+    volume: str          # e.g. "Chapter I — Matrices, Elimination, and Subspaces"
     number: str          # e.g. "1.3"
     title: str           # e.g. "The Double Pendulum"
     blurb: str = ""       # one-line description shown under the title
@@ -79,14 +79,14 @@ def header(
 ):
     """Return the series header for a notebook as a rich HTML display object.
 
-    Pass ``optional=True`` for capstone notebooks that sit outside a volume's
+    Pass ``optional=True`` for capstone notebooks that sit outside a chapter's
     required arc; the flag renders as an extra chip in the meta line.
 
     Usage (first code cell of every notebook)::
 
         from ecp.style import header
         header(
-            volume="Volume I — Elementary Mechanics",
+            volume="Chapter I — Matrices, Elimination, and Subspaces",
             number="1.3",
             title="The Double Pendulum",
             blurb="Chaos, energy conservation, and animation from a Lagrangian.",

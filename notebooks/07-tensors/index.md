@@ -1,8 +1,8 @@
-# Volume VII — Multilinear Algebra and Tensor Networks
+# Chapter VII — Multilinear Algebra and Tensor Networks
 
 A matrix has two indices. Nothing in the world insists on two.
 
-This volume is about arrays with more indices than that, and it is the part of
+This chapter is about arrays with more indices than that, and it is the part of
 the course furthest from a standard syllabus. It has three notebooks and they do
 three quite different jobs.
 
@@ -30,6 +30,6 @@ three-index tensors, and for the states that actually occur in nature the chain
 is short. We build the tensor train decomposition from repeated SVDs, compress a
 twenty-qubit state to under one percent of its dense size, evaluate an observable
 without ever forming the full vector, and read the entanglement entropy off the
-singular values at a bond. The whole apparatus is Volume IV's truncation theorem
+singular values at a bond. The whole apparatus is Chapter IV's truncation theorem
 applied recursively. That is the entire trick, and it is the foundation of
 modern computational quantum many-body physics.

@@ -19,7 +19,7 @@ Run the cells to regenerate everything.
 
 ## Status
 
-The course is being written in public and volumes land in order. Everything
+The course is being written in public and chapters land in order. Everything
 here is finished work: each notebook executes end to end on every commit, and
 every one of its checks passes before it is published.
 

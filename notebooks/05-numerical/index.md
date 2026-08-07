@@ -1,6 +1,6 @@
-# Volume V — Numerical Linear Algebra
+# Chapter V — Numerical Linear Algebra
 
-Volumes I through IV named the algorithms. This one asks what they cost and
+Chapters I through IV named the algorithms. This one asks what they cost and
 whether you can trust the answers, and the two questions turn out to be the same
 question asked twice.
 
@@ -27,6 +27,6 @@ sparse solvers, where the enemy is fill-in and the weapon is reordering. [§5.4]
 and [§5.5](krylov-gmres-preconditioning.ipynb) are the iterative methods — Jacobi through SOR, then conjugate
 gradients, then the Krylov family: Arnoldi, Lanczos, GMRES, and preconditioning,
 which is the art of changing the problem into an easier one that has the same
-answer. A preconditioner is a change of basis, which is Volume I again, and the
-convergence rate is governed by $\sqrt{\kappa}$, which is [§5.1](norms-conditioning-stability.ipynb) again. The volume
+answer. A preconditioner is a change of basis, which is Chapter I again, and the
+convergence rate is governed by $\sqrt{\kappa}$, which is [§5.1](norms-conditioning-stability.ipynb) again. The chapter
 is where the course's threads meet.

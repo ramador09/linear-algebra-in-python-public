@@ -1,4 +1,4 @@
-# Volume IV — The Singular Value Decomposition
+# Chapter IV — The Singular Value Decomposition
 
 Every matrix, without exception, factors as $A = U\Sigma V^{\top}$ with $U$ and
 $V$ orthogonal and $\Sigma$ diagonal and nonnegative. No symmetry required, no
@@ -12,7 +12,7 @@ semi-axes. Rotate, stretch, rotate. Everything else follows. The four
 fundamental subspaces are read straight off $U$ and $V$. The $2$-norm is
 $\sigma_1$. The condition number is $\sigma_1/\sigma_n$. The rank is the count
 of nonzero singular values — with all the trouble that word "nonzero" causes,
-which this volume finally settles.
+which this chapter finally settles.
 
 [§4.2](low-rank-eckart-young.ipynb) is the theorem that does the work. Truncating the SVD after $k$ terms gives
 the best possible rank-$k$ approximation, in both the spectral and the Frobenius

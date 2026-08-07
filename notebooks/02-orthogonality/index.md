@@ -1,4 +1,4 @@
-# Volume II — Orthogonality and Least Squares
+# Chapter II — Orthogonality and Least Squares
 
 Perpendicularity is the most computationally useful idea in the subject.
 
@@ -6,7 +6,7 @@ The reason is worth stating plainly at the start. An orthogonal matrix does not
 change the length of a vector, so it cannot amplify an error. Every stable
 algorithm in numerical linear algebra is built out of orthogonal operations for
 exactly that reason, and every unstable one usually got that way by using
-something else. Volume V will make the claim quantitative; this volume builds
+something else. Chapter V will make the claim quantitative; this chapter builds
 the machinery.
 
 The arc is: project, then factor, then fit. [§2.1](projections-normal-equations.ipynb) projects a vector onto a
@@ -26,6 +26,6 @@ the whole apparatus and applies it to functions instead of vectors, which is
 where Legendre polynomials, Chebyshev polynomials, and the discrete Fourier
 transform turn out to be the same idea wearing three coats.
 
-If you only read one volume of this course, read this one. Least squares is the
+If you only read one chapter of this course, read this one. Least squares is the
 single most-used computation in applied mathematics, and it is where the
 distance between "the formula" and "what you should actually type" is widest.
