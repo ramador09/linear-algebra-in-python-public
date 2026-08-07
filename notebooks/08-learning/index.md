@@ -46,3 +46,6 @@ course that only showed you what its subject *can* do would be selling something
 architecture survey, no training-at-scale engineering. What there is, is an
 honest account of the linear algebra those things are made of, with every claim
 checked.
+
+[Chapter IX](../09-quantum/index.md) then makes the same argument in a field
+that sounds even less like linear algebra, and turns out to be even more so.

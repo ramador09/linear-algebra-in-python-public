@@ -31,3 +31,12 @@ the error bounded, not hoped for. Randomized numerical linear algebra is barely
 twenty years old, it is ten times faster than the classical algorithm at the
 sizes people actually work at, and it almost never appears in an undergraduate
 course. It appears in this one.
+
+[§4.5](polar-procrustes.ipynb) regroups the same three factors into two. Every
+matrix is one rotation times one symmetric stretch, and that rotation is the
+*nearest* orthogonal matrix there is — certified here against ten thousand
+challengers, none of which wins. The same factor solves the alignment problem:
+given two point clouds, one a noisy rotated copy of the other, the best-fitting
+rotation is a single SVD away. Crystallographers, structural biologists and
+shape statisticians all run on that identity, and it is one regrouping of
+[§4.1](svd-geometry.ipynb) away from where this chapter started.

@@ -29,3 +29,13 @@ halves meet: a Gram matrix is a matrix of inner products in a feature space you
 never construct, positive definiteness is exactly the condition that makes such
 a space exist, and the Nyström approximation is Chapter IV's low-rank story
 arriving in a new costume. It is also the bridge to Chapter VIII.
+
+[§6.6](kalman-recursive-least-squares.ipynb) adds the structure that is not in
+the matrix but in the *arrival of the data*. Refitting a least-squares problem
+from scratch after every new observation is waste; the Sherman–Morrison
+identity of [§1.3](../01-matrices/inverses-rank-cr.ipynb) turns it into a
+rank-one update, and the result — recursive least squares — is exactly the
+batch answer on every prefix, gated as an identity rather than an
+approximation. Give the unknown permission to move between observations and the
+same algebra becomes the Kalman filter, which is how a tracked object's
+position is estimated from noisy sightings, in orbit and on the road.

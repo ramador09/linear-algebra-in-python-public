@@ -19,9 +19,9 @@ Run the cells to regenerate everything.
 
 ## Status
 
-The course is being written in public and chapters land in order. Everything
-here is finished work: each notebook executes end to end on every commit, and
-every one of its checks passes before it is published.
+Complete: all 55 notebooks across ten chapters, a Prologue and an Epilogue.
+Each notebook executes end to end on every commit, and every one of its checks
+passes before the mirror is republished.
 
 ## Licence
 

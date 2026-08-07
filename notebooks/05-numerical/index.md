@@ -30,3 +30,12 @@ which is the art of changing the problem into an easier one that has the same
 answer. A preconditioner is a change of basis, which is Chapter I again, and the
 convergence rate is governed by $\sqrt{\kappa}$, which is [§5.1](norms-conditioning-stability.ipynb) again. The chapter
 is where the course's threads meet.
+
+[§5.6](multigrid.ipynb) then does the thing that should not be possible. Every
+method above pays more iterations as the grid refines; multigrid pays the
+*same* number, no matter how fine the grid gets, because it stops trying to fix
+smooth error on a fine grid and coarsens instead. The result is a solver whose
+total cost is proportional to the number of unknowns — optimal, in the strict
+sense that you cannot beat reading the problem once — and the chapter ends by
+measuring exactly that: iteration counts flat across four grid sizes while
+conjugate gradients climbs.

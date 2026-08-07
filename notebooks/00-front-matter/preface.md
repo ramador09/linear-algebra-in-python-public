@@ -16,21 +16,19 @@ This course lives in that gap. It runs from "what is a vector" to the singular
 spectrum of a trained weight matrix, and every single claim along the way is
 checked in code against something the calculation did not assume.
 
-```{admonition} This course is being written in public
+```{admonition} The course is complete, and it stays live
 :class: note
-6 of a planned 47 notebooks are live, and chapters are landing in
-order. Everything published here is finished work: each notebook executes
-end to end on every commit, and every one of its checks passes before it
-appears. What you will not find yet is the later chapters — the table of
-contents shows what exists rather than what is promised. Forward references in
-the prose point at notebooks that are still coming; they are tracked, and they
-resolve as each one lands.
+All 55 notebooks are published. Everything here is finished work in a strong
+sense: every notebook executes end to end on every commit, and every one of its
+checks passes before the page rebuilds — so if a claim in the prose has drifted
+from what the code actually computes, the build says so rather than the reader
+discovering it. Corrections and additions still land (the version history is in
+the repository); what will not happen is a page that quietly stops running.
 ```
 
 ## What this is
 
-Forty-seven Jupyter notebooks when complete, in nine chapters plus a Prologue
-and an Epilogue.
+Fifty-five Jupyter notebooks in ten chapters, plus a Prologue and an Epilogue.
 Each notebook opens with a review of the mathematics it needs, then works
 through six to ten exercises. Every exercise has three parts: a statement that
 names every object you compute with, a reference solution, and a **validation**
@@ -72,8 +70,8 @@ one costs $O(n)$. A circulant one costs $O(n \log n)$, because the Fourier
 matrix diagonalises it. A Kronecker product should never be formed at all.
 Chapter VI is about recognising structure and cashing it in.
 
-**And the last thread is the one I did not expect to write.** The course ends
-with the linear algebra inside the systems that are currently rewriting how
+**And the fourth thread is the one I did not expect to write.** Chapter VIII is
+about the linear algebra inside the systems that are currently rewriting how
 everyone works. Attention is a product of matrices — three projections, a scaled
 Gram matrix, a row-wise softmax, and one more product. Rotary position
 embeddings are $2\times 2$ rotation blocks, and they work because
@@ -90,6 +88,17 @@ algebra that machine learning is made of — and [§8.7](../08-learning/where-li
 marker, the notebook where the course says *here is where linear algebra stops*
 and shows you exactly what a nonlinearity buys that a matrix cannot.
 
+Chapter IX is the coda, and it makes the course's case in the least expected
+place. Strip the folklore from quantum information and what is left is this
+book: a state is a unit vector, a gate is a unitary matrix, entanglement is a
+statement about an SVD, and whether a noisy process is physically possible at
+all is a positive-semidefinite test on one matrix. It is also where the exact
+thread pays its largest dividend, because the subject's famous numbers are
+algebraic — a Bell pair's entropy is $\ln 2$ and the quantum ceiling on the CHSH
+game is $2\sqrt2$, both verified in symbols beside their floating-point
+measurements. No physics background is assumed; everything used was built in
+Chapters III, VI and VII.
+
 ## How to read it
 
 In order, ideally. The chapters depend on each other: Chapter V asks what the
@@ -97,7 +106,9 @@ algorithms of Chapters I and II actually cost, Chapter VIII is written in the
 index notation of Chapter VII, and the Epilogue only makes sense once all five
 factorizations are in hand. That said, Chapters VI and VIII are more independent
 than the rest, and a reader who already knows the fundamentals can start at
-Chapter IV without much pain.
+Chapter IV without much pain. Chapter IX needs Chapter III's spectral theory and
+Chapter VII's index notation, but nothing from Chapter VIII — it can be read
+directly after the Epilogue, or instead of it.
 
 Every notebook runs in the browser: the launch buttons at the top of each page
 open it on Binder or in Colab, with nothing to install. The reference solutions
